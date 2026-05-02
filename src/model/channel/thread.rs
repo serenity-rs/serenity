@@ -51,7 +51,7 @@ impl ThreadId {
             }
         }
 
-        let channel: Channel = cache_http.http().get_channel(self.widen()).await?;
+        let channel: Channel = cache_http.http().get_channel(self.0).await?;
         let guild_thread = channel.thread().ok_or(ModelError::InvalidChannelType)?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
@@ -75,7 +75,7 @@ impl ThreadId {
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn get_thread_members(self, http: &Http) -> Result<Vec<ThreadMember>> {
-        http.get_channel_thread_members(self).await
+        http.get_channel_thread_members(self.0).await
     }
 
     /// Joins the thread, if this channel is a thread.
@@ -84,7 +84,7 @@ impl ThreadId {
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn join_thread(self, http: &Http) -> Result<()> {
-        http.join_thread_channel(self).await
+        http.join_thread_channel(self.0).await
     }
 
     /// Edits the thread.
@@ -102,7 +102,7 @@ impl ThreadId {
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn leave_thread(self, http: &Http) -> Result<()> {
-        http.leave_thread_channel(self).await
+        http.leave_thread_channel(self.0).await
     }
 
     /// Adds a thread member, if this channel is a thread.
@@ -111,7 +111,7 @@ impl ThreadId {
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn add_thread_member(self, http: &Http, user_id: UserId) -> Result<()> {
-        http.add_thread_channel_member(self, user_id).await
+        http.add_thread_channel_member(self.0, user_id.0).await
     }
 
     /// Removes a thread member, if this channel is a thread.
@@ -120,7 +120,7 @@ impl ThreadId {
     ///
     /// It may return an [`Error::Http`] if the channel is not a thread channel
     pub async fn remove_thread_member(self, http: &Http, user_id: UserId) -> Result<()> {
-        http.remove_thread_channel_member(self, user_id).await
+        http.remove_thread_channel_member(self.0, user_id.0).await
     }
 
     /// Gets a thread member, if this channel is a thread.
@@ -136,7 +136,7 @@ impl ThreadId {
         user_id: UserId,
         with_member: bool,
     ) -> Result<ThreadMember> {
-        http.get_thread_channel_member(self, user_id, with_member).await
+        http.get_thread_channel_member(self.0, user_id.0, with_member).await
     }
 }
 

@@ -42,6 +42,8 @@ pub use time::error::Parse as InnerError;
 #[cfg(not(feature = "chrono"))]
 use time::{Duration, OffsetDateTime, format_description::well_known::Rfc3339, serde::rfc3339};
 
+use crate::model::id::Snowflake;
+
 /// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
 const DISCORD_EPOCH: u64 = 1_420_070_400_000;
 // `(u64::MAX >> 22) + DISCORD_EPOCH` = 5818116911103 = "Wed May 15 2154 07:35:11 GMT+0000"
@@ -74,10 +76,10 @@ impl Timestamp {
         x.map(Self).ok_or(InvalidTimestamp)
     }
 
-    pub(crate) fn from_discord_id(id: u64) -> Self {
+    pub(crate) fn from_snowflake(id: Snowflake) -> Self {
         // This can't fail because of the bit shifting
         // `(u64::MAX >> 22) + DISCORD_EPOCH` = 5818116911103 = "Wed May 15 2154 07:35:11 GMT+0000"
-        Self::from_millis(((id >> 22) + DISCORD_EPOCH) as i64).expect("can't fail")
+        Self::from_millis(((id.get() >> 22) + DISCORD_EPOCH) as i64).expect("can't fail")
     }
 
     /// Create a new `Timestamp` with the current date and time in UTC.
@@ -156,13 +158,13 @@ impl Timestamp {
             .expect("as the OffsetDateTime is always parsed from rfc3339, this should never fail");
     }
 
-    pub(crate) fn try_as_discord_id(self) -> Result<u64, TimestampOutOfRange> {
+    pub(crate) fn try_as_snowflake(self) -> Result<Snowflake, TimestampOutOfRange> {
         let unix_millis = TryInto::<u64>::try_into(self.unix_timestamp_millis())
             .map_err(|_| TimestampOutOfRange)?;
         if !(DISCORD_EPOCH..=MAX_DISCORD_ID_MILLIS).contains(&unix_millis) {
             return Err(TimestampOutOfRange);
         }
-        Ok((unix_millis - DISCORD_EPOCH) << 22)
+        Ok(Snowflake::new((unix_millis - DISCORD_EPOCH) << 22))
     }
 }
 
@@ -280,23 +282,23 @@ mod tests {
     }
 
     #[test]
-    fn test_try_as_discord_id() {
+    fn test_try_as_snowflake() {
         // https://docs.discord.com/developers/reference#convert-snowflake-to-datetime
         let timestamp = Timestamp::from_millis(1462015105796).unwrap();
-        let as_discord_id = timestamp.try_as_discord_id().unwrap();
+        let as_discord_id = timestamp.try_as_snowflake().unwrap();
         assert_eq!(as_discord_id, 175928847298985984);
 
         let too_early = Timestamp::from_millis((DISCORD_EPOCH - 1) as i64).unwrap();
-        let result = too_early.try_as_discord_id();
+        let result = too_early.try_as_snowflake();
         assert!(matches!(result, Err(TimestampOutOfRange)));
 
         let too_late = Timestamp::from_millis((MAX_DISCORD_ID_MILLIS + 1) as i64).unwrap();
-        let result = too_late.try_as_discord_id();
+        let result = too_late.try_as_snowflake();
         assert!(matches!(result, Err(TimestampOutOfRange)));
 
         // The Discord epoch itself should be a valid conversion, and should produce an id of 0.
         let just_right = Timestamp::from_millis(DISCORD_EPOCH as i64).unwrap();
-        let zero = just_right.try_as_discord_id().unwrap();
+        let zero = just_right.try_as_snowflake().unwrap();
         assert_eq!(zero, 0);
     }
 }

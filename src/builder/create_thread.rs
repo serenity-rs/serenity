@@ -108,9 +108,10 @@ impl<'a> CreateThread<'a> {
     ) -> Result<GuildThread> {
         match message_id {
             Some(id) => {
-                http.create_thread_from_message(channel_id, id, &self, self.audit_log_reason).await
+                http.create_thread_from_message(channel_id.0, id.0, &self, self.audit_log_reason)
+                    .await
             },
-            None => http.create_thread(channel_id, &self, self.audit_log_reason).await,
+            None => http.create_thread(channel_id.0, &self, self.audit_log_reason).await,
         }
     }
 }

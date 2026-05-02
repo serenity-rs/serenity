@@ -172,8 +172,8 @@ impl<'a> EditCommand<'a> {
         guild_id: Option<GuildId>,
     ) -> Result<Command> {
         match guild_id {
-            Some(guild_id) => http.edit_guild_command(guild_id, command_id, &self).await,
-            None => http.edit_global_command(command_id, &self).await,
+            Some(guild_id) => http.edit_guild_command(guild_id.0, command_id.0, &self).await,
+            None => http.edit_global_command(command_id.0, &self).await,
         }
     }
 }

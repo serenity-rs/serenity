@@ -3,6 +3,7 @@
 use std::borrow::Cow;
 use std::cell::Cell;
 use std::collections::HashMap;
+use std::hash::Hash;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use arrayvec::ArrayVec;
@@ -24,14 +25,7 @@ use super::multipart::{Multipart, MultipartUpload};
 use super::ratelimiting::Ratelimiter;
 use super::request::Request;
 use super::routing::Route;
-use super::{
-    ErrorResponse,
-    GuildPagination,
-    HttpError,
-    LightMethod,
-    MessagePagination,
-    UserPagination,
-};
+use super::{ErrorResponse, HttpError, LightMethod, MessagePagination, Pagination};
 use crate::builder::{AttachmentData, CreateAllowedMentions};
 use crate::constants;
 use crate::model::prelude::*;
@@ -84,7 +78,7 @@ pub struct HttpBuilder {
     ratelimiter_disabled: bool,
     token: Option<Token>,
     proxy: Option<FixedString<u16>>,
-    application_id: Option<ApplicationId>,
+    application_id: Option<Snowflake>,
     default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
 }
 
@@ -119,7 +113,7 @@ impl HttpBuilder {
     }
 
     /// Sets the application_id to use interactions.
-    pub fn application_id(mut self, application_id: ApplicationId) -> Self {
+    pub fn application_id(mut self, application_id: Snowflake) -> Self {
         self.application_id = Some(application_id);
         self
     }
@@ -193,8 +187,7 @@ impl HttpBuilder {
     /// Use the given configuration to build the `Http` client.
     #[must_use]
     pub fn build(self) -> Http {
-        let application_id =
-            AtomicU64::new(self.application_id.map_or(u64::MAX, ApplicationId::get));
+        let application_id = AtomicU64::new(self.application_id.map_or(u64::MAX, Snowflake::get));
 
         let client = self.client.unwrap_or_else(|| {
             let builder = configure_client_backend(Client::builder());
@@ -261,16 +254,16 @@ impl Http {
         HttpBuilder::without_token().build()
     }
 
-    pub fn application_id(&self) -> Option<ApplicationId> {
+    pub fn application_id(&self) -> Option<Snowflake> {
         let application_id = self.application_id.load(Ordering::Acquire);
-        if application_id == u64::MAX { None } else { Some(ApplicationId::new(application_id)) }
+        if application_id == u64::MAX { None } else { Some(Snowflake::new(application_id)) }
     }
 
-    fn try_application_id(&self) -> Result<ApplicationId> {
+    fn try_application_id(&self) -> Result<Snowflake> {
         self.application_id().ok_or_else(|| HttpError::ApplicationIdMissing.into())
     }
 
-    pub fn set_application_id(&self, application_id: ApplicationId) {
+    pub fn set_application_id(&self, application_id: Snowflake) {
         self.application_id.store(application_id.get(), Ordering::Release);
     }
 
@@ -279,8 +272,8 @@ impl Http {
     /// Returns the created [`Member`] object, or nothing if the user is already a guild member.
     pub async fn add_guild_member<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<Option<T>> {
         let response = self
@@ -303,9 +296,9 @@ impl Http {
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
     pub async fn add_member_role(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
-        role_id: RoleId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
+        role_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -330,8 +323,8 @@ impl Http {
     /// `604800` seconds (or 7 days) worth of messages may be deleted.
     pub async fn ban_user(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
         delete_message_seconds: u32,
         reason: Option<&str>,
     ) -> Result<()> {
@@ -355,7 +348,7 @@ impl Http {
     /// for more information.
     pub async fn bulk_ban_users<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         reason: Option<&str>,
     ) -> Result<T> {
@@ -373,7 +366,7 @@ impl Http {
     }
 
     /// Broadcasts that the current user is typing in the given [`Channel`].
-    pub async fn broadcast_typing(&self, channel_id: GenericChannelId) -> Result<()> {
+    pub async fn broadcast_typing(&self, channel_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -390,7 +383,7 @@ impl Http {
     /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
     pub async fn create_channel<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -427,8 +420,8 @@ impl Http {
     /// Creates a thread channel in the [`GuildChannel`] given its Id, with a base message Id.
     pub async fn create_thread_from_message<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -449,7 +442,7 @@ impl Http {
     /// Creates a thread channel not attached to a message in the [`GuildChannel`] given its Id.
     pub async fn create_thread<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -469,7 +462,7 @@ impl Http {
     /// Creates a forum post channel in the [`GuildChannel`] given its Id.
     pub async fn create_forum_post<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         files: Vec<AttachmentData<'_>>,
         audit_log_reason: Option<&str>,
@@ -494,7 +487,7 @@ impl Http {
     /// Creates an emoji in the given [`Guild`] with the given data.
     pub async fn create_emoji<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -606,7 +599,7 @@ impl Http {
     /// Creates new guild application commands.
     pub async fn create_guild_commands<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -647,7 +640,7 @@ impl Http {
     /// New guild commands will be available in the guild immediately.
     pub async fn create_guild_command<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -667,8 +660,8 @@ impl Http {
     /// Creates an [`Integration`] for a [`Guild`].
     pub async fn create_guild_integration(
         &self,
-        guild_id: GuildId,
-        integration_id: IntegrationId,
+        guild_id: Snowflake,
+        integration_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -689,7 +682,7 @@ impl Http {
     /// Creates a response to an [`Interaction`] from the gateway.
     pub async fn create_interaction_response(
         &self,
-        interaction_id: InteractionId,
+        interaction_id: Snowflake,
         interaction_token: &str,
         map: &impl Serialize,
         files: Vec<AttachmentData<'_>>,
@@ -722,7 +715,7 @@ impl Http {
     /// Creates an [`Invite`] for the given [channel][`GuildChannel`].
     pub async fn create_invite<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -742,8 +735,8 @@ impl Http {
     /// Creates a permission override for a member or a role in a channel.
     pub async fn create_permission(
         &self,
-        channel_id: ChannelId,
-        target_id: TargetId,
+        channel_id: Snowflake,
+        target_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -780,8 +773,8 @@ impl Http {
     /// Reacts to a message.
     pub async fn create_reaction(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
@@ -802,7 +795,7 @@ impl Http {
     /// Creates a role.
     pub async fn create_role<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -829,7 +822,7 @@ impl Http {
     /// Creates a Guild Scheduled Event.
     pub async fn create_scheduled_event<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -849,7 +842,7 @@ impl Http {
     /// Creates a sticker.
     pub async fn create_sticker<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
         file: AttachmentData<'_>,
         audit_log_reason: Option<&str>,
@@ -894,7 +887,7 @@ impl Http {
     /// Creates a webhook for the given [`GuildChannel`]'s Id, passing in the given data.
     pub async fn create_webhook<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -914,7 +907,7 @@ impl Http {
     /// Deletes a private channel or a channel in a guild.
     pub async fn delete_channel<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
+        channel_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
         self.fire(Request {
@@ -933,7 +926,7 @@ impl Http {
     /// Deletes a stage instance.
     pub async fn delete_stage_instance(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -952,8 +945,8 @@ impl Http {
     /// Deletes an emoji from a guild.
     pub async fn delete_emoji(
         &self,
-        guild_id: GuildId,
-        emoji_id: EmojiId,
+        guild_id: Snowflake,
+        emoji_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -971,7 +964,7 @@ impl Http {
     }
 
     /// Deletes an application emoji.
-    pub async fn delete_application_emoji(&self, emoji_id: EmojiId) -> Result<()> {
+    pub async fn delete_application_emoji(&self, emoji_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -990,7 +983,7 @@ impl Http {
     pub async fn delete_followup_message(
         &self,
         interaction_token: &str,
-        message_id: MessageId,
+        message_id: Snowflake,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -1008,7 +1001,7 @@ impl Http {
     }
 
     /// Deletes a global command.
-    pub async fn delete_global_command(&self, command_id: CommandId) -> Result<()> {
+    pub async fn delete_global_command(&self, command_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -1024,7 +1017,7 @@ impl Http {
     }
 
     /// Deletes a guild, only if connected account owns it.
-    pub async fn delete_guild(&self, guild_id: GuildId) -> Result<()> {
+    pub async fn delete_guild(&self, guild_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -1041,8 +1034,8 @@ impl Http {
     /// Deletes a guild command.
     pub async fn delete_guild_command(
         &self,
-        guild_id: GuildId,
-        command_id: CommandId,
+        guild_id: Snowflake,
+        command_id: Snowflake,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -1062,8 +1055,8 @@ impl Http {
     /// Removes an integration from a guild.
     pub async fn delete_guild_integration(
         &self,
-        guild_id: GuildId,
-        integration_id: IntegrationId,
+        guild_id: Snowflake,
+        integration_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -1102,8 +1095,8 @@ impl Http {
     /// Deletes a message if created by us or we have specific permissions.
     pub async fn delete_message(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -1123,7 +1116,7 @@ impl Http {
     /// Deletes a bunch of messages, only works for bots.
     pub async fn delete_messages(
         &self,
-        channel_id: GenericChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -1143,8 +1136,8 @@ impl Http {
     /// Deletes all of the [`Reaction`]s associated with a [`Message`].
     pub async fn delete_message_reactions(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -1163,8 +1156,8 @@ impl Http {
     /// Deletes all the reactions for a given emoji on a message.
     pub async fn delete_message_reaction_emoji(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
@@ -1204,8 +1197,8 @@ impl Http {
     /// Deletes a permission override from a role or a member in a channel.
     pub async fn delete_permission(
         &self,
-        channel_id: ChannelId,
-        target_id: TargetId,
+        channel_id: Snowflake,
+        target_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -1225,9 +1218,9 @@ impl Http {
     /// Deletes a user's reaction from a message.
     pub async fn delete_reaction(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
-        user_id: UserId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
+        user_id: Snowflake,
         reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
@@ -1249,8 +1242,8 @@ impl Http {
     /// Deletes a reaction by the current user from a message.
     pub async fn delete_reaction_me(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         reaction: &str,
     ) -> Result<()> {
         self.wind(Request {
@@ -1271,8 +1264,8 @@ impl Http {
     /// Deletes a role from a server. Can't remove the default everyone role.
     pub async fn delete_role(
         &self,
-        guild_id: GuildId,
-        role_id: RoleId,
+        guild_id: Snowflake,
+        role_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -1292,8 +1285,8 @@ impl Http {
     /// Deletes a [Scheduled Event] from a server.
     pub async fn delete_scheduled_event(
         &self,
-        guild_id: GuildId,
-        event_id: ScheduledEventId,
+        guild_id: Snowflake,
+        event_id: Snowflake,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -1312,8 +1305,8 @@ impl Http {
     /// Deletes a sticker from a server.
     pub async fn delete_sticker(
         &self,
-        guild_id: GuildId,
-        sticker_id: StickerId,
+        guild_id: Snowflake,
+        sticker_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -1332,7 +1325,7 @@ impl Http {
 
     /// Deletes a currently active test entitlement. Discord will act as though the corresponding
     /// user/guild *no longer has* an entitlement to the corresponding SKU.
-    pub async fn delete_test_entitlement(&self, entitlement_id: EntitlementId) -> Result<()> {
+    pub async fn delete_test_entitlement(&self, entitlement_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -1350,7 +1343,7 @@ impl Http {
     /// Deletes a [`Webhook`] given its Id.
     pub async fn delete_webhook(
         &self,
-        webhook_id: WebhookId,
+        webhook_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -1371,7 +1364,7 @@ impl Http {
     /// This method does _not_ require authentication.
     pub async fn delete_webhook_with_token(
         &self,
-        webhook_id: WebhookId,
+        webhook_id: Snowflake,
         token: &str,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -1392,7 +1385,7 @@ impl Http {
     /// Changes channel information.
     pub async fn edit_channel<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1412,7 +1405,7 @@ impl Http {
     /// Edits a stage instance.
     pub async fn edit_stage_instance<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1432,8 +1425,8 @@ impl Http {
     /// Changes guild emoji information.
     pub async fn edit_emoji<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        emoji_id: EmojiId,
+        guild_id: Snowflake,
+        emoji_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1458,7 +1451,7 @@ impl Http {
     /// [`Context::edit_application_emoji`]: crate::gateway::client::Context::edit_application_emoji
     pub async fn edit_application_emoji<T: DeserializeOwned>(
         &self,
-        emoji_id: EmojiId,
+        emoji_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -1479,7 +1472,7 @@ impl Http {
     pub async fn edit_followup_message<T: DeserializeOwned>(
         &self,
         interaction_token: &str,
-        message_id: MessageId,
+        message_id: Snowflake,
         map: &impl Serialize,
         new_attachments: Vec<AttachmentData<'_>>,
     ) -> Result<T> {
@@ -1513,7 +1506,7 @@ impl Http {
     pub async fn get_followup_message<T: DeserializeOwned>(
         &self,
         interaction_token: &str,
-        message_id: MessageId,
+        message_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -1533,7 +1526,7 @@ impl Http {
     /// Edits a global command.
     pub async fn edit_global_command<T: DeserializeOwned>(
         &self,
-        command_id: CommandId,
+        command_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -1553,7 +1546,7 @@ impl Http {
     /// Changes guild information.
     pub async fn edit_guild<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1573,8 +1566,8 @@ impl Http {
     /// Edits a guild command.
     pub async fn edit_guild_command<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        command_id: CommandId,
+        guild_id: Snowflake,
+        command_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -1595,8 +1588,8 @@ impl Http {
     /// Edits a guild command permissions.
     pub async fn edit_guild_command_permissions<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        command_id: CommandId,
+        guild_id: Snowflake,
+        command_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -1617,7 +1610,7 @@ impl Http {
     /// Edits the positions of a guild's channels.
     pub async fn edit_guild_channel_positions(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         value: impl Iterator<Item: Serialize>,
     ) -> Result<()> {
         let body = to_vec(&SerializeIter::new(value))?;
@@ -1638,7 +1631,7 @@ impl Http {
     /// Edits the MFA level of a guild. Requires guild ownership.
     pub async fn edit_guild_mfa_level<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1664,7 +1657,7 @@ impl Http {
     /// Edits a [`Guild`]'s widget.
     pub async fn edit_guild_widget<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1684,7 +1677,7 @@ impl Http {
     /// Edits a guild welcome screen.
     pub async fn edit_guild_welcome_screen<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1704,8 +1697,8 @@ impl Http {
     /// Does specific actions to a member.
     pub async fn edit_member<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1735,8 +1728,8 @@ impl Http {
     /// **Note**: Only the author of a message can modify it.
     pub async fn edit_message<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         map: &impl Serialize,
         new_attachments: Vec<AttachmentData<'_>>,
     ) -> Result<T> {
@@ -1770,8 +1763,8 @@ impl Http {
     /// **Note**: Only available on news channels.
     pub async fn crosspost_message<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -1790,7 +1783,7 @@ impl Http {
     /// Edits the current member for the provided [`Guild`] via its Id.
     pub async fn edit_current_member<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1810,7 +1803,7 @@ impl Http {
     /// Follow a News Channel to send messages to a target channel.
     pub async fn follow_news_channel<T: DeserializeOwned>(
         &self,
-        news_channel_id: ChannelId,
+        news_channel_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -1893,8 +1886,8 @@ impl Http {
     /// Changes a role in a guild.
     pub async fn edit_role<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        role_id: RoleId,
+        guild_id: Snowflake,
+        role_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1922,7 +1915,7 @@ impl Http {
     /// Changes the positions of roles in a guild.
     pub async fn edit_role_positions<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         positions: impl Iterator<Item: Serialize>,
         audit_log_reason: Option<&str>,
     ) -> Result<Vec<T>> {
@@ -1959,8 +1952,8 @@ impl Http {
     /// [Manage Events]: Permissions::MANAGE_EVENTS
     pub async fn edit_scheduled_event<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        event_id: ScheduledEventId,
+        guild_id: Snowflake,
+        event_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -1983,8 +1976,8 @@ impl Http {
     /// See [`GuildId::edit_sticker`] for permissions requirements.
     pub async fn edit_sticker<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        sticker_id: StickerId,
+        guild_id: Snowflake,
+        sticker_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -2012,8 +2005,8 @@ impl Http {
     /// Changes another user's voice state in a stage channel.
     pub async fn edit_voice_state(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<()> {
         self.wind(Request {
@@ -2031,7 +2024,11 @@ impl Http {
     }
 
     /// Changes the current user's voice state in a stage channel.
-    pub async fn edit_voice_state_me(&self, guild_id: GuildId, map: &impl Serialize) -> Result<()> {
+    pub async fn edit_voice_state_me(
+        &self,
+        guild_id: Snowflake,
+        map: &impl Serialize,
+    ) -> Result<()> {
         self.wind(Request {
             body: Some(to_vec(map)?),
             multipart: None,
@@ -2048,7 +2045,7 @@ impl Http {
     /// Changes a voice channel's status.
     pub async fn edit_voice_status(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
@@ -2068,7 +2065,7 @@ impl Http {
     /// Edits a the webhook with the given data.
     pub async fn edit_webhook<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
+        webhook_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -2088,7 +2085,7 @@ impl Http {
     /// Edits the webhook with the given data.
     pub async fn edit_webhook_with_token<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
+        webhook_id: Snowflake,
         token: &str,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
@@ -2110,8 +2107,8 @@ impl Http {
     /// Executes a webhook, posting a [`Message`] in the webhook's associated [`Channel`].
     pub async fn execute_webhook<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
-        thread_id: Option<ThreadId>,
+        webhook_id: Snowflake,
+        thread_id: Option<Snowflake>,
         token: &str,
         wait: bool,
         files: Vec<AttachmentData<'_>>,
@@ -2128,8 +2125,8 @@ impl Http {
     /// [Discord docs]: https://docs.discord.com/developers/resources/webhook#execute-webhook-query-string-params
     pub async fn execute_webhook_with_components<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
-        thread_id: Option<ThreadId>,
+        webhook_id: Snowflake,
+        thread_id: Option<Snowflake>,
         token: &str,
         wait: bool,
         files: Vec<AttachmentData<'_>>,
@@ -2141,8 +2138,8 @@ impl Http {
     #[expect(clippy::too_many_arguments)]
     async fn execute_webhook_<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
-        thread_id: Option<ThreadId>,
+        webhook_id: Snowflake,
+        thread_id: Option<Snowflake>,
         token: &str,
         wait: bool,
         files: Vec<AttachmentData<'_>>,
@@ -2194,10 +2191,10 @@ impl Http {
     // Gets a webhook's message by Id
     pub async fn get_webhook_message<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
-        thread_id: Option<ThreadId>,
+        webhook_id: Snowflake,
+        thread_id: Option<Snowflake>,
         token: &str,
-        message_id: MessageId,
+        message_id: Snowflake,
     ) -> Result<T> {
         let thread_id_str;
         let mut params = None;
@@ -2225,10 +2222,10 @@ impl Http {
     /// Edits a webhook's message by Id.
     pub async fn edit_webhook_message<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
-        thread_id: Option<ThreadId>,
+        webhook_id: Snowflake,
+        thread_id: Option<Snowflake>,
         token: &str,
-        message_id: MessageId,
+        message_id: Snowflake,
         map: &impl Serialize,
         new_attachments: Vec<AttachmentData<'_>>,
     ) -> Result<T> {
@@ -2269,10 +2266,10 @@ impl Http {
     /// Deletes a webhook's message by Id.
     pub async fn delete_webhook_message(
         &self,
-        webhook_id: WebhookId,
-        thread_id: Option<ThreadId>,
+        webhook_id: Snowflake,
+        thread_id: Option<Snowflake>,
         token: &str,
-        message_id: MessageId,
+        message_id: Snowflake,
     ) -> Result<()> {
         let thread_id_str;
         let mut params = None;
@@ -2328,12 +2325,10 @@ impl Http {
     ///
     /// If `target` is set, then users will be filtered by Id, such that their Id comes before or
     /// after the provided [`UserId`] wrapped by the [`UserPagination`].
-    ///
-    /// [`UserId`]: crate::model::id::UserId
     pub async fn get_bans<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        target: Option<UserPagination>,
+        guild_id: Snowflake,
+        target: Option<Pagination>,
         limit: Option<NonMaxU16>,
     ) -> Result<Vec<T>> {
         let id_str;
@@ -2347,8 +2342,8 @@ impl Http {
 
         if let Some(target) = target {
             let (name, id) = match target {
-                UserPagination::After(id) => ("after", id),
-                UserPagination::Before(id) => ("before", id),
+                Pagination::After(id) => ("after", id),
+                Pagination::Before(id) => ("before", id),
             };
 
             id_str = id.to_arraystring();
@@ -2380,8 +2375,8 @@ impl Http {
     /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn get_ban<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
     ) -> Result<Option<T>> {
         let result = self
             .fire(Request {
@@ -2409,11 +2404,11 @@ impl Http {
     /// Gets all audit logs in a specific guild.
     pub async fn get_audit_logs<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         action_type: Option<u16>,
-        user_id: Option<UserId>,
-        before: Option<AuditLogEntryId>,
-        after: Option<AuditLogEntryId>,
+        user_id: Option<Snowflake>,
+        before: Option<Snowflake>,
+        after: Option<Snowflake>,
         limit: Option<NonMaxU8>,
     ) -> Result<T> {
         let (action_type_str, before_str, after_str, limit_str, user_id_str);
@@ -2455,7 +2450,7 @@ impl Http {
     /// Retrieves all auto moderation rules in a guild.
     pub async fn get_automod_rules<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -2473,8 +2468,8 @@ impl Http {
     /// Retrieves an auto moderation rule in a guild.
     pub async fn get_automod_rule<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        rule_id: RuleId,
+        guild_id: Snowflake,
+        rule_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -2493,7 +2488,7 @@ impl Http {
     /// Creates an auto moderation rule in a guild.
     pub async fn create_automod_rule<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -2513,8 +2508,8 @@ impl Http {
     /// Retrieves an auto moderation rule in a guild.
     pub async fn edit_automod_rule<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        rule_id: RuleId,
+        guild_id: Snowflake,
+        rule_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -2535,8 +2530,8 @@ impl Http {
     /// Deletes an auto moderation rule in a guild.
     pub async fn delete_automod_rule(
         &self,
-        guild_id: GuildId,
-        rule_id: RuleId,
+        guild_id: Snowflake,
+        rule_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -2569,7 +2564,7 @@ impl Http {
     /// Gets all invites for a channel.
     pub async fn get_channel_invites<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -2587,7 +2582,7 @@ impl Http {
     /// Gets all thread members for a thread.
     pub async fn get_channel_thread_members<T: DeserializeOwned>(
         &self,
-        thread_id: ThreadId,
+        thread_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -2605,7 +2600,7 @@ impl Http {
     /// Gets all active threads from a guild.
     pub async fn get_guild_active_threads<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -2623,7 +2618,7 @@ impl Http {
     /// Gets all archived public threads from a channel.
     pub async fn get_channel_archived_public_threads<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<T> {
@@ -2654,7 +2649,7 @@ impl Http {
     /// Gets all archived private threads from a channel.
     pub async fn get_channel_archived_private_threads<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<T> {
@@ -2685,8 +2680,8 @@ impl Http {
     /// Gets all archived private threads joined from a channel.
     pub async fn get_channel_joined_archived_private_threads<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
-        before: Option<ChannelId>,
+        channel_id: Snowflake,
+        before: Option<Snowflake>,
         limit: Option<u64>,
     ) -> Result<T> {
         let (before_str, limit_str);
@@ -2714,7 +2709,7 @@ impl Http {
     }
 
     /// Joins a thread channel.
-    pub async fn join_thread_channel(&self, thread_id: ThreadId) -> Result<()> {
+    pub async fn join_thread_channel(&self, thread_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -2729,7 +2724,7 @@ impl Http {
     }
 
     /// Leaves a thread channel.
-    pub async fn leave_thread_channel(&self, thread_id: ThreadId) -> Result<()> {
+    pub async fn leave_thread_channel(&self, thread_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -2746,8 +2741,8 @@ impl Http {
     /// Adds a member to a thread channel.
     pub async fn add_thread_channel_member(
         &self,
-        thread_id: ThreadId,
-        user_id: UserId,
+        thread_id: Snowflake,
+        user_id: Snowflake,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -2766,8 +2761,8 @@ impl Http {
     /// Removes a member from a thread channel.
     pub async fn remove_thread_channel_member(
         &self,
-        thread_id: ThreadId,
-        user_id: UserId,
+        thread_id: Snowflake,
+        user_id: Snowflake,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -2785,8 +2780,8 @@ impl Http {
 
     pub async fn get_thread_channel_member<T: DeserializeOwned>(
         &self,
-        thread_id: ThreadId,
-        user_id: UserId,
+        thread_id: Snowflake,
+        user_id: Snowflake,
         with_member: bool,
     ) -> Result<T> {
         self.fire(Request {
@@ -2806,7 +2801,7 @@ impl Http {
     /// Retrieves the webhooks for the given [channel][`GuildChannel`]'s Id.
     pub async fn get_channel_webhooks<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -2822,10 +2817,7 @@ impl Http {
     }
 
     /// Gets channel information.
-    pub async fn get_channel<T: DeserializeOwned>(
-        &self,
-        channel_id: GenericChannelId,
-    ) -> Result<T> {
+    pub async fn get_channel<T: DeserializeOwned>(&self, channel_id: Snowflake) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2840,10 +2832,11 @@ impl Http {
     }
 
     /// Gets all channels in a guild.
-    pub async fn get_channels<T: DeserializeOwned + ExtractKey<ChannelId>>(
-        &self,
-        guild_id: GuildId,
-    ) -> Result<ExtractMap<ChannelId, T>> {
+    pub async fn get_channels<T, Id>(&self, guild_id: Snowflake) -> Result<ExtractMap<Id, T>>
+    where
+        T: DeserializeOwned + ExtractKey<Id>,
+        Id: Hash + Eq,
+    {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2860,7 +2853,7 @@ impl Http {
     /// Gets a stage instance.
     pub async fn get_stage_instance<T: DeserializeOwned>(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -2878,10 +2871,10 @@ impl Http {
     /// Get a list of users that voted for this specific answer.
     pub async fn get_poll_answer_voters<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
-        answer_id: AnswerId,
-        after: Option<UserId>,
+        channel_id: Snowflake,
+        message_id: Snowflake,
+        answer_id: u8,
+        after: Option<Snowflake>,
         limit: Option<u8>,
     ) -> Result<Vec<T>> {
         let (after_str, limit_str);
@@ -2919,8 +2912,8 @@ impl Http {
 
     pub async fn expire_poll<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -2965,7 +2958,7 @@ impl Http {
     }
 
     /// Gets all emojis of a guild.
-    pub async fn get_emojis<T: DeserializeOwned>(&self, guild_id: GuildId) -> Result<Vec<T>> {
+    pub async fn get_emojis<T: DeserializeOwned>(&self, guild_id: Snowflake) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -2982,8 +2975,8 @@ impl Http {
     /// Gets information about an emoji in a guild.
     pub async fn get_emoji<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        emoji_id: EmojiId,
+        guild_id: Snowflake,
+        emoji_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -3021,7 +3014,10 @@ impl Http {
     }
 
     /// Gets information about an application emoji.
-    pub async fn get_application_emoji<T: DeserializeOwned>(&self, emoji_id: EmojiId) -> Result<T> {
+    pub async fn get_application_emoji<T: DeserializeOwned>(
+        &self,
+        emoji_id: Snowflake,
+    ) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3043,7 +3039,7 @@ impl Http {
     /// [`Self::get_entitlements`].
     ///
     /// [`Consumable`]: SkuKind::Consumable
-    pub async fn consume_entitlement(&self, entitlement_id: EntitlementId) -> Result<()> {
+    pub async fn consume_entitlement(&self, entitlement_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -3062,12 +3058,12 @@ impl Http {
     /// Gets all entitlements for the current app, active and expired.
     pub async fn get_entitlements<T: DeserializeOwned>(
         &self,
-        user_id: Option<UserId>,
-        sku_ids: Option<&[SkuId]>,
-        before: Option<EntitlementId>,
-        after: Option<EntitlementId>,
+        user_id: Option<Snowflake>,
+        sku_ids: Option<&[Snowflake]>,
+        before: Option<Snowflake>,
+        after: Option<Snowflake>,
         limit: Option<NonMaxU8>,
-        guild_id: Option<GuildId>,
+        guild_id: Option<Snowflake>,
         exclude_ended: Option<bool>,
     ) -> Result<Vec<T>> {
         let (user_id_str, sku_ids_str, before_str, after_str, limit_str, guild_id_str, exclude_str);
@@ -3162,7 +3158,7 @@ impl Http {
     /// Fetches a global commands for your application by its Id.
     pub async fn get_global_command<T: DeserializeOwned>(
         &self,
-        command_id: CommandId,
+        command_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -3179,7 +3175,7 @@ impl Http {
     }
 
     /// Gets guild information.
-    pub async fn get_guild<T: DeserializeOwned>(&self, guild_id: GuildId) -> Result<T> {
+    pub async fn get_guild<T: DeserializeOwned>(&self, guild_id: Snowflake) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3194,7 +3190,10 @@ impl Http {
     }
 
     /// Gets guild information with counts.
-    pub async fn get_guild_with_counts<T: DeserializeOwned>(&self, guild_id: GuildId) -> Result<T> {
+    pub async fn get_guild_with_counts<T: DeserializeOwned>(
+        &self,
+        guild_id: Snowflake,
+    ) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3211,7 +3210,7 @@ impl Http {
     /// Fetches all of the guild commands for your application for a specific guild.
     pub async fn get_guild_commands<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -3231,7 +3230,7 @@ impl Http {
     /// guild.
     pub async fn get_guild_commands_with_localizations<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -3250,8 +3249,8 @@ impl Http {
     /// Fetches a guild command by its Id.
     pub async fn get_guild_command<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        command_id: CommandId,
+        guild_id: Snowflake,
+        command_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -3271,7 +3270,7 @@ impl Http {
     /// Fetches all of the guild commands permissions for your application for a specific guild.
     pub async fn get_guild_commands_permissions<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -3290,8 +3289,8 @@ impl Http {
     /// Gives the guild command permission for your application for a specific guild.
     pub async fn get_guild_command_permissions<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        command_id: CommandId,
+        guild_id: Snowflake,
+        command_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -3309,7 +3308,7 @@ impl Http {
     }
 
     /// Gets a guild widget information.
-    pub async fn get_guild_widget<T: DeserializeOwned>(&self, guild_id: GuildId) -> Result<T> {
+    pub async fn get_guild_widget<T: DeserializeOwned>(&self, guild_id: Snowflake) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3324,7 +3323,7 @@ impl Http {
     }
 
     /// Gets a guild preview.
-    pub async fn get_guild_preview<T: DeserializeOwned>(&self, guild_id: GuildId) -> Result<T> {
+    pub async fn get_guild_preview<T: DeserializeOwned>(&self, guild_id: Snowflake) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3341,7 +3340,7 @@ impl Http {
     /// Gets a guild welcome screen information.
     pub async fn get_guild_welcome_screen<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -3359,7 +3358,7 @@ impl Http {
     /// Gets integrations that a guild has.
     pub async fn get_guild_integrations<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -3377,7 +3376,7 @@ impl Http {
     /// Gets all invites to a guild.
     pub async fn get_guild_invites<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -3393,7 +3392,10 @@ impl Http {
     }
 
     /// Gets a guild's vanity URL if it has one.
-    pub async fn get_guild_vanity_url<T: DeserializeOwned>(&self, guild_id: GuildId) -> Result<T> {
+    pub async fn get_guild_vanity_url<T: DeserializeOwned>(
+        &self,
+        guild_id: Snowflake,
+    ) -> Result<T> {
         let resp = self
             .fire::<Value>(Request {
                 body: None,
@@ -3417,9 +3419,9 @@ impl Http {
     /// result by.
     pub async fn get_guild_members<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         limit: Option<NonMaxU16>,
-        after: Option<UserId>,
+        after: Option<Snowflake>,
     ) -> Result<Vec<T>> {
         let (limit_str, after_str);
         let mut params = ArrayVec::<_, 2>::new();
@@ -3459,7 +3461,7 @@ impl Http {
     /// Gets the amount of users that can be pruned.
     pub async fn get_guild_prune_count<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         days: u8,
     ) -> Result<T> {
         let days_str = days.to_arraystring();
@@ -3480,7 +3482,7 @@ impl Http {
     /// additional VIP-only regions are returned.
     pub async fn get_guild_regions<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -3498,8 +3500,8 @@ impl Http {
     /// Retrieves a specific role in a [`Guild`].
     pub async fn get_guild_role<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        role_id: RoleId,
+        guild_id: Snowflake,
+        role_id: Snowflake,
     ) -> Result<T> {
         let mut value: Value = self
             .fire(Request {
@@ -3525,8 +3527,8 @@ impl Http {
     /// Retrieves a map of role IDs with total members each. Does not include `everyone` role.
     pub async fn get_guild_role_member_counts(
         &self,
-        guild_id: GuildId,
-    ) -> Result<HashMap<RoleId, u32>> {
+        guild_id: Snowflake,
+    ) -> Result<HashMap<Snowflake, u32>> {
         let value: Value = self
             .fire(Request {
                 body: None,
@@ -3544,10 +3546,11 @@ impl Http {
     }
 
     /// Retrieves a list of roles in a [`Guild`].
-    pub async fn get_guild_roles<T: DeserializeOwned + ExtractKey<RoleId>>(
-        &self,
-        guild_id: GuildId,
-    ) -> Result<ExtractMap<RoleId, T>> {
+    pub async fn get_guild_roles<T, Id>(&self, guild_id: Snowflake) -> Result<ExtractMap<Id, T>>
+    where
+        T: DeserializeOwned + ExtractKey<Id>,
+        Id: Hash + Eq,
+    {
         let mut value: Value = self
             .fire(Request {
                 body: None,
@@ -3575,8 +3578,8 @@ impl Http {
     /// Gets a scheduled event by Id.
     pub async fn get_scheduled_event<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        event_id: ScheduledEventId,
+        guild_id: Snowflake,
+        event_id: Snowflake,
         with_user_count: bool,
     ) -> Result<T> {
         let with_user_count_str = with_user_count.to_arraystring();
@@ -3597,7 +3600,7 @@ impl Http {
     /// Gets a list of all scheduled events for the corresponding guild.
     pub async fn get_scheduled_events<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         with_user_count: bool,
     ) -> Result<Vec<T>> {
         let with_user_count_str = with_user_count.to_arraystring();
@@ -3618,10 +3621,10 @@ impl Http {
     /// options for filtering.
     pub async fn get_scheduled_event_users<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        event_id: ScheduledEventId,
+        guild_id: Snowflake,
+        event_id: Snowflake,
         limit: Option<NonMaxU8>,
-        target: Option<UserPagination>,
+        target: Option<Pagination>,
         with_member: Option<bool>,
     ) -> Result<Vec<T>> {
         let (limit_str, with_member_str, id_str);
@@ -3636,8 +3639,8 @@ impl Http {
         }
         if let Some(target) = target {
             let (name, id) = match target {
-                UserPagination::After(id) => ("after", id),
-                UserPagination::Before(id) => ("before", id),
+                Pagination::After(id) => ("after", id),
+                Pagination::Before(id) => ("before", id),
             };
 
             id_str = id.to_arraystring();
@@ -3661,7 +3664,7 @@ impl Http {
     /// Retrieves a list of stickers in a [`Guild`].
     pub async fn get_guild_stickers<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         let mut value: Value = self
             .fire(Request {
@@ -3690,8 +3693,8 @@ impl Http {
     /// Retrieves a single sticker in a [`Guild`].
     pub async fn get_guild_sticker<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        sticker_id: StickerId,
+        guild_id: Snowflake,
+        sticker_id: Snowflake,
     ) -> Result<T> {
         let mut value: Value = self
             .fire(Request {
@@ -3717,7 +3720,7 @@ impl Http {
     /// Retrieves the webhooks for the given [`Guild`]'s Id.
     pub async fn get_guild_webhooks<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         self.fire(Request {
             body: None,
@@ -3737,7 +3740,7 @@ impl Http {
     /// The `limit` has a maximum value of 200.
     pub async fn get_guilds<T: DeserializeOwned>(
         &self,
-        target: Option<GuildPagination>,
+        target: Option<Pagination>,
         limit: Option<NonMaxU8>,
     ) -> Result<Vec<T>> {
         let (limit_str, id_str);
@@ -3748,8 +3751,8 @@ impl Http {
         }
         if let Some(target) = target {
             let (name, id) = match target {
-                GuildPagination::After(id) => ("after", id),
-                GuildPagination::Before(id) => ("before", id),
+                Pagination::After(id) => ("after", id),
+                Pagination::Before(id) => ("before", id),
             };
 
             id_str = id.to_arraystring();
@@ -3774,7 +3777,7 @@ impl Http {
     /// [`GuildsMembersRead`]: crate::model::application::Scope::GuildsMembersRead
     pub async fn get_current_user_guild_member<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<T> {
         let mut value: Value = self
             .fire(Request {
@@ -3801,7 +3804,7 @@ impl Http {
         &self,
         code: &str,
         member_counts: bool,
-        event_id: Option<ScheduledEventId>,
+        event_id: Option<Snowflake>,
     ) -> Result<T> {
         let (member_counts_str, event_id_str);
         let mut params = ArrayVec::<_, 2>::new();
@@ -3830,8 +3833,8 @@ impl Http {
     /// Gets member of a guild.
     pub async fn get_member<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
     ) -> Result<T> {
         let mut value: Value = self
             .fire(Request {
@@ -3857,8 +3860,8 @@ impl Http {
     /// Gets a message by an Id, bots only.
     pub async fn get_message<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -3877,7 +3880,7 @@ impl Http {
     /// Gets X messages from a channel.
     pub async fn get_messages<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
+        channel_id: Snowflake,
         target: Option<MessagePagination>,
         limit: Option<NonMaxU8>,
     ) -> Result<Vec<T>> {
@@ -3916,7 +3919,7 @@ impl Http {
     /// Retrieves a specific [`StickerPack`] from it's [`StickerPackId`]
     pub async fn get_sticker_pack<T: DeserializeOwned>(
         &self,
-        sticker_pack_id: StickerPackId,
+        sticker_pack_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -3953,7 +3956,7 @@ impl Http {
     /// Gets all pins of a channel.
     pub async fn get_pins<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
+        channel_id: Snowflake,
         before: Option<Timestamp>,
         limit: Option<u8>,
     ) -> Result<T> {
@@ -3986,12 +3989,12 @@ impl Http {
     /// Gets a list of users who reacted with an emoji.
     pub async fn get_reaction_users<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         emoji: &str,
         reaction_type: Option<ReactionTypes>,
         limit: Option<NonMaxU8>,
-        after: Option<UserId>,
+        after: Option<Snowflake>,
     ) -> Result<Vec<T>> {
         let (type_str, limit_str, after_str);
         let mut params = ArrayVec::<_, 3>::new();
@@ -4042,7 +4045,7 @@ impl Http {
     }
 
     /// Gets a sticker.
-    pub async fn get_sticker<T: DeserializeOwned>(&self, sticker_id: StickerId) -> Result<T> {
+    pub async fn get_sticker<T: DeserializeOwned>(&self, sticker_id: Snowflake) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -4103,7 +4106,7 @@ impl Http {
     }
 
     /// Gets a user by Id.
-    pub async fn get_user<T: DeserializeOwned>(&self, user_id: UserId) -> Result<T> {
+    pub async fn get_user<T: DeserializeOwned>(&self, user_id: Snowflake) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -4164,8 +4167,8 @@ impl Http {
     /// Returns the specified user's voice state in the guild.
     pub async fn get_user_voice_state<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -4185,7 +4188,7 @@ impl Http {
     ///
     /// This method requires authentication, whereas [`Http::get_webhook_with_token`] and
     /// [`Http::get_webhook_from_url`] do not.
-    pub async fn get_webhook<T: DeserializeOwned>(&self, webhook_id: WebhookId) -> Result<T> {
+    pub async fn get_webhook<T: DeserializeOwned>(&self, webhook_id: Snowflake) -> Result<T> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -4204,7 +4207,7 @@ impl Http {
     /// This method does _not_ require authentication.
     pub async fn get_webhook_with_token<T: DeserializeOwned>(
         &self,
-        webhook_id: WebhookId,
+        webhook_id: Snowflake,
         token: &str,
     ) -> Result<T> {
         self.fire(Request {
@@ -4246,8 +4249,8 @@ impl Http {
     /// Kicks a member from a guild with a provided reason.
     pub async fn kick_member(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
         reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -4265,7 +4268,7 @@ impl Http {
     }
 
     /// Leaves a guild.
-    pub async fn leave_guild(&self, guild_id: GuildId) -> Result<()> {
+    pub async fn leave_guild(&self, guild_id: Snowflake) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
@@ -4282,7 +4285,7 @@ impl Http {
     /// Sends a message to a channel.
     pub async fn send_message<T: DeserializeOwned>(
         &self,
-        channel_id: GenericChannelId,
+        channel_id: Snowflake,
         files: Vec<AttachmentData<'_>>,
         map: &impl Serialize,
     ) -> Result<T> {
@@ -4313,8 +4316,8 @@ impl Http {
     /// Pins a message in a channel.
     pub async fn pin_message(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -4334,8 +4337,8 @@ impl Http {
     /// Unbans a user from a guild.
     pub async fn remove_ban(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -4355,9 +4358,9 @@ impl Http {
     /// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
     pub async fn remove_member_role(
         &self,
-        guild_id: GuildId,
-        user_id: UserId,
-        role_id: RoleId,
+        guild_id: Snowflake,
+        user_id: Snowflake,
+        role_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -4379,7 +4382,7 @@ impl Http {
     /// provided string.
     pub async fn search_guild_members<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         query: &str,
         limit: Option<NonMaxU16>,
     ) -> Result<Vec<T>> {
@@ -4411,7 +4414,7 @@ impl Http {
     /// Starts removing some members from a guild based on the last time they've been online.
     pub async fn start_guild_prune<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         days: u8,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -4432,8 +4435,8 @@ impl Http {
     /// Starts syncing an integration with a guild.
     pub async fn start_integration_sync(
         &self,
-        guild_id: GuildId,
-        integration_id: IntegrationId,
+        guild_id: Snowflake,
+        integration_id: Snowflake,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
@@ -4456,7 +4459,7 @@ impl Http {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit_guild_incident_actions<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<T> {
         self.fire(Request {
@@ -4475,8 +4478,8 @@ impl Http {
     /// Unpins a message from a channel.
     pub async fn unpin_message(
         &self,
-        channel_id: GenericChannelId,
-        message_id: MessageId,
+        channel_id: Snowflake,
+        message_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
@@ -4496,7 +4499,7 @@ impl Http {
     /// Sends a soundboard sound to a voice channel the user is connected to.
     pub async fn send_soundboard_sound(
         &self,
-        channel_id: ChannelId,
+        channel_id: Snowflake,
         map: &impl Serialize,
     ) -> Result<()> {
         self.wind(Request {
@@ -4528,7 +4531,7 @@ impl Http {
     /// Retrieves soundboard sounds from a guild.
     pub async fn get_guild_soundboards<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
     ) -> Result<Vec<T>> {
         let result = self
             .fire::<Value>(Request {
@@ -4552,8 +4555,8 @@ impl Http {
     /// Retrieves a soundboard sound from a guild.
     pub async fn get_guild_soundboard<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        sound_id: SoundId,
+        guild_id: Snowflake,
+        sound_id: Snowflake,
     ) -> Result<T> {
         self.fire(Request {
             body: None,
@@ -4572,7 +4575,7 @@ impl Http {
     /// Creates a soundboard sound in a guild.
     pub async fn create_guild_soundboard<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
+        guild_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -4592,8 +4595,8 @@ impl Http {
     /// Edits a soundboard sound in a guild.
     pub async fn edit_guild_soundboard<T: DeserializeOwned>(
         &self,
-        guild_id: GuildId,
-        sound_id: SoundId,
+        guild_id: Snowflake,
+        sound_id: Snowflake,
         map: &impl Serialize,
         audit_log_reason: Option<&str>,
     ) -> Result<T> {
@@ -4614,8 +4617,8 @@ impl Http {
     /// Deletes a soundboard sound in a guild.
     pub async fn delete_guild_soundboard(
         &self,
-        guild_id: GuildId,
-        sound_id: SoundId,
+        guild_id: Snowflake,
+        sound_id: Snowflake,
         audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {

@@ -140,7 +140,7 @@ impl Invite {
         member_counts: bool,
         event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
-        http.get_invite(code, member_counts, event_id).await
+        http.get_invite(code, member_counts, event_id.map(|id| id.0)).await
     }
 
     /// Returns a URL to use for the invite.

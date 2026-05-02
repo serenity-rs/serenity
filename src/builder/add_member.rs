@@ -96,6 +96,6 @@ impl<'a> AddMember<'a> {
         guild_id: GuildId,
         user_id: UserId,
     ) -> Result<Option<Member>> {
-        http.add_guild_member(guild_id, user_id, &self).await
+        http.add_guild_member(guild_id.0, user_id.0, &self).await
     }
 }

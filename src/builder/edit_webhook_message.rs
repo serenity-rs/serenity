@@ -187,10 +187,10 @@ impl<'a> EditWebhookMessage<'a> {
         }
 
         http.edit_webhook_message(
-            webhook_id,
-            self.thread_id,
+            webhook_id.0,
+            self.thread_id.map(|id| id.0),
             webhook_token,
-            message_id,
+            message_id.0,
             &self,
             files,
         )

@@ -244,7 +244,7 @@ impl ShardManager {
         .await?;
 
         let cloned_http = Arc::clone(&self.http);
-        shard.set_application_id_callback(move |id| cloned_http.set_application_id(id));
+        shard.set_application_id_callback(move |id| cloned_http.set_application_id(id.0));
 
         let (runner_tx, runner_rx) = mpsc::unbounded();
         let runner_info = Arc::new(RwLock::new(ShardRunnerInfo {

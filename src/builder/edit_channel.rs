@@ -330,7 +330,7 @@ impl<'a> EditChannel<'a> {
             }
 
             http.edit_voice_status(
-                channel_id,
+                channel_id.0,
                 &EditVoiceStatusBody {
                     status,
                 },
@@ -340,7 +340,7 @@ impl<'a> EditChannel<'a> {
         }
 
         let channel: Channel =
-            http.edit_channel(channel_id.widen(), &self, self.audit_log_reason).await?;
+            http.edit_channel(channel_id.0, &self, self.audit_log_reason).await?;
         channel.guild().ok_or(Error::Model(ModelError::InvalidChannelType))
     }
 }

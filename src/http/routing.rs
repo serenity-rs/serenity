@@ -1,10 +1,10 @@
 use std::borrow::Cow;
 
-use crate::model::id::*;
+use crate::model::id::Snowflake;
 
 /// Used to group requests together for ratelimiting.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub struct RatelimitingBucket(Option<(RouteKind, Option<GenericId>)>);
+pub struct RatelimitingBucket(Option<(RouteKind, Option<Snowflake>)>);
 
 impl RatelimitingBucket {
     #[must_use]
@@ -16,7 +16,7 @@ impl RatelimitingBucket {
 enum RatelimitingKind {
     /// Requests with the same path and major parameter (usually an Id) should be grouped together
     /// for ratelimiting.
-    PathAndId(GenericId),
+    PathAndId(Snowflake),
     /// Requests with the same path should be ratelimited together.
     Path,
 }
@@ -89,117 +89,117 @@ macro_rules! routes {
 // 2. The second line provides the url for that endpoint.
 // 3. The third line indicates what type of ratelimiting the endpoint employs.
 routes! ('a, {
-    Channel { channel_id: GenericChannelId },
+    Channel { channel_id: Snowflake },
     api!("/channels/{}", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelInvites { channel_id: ChannelId },
+    ChannelInvites { channel_id: Snowflake },
     api!("/channels/{}/invites", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessage { channel_id: GenericChannelId, message_id: MessageId },
+    ChannelMessage { channel_id: Snowflake, message_id: Snowflake },
     api!("/channels/{}/messages/{}", channel_id, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessageCrosspost { channel_id: ChannelId, message_id: MessageId },
+    ChannelMessageCrosspost { channel_id: Snowflake, message_id: Snowflake },
     api!("/channels/{}/messages/{}/crosspost", channel_id, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessageReaction { channel_id: GenericChannelId, message_id: MessageId, user_id: UserId, reaction: &'a str },
+    ChannelMessageReaction { channel_id: Snowflake, message_id: Snowflake, user_id: Snowflake, reaction: &'a str },
     api!("/channels/{}/messages/{}/reactions/{}/{}", channel_id, message_id, reaction, user_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessageReactionMe { channel_id: GenericChannelId, message_id: MessageId, reaction: &'a str },
+    ChannelMessageReactionMe { channel_id: Snowflake, message_id: Snowflake, reaction: &'a str },
     api!("/channels/{}/messages/{}/reactions/{}/@me", channel_id, message_id, reaction),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessageReactionEmoji { channel_id: GenericChannelId, message_id: MessageId, reaction: &'a str },
+    ChannelMessageReactionEmoji { channel_id: Snowflake, message_id: Snowflake, reaction: &'a str },
     api!("/channels/{}/messages/{}/reactions/{}", channel_id, message_id, reaction),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessageReactions { channel_id: GenericChannelId, message_id: MessageId },
+    ChannelMessageReactions { channel_id: Snowflake, message_id: Snowflake },
     api!("/channels/{}/messages/{}/reactions", channel_id, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessages { channel_id: GenericChannelId },
+    ChannelMessages { channel_id: Snowflake },
     api!("/channels/{}/messages", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessagesBulkDelete { channel_id: GenericChannelId },
+    ChannelMessagesBulkDelete { channel_id: Snowflake },
     api!("/channels/{}/messages/bulk-delete", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelFollowNews { channel_id: ChannelId },
+    ChannelFollowNews { channel_id: Snowflake },
     api!("/channels/{}/followers", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelPermission { channel_id: ChannelId, target_id: TargetId },
+    ChannelPermission { channel_id: Snowflake, target_id: Snowflake },
     api!("/channels/{}/permissions/{}", channel_id, target_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelPin { channel_id: GenericChannelId, message_id: MessageId },
+    ChannelPin { channel_id: Snowflake, message_id: Snowflake },
     api!("/channels/{}/messages/pins/{}", channel_id, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelPins { channel_id: GenericChannelId },
+    ChannelPins { channel_id: Snowflake },
     api!("/channels/{}/messages/pins", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelTyping { channel_id: GenericChannelId },
+    ChannelTyping { channel_id: Snowflake },
     api!("/channels/{}/typing", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelWebhooks { channel_id: ChannelId },
+    ChannelWebhooks { channel_id: Snowflake },
     api!("/channels/{}/webhooks", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelMessageThreads { channel_id: ChannelId, message_id: MessageId },
+    ChannelMessageThreads { channel_id: Snowflake, message_id: Snowflake },
     api!("/channels/{}/messages/{}/threads", channel_id, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelThreads { channel_id: ChannelId },
+    ChannelThreads { channel_id: Snowflake },
     api!("/channels/{}/threads", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelForumPosts { channel_id: ChannelId },
+    ChannelForumPosts { channel_id: Snowflake },
     api!("/channels/{}/threads", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelThreadMember { thread_id: ThreadId, user_id: UserId },
+    ChannelThreadMember { thread_id: Snowflake, user_id: Snowflake },
     api!("/channels/{}/thread-members/{}", thread_id, user_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(thread_id.get())));
+    Some(RatelimitingKind::PathAndId(thread_id));
 
-    ChannelThreadMemberMe { thread_id: ThreadId },
+    ChannelThreadMemberMe { thread_id: Snowflake },
     api!("/channels/{}/thread-members/@me", thread_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(thread_id.get())));
+    Some(RatelimitingKind::PathAndId(thread_id));
 
-    ChannelThreadMembers { thread_id: ThreadId },
+    ChannelThreadMembers { thread_id: Snowflake },
     api!("/channels/{}/thread-members", thread_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(thread_id.get())));
+    Some(RatelimitingKind::PathAndId(thread_id));
 
-    ChannelArchivedPublicThreads { channel_id: ChannelId },
+    ChannelArchivedPublicThreads { channel_id: Snowflake },
     api!("/channels/{}/threads/archived/public", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelArchivedPrivateThreads { channel_id: ChannelId },
+    ChannelArchivedPrivateThreads { channel_id: Snowflake },
     api!("/channels/{}/threads/archived/private", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelJoinedPrivateThreads { channel_id: ChannelId },
+    ChannelJoinedPrivateThreads { channel_id: Snowflake },
     api!("/channels/{}/users/@me/threads/archived/private", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelPollGetAnswerVoters { channel_id: GenericChannelId, message_id: MessageId, answer_id: AnswerId },
+    ChannelPollGetAnswerVoters { channel_id: Snowflake, message_id: Snowflake, answer_id: u8 },
     api!("/channels/{}/polls/{}/answers/{}", channel_id, message_id, answer_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelPollExpire { channel_id: GenericChannelId, message_id: MessageId },
+    ChannelPollExpire { channel_id: Snowflake, message_id: Snowflake },
     api!("/channels/{}/polls/{}/expire", channel_id, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
-    ChannelVoiceStatus { channel_id: ChannelId },
+    ChannelVoiceStatus { channel_id: Snowflake },
     api!("/channels/{}/voice-status", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
     Gateway,
     api!("/gateway"),
@@ -209,161 +209,161 @@ routes! ('a, {
     api!("/gateway/bot"),
     Some(RatelimitingKind::Path);
 
-    Guild { guild_id: GuildId },
+    Guild { guild_id: Snowflake },
     api!("/guilds/{}", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildAuditLogs { guild_id: GuildId },
+    GuildAuditLogs { guild_id: Snowflake },
     api!("/guilds/{}/audit-logs", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildAutomodRule { guild_id: GuildId, rule_id: RuleId },
+    GuildAutomodRule { guild_id: Snowflake, rule_id: Snowflake },
     api!("/guilds/{}/auto-moderation/rules/{}", guild_id, rule_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildAutomodRules { guild_id: GuildId },
+    GuildAutomodRules { guild_id: Snowflake },
     api!("/guilds/{}/auto-moderation/rules", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildBan { guild_id: GuildId, user_id: UserId },
+    GuildBan { guild_id: Snowflake, user_id: Snowflake },
     api!("/guilds/{}/bans/{}", guild_id, user_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildBulkBan { guild_id: GuildId },
+    GuildBulkBan { guild_id: Snowflake },
     api!("/guilds/{}/bulk-ban", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildBans { guild_id: GuildId },
+    GuildBans { guild_id: Snowflake },
     api!("/guilds/{}/bans", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildChannels { guild_id: GuildId },
+    GuildChannels { guild_id: Snowflake },
     api!("/guilds/{}/channels", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildWidget { guild_id: GuildId },
+    GuildWidget { guild_id: Snowflake },
     api!("/guilds/{}/widget", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildPreview { guild_id: GuildId },
+    GuildPreview { guild_id: Snowflake },
     api!("/guilds/{}/preview", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildEmojis { guild_id: GuildId },
+    GuildEmojis { guild_id: Snowflake },
     api!("/guilds/{}/emojis", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildEmoji { guild_id: GuildId, emoji_id: EmojiId },
+    GuildEmoji { guild_id: Snowflake, emoji_id: Snowflake },
     api!("/guilds/{}/emojis/{}", guild_id, emoji_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildIntegration { guild_id: GuildId, integration_id: IntegrationId },
+    GuildIntegration { guild_id: Snowflake, integration_id: Snowflake },
     api!("/guilds/{}/integrations/{}", guild_id, integration_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildIntegrationSync { guild_id: GuildId, integration_id: IntegrationId },
+    GuildIntegrationSync { guild_id: Snowflake, integration_id: Snowflake },
     api!("/guilds/{}/integrations/{}/sync", guild_id, integration_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildIntegrations { guild_id: GuildId },
+    GuildIntegrations { guild_id: Snowflake },
     api!("/guilds/{}/integrations", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildInvites { guild_id: GuildId },
+    GuildInvites { guild_id: Snowflake },
     api!("/guilds/{}/invites", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildMember { guild_id: GuildId, user_id: UserId },
+    GuildMember { guild_id: Snowflake, user_id: Snowflake },
     api!("/guilds/{}/members/{}", guild_id, user_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildMemberRole { guild_id: GuildId, user_id: UserId, role_id: RoleId },
+    GuildMemberRole { guild_id: Snowflake, user_id: Snowflake, role_id: Snowflake },
     api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildMembers { guild_id: GuildId },
+    GuildMembers { guild_id: Snowflake },
     api!("/guilds/{}/members", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildMembersSearch { guild_id: GuildId },
+    GuildMembersSearch { guild_id: Snowflake },
     api!("/guilds/{}/members/search", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildMemberMe { guild_id: GuildId },
+    GuildMemberMe { guild_id: Snowflake },
     api!("/guilds/{}/members/@me", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildMfa { guild_id: GuildId },
+    GuildMfa { guild_id: Snowflake },
     api!("/guilds/{}/mfa", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildPrune { guild_id: GuildId },
+    GuildPrune { guild_id: Snowflake },
     api!("/guilds/{}/prune", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildRegions { guild_id: GuildId },
+    GuildRegions { guild_id: Snowflake },
     api!("/guilds/{}/regions", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildRole { guild_id: GuildId, role_id: RoleId },
+    GuildRole { guild_id: Snowflake, role_id: Snowflake },
     api!("/guilds/{}/roles/{}", guild_id, role_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildRoles { guild_id: GuildId },
+    GuildRoles { guild_id: Snowflake },
     api!("/guilds/{}/roles", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildRoleMemberCounts { guild_id: GuildId },
+    GuildRoleMemberCounts { guild_id: Snowflake },
     api!("/guilds/{}/roles/member-counts", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildScheduledEvent { guild_id: GuildId, event_id: ScheduledEventId },
+    GuildScheduledEvent { guild_id: Snowflake, event_id: Snowflake },
     api!("/guilds/{}/scheduled-events/{}", guild_id, event_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildScheduledEvents { guild_id: GuildId },
+    GuildScheduledEvents { guild_id: Snowflake },
     api!("/guilds/{}/scheduled-events", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildScheduledEventUsers { guild_id: GuildId, event_id: ScheduledEventId },
+    GuildScheduledEventUsers { guild_id: Snowflake, event_id: Snowflake },
     api!("/guilds/{}/scheduled-events/{}/users", guild_id, event_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildSticker { guild_id: GuildId, sticker_id: StickerId },
+    GuildSticker { guild_id: Snowflake, sticker_id: Snowflake },
     api!("/guilds/{}/stickers/{}", guild_id, sticker_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildStickers { guild_id: GuildId },
+    GuildStickers { guild_id: Snowflake },
     api!("/guilds/{}/stickers", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildVanityUrl { guild_id: GuildId },
+    GuildVanityUrl { guild_id: Snowflake },
     api!("/guilds/{}/vanity-url", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildVoiceStates { guild_id: GuildId, user_id: UserId },
+    GuildVoiceStates { guild_id: Snowflake, user_id: Snowflake },
     api!("/guilds/{}/voice-states/{}", guild_id, user_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildVoiceStateMe { guild_id: GuildId },
+    GuildVoiceStateMe { guild_id: Snowflake },
     api!("/guilds/{}/voice-states/@me", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildWebhooks { guild_id: GuildId },
+    GuildWebhooks { guild_id: Snowflake },
     api!("/guilds/{}/webhooks", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildWelcomeScreen { guild_id: GuildId },
+    GuildWelcomeScreen { guild_id: Snowflake },
     api!("/guilds/{}/welcome-screen", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildThreadsActive { guild_id: GuildId },
+    GuildThreadsActive { guild_id: Snowflake },
     api!("/guilds/{}/threads/active", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildIncidentActions { guild_id: GuildId },
+    GuildIncidentActions { guild_id: Snowflake },
     api!("/guilds/{}/incident-actions", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
     Guilds,
     api!("/guilds"),
@@ -389,21 +389,21 @@ routes! ('a, {
     api!("/oauth2/@me"),
     None;
 
-    SoundboardSend { channel_id: ChannelId },
+    SoundboardSend { channel_id: Snowflake },
     api!("/channels/{}/send-soundboard-sound", channel_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+    Some(RatelimitingKind::PathAndId(channel_id));
 
     SoundboardDefaultSounds,
     api!("/soundboard-default-sounds"),
     Some(RatelimitingKind::Path);
 
-    GuildSoundboards { guild_id: GuildId },
+    GuildSoundboards { guild_id: Snowflake },
     api!("/guilds/{}/soundboard-sounds", guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
-    GuildSoundboard { guild_id: GuildId, sound_id: SoundId },
+    GuildSoundboard { guild_id: Snowflake, sound_id: Snowflake },
     api!("/guilds/{}/soundboard-sounds/{}", guild_id, sound_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+    Some(RatelimitingKind::PathAndId(guild_id));
 
     StatusIncidentsUnresolved,
     status!("/incidents/unresolved.json"),
@@ -417,7 +417,7 @@ routes! ('a, {
     status!("/scheduled-maintenances/upcoming.json"),
     None;
 
-    Sticker { sticker_id: StickerId },
+    Sticker { sticker_id: Snowflake },
     api!("/stickers/{}", sticker_id),
     Some(RatelimitingKind::Path);
 
@@ -425,11 +425,11 @@ routes! ('a, {
     api!("/sticker-packs"),
     Some(RatelimitingKind::Path);
 
-    StickerPack { sticker_pack_id: StickerPackId },
+    StickerPack { sticker_pack_id: Snowflake },
     api!("/sticker-packs/{}", sticker_pack_id),
     Some(RatelimitingKind::Path);
 
-    User { user_id: UserId },
+    User { user_id: Snowflake },
     api!("/users/{}", user_id),
     Some(RatelimitingKind::Path);
 
@@ -445,11 +445,11 @@ routes! ('a, {
     api!("/users/@me/channels"),
     Some(RatelimitingKind::Path);
 
-    UserMeGuild { guild_id: GuildId },
+    UserMeGuild { guild_id: Snowflake },
     api!("/users/@me/guilds/{}", guild_id),
     Some(RatelimitingKind::Path);
 
-    UserMeGuildMember { guild_id: GuildId },
+    UserMeGuildMember { guild_id: Snowflake },
     api!("/users/@me/guilds/{}/member", guild_id),
     Some(RatelimitingKind::Path);
 
@@ -461,87 +461,87 @@ routes! ('a, {
     api!("/voice/regions"),
     Some(RatelimitingKind::Path);
 
-    Webhook { webhook_id: WebhookId },
+    Webhook { webhook_id: Snowflake },
     api!("/webhooks/{}", webhook_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(webhook_id.get())));
+    Some(RatelimitingKind::PathAndId(webhook_id));
 
-    WebhookWithToken { webhook_id: WebhookId, token: &'a str },
+    WebhookWithToken { webhook_id: Snowflake, token: &'a str },
     api!("/webhooks/{}/{}", webhook_id, token),
-    Some(RatelimitingKind::PathAndId(GenericId::new(webhook_id.get())));
+    Some(RatelimitingKind::PathAndId(webhook_id));
 
-    WebhookMessage { webhook_id: WebhookId, token: &'a str, message_id: MessageId },
+    WebhookMessage { webhook_id: Snowflake, token: &'a str, message_id: Snowflake },
     api!("/webhooks/{}/{}/messages/{}", webhook_id, token, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(webhook_id.get())));
+    Some(RatelimitingKind::PathAndId(webhook_id));
 
-    WebhookOriginalInteractionResponse { application_id: ApplicationId, token: &'a str },
+    WebhookOriginalInteractionResponse { application_id: Snowflake, token: &'a str },
     api!("/webhooks/{}/{}/messages/@original", application_id, token),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    WebhookFollowupMessage { application_id: ApplicationId, token: &'a str, message_id: MessageId },
+    WebhookFollowupMessage { application_id: Snowflake, token: &'a str, message_id: Snowflake },
     api!("/webhooks/{}/{}/messages/{}", application_id, token, message_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    WebhookFollowupMessages { application_id: ApplicationId, token: &'a str },
+    WebhookFollowupMessages { application_id: Snowflake, token: &'a str },
     api!("/webhooks/{}/{}", application_id, token),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    InteractionResponse { interaction_id: InteractionId, token: &'a str },
+    InteractionResponse { interaction_id: Snowflake, token: &'a str },
     api!("/interactions/{}/{}/callback", interaction_id, token),
-    Some(RatelimitingKind::PathAndId(GenericId::new(interaction_id.get())));
+    Some(RatelimitingKind::PathAndId(interaction_id));
 
-    Command { application_id: ApplicationId, command_id: CommandId },
+    Command { application_id: Snowflake, command_id: Snowflake },
     api!("/applications/{}/commands/{}", application_id, command_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    Commands { application_id: ApplicationId },
+    Commands { application_id: Snowflake },
     api!("/applications/{}/commands", application_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    GuildCommand { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
+    GuildCommand { application_id: Snowflake, guild_id: Snowflake, command_id: Snowflake },
     api!("/applications/{}/guilds/{}/commands/{}", application_id, guild_id, command_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    GuildCommandPermissions { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },
+    GuildCommandPermissions { application_id: Snowflake, guild_id: Snowflake, command_id: Snowflake },
     api!("/applications/{}/guilds/{}/commands/{}/permissions", application_id, guild_id, command_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    GuildCommands { application_id: ApplicationId, guild_id: GuildId },
+    GuildCommands { application_id: Snowflake, guild_id: Snowflake },
     api!("/applications/{}/guilds/{}/commands", application_id, guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    GuildCommandsPermissions { application_id: ApplicationId, guild_id: GuildId },
+    GuildCommandsPermissions { application_id: Snowflake, guild_id: Snowflake },
     api!("/applications/{}/guilds/{}/commands/permissions", application_id, guild_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    Skus { application_id: ApplicationId },
+    Skus { application_id: Snowflake },
     api!("/applications/{}/skus", application_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    Emoji { application_id: ApplicationId, emoji_id: EmojiId },
+    Emoji { application_id: Snowflake, emoji_id: Snowflake },
     api!("/applications/{}/emojis/{}", application_id, emoji_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    Emojis { application_id: ApplicationId },
+    Emojis { application_id: Snowflake },
     api!("/applications/{}/emojis", application_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    Entitlement { application_id: ApplicationId, entitlement_id: EntitlementId },
+    Entitlement { application_id: Snowflake, entitlement_id: Snowflake },
     api!("/applications/{}/entitlements/{}", application_id, entitlement_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    ConsumeEntitlement { application_id: ApplicationId, entitlement_id: EntitlementId },
+    ConsumeEntitlement { application_id: Snowflake, entitlement_id: Snowflake },
     api!("/applications/{}/entitlements/{}/consume", application_id, entitlement_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
-    Entitlements { application_id: ApplicationId },
+    Entitlements { application_id: Snowflake },
     api!("/applications/{}/entitlements", application_id),
-    Some(RatelimitingKind::PathAndId(GenericId::new(application_id.get())));
+    Some(RatelimitingKind::PathAndId(application_id));
 
     StageInstances,
     api!("/stage-instances"),
     Some(RatelimitingKind::Path);
 
-    StageInstance { channel_id: ChannelId },
+    StageInstance { channel_id: Snowflake },
     api!("/stage-instances/{}", channel_id),
     Some(RatelimitingKind::Path);
 });

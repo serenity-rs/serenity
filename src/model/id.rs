@@ -2,6 +2,7 @@
 #![expect(clippy::unsafe_derive_deserialize)] // This is from `ref_cast`
 
 use std::fmt;
+use std::str::FromStr;
 
 use nonmax::NonMaxU64;
 use serde::de::Error;
@@ -11,22 +12,25 @@ use super::prelude::*;
 use super::timestamp::TimestampOutOfRange;
 
 macro_rules! newtype_display_impl {
-    ($name:ident, |$this:ident| $inner:expr) => {
+    ($name:ident) => {
         impl fmt::Display for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                fmt::Display::fmt(&(|$this: $name| $inner)(*self), f)
+                { self.0 }.fmt(f)
             }
         }
     };
 }
 
-macro_rules! forward_fromstr_impl {
-    ($name:ident, $wrapper:path) => {
-        impl std::str::FromStr for $name {
+macro_rules! newtype_fromstr_impl {
+    ($name:ident) => {
+        impl FromStr for $name {
             type Err = ParseIdError;
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
-                s.parse().map($wrapper).map(Self).map_err(ParseIdError)
+                match s.parse() {
+                    Ok(id) => Ok(Self(id)),
+                    Err(e) => Err(ParseIdError(e)),
+                }
             }
         }
     };
@@ -49,7 +53,7 @@ macro_rules! id_u64 {
             #[derive(ref_cast::RefCastCustom)]
             #[repr(transparent)]
             #[doc = $doc]
-            pub struct $name(pub(crate) InnerId);
+            pub struct $name(pub(crate) Snowflake);
 
             impl $name {
                 #[doc = concat!("Creates a new ", stringify!($name), " from a u64.")]
@@ -58,15 +62,12 @@ macro_rules! id_u64 {
                 #[must_use]
                 #[track_caller]
                 pub const fn new(id: u64) -> Self {
-                    match NonMaxU64::new(id) {
-                        Some(inner) => Self(InnerId(inner)),
-                        None => panic!(concat!("Attempted to call ", stringify!($name), "::new with invalid (u64::MAX) value"))
-                    }
+                    Self(Snowflake::new(id))
                 }
 
                 #[ref_cast::ref_cast_custom]
                 #[allow(unused, clippy::allow_attributes, reason = "Most IDs don't need casting like this")]
-                pub(crate) const fn cast_from(inner: &InnerId) -> &Self;
+                pub(crate) const fn cast_from(inner: &Snowflake) -> &Self;
 
                 /// Retrieves the inner `id` as a [`u64`].
                 #[must_use]
@@ -74,13 +75,13 @@ macro_rules! id_u64 {
                     // By wrapping `self.0.0` in a block, it forces a Copy, as NonMax::get takes &self.
                     // If removed, the compiler will auto-ref to `&self.0`, which is a
                     // reference to a packed field and therefore errors.
-                    {self.0.0}.get()
+                    self.0.get()
                 }
 
                 #[doc = concat!("Retrieves the time that the ", stringify!($name), " was created.")]
                 #[must_use]
                 pub fn created_at(&self) -> Timestamp {
-                    Timestamp::from_discord_id(self.get())
+                    Timestamp::from_snowflake(self.0)
                 }
             }
 
@@ -123,15 +124,22 @@ macro_rules! id_u64 {
                 }
             }
 
-            newtype_display_impl!($name, |this| this.0.0);
-            forward_fromstr_impl!($name, InnerId);
+            impl From<$name> for Snowflake {
+                fn from(id: $name) -> Snowflake {
+                    id.0
+                }
+            }
+
+            newtype_display_impl!($name);
+
+            newtype_fromstr_impl!($name);
 
             impl ToArrayString for $name {
-                type ArrayString = <u64 as ToArrayString>::ArrayString;
-                const MAX_LENGTH: usize = <u64 as ToArrayString>::MAX_LENGTH;
+                type ArrayString = <Snowflake as ToArrayString>::ArrayString;
+                const MAX_LENGTH: usize = <Snowflake as ToArrayString>::MAX_LENGTH;
 
                 fn to_arraystring(self) -> Self::ArrayString {
-                    self.get().to_arraystring()
+                    self.0.to_arraystring()
                 }
             }
 
@@ -142,7 +150,7 @@ macro_rules! id_u64 {
                 type Error = TimestampOutOfRange;
 
                 fn try_from(value: Timestamp) -> Result<Self, Self::Error> {
-                    Ok(value.try_as_discord_id()?.into())
+                    value.try_as_snowflake().map(Self)
                 }
             }
 
@@ -153,19 +161,59 @@ macro_rules! id_u64 {
 /// The inner storage of an ID.
 #[derive(Clone, Copy, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
 #[repr(Rust, packed)]
-pub(crate) struct InnerId(NonMaxU64);
+#[must_use]
+pub struct Snowflake(NonMaxU64);
 
-impl fmt::Debug for InnerId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let inner = self.0;
-        inner.fmt(f)
+impl Snowflake {
+    pub const fn new(id: u64) -> Self {
+        let Some(inner) = NonMaxU64::new(id) else {
+            panic!("Attempted to call Snowflake::new with invalid (u64::MAX) value")
+        };
+
+        Self(inner)
+    }
+
+    #[must_use]
+    pub const fn get(self) -> u64 {
+        { self.0 }.get()
     }
 }
+
+impl fmt::Debug for Snowflake {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        { self.0 }.fmt(f)
+    }
+}
+
+impl FromStr for Snowflake {
+    type Err = nonmax::ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        s.parse().map(Self)
+    }
+}
+
+impl PartialEq<u64> for Snowflake {
+    fn eq(&self, u: &u64) -> bool {
+        self.get() == *u
+    }
+}
+
+impl ToArrayString for Snowflake {
+    type ArrayString = <u64 as ToArrayString>::ArrayString;
+    const MAX_LENGTH: usize = <u64 as ToArrayString>::MAX_LENGTH;
+
+    fn to_arraystring(self) -> Self::ArrayString {
+        self.get().to_arraystring()
+    }
+}
+
+newtype_display_impl!(Snowflake);
 
 struct SnowflakeVisitor;
 
 impl serde::de::Visitor<'_> for SnowflakeVisitor {
-    type Value = InnerId;
+    type Value = Snowflake;
 
     fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str("a string or integer snowflake that is not u64::MAX")
@@ -178,22 +226,22 @@ impl serde::de::Visitor<'_> for SnowflakeVisitor {
 
     fn visit_u64<E: Error>(self, value: u64) -> Result<Self::Value, E> {
         NonMaxU64::new(value)
-            .map(InnerId)
+            .map(Snowflake)
             .ok_or_else(|| Error::custom("invalid value, expected non-max"))
     }
 
     fn visit_str<E: Error>(self, value: &str) -> Result<Self::Value, E> {
-        value.parse().map(InnerId).map_err(Error::custom)
+        value.parse().map(Snowflake).map_err(Error::custom)
     }
 }
 
-impl<'de> serde::Deserialize<'de> for InnerId {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<InnerId, D::Error> {
+impl<'de> serde::Deserialize<'de> for Snowflake {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Snowflake, D::Error> {
         deserializer.deserialize_any(SnowflakeVisitor)
     }
 }
 
-impl serde::Serialize for InnerId {
+impl serde::Serialize for Snowflake {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         serializer.collect_str(&{ self.0 })
     }
@@ -247,7 +295,7 @@ impl ShardId {
     }
 }
 
-newtype_display_impl!(ShardId, |this| this.0);
+newtype_display_impl!(ShardId);
 
 /// An identifier for a [`Poll Answer`](super::channel::PollAnswer).
 ///
@@ -257,26 +305,32 @@ newtype_display_impl!(ShardId, |this| this.0);
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 #[repr(Rust, packed)]
-pub struct AnswerId(nonmax::NonMaxU8);
+pub struct AnswerId(pub(crate) nonmax::NonMaxU8);
 
 impl AnswerId {
-    /// Retrieves the value as a [`u64`].
+    /// Retrieves the value as a [`u8`].
     ///
     /// Keep in mind that this is **not a snowflake** and the values are subject to change.
     #[must_use]
-    pub fn get(self) -> u64 {
-        { self.0 }.get().into()
+    pub fn get(self) -> u8 {
+        { self.0 }.get()
     }
 }
 
-newtype_display_impl!(AnswerId, |this| this.0);
-forward_fromstr_impl!(AnswerId, std::convert::identity);
+impl fmt::Display for AnswerId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let inner = self.0;
+        inner.fmt(f)
+    }
+}
+
+newtype_fromstr_impl!(AnswerId);
 
 #[cfg(test)]
 mod tests {
     use nonmax::NonMaxU64;
 
-    use super::{GuildId, InnerId};
+    use super::{GuildId, Snowflake};
 
     #[test]
     fn test_created_at() {
@@ -295,7 +349,7 @@ mod tests {
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
         struct S {
-            id: InnerId,
+            id: Snowflake,
         }
 
         #[derive(Debug, PartialEq, Deserialize, Serialize)]
@@ -307,7 +361,7 @@ mod tests {
         assert_json(&id, json!("175928847299117063"));
 
         let s = S {
-            id: InnerId(NonMaxU64::new(17_5928_8472_9911_7063).unwrap()),
+            id: Snowflake(NonMaxU64::new(17_5928_8472_9911_7063).unwrap()),
         };
         assert_json(&s, json!({"id": "175928847299117063"}));
 

@@ -140,6 +140,6 @@ impl<'a> CreateInvite<'a> {
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<Invite> {
-        http.create_invite(channel_id, &self, self.audit_log_reason).await
+        http.create_invite(channel_id.0, &self, self.audit_log_reason).await
     }
 }

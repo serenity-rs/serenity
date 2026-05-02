@@ -350,8 +350,8 @@ impl Message {
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
         http.delete_message_reaction_emoji(
-            self.channel_id,
-            self.id,
+            self.channel_id.0,
+            self.id.0,
             &reaction_type.into().as_data(),
         )
         .await
@@ -521,7 +521,7 @@ impl Message {
     ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     pub async fn react(&self, http: &Http, reaction_type: impl Into<ReactionType>) -> Result<()> {
-        http.create_reaction(self.channel_id, self.id, &reaction_type.into().as_data()).await
+        http.create_reaction(self.channel_id.0, self.id.0, &reaction_type.into().as_data()).await
     }
 
     /// Uses Discord's inline reply to a user without pinging them.
@@ -606,7 +606,7 @@ impl Message {
     ///
     /// [Pin Messages]: Permissions::PIN_MESSAGES
     pub async fn unpin(&self, http: &Http, reason: Option<&str>) -> Result<()> {
-        http.unpin_message(self.channel_id, self.id, reason).await
+        http.unpin_message(self.channel_id.0, self.id.0, reason).await
     }
 
     /// Ends the [`Poll`] on this message, if there is one.
@@ -642,7 +642,7 @@ impl Message {
             return channel.parent_id;
         }
 
-        let channel: Channel = cache_http.http().get_channel(self.channel_id).await.ok()?;
+        let channel: Channel = cache_http.http().get_channel(self.channel_id.0).await.ok()?;
         channel.guild()?.parent_id
     }
 }

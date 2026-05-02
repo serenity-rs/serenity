@@ -124,13 +124,14 @@ impl<'a> GetEntitlements<'a> {
     /// May error due to an invalid response from discord, or network error.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http) -> Result<Vec<Entitlement>> {
+        let sku_ids = self.sku_ids.map(|ids| ids.iter().map(|id| id.0).collect::<Vec<_>>());
         http.get_entitlements(
-            self.user_id,
-            self.sku_ids.as_deref(),
-            self.before,
-            self.after,
+            self.user_id.map(|id| id.0),
+            sku_ids.as_deref(),
+            self.before.map(|id| id.0),
+            self.after.map(|id| id.0),
             self.limit,
-            self.guild_id,
+            self.guild_id.map(|id| id.0),
             self.exclude_ended,
         )
         .await

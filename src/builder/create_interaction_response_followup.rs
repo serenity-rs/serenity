@@ -185,7 +185,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         }
 
         match message_id {
-            Some(id) => http.edit_followup_message(interaction_token, id, &self, files).await,
+            Some(id) => http.edit_followup_message(interaction_token, id.0, &self, files).await,
             None => http.create_followup_message(interaction_token, &self, files).await,
         }
     }

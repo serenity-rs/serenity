@@ -394,7 +394,7 @@ const MAX_DOMAIN_LEN: usize = {
 /// assert_eq!(token, "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV");
 /// ```
 #[must_use]
-pub fn parse_webhook(url: &Url) -> Option<(WebhookId, &str)> {
+pub fn parse_webhook(url: &Url) -> Option<(Snowflake, &str)> {
     let (webhook_id, token) = url.path().strip_prefix("/api/webhooks/")?.split_once('/')?;
     if !["http", "https"].contains(&url.scheme())
         || !DOMAINS.contains(&url.domain()?)

@@ -319,6 +319,6 @@ impl<'a> EditGuild<'a> {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<PartialGuild> {
-        http.edit_guild(guild_id, &self, self.audit_log_reason).await
+        http.edit_guild(guild_id.0, &self, self.audit_log_reason).await
     }
 }

@@ -75,9 +75,10 @@ impl<'a> EditWebhook<'a> {
     ) -> Result<Webhook> {
         match webhook_token {
             Some(token) => {
-                http.edit_webhook_with_token(webhook_id, token, &self, self.audit_log_reason).await
+                http.edit_webhook_with_token(webhook_id.0, token, &self, self.audit_log_reason)
+                    .await
             },
-            None => http.edit_webhook(webhook_id, &self, self.audit_log_reason).await,
+            None => http.edit_webhook(webhook_id.0, &self, self.audit_log_reason).await,
         }
     }
 }

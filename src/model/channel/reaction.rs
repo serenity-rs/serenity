@@ -134,8 +134,12 @@ impl Reaction {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: crate::model::permissions
     pub async fn delete_all(&self, http: &Http) -> Result<()> {
-        http.delete_message_reaction_emoji(self.channel_id, self.message_id, &self.emoji.as_data())
-            .await
+        http.delete_message_reaction_emoji(
+            self.channel_id.0,
+            self.message_id.0,
+            &self.emoji.as_data(),
+        )
+        .await
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -204,12 +208,12 @@ impl Reaction {
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
         http.get_reaction_users(
-            self.channel_id,
-            self.message_id,
+            self.channel_id.0,
+            self.message_id.0,
             &self.emoji.as_data(),
             Some(self.reaction_type),
             limit,
-            after,
+            after.map(|id| id.0),
         )
         .await
     }

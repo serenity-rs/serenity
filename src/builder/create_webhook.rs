@@ -65,6 +65,6 @@ impl<'a> CreateWebhook<'a> {
         crate::model::error::Minimum::WebhookName.check_underflow(self.name.chars().count())?;
         crate::model::error::Maximum::WebhookName.check_overflow(self.name.chars().count())?;
 
-        http.create_webhook(channel_id, &self, self.audit_log_reason).await
+        http.create_webhook(channel_id.0, &self, self.audit_log_reason).await
     }
 }
