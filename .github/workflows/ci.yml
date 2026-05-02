@@ -170,6 +170,8 @@ jobs:
           cargo update base64ct --precise 1.7.3
           cargo update deranged --precise 0.5.3
           cargo update time --precise 0.3.40
+          cargo update rustc-hash --precise 2.1.1
+          cargo update hyper-rustls@0.27 --precise 0.27.7
 
       - name: Check
         run: cargo check --features full

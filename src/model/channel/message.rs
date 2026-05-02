@@ -238,10 +238,9 @@ impl Message {
         let guild = cache.as_ref().guild(guild_id)?;
         let (channel, is_thread) = if let Some(channel) = guild.channels.get(&self.channel_id) {
             (channel, false)
-        } else if let Some(thread) = guild.threads.iter().find(|th| th.id == self.channel_id) {
-            (thread, true)
         } else {
-            return None;
+            let thread = guild.threads.iter().find(|th| th.id == self.channel_id)?;
+            (thread, true)
         };
 
         let mut permissions = if let Some(member) = &self.member {

@@ -906,7 +906,7 @@ fn flatten_group_to_string(
     let mut summary_or_prefixes = false;
 
     if let Some(group_summary) = group.summary {
-        writeln!(group_text, "{}*{group_summary}*", &repeated_indent_str)?;
+        writeln!(group_text, "{repeated_indent_str}*{group_summary}*")?;
         summary_or_prefixes = true;
     }
 
@@ -914,7 +914,7 @@ fn flatten_group_to_string(
         writeln!(
             group_text,
             "{}{}: `{}`",
-            &repeated_indent_str,
+            repeated_indent_str,
             help_options.group_prefix,
             group.prefixes.join("`, `"),
         )?;
@@ -1232,7 +1232,7 @@ fn grouped_commands_to_plain_string(
     result.push('\n');
 
     for group in groups {
-        write!(result, "\n**{}**", &group.name).expect("writing to a string should never fail");
+        write!(result, "\n**{}**", group.name).expect("writing to a string should never fail");
 
         flatten_group_to_plain_string(&mut result, group, 0, help_options);
     }

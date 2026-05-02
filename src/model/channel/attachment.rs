@@ -82,7 +82,7 @@ impl Attachment {
     /// If this attachment is an image, then a tuple of the width and height in pixels is returned.
     #[must_use]
     pub fn dimensions(&self) -> Option<(u32, u32)> {
-        self.width.and_then(|width| self.height.map(|height| (width, height)))
+        self.width.zip(self.height)
     }
 
     /// Downloads the attachment, returning back a vector of bytes.
