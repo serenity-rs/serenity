@@ -51,6 +51,7 @@ use super::{
     ShardManagerOptions,
     TransportCompression,
 };
+use crate::builder::CreateAllowedMentions;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
@@ -72,6 +73,7 @@ pub struct ClientBuilder {
     data: Option<Arc<dyn std::any::Any + Send + Sync>>,
     http: Arc<Http>,
     intents: GatewayIntents,
+    default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
     #[cfg(feature = "framework")]
@@ -107,6 +109,7 @@ impl ClientBuilder {
             token,
             http,
             intents,
+            default_allowed_mentions: None,
             data: None,
             #[cfg(feature = "cache")]
             cache_settings: CacheSettings::default(),
@@ -231,6 +234,21 @@ impl ClientBuilder {
         self.intents
     }
 
+    /// Sets the [`CreateAllowedMentions`] used by default for each request that would use it.
+    pub fn default_allowed_mentions(
+        mut self,
+        allowed_mentions: CreateAllowedMentions<'static>,
+    ) -> Self {
+        self.default_allowed_mentions = Some(allowed_mentions);
+        self
+    }
+
+    /// Gets the default allowed mentions.
+    #[must_use]
+    pub fn get_default_allowed_mentions(&self) -> Option<&CreateAllowedMentions<'static>> {
+        self.default_allowed_mentions.as_ref()
+    }
+
     /// Sets the event handler where all received gateway events will be dispatched.
     pub fn event_handler(mut self, event_handler: Arc<dyn EventHandler>) -> Self {
         self.event_handler = Some(event_handler);
@@ -337,6 +355,7 @@ impl IntoFuture for ClientBuilder {
                 cache: Arc::clone(&cache),
                 http: Arc::clone(&http),
                 intents,
+                default_allowed_mentions: self.default_allowed_mentions,
                 presence: Some(presence),
                 wait_time_between_shard_start: self.wait_time_between_shard_start,
             });

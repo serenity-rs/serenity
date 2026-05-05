@@ -13,7 +13,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::{CacheHttp, Http};
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
@@ -125,7 +125,7 @@ impl CreateInteractionResponse<'_> {
     #[cfg(feature = "http")]
     pub async fn execute(
         mut self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         interaction_id: InteractionId,
         interaction_token: &str,
     ) -> Result<()> {
@@ -140,10 +140,13 @@ impl CreateInteractionResponse<'_> {
         if let Self::Message(msg) | Self::Defer(msg) | Self::UpdateMessage(msg) = &mut self
             && msg.allowed_mentions.is_none()
         {
-            msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
+            msg.allowed_mentions.clone_from(&cache_http.default_allowed_mentions());
         }
 
-        http.create_interaction_response(interaction_id, interaction_token, &self, files).await
+        cache_http
+            .http()
+            .create_interaction_response(interaction_id, interaction_token, &self, files)
+            .await
     }
 }
 

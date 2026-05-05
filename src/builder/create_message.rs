@@ -10,7 +10,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -278,14 +278,18 @@ impl<'a> CreateMessage<'a> {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Attach Files]: Permissions::ATTACH_FILES
     #[cfg(feature = "http")]
-    pub async fn execute(mut self, http: &Http, channel_id: GenericChannelId) -> Result<Message> {
+    pub async fn execute(
+        mut self,
+        cache_http: impl CacheHttp,
+        channel_id: GenericChannelId,
+    ) -> Result<Message> {
         self.check_length()?;
 
         let files = self.attachments.new_attachments();
         if self.allowed_mentions.is_none() {
-            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+            self.allowed_mentions.clone_from(&cache_http.default_allowed_mentions());
         }
 
-        http.send_message(channel_id, files, &self).await
+        cache_http.http().send_message(channel_id, files, &self).await
     }
 }

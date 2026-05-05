@@ -728,13 +728,17 @@ impl UserId {
         // Do not refactor this to a one liner. The PrivateChannel from `create_dm_channel`
         // should be dropped before the `send_message` call to avoid bloating future sizes.
         let dm_channel_id = self.create_dm_channel(&cache_http).await?.id;
-        dm_channel_id.widen().send_message(cache_http.http(), builder).await
+        dm_channel_id.widen().send_message(cache_http, builder).await
     }
 
     /// This is an alias of [`Self::direct_message`].
     #[expect(clippy::missing_errors_doc)]
-    pub async fn dm(self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
-        self.direct_message(http, builder).await
+    pub async fn dm(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'_>,
+    ) -> Result<Message> {
+        self.direct_message(cache_http, builder).await
     }
 
     /// First attempts to find a [`User`] by its Id in the `temp_cache` if enabled,

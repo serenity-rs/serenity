@@ -44,7 +44,7 @@ impl EventHandler for Handler {
                 let m = new_message
                     .channel_id
                     .send_message(
-                        &ctx.http,
+                        ctx,
                         CreateMessage::new()
                             .content("Please select your favorite animal")
                             .select_menu(

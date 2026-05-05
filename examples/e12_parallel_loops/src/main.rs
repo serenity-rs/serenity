@@ -24,7 +24,7 @@ impl EventHandler for Handler {
                 new_message, ..
             } => {
                 if new_message.content == "!ping" {
-                    if let Err(why) = new_message.channel_id.say(&ctx.http, "Pong!").await {
+                    if let Err(why) = new_message.channel_id.say(ctx, "Pong!").await {
                         println!("Error sending message: {why:?}");
                     }
                 }
@@ -95,7 +95,7 @@ async fn log_system_load(ctx: &Context) {
             false,
         );
     let builder = CreateMessage::new().embed(embed);
-    let message = GenericChannelId::new(381926291785383946).send_message(&ctx.http, builder).await;
+    let message = GenericChannelId::new(381926291785383946).send_message(ctx, builder).await;
     if let Err(why) = message {
         eprintln!("Error sending message: {why:?}");
     };

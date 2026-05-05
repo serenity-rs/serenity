@@ -10,7 +10,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -174,7 +174,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     #[cfg(feature = "http")]
     pub async fn execute(
         mut self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         message_id: Option<MessageId>,
         interaction_token: &str,
     ) -> Result<Message> {
@@ -183,9 +183,10 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         let files = self.attachments.new_attachments();
 
         if self.allowed_mentions.is_none() {
-            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+            self.allowed_mentions.clone_from(&cache_http.default_allowed_mentions());
         }
 
+        let http = cache_http.http();
         match message_id {
             Some(id) => http.edit_followup_message(interaction_token, id, &self, files).await,
             None => http.create_followup_message(interaction_token, &self, files).await,

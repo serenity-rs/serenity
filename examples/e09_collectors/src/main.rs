@@ -24,7 +24,7 @@ impl EventHandler for Handler {
             } => {
                 let mut score = 0u32;
                 let _ = new_message
-                    .reply(&ctx.http, "How was that crusty crab called again? 10 seconds time!")
+                    .reply(ctx, "How was that crusty crab called again? 10 seconds time!")
                     .await;
 
                 // There is a method implemented for some models to conveniently collect replies.
@@ -34,13 +34,13 @@ impl EventHandler for Handler {
                     new_message.author.id.collect_messages(ctx).timeout(Duration::from_secs(10));
                 if let Some(answer) = collector.await {
                     if answer.content.to_lowercase() == "ferris" {
-                        let _ = answer.reply(&ctx.http, "That's correct!").await;
+                        let _ = answer.reply(ctx, "That's correct!").await;
                         score += 1;
                     } else {
-                        let _ = answer.reply(&ctx.http, "Wrong, it's Ferris!").await;
+                        let _ = answer.reply(ctx, "Wrong, it's Ferris!").await;
                     }
                 } else {
-                    let _ = new_message.reply(&ctx.http, "No answer within 10 seconds.").await;
+                    let _ = new_message.reply(ctx, "No answer within 10 seconds.").await;
                 };
 
                 let react_msg = new_message

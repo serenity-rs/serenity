@@ -630,11 +630,11 @@ impl GenericChannelId {
     /// reasons.
     pub async fn edit_message(
         self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         message_id: MessageId,
         builder: EditMessage<'_>,
     ) -> Result<Message> {
-        builder.execute(http, self, message_id, None).await
+        builder.execute(cache_http, self, message_id, None).await
     }
 
     /// Attempts to retrieve the channel from the guild cache, otherwise from HTTP/temp cache.
@@ -871,9 +871,13 @@ impl GenericChannelId {
     ///
     /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
     /// [`CreateMessage::execute`] for more details.
-    pub async fn say(self, http: &Http, content: impl Into<Cow<'_, str>>) -> Result<Message> {
+    pub async fn say(
+        self,
+        cache_http: impl CacheHttp,
+        content: impl Into<Cow<'_, str>>,
+    ) -> Result<Message> {
         let builder = CreateMessage::new().content(content);
-        self.send_message(http, builder).await
+        self.send_message(cache_http, builder).await
     }
 
     /// Sends file(s) along with optional message contents. The filename _must_ be specified.
@@ -944,11 +948,11 @@ impl GenericChannelId {
     /// [`File`]: tokio::fs::File
     pub async fn send_files<'a>(
         self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         files: impl IntoIterator<Item = CreateAttachment<'a>>,
         builder: CreateMessage<'a>,
     ) -> Result<Message> {
-        self.send_message(http, builder.files(files)).await
+        self.send_message(cache_http, builder.files(files)).await
     }
 
     /// Sends a message to the channel.
@@ -960,8 +964,12 @@ impl GenericChannelId {
     ///
     /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
     /// reasons.
-    pub async fn send_message(self, http: &Http, builder: CreateMessage<'_>) -> Result<Message> {
-        builder.execute(http, self).await
+    pub async fn send_message(
+        self,
+        cache_http: impl CacheHttp,
+        builder: CreateMessage<'_>,
+    ) -> Result<Message> {
+        builder.execute(cache_http, self).await
     }
 
     /// Starts typing in the channel for an indefinite period of time.

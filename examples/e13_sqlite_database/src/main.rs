@@ -38,7 +38,7 @@ impl EventHandler for Bot {
 
                     let response =
                         format!("Successfully added `{task_description}` to your todo list");
-                    new_message.channel_id.say(&ctx.http, response).await.unwrap();
+                    new_message.channel_id.say(ctx, response).await.unwrap();
                 } else if let Some(task_index) = new_message.content.strip_prefix("~todo remove") {
                     let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
 
@@ -60,7 +60,7 @@ impl EventHandler for Bot {
                         .unwrap();
 
                     let response = format!("Successfully completed `{}`!", entry.task);
-                    new_message.channel_id.say(&ctx.http, response).await.unwrap();
+                    new_message.channel_id.say(ctx, response).await.unwrap();
                 } else if new_message.content.trim() == "~todo list" {
                     // "SELECT" will return the task of all rows where user_Id column = user_id in
                     // todo.
@@ -74,7 +74,7 @@ impl EventHandler for Bot {
                         writeln!(response, "{}. {}", i + 1, todo.task).unwrap();
                     }
 
-                    new_message.channel_id.say(&ctx.http, response).await.unwrap();
+                    new_message.channel_id.say(ctx, response).await.unwrap();
                 }
             },
             FullEvent::Ready {

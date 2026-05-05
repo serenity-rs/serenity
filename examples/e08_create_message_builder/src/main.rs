@@ -39,7 +39,7 @@ impl EventHandler for Handler {
                         .content("Hello, World!")
                         .embed(embed)
                         .add_file(CreateAttachment::path("./ferris_eyes.png".as_ref()).unwrap());
-                    let msg = new_message.channel_id.send_message(&ctx.http, builder).await;
+                    let msg = new_message.channel_id.send_message(ctx, builder).await;
 
                     if let Err(why) = msg {
                         println!("Error sending message: {why:?}");

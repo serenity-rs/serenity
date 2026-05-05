@@ -39,6 +39,8 @@ pub use self::ratelimiting::*;
 pub use self::request::*;
 pub use self::routing::*;
 pub use self::typing::*;
+#[cfg(feature = "builder")]
+use crate::builder::CreateAllowedMentions;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::model::prelude::*;
@@ -50,6 +52,11 @@ use crate::model::prelude::*;
 /// the [`CacheHttp::cache`] method will simply return `None`.
 pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
+
+    #[cfg(feature = "builder")]
+    fn default_allowed_mentions(&self) -> Option<CreateAllowedMentions<'static>> {
+        None
+    }
 
     #[cfg(feature = "cache")]
     #[must_use]
@@ -65,6 +72,10 @@ where
     fn http(&self) -> &Http {
         (*self).http()
     }
+    #[cfg(feature = "builder")]
+    fn default_allowed_mentions(&self) -> Option<CreateAllowedMentions<'static>> {
+        (*self).default_allowed_mentions()
+    }
     #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&Arc<Cache>> {
         (*self).cache()
@@ -77,6 +88,10 @@ where
 {
     fn http(&self) -> &Http {
         (**self).http()
+    }
+    #[cfg(feature = "builder")]
+    fn default_allowed_mentions(&self) -> Option<CreateAllowedMentions<'static>> {
+        (**self).default_allowed_mentions()
     }
     #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&Arc<Cache>> {

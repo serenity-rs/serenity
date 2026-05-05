@@ -3,7 +3,7 @@
 #[cfg(feature = "model")]
 use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "model")]
-use crate::http::Http;
+use crate::http::{CacheHttp, Http};
 use crate::model::prelude::*;
 
 enum_number! {
@@ -328,12 +328,12 @@ impl Webhook {
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn execute(
         &self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         wait: bool,
         builder: ExecuteWebhook<'_>,
     ) -> Result<Option<Message>> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        builder.execute(http, self.id, token, wait).await
+        builder.execute(cache_http, self.id, token, wait).await
     }
 
     /// Gets a previously sent message from the webhook.
@@ -371,12 +371,12 @@ impl Webhook {
     /// Or may return an [`Error::Json`] if there is an error deserialising Discord's response.
     pub async fn edit_message(
         &self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         message_id: MessageId,
         builder: EditWebhookMessage<'_>,
     ) -> Result<Message> {
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?.expose_secret();
-        builder.execute(http, self.id, token, message_id).await
+        builder.execute(cache_http, self.id, token, message_id).await
     }
 
     /// Deletes a webhook message.

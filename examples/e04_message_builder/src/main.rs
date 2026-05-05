@@ -35,7 +35,7 @@ impl EventHandler for Handler {
                         .push(" channel")
                         .build();
 
-                    if let Err(why) = new_message.channel_id.say(&ctx.http, &response).await {
+                    if let Err(why) = new_message.channel_id.say(ctx, &response).await {
                         println!("Error sending message: {why:?}");
                     }
                 }

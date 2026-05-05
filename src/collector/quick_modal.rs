@@ -119,7 +119,7 @@ impl<'a> CreateQuickModal<'a> {
         let builder = CreateInteractionResponse::Modal(
             CreateModal::new(interaction_id.to_string(), self.title).components(self.components),
         );
-        builder.execute(&ctx.http, interaction_id, token).await?;
+        builder.execute(&ctx, interaction_id, token).await?;
 
         let collector = ModalInteractionCollector::new(ctx)
             .custom_ids(vec![FixedString::from_str_trunc(&interaction_id.to_string())]);

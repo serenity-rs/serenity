@@ -490,8 +490,12 @@ impl Message {
     /// # Errors
     ///
     /// See the documentation of [`CreateMessage::execute`] for possible errors.
-    pub async fn reply(&self, http: &Http, content: impl Into<Cow<'_, str>>) -> Result<Message> {
-        self.reply_(http, content.into(), false).await
+    pub async fn reply(
+        &self,
+        cache_http: impl CacheHttp,
+        content: impl Into<Cow<'_, str>>,
+    ) -> Result<Message> {
+        self.reply_(cache_http, content.into(), false).await
     }
 
     /// Uses Discord's inline reply to a user with a ping.
@@ -504,15 +508,19 @@ impl Message {
     /// See the documentation of [`CreateMessage::execute`] for possible errors.
     pub async fn reply_ping(
         &self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         content: impl Into<Cow<'_, str>>,
     ) -> Result<Message> {
-        self.reply_(http, content.into(), true).await
+        self.reply_(cache_http, content.into(), true).await
     }
 
-    async fn reply_(&self, http: &Http, content: Cow<'_, str>, ping_user: bool) -> Result<Message> {
-        let default_allowed_mentions = http.default_allowed_mentions.clone();
-        let allowed_mentions = default_allowed_mentions.unwrap_or_else(|| {
+    async fn reply_(
+        &self,
+        cache_http: impl CacheHttp,
+        content: Cow<'_, str>,
+        ping_user: bool,
+    ) -> Result<Message> {
+        let allowed_mentions = cache_http.default_allowed_mentions().unwrap_or_else(|| {
             CreateAllowedMentions::new().everyone(true).all_users(true).all_roles(true)
         });
 
@@ -521,7 +529,7 @@ impl Message {
             .reference_message(self)
             .allowed_mentions(allowed_mentions.replied_user(ping_user));
 
-        self.channel_id.send_message(http, builder).await
+        self.channel_id.send_message(cache_http, builder).await
     }
 
     /// Checks whether the message mentions passed [`UserId`].

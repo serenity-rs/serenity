@@ -22,6 +22,7 @@ use super::{
     ShardRunnerInfo,
     ShardRunnerMessage,
 };
+use crate::builder::CreateAllowedMentions;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "framework")]
@@ -84,6 +85,7 @@ pub struct ShardManager {
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
+    pub default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
     pub presence: Option<PresenceData>,
 }
 
@@ -114,6 +116,7 @@ impl ShardManager {
             cache: opt.cache,
             http: opt.http,
             intents: opt.intents,
+            default_allowed_mentions: opt.default_allowed_mentions,
             presence: opt.presence,
             wait_time_between_shard_start: opt.wait_time_between_shard_start,
         }
@@ -265,6 +268,7 @@ impl ShardManager {
                 manager: self.manager_tx.clone(),
                 shard_id,
                 http: Arc::clone(&self.http),
+                default_allowed_mentions: self.default_allowed_mentions.clone(),
                 #[cfg(feature = "cache")]
                 cache: Arc::clone(&self.cache),
                 #[cfg(feature = "collector")]
@@ -333,6 +337,7 @@ pub struct ShardManagerOptions {
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
+    pub default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
     pub presence: Option<PresenceData>,
 }
 

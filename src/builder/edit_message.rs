@@ -239,11 +239,10 @@ impl<'a> EditMessage<'a> {
 
         let files = self.attachments.as_ref().map_or(Vec::new(), EditAttachments::new_attachments);
 
-        let http = cache_http.http();
         if self.allowed_mentions.is_none() {
-            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+            self.allowed_mentions.clone_from(&cache_http.default_allowed_mentions());
         }
 
-        http.edit_message(channel_id, message_id, &self, files).await
+        cache_http.http().edit_message(channel_id, message_id, &self, files).await
     }
 }

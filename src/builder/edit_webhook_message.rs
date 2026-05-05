@@ -8,7 +8,7 @@ use super::{
     EditAttachments,
 };
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::CacheHttp;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
@@ -166,7 +166,7 @@ impl<'a> EditWebhookMessage<'a> {
     #[cfg(feature = "http")]
     pub async fn execute(
         mut self,
-        http: &Http,
+        cache_http: impl CacheHttp,
         webhook_id: WebhookId,
         webhook_token: &str,
         message_id: MessageId,
@@ -176,17 +176,19 @@ impl<'a> EditWebhookMessage<'a> {
         let files = self.attachments.as_ref().map_or(Vec::new(), EditAttachments::new_attachments);
 
         if self.allowed_mentions.is_none() {
-            self.allowed_mentions.clone_from(&http.default_allowed_mentions);
+            self.allowed_mentions.clone_from(&cache_http.default_allowed_mentions());
         }
 
-        http.edit_webhook_message(
-            webhook_id,
-            self.thread_id,
-            webhook_token,
-            message_id,
-            &self,
-            files,
-        )
-        .await
+        cache_http
+            .http()
+            .edit_webhook_message(
+                webhook_id,
+                self.thread_id,
+                webhook_token,
+                message_id,
+                &self,
+                files,
+            )
+            .await
     }
 }

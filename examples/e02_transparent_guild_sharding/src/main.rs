@@ -30,7 +30,7 @@ impl EventHandler for Handler {
                 new_message, ..
             } => {
                 if new_message.content == "!ping" {
-                    if let Err(why) = new_message.channel_id.say(&ctx.http, "Pong!").await {
+                    if let Err(why) = new_message.channel_id.say(ctx, "Pong!").await {
                         println!("Error sending message: {why:?}");
                     }
                 }

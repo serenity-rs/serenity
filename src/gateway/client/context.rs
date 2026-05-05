@@ -3,7 +3,7 @@ use std::sync::Arc;
 use futures::channel::mpsc::UnboundedSender as Sender;
 use parking_lot::RwLock;
 
-use crate::builder::DataUri;
+use crate::builder::{CreateAllowedMentions, DataUri};
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 #[cfg(feature = "collector")]
@@ -46,6 +46,7 @@ pub struct Context {
     /// The ID of the shard this context is related to.
     pub shard_id: ShardId,
     pub http: Arc<Http>,
+    pub(crate) default_allowed_mentions: Option<CreateAllowedMentions<'static>>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     /// Metadata about the shard.
@@ -57,6 +58,9 @@ pub struct Context {
 impl CacheHttp for Context {
     fn http(&self) -> &Http {
         &self.http
+    }
+    fn default_allowed_mentions(&self) -> Option<CreateAllowedMentions<'static>> {
+        self.default_allowed_mentions.clone()
     }
     #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&Arc<Cache>> {
