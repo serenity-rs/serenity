@@ -138,7 +138,7 @@ pub struct GuildChannel {
     /// Unix timestamp (in seconds) of when a voice session started.
     ///
     /// **Note**: This is only available in voice channels and will only be [`Some`] when the cache
-    /// is enabled.  To manually retrieve the value and trigger population in the cache, see
+    /// is enabled. To manually retrieve the value and trigger population in the cache, see
     /// [`Context::channel_info`].
     ///
     /// [`Context::channel_info`]: crate::gateway::client::Context::channel_info
