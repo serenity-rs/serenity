@@ -275,6 +275,10 @@ pub struct User {
     #[serde(default)]
     pub flags: UserPublicFlags,
     /// The type of Nitro subscription on a user's account
+    ///
+    /// Requires [`Scope::IdentifyPremium`]
+    /// **Note**: This will return `0` for applications that have not been approved for the
+    /// [`Scope::IdentifyPremium`] scope.
     #[serde(default)]
     pub premium_type: PremiumType,
     /// The public flags on a user's account

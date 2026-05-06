@@ -26,6 +26,12 @@ pub enum Scope {
     /// Allows `/users/@me` without [`Self::Email`].
     #[serde(rename = "identify")]
     Identify,
+    /// Allows your app to read a user’s Nitro subscription type as defined by
+    /// [`User::premium_type`] - only available to approved partners.
+    ///
+    /// [`User::premium_type`]: crate::model::user::User::premium_type
+    #[serde(rename = "identify.premium")]
+    IdentifyPremium,
     /// Enables `/users/@me` to return an `email` field.
     #[serde(rename = "email")]
     Email,
