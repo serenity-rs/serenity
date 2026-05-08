@@ -1,9 +1,7 @@
 use super::*;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditThread};
-#[cfg(feature = "model")]
-use crate::http::CacheHttp;
-use crate::internal::prelude::*;
+use crate::model::prelude::*;
 use crate::model::utils::is_false;
 
 impl ThreadId {

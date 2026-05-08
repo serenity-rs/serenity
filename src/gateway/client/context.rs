@@ -15,7 +15,7 @@ use crate::gateway::{
     ShardRunnerInfo,
     ShardRunnerMessage,
 };
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 /// A general utility struct provided on event dispatches.

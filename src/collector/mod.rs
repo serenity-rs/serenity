@@ -8,7 +8,6 @@ pub use quick_modal::*;
 
 use crate::gateway::CollectorCallback;
 use crate::gateway::client::Context;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Fundamental collector function. All collector types in this module are just wrappers around

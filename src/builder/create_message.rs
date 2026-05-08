@@ -9,10 +9,6 @@ use super::{
     CreatePoll,
     EditAttachments,
 };
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to specify the contents of an send message request, primarily meant for use

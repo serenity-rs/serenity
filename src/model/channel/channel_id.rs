@@ -27,7 +27,7 @@ use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "temp_cache", feature = "model"))]
 use crate::cache::MaybeOwnedArc;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http, Typing};
+use crate::http::{Http, Typing};
 use crate::model::prelude::*;
 
 impl ChannelId {
@@ -642,6 +642,7 @@ impl GenericChannelId {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the channel retrieval request failed.
+    #[cfg_attr(not(feature = "cache"), allow(unused_variables))]
     pub async fn to_channel(
         self,
         cache_http: impl CacheHttp,
@@ -652,14 +653,14 @@ impl GenericChannelId {
 
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
-            match guild_id.and_then(|id| cache.guild(id)).as_ref().and_then(|g| g.channel(self)) {
-                Some(GenericGuildChannelRef::Channel(chan)) => {
-                    return Ok(Channel::Guild(chan.clone()));
-                },
-                Some(GenericGuildChannelRef::Thread(th)) => {
-                    return Ok(Channel::GuildThread(th.clone()));
-                },
-                None => {},
+            if let Some(id) = guild_id
+                && let Some(guild) = cache.guild(id)
+                && let Some(channel) = guild.channel(self)
+            {
+                return Ok(match channel {
+                    GenericGuildChannelRef::Channel(chan) => Channel::Guild(chan.clone()),
+                    GenericGuildChannelRef::Thread(th) => Channel::GuildThread(th.clone()),
+                });
             }
 
             #[cfg(feature = "temp_cache")]

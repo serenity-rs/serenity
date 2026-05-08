@@ -12,7 +12,7 @@ use serde::de::Error as DeError;
 use serde::ser::{Serialize, SerializeMap, Serializer};
 
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 use crate::model::utils::discord_colours_opt;
 

@@ -21,9 +21,9 @@ pub use crate::gateway::GatewayError;
 #[cfg(feature = "gateway")]
 pub use crate::gateway::client::{Client, Context, EventHandler, RawEventHandler};
 #[cfg(feature = "http")]
-pub use crate::http::CacheHttp;
-#[cfg(feature = "http")]
 pub use crate::http::HttpError;
+#[cfg(feature = "http")]
+pub use crate::model::CacheHttp;
 pub use crate::model::mention::Mentionable;
 #[cfg(feature = "model")]
 pub use crate::model::{ModelError, gateway::GatewayIntents};

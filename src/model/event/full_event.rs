@@ -404,6 +404,7 @@ full_event! {
 }
 
 impl FullEvent {
+    #[cfg_attr(not(feature = "cache"), allow(unused_variables))]
     pub fn from_event(
         event: Box<Event>,
         extra_event: &mut Option<Self>,

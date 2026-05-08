@@ -27,8 +27,6 @@ mod request;
 mod routing;
 mod typing;
 
-use std::sync::Arc;
-
 use reqwest::Method;
 pub use reqwest::StatusCode;
 
@@ -39,82 +37,7 @@ pub use self::ratelimiting::*;
 pub use self::request::*;
 pub use self::routing::*;
 pub use self::typing::*;
-#[cfg(feature = "builder")]
-use crate::builder::CreateAllowedMentions;
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
-use crate::model::prelude::*;
-
-/// This trait will be required by functions that need [`Http`] and can optionally use a [`Cache`]
-/// to potentially avoid REST-requests.
-///
-/// If the `cache` feature is enabled, but an implementing type does not have access to a cache,
-/// the [`CacheHttp::cache`] method will simply return `None`.
-pub trait CacheHttp: Send + Sync {
-    fn http(&self) -> &Http;
-
-    #[cfg(feature = "builder")]
-    fn default_allowed_mentions(&self) -> Option<CreateAllowedMentions<'static>> {
-        None
-    }
-
-    #[cfg(feature = "cache")]
-    #[must_use]
-    fn cache(&self) -> Option<&Arc<Cache>> {
-        None
-    }
-}
-
-impl<T> CacheHttp for &T
-where
-    T: CacheHttp,
-{
-    fn http(&self) -> &Http {
-        (*self).http()
-    }
-    #[cfg(feature = "builder")]
-    fn default_allowed_mentions(&self) -> Option<CreateAllowedMentions<'static>> {
-        (*self).default_allowed_mentions()
-    }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&Arc<Cache>> {
-        (*self).cache()
-    }
-}
-
-impl<T> CacheHttp for Arc<T>
-where
-    T: CacheHttp,
-{
-    fn http(&self) -> &Http {
-        (**self).http()
-    }
-    #[cfg(feature = "builder")]
-    fn default_allowed_mentions(&self) -> Option<CreateAllowedMentions<'static>> {
-        (**self).default_allowed_mentions()
-    }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&Arc<Cache>> {
-        (**self).cache()
-    }
-}
-
-#[cfg(feature = "cache")]
-impl CacheHttp for (Option<&Arc<Cache>>, &Http) {
-    fn cache(&self) -> Option<&Arc<Cache>> {
-        self.0
-    }
-
-    fn http(&self) -> &Http {
-        self.1
-    }
-}
-
-impl CacheHttp for Http {
-    fn http(&self) -> &Http {
-        self
-    }
-}
+use crate::model::id::*;
 
 /// An method used for ratelimiting special routes.
 ///

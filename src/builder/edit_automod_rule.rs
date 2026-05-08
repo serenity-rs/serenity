@@ -2,8 +2,6 @@ use std::borrow::Cow;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::guild::automod::EventType;
 use crate::model::prelude::*;
 

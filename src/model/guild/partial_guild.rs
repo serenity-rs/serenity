@@ -4,7 +4,7 @@ use super::IncidentsData;
 #[cfg(feature = "model")]
 use crate::builder::EditGuild;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::icon_url;

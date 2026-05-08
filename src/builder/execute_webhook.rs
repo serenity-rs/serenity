@@ -7,10 +7,6 @@ use super::{
     CreateEmbed,
     EditAttachments,
 };
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to create the content for a [`Webhook`]'s execution.

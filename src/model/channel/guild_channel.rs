@@ -14,7 +14,7 @@ use crate::builder::{
 #[cfg(feature = "cache")]
 use crate::cache::{self, Cache};
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 /// Represents the shared fields between [`GuildChannel`] and [`GuildThread`].

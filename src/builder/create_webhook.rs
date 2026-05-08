@@ -4,8 +4,6 @@ use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
-use crate::internal::prelude::*;
-#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
 /// [Discord docs](https://docs.discord.com/developers/resources/webhook#create-webhook)

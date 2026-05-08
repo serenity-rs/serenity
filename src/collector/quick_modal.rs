@@ -10,7 +10,6 @@ use crate::builder::{
 };
 use crate::collector::ModalInteractionCollector;
 use crate::gateway::client::Context;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 pub struct QuickModalResponse {

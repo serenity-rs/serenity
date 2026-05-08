@@ -10,7 +10,7 @@ use crate::builder::{
     EditInteractionResponse,
 };
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 /// An interaction triggered by a message component.

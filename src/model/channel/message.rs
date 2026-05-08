@@ -10,14 +10,14 @@ use nonmax::NonMaxU8;
 use nonmax::NonMaxU64;
 use serde::de::Error as _;
 
-#[cfg(all(feature = "model", feature = "utils"))]
+#[cfg(feature = "model")]
 use crate::builder::{CreateAllowedMentions, CreateMessage, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
 use crate::constants;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 use crate::model::utils::{StrOrInt, discord_colours};
 

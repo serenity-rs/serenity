@@ -5,8 +5,6 @@ use nonmax::NonMaxU16;
 use super::CreateForumTag;
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].

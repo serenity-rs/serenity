@@ -3,7 +3,7 @@
 #[cfg(feature = "model")]
 use crate::builder::{EditWebhook, EditWebhookMessage, ExecuteWebhook};
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 enum_number! {
