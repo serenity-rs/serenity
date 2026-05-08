@@ -5,8 +5,6 @@ use nonmax::NonMaxU16;
 use super::CreateMessage;
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// [Discord docs](https://docs.discord.com/developers/resources/channel#start-thread-in-forum-or-media-channel).

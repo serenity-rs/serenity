@@ -75,6 +75,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run tests
+        env:
+          RUSTFLAGS: -D warnings
         run: cargo test --no-default-features --features "${{ matrix.features || 'full' }}"
 
   check:
@@ -117,6 +119,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run checks
+        env:
+          RUSTFLAGS: -D warnings
         run: cargo check --no-default-features --features "${{ matrix.features || 'full' }}"
 
   MSRV:
@@ -142,6 +146,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run checks
+        env:
+          RUSTFLAGS: -D warnings
         run: cargo check --features full
 
   min_versions:
@@ -164,6 +170,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Check minimal versions
+        env:
+          RUSTFLAGS: -D warnings
         run: |
           cargo update -Z minimal-versions
           cargo check

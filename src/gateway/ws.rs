@@ -1,5 +1,5 @@
 use std::env::consts;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::time::{Duration, SystemTime};
 
 use flate2::read::ZlibDecoder;
@@ -137,6 +137,8 @@ impl Compression {
                 decoder,
                 compressed,
             } => {
+                use std::io::Write;
+
                 const ZLIB_SUFFIX: [u8; 4] = [0x00, 0x00, 0xFF, 0xFF];
 
                 compressed.extend_from_slice(slice);
@@ -162,6 +164,8 @@ impl Compression {
             Compression::Zstd {
                 decoder,
             } => {
+                use std::io::Write;
+
                 decoder.get_mut().clear();
                 decoder.write_all(slice).map_err(|why| {
                     warn!("Err decompressing bytes: {why:?}");

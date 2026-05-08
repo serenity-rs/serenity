@@ -110,11 +110,11 @@ impl CacheUpdate for ChannelInfoEvent {
             let old_voice_start_time = channel.voice_start_time;
             channel.status.clone_from(&channel_info_channel.status);
             channel.voice_start_time.clone_from(&channel_info_channel.voice_start_time);
-            old.push(ChannelInfoChannel::new(
-                channel_info_channel.id,
-                old_status,
-                old_voice_start_time,
-            ));
+            old.push(ChannelInfoChannel {
+                id: channel_info_channel.id,
+                status: old_status,
+                voice_start_time: old_voice_start_time,
+            });
         }
 
         if old.is_empty() { None } else { Some(old) }

@@ -598,21 +598,6 @@ pub struct ChannelInfoChannel {
     pub voice_start_time: Option<i64>,
 }
 
-impl ChannelInfoChannel {
-    #[must_use]
-    pub(crate) fn new(
-        id: ChannelId,
-        status: Option<FixedString<u16>>,
-        voice_start_time: Option<i64>,
-    ) -> Self {
-        Self {
-            id,
-            status,
-            voice_start_time,
-        }
-    }
-}
-
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#request-channel-info-request-channel-info-structure).
 #[derive(Debug)]
 pub enum ChannelInfoField {

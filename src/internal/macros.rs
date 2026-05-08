@@ -186,6 +186,7 @@ macro_rules! bitflags {
 /// Discord-defined [`HttpResponseCode`]s and meanings into error messages.
 ///
 /// [`HttpResponseCode`]: crate::http::HttpResponseCode
+#[cfg(feature = "http")]
 macro_rules! http_response_codes {
     (
         $(

@@ -7,10 +7,11 @@ pub use std::result::Result as StdResult;
 pub use extract_map::{ExtractKey, ExtractMap};
 pub use serde_json::Value;
 pub use small_fixed_array::{FixedArray, FixedString, TruncatingInto};
-pub use to_arraystring::ToArrayString;
 
 pub use super::utils::join_to_string;
 #[cfg(feature = "http")]
 pub use crate::error::Error;
 pub use crate::error::Result;
-pub use crate::secrets::{SecretString, Token};
+pub use crate::secrets::SecretString;
+#[cfg(feature = "http")]
+pub use crate::secrets::Token;

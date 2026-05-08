@@ -2,8 +2,6 @@ use std::borrow::Cow;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// Builder for creating a stage instance

@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "http")]
 use crate::model::prelude::*;
 
 /// A builder which edits the properties of the bot's [`Member`], to be used in conjunction with

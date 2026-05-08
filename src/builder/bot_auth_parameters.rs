@@ -1,12 +1,11 @@
 use std::borrow::Cow;
 
 use arrayvec::ArrayVec;
+pub use to_arraystring::ToArrayString;
 use url::Url;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder for constructing an invite link with custom OAuth2 scopes.

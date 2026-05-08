@@ -14,7 +14,6 @@ use super::{
 };
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-response-object).

@@ -2,8 +2,6 @@ use std::borrow::Cow;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 #[cfg(any(feature = "http", doc))]
 use crate::model::prelude::*;
 

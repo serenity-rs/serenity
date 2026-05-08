@@ -10,8 +10,6 @@ use super::{
 };
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#edit-original-interaction-response)

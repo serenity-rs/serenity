@@ -34,7 +34,6 @@ use super::{
 };
 use crate::builder::{CreateAllowedMentions, CreateAttachment};
 use crate::constants;
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 // NOTE: This cannot be passed in from outside, due to `Cell` being !Send.

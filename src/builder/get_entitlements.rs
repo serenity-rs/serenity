@@ -4,9 +4,7 @@ use nonmax::NonMaxU8;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
-use crate::internal::prelude::Result;
-use crate::model::id::{EntitlementId, GuildId, SkuId, UserId};
-use crate::model::monetization::Entitlement;
+use crate::model::prelude::*;
 
 /// Builds a request to fetch active and ended [`Entitlement`]s.
 ///

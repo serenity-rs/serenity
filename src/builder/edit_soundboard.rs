@@ -2,8 +2,6 @@ use std::borrow::Cow;
 
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to create or edit a [`Soundboard`] for use with [`GuildId::edit_soundboard`].

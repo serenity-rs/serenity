@@ -3,8 +3,6 @@ use std::borrow::Cow;
 use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
-#[cfg(feature = "http")]
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
 /// A builder to optionally edit certain fields of a guild
