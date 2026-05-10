@@ -10,53 +10,79 @@ use crate::http::Http;
 
 /// Information about an invite code.
 ///
-/// Information can not be accessed for guilds the current user is banned from.
-///
 /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Invite {
-    /// The approximate number of [`Member`]s in the related [`Guild`].
-    pub approximate_member_count: Option<NonMaxU64>,
-    /// The approximate number of [`Member`]s with an active session in the related [`Guild`].
-    ///
-    /// An active session is defined as an open, heartbeating WebSocket connection.
-    /// These include [invisible][`OnlineStatus::Invisible`] members.
-    pub approximate_presence_count: Option<NonMaxU64>,
+    /// The type of invite.
+    #[serde(rename = "type")]
+    pub kind: InviteType,
     /// The unique code for the invite.
     pub code: FixedString,
-    /// A representation of the minimal amount of information needed about the [`GuildChannel`]
-    /// being invited to.
-    pub channel: InviteChannel,
     /// A representation of the minimal amount of information needed about the [`Guild`] being
     /// invited to.
     pub guild: Option<InviteGuild>,
-    /// A representation of the minimal amount of information needed about the [`User`] that
-    /// created the invite.
+    /// A representation of the minimal amount of information needed about the [`GuildChannel`]
+    /// being invited to.
+    pub channel: InviteChannel,
+    /// The [`User`] who created the invite.
     ///
-    /// This can be [`None`] for invites created by Discord such as invite-widgets or vanity invite
+    /// Can be [`None`] for invites created by Discord, e.g., server widgets or vanity invite
     /// links.
     pub inviter: Option<User>,
     /// The type of target for this voice channel invite.
     pub target_type: Option<InviteTargetType>,
-    /// The user whose stream to display for this voice channel stream invite.
+    /// The [`User`] whose stream to display for this voice channel stream invite.
     ///
     /// Only shows up if `target_type` is `Stream`.
-    pub target_user: Option<UserId>,
+    pub target_user: Option<User>,
     /// The embedded application to open for this voice channel embedded application invite.
     ///
     /// Only shows up if `target_type` is `EmmbeddedApplication`.
-    pub target_application: Option<ApplicationId>,
-    /// The expiration date of this invite, returned from `Http::get_invite` when `with_expiration`
-    /// is true.
+    pub target_application: Option<MessageApplication>,
+    /// The approximate number of [`Member`]s with an active session in the related [`Guild`].
+    ///
+    /// An active session is defined as an open, heartbeating WebSocket connection.
+    /// These include [invisible][`OnlineStatus::Invisible`] members.
+    ///
+    /// Only included when retrieving a single invite with `member_counts` set to `true`.
+    pub approximate_presence_count: Option<NonMaxU64>,
+    /// The approximate number of [`Member`]s in the related [`Guild`].
+    ///
+    /// Only included when retrieving a single invite with `member_counts` set to `true`.
+    pub approximate_member_count: Option<NonMaxU64>,
+    /// The expiration date of this invite.
     pub expires_at: Option<Timestamp>,
-    /// The Stage instance data if there is a public Stage instance in the Stage channel this
-    /// invite is for.
-    pub stage_instance: Option<InviteStageInstance>,
-    /// Guild scheduled event data, only included if guild_scheduled_event_id contains a valid
-    /// guild scheduled event id (according to Discord docs, whatever that means).
+    /// Guild scheduled event data.
+    ///
+    /// Only included when retrieving a single invite with a valid [`ScheduledEventId`] provided
+    /// for `event_id`.
     #[serde(rename = "guild_scheduled_event")]
     pub scheduled_event: Option<ScheduledEvent>,
+    /// Guild invite flags for guild invites.
+    pub flags: Option<GuildInviteFlags>,
+    /// A representation of the minimal amount of information needed about the [`Role`]s assigned
+    /// to a user upon accepting the invite.
+    pub roles: Option<FixedArray<InviteRole>>,
+    /// Extra information about an invite.
+    ///
+    /// Only included when retrieving guild invites with the
+    /// [`MANAGE_GUILD`][Permissions::MANAGE_GUILD] permission or channel invites with the
+    /// [`MANAGE_CHANNELS`][Permissions::MANAGE_CHANNELS] permission.
+    #[serde(flatten)]
+    pub metadata: Option<InviteMetadata>,
+}
+
+bitflags! {
+    /// Flags for a guild invite.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-guild-invite-flags).
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+    pub struct GuildInviteFlags: u32 {
+        /// This invite is a guest invite for a voice channel.
+        const IS_GUEST_INVITE = 1 << 0;
+    }
 }
 
 #[cfg(feature = "model")]
@@ -74,21 +100,21 @@ impl Invite {
         http: &Http,
         channel_id: ChannelId,
         builder: CreateInvite<'_>,
-    ) -> Result<RichInvite> {
+    ) -> Result<Invite> {
         channel_id.create_invite(http, builder).await
     }
 
     /// Deletes the invite.
     ///
-    /// **Note**: Requires the [Manage Guild] permission.
+    /// **Note**: Requires the [Manage Channels] permission on the channel this invite belongs to,
+    /// or [Manage Guild] to remove any invite across the guild.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if the invite is
-    /// invalid.
+    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    /// [permission]: super::permissions
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<Invite> {
         http.delete_invite(&self.code, reason).await
     }
@@ -99,7 +125,6 @@ impl Invite {
     /// * `code` - The invite code.
     /// * `member_counts` - Whether to include information about the current number of members in
     ///   the server that the invite belongs to.
-    /// * `expiration` - Whether to include information about when the invite expires.
     /// * `event_id` - An optional server event ID to include with the invite.
     ///
     /// More information about these arguments can be found on Discord's
@@ -113,10 +138,9 @@ impl Invite {
         http: &Http,
         code: &str,
         member_counts: bool,
-        expiration: bool,
         event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
-        http.get_invite(code, member_counts, expiration, event_id).await
+        http.get_invite(code, member_counts, event_id).await
     }
 
     /// Returns a URL to use for the invite.
@@ -131,14 +155,8 @@ impl Invite {
     /// #
     /// # fn main() {
     /// # let invite = from_value::<Invite>(json!({
-    /// #     "approximate_member_count": Some(1812),
-    /// #     "approximate_presence_count": Some(717),
+    /// #     "type": 0,
     /// #     "code": "WxZumR",
-    /// #     "channel": {
-    /// #         "id": ChannelId::new(1),
-    /// #         "name": "foo",
-    /// #         "type": ChannelType::Text,
-    /// #     },
     /// #     "guild": {
     /// #         "id": GuildId::new(2),
     /// #         "icon": None::<String>,
@@ -150,12 +168,19 @@ impl Invite {
     /// #         "verification_level": 2,
     /// #         "nsfw_level": 0,
     /// #     },
+    /// #     "channel": {
+    /// #         "id": ChannelId::new(1),
+    /// #         "name": "foo",
+    /// #         "type": ChannelType::Text,
+    /// #     },
     /// #     "inviter": {
     /// #         "id": UserId::new(3),
     /// #         "username": "foo",
     /// #         "discriminator": "1234",
     /// #         "avatar": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     /// #     },
+    /// #     "approximate_presence_count": Some(717),
+    /// #     "approximate_member_count": Some(1812),
     /// # })).unwrap();
     /// #
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
@@ -198,128 +223,64 @@ pub struct InviteGuild {
     pub premium_subscription_count: Option<NonMaxU64>,
 }
 
-/// Detailed information about an invite.
+/// A minimal amount of information about a role assigned to a user upon accepting an invite.
 ///
-/// This information can only be retrieved by anyone with the [Manage Guild] permission. Otherwise,
-/// a minimal amount of information can be retrieved via the [`Invite`] struct.
+/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-invite-structure).
+#[non_exhaustive]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InviteRole {
+    pub id: RoleId,
+    pub name: FixedString,
+    pub position: i16,
+    #[serde(rename = "color")]
+    pub colour: Colour,
+    #[serde(rename = "colors")]
+    pub colours: RoleColours,
+    pub icon: Option<ImageHash>,
+    pub unicode_emoji: Option<FixedString>,
+}
+
+/// Extra information about an invite. Extends [`Invite`].
+///
+/// Retrieving this information requires the [Manage Guild] permission when retrieving guild
+/// invites or the [Manage Channels] permission when retrieving channel invites.
 ///
 /// [Manage Guild]: Permissions::MANAGE_GUILD
+/// [Manage Channels]: Permissions::MANAGE_CHANNELS
 ///
-/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-metadata-object) (extends [`Invite`] fields).
+/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-metadata-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
-pub struct RichInvite {
-    /// A representation of the minimal amount of information needed about the channel being
-    /// invited to.
-    pub channel: InviteChannel,
-    /// The unique code for the invite.
-    pub code: FixedString,
+pub struct InviteMetadata {
+    /// The number of times the invite has been used.
+    pub uses: u64,
+    /// The maximum number of times the invite can be used.
+    ///
+    /// If the value is `0`, then the invite has unlimited uses.
+    pub max_uses: u8,
+    /// The duration (in seconds) after which the invite expires.
+    ///
+    /// If the value is `0`, then the invite never expires.
+    pub max_age: u32,
+    /// Whether the invite only grants temporary membership.
+    pub temporary: bool,
     /// When the invite was created.
     pub created_at: Timestamp,
-    /// A representation of the minimal amount of information needed about the [`Guild`] being
-    /// invited to.
-    pub guild: Option<InviteGuild>,
-    /// The user that created the invite.
-    pub inviter: Option<User>,
-    /// The maximum age of the invite in seconds, from when it was created.
-    pub max_age: u32,
-    /// The maximum number of times that an invite may be used before it expires.
-    ///
-    /// Note that this does not supersede the [`Self::max_age`] value, if the value of
-    /// [`Self::temporary`] is `true`. If the value of `temporary` is `false`, then the invite
-    /// _will_ self-expire after the given number of max uses.
-    ///
-    /// If the value is `0`, then the invite is permanent.
-    pub max_uses: u8,
-    /// Indicator of whether the invite self-expires after a certain amount of time or uses.
-    pub temporary: bool,
-    /// The amount of times that an invite has been used.
-    pub uses: u64,
 }
 
-#[cfg(feature = "model")]
-impl RichInvite {
-    /// Deletes the invite.
+enum_number! {
+    /// Type of invite.
     ///
-    /// Refer to [`Http::delete_invite`] for more information.
-    ///
-    /// **Note**: Requires the [Manage Guild] permission.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-    ///
-    /// [Manage Guild]: Permissions::MANAGE_GUILD
-    /// [permission]: super::permissions
-    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<Invite> {
-        http.delete_invite(&self.code, reason).await
+    /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-invite-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum InviteType {
+        Guild = 0,
+        GroupDm = 1,
+        Friend = 2,
+        _ => Unknown(u8),
     }
-
-    /// Returns a URL to use for the invite.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve the URL for an invite with the code `WxZumR`:
-    ///
-    /// ```rust
-    /// # use serde_json::{json, from_value};
-    /// # use serenity::model::prelude::*;
-    /// #
-    /// # fn main() {
-    /// # let invite = from_value::<RichInvite>(json!({
-    /// #     "code": "WxZumR",
-    /// #     "channel": {
-    /// #         "id": ChannelId::new(1),
-    /// #         "name": "foo",
-    /// #         "type": ChannelType::Text,
-    /// #     },
-    /// #     "created_at": "2017-01-29T15:35:17.136000+00:00",
-    /// #     "guild": {
-    /// #         "id": GuildId::new(2),
-    /// #         "icon": None::<String>,
-    /// #         "name": "baz",
-    /// #         "splash_hash": None::<String>,
-    /// #         "text_channel_count": None::<u64>,
-    /// #         "voice_channel_count": None::<u64>,
-    /// #         "features": ["NEWS", "DISCOVERABLE"],
-    /// #         "verification_level": 2,
-    /// #         "nsfw_level": 0,
-    /// #     },
-    /// #     "inviter": {
-    /// #         "avatar": None::<String>,
-    /// #         "bot": false,
-    /// #         "discriminator": "1234",
-    /// #         "id": UserId::new(4),
-    /// #         "username": "qux",
-    /// #         "public_flags": None::<UserPublicFlags>,
-    /// #     },
-    /// #     "max_age": 5,
-    /// #     "max_uses": 6,
-    /// #     "temporary": true,
-    /// #     "uses": 7,
-    /// # })).unwrap();
-    /// #
-    /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
-    /// # }
-    /// ```
-    #[must_use]
-    pub fn url(&self) -> String {
-        format!("https://discord.gg/{}", self.code)
-    }
-}
-
-/// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-stage-instance-object).
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct InviteStageInstance {
-    /// The members speaking in the Stage
-    pub members: FixedArray<PartialMember>,
-    /// The number of users in the Stage
-    pub participant_count: u64,
-    /// The number of users speaking in the Stage
-    pub speaker_count: u64,
-    /// The topic of the Stage instance (1-120 characters)
-    pub topic: FixedString<u16>,
 }
 
 enum_number! {

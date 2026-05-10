@@ -722,13 +722,13 @@ impl Http {
         self.wind(request).await
     }
 
-    /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
+    /// Creates an [`Invite`] for the given [channel][`GuildChannel`].
     pub async fn create_invite(
         &self,
         channel_id: ChannelId,
         map: &impl serde::Serialize,
         audit_log_reason: Option<&str>,
-    ) -> Result<RichInvite> {
+    ) -> Result<Invite> {
         let body = to_vec(map)?;
 
         self.fire(Request {
@@ -2621,7 +2621,7 @@ impl Http {
     }
 
     /// Gets all invites for a channel.
-    pub async fn get_channel_invites(&self, channel_id: ChannelId) -> Result<Vec<RichInvite>> {
+    pub async fn get_channel_invites(&self, channel_id: ChannelId) -> Result<Vec<Invite>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3401,7 +3401,7 @@ impl Http {
     }
 
     /// Gets all invites to a guild.
-    pub async fn get_guild_invites(&self, guild_id: GuildId) -> Result<Vec<RichInvite>> {
+    pub async fn get_guild_invites(&self, guild_id: GuildId) -> Result<Vec<Invite>> {
         self.fire(Request {
             body: None,
             multipart: None,
@@ -3801,17 +3801,13 @@ impl Http {
         &self,
         code: &str,
         member_counts: bool,
-        expiration: bool,
         event_id: Option<ScheduledEventId>,
     ) -> Result<Invite> {
-        let (member_counts_str, expiration_str, event_id_str);
-        let mut params = ArrayVec::<_, 3>::new();
+        let (member_counts_str, event_id_str);
+        let mut params = ArrayVec::<_, 2>::new();
 
         member_counts_str = member_counts.to_arraystring();
         params.push(("with_counts", member_counts_str.as_str()));
-
-        expiration_str = expiration.to_arraystring();
-        params.push(("with_expiration", &expiration_str));
 
         if let Some(event_id) = event_id {
             event_id_str = event_id.to_arraystring();

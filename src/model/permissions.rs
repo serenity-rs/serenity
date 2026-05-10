@@ -267,9 +267,9 @@ pub const PRESET_VOICE: Permissions = Permissions::from_bits_truncate(
 pub struct Permissions(u64);
 
 generate_permissions! {
-    /// Allows for the creation of [`RichInvite`]s.
+    /// Allows for the creation of [`Invite`]s.
     ///
-    /// [`RichInvite`]: super::invite::RichInvite
+    /// [`Invite`]: super::invite::Invite
     CREATE_INSTANT_INVITE, create_instant_invite, "Create Invites" = 1 << 0;
     /// Allows for the kicking of guild [member]s.
     ///

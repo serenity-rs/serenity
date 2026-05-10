@@ -1,10 +1,12 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-/// A builder to create a [`RichInvite`] for use via [`ChannelId::create_invite`].
+/// A builder to create an [`Invite`] for use via [`ChannelId::create_invite`].
 ///
 /// This is a structured and cleaner way of creating an invite, as all parameters are optional.
 ///
@@ -41,6 +43,8 @@ pub struct CreateInvite<'a> {
     target_user_id: Option<UserId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     target_application_id: Option<ApplicationId>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    role_ids: Option<Cow<'a, [RoleId]>>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -52,27 +56,23 @@ impl<'a> CreateInvite<'a> {
         Self::default()
     }
 
-    /// The duration that the invite will be valid for.
+    /// The duration of the invite in seconds before expiry.
     ///
-    /// Set to `0` for an invite which does not expire after an amount of time.
-    ///
-    /// Defaults to `86400`, or 24 hours.
+    /// Between `0` (never) and `604800` (7 days). Defaults to `86400` (24 hours).
     pub fn max_age(mut self, max_age: u32) -> Self {
         self.max_age = Some(max_age);
         self
     }
 
-    /// The number of uses that the invite will be valid for.
+    /// The maximum number of uses for the invite.
     ///
-    /// Set to `0` for an invite which does not expire after a number of uses.
-    ///
-    /// Defaults to `0`.
+    /// Between `0` (unlimited) and `100`. Defaults to `0`.
     pub fn max_uses(mut self, max_uses: u8) -> Self {
         self.max_uses = Some(max_uses);
         self
     }
 
-    /// Whether an invite grants a temporary membership.
+    /// Whether the invite only grants temporary membership.
     ///
     /// Defaults to `false`.
     pub fn temporary(mut self, temporary: bool) -> Self {
@@ -94,31 +94,33 @@ impl<'a> CreateInvite<'a> {
         self
     }
 
-    /// The ID of the user whose stream to display for this invite, required if `target_type` is
-    /// `Stream`
-    /// The user must be streaming in the channel.
+    /// The [`UserId`] of the user whose stream to display for this invite.
+    ///
+    /// Required if `target_type` is `Stream`. The user must be streaming in the channel.
     pub fn target_user_id(mut self, target_user_id: UserId) -> Self {
         self.target_user_id = Some(target_user_id);
         self
     }
 
-    /// The ID of the embedded application to open for this invite, required if `target_type` is
-    /// `EmmbeddedApplication`.
+    /// The ID of the embedded application to open for this invite.
     ///
-    /// The application must have the `EMBEDDED` flag.
+    /// Required if `target_type` is `EmmbeddedApplication`. The application must have the
+    /// [`ApplicationFlags::EMBEDDED`] flag.
     ///
-    /// When sending an invite with this value, the first user to use the invite will have to click
-    /// on the URL, that will enable the buttons in the embed.
+    /// Some examples of popular embedded applications:
     ///
-    /// These are some of the known applications which have the flag:
-    ///
-    /// betrayal: `773336526917861400`
-    /// youtube: `755600276941176913`
-    /// fishing: `814288819477020702`
-    /// poker: `755827207812677713`
-    /// chess: `832012774040141894`
+    /// Watch Together: `880218394199220334`
+    /// Wordle: `1211781489931452447`
+    /// Poker Night: `755827207812677713`
+    /// Chess in the Park: `832012774040141894`
     pub fn target_application_id(mut self, target_application_id: ApplicationId) -> Self {
         self.target_application_id = Some(target_application_id);
+        self
+    }
+
+    /// The [`RoleId`]s for roles in the guild given to the users that accept this invite.
+    pub fn role_ids(mut self, role_ids: impl Into<Cow<'a, [RoleId]>>) -> Self {
+        self.role_ids = Some(role_ids.into());
         self
     }
 
@@ -139,7 +141,7 @@ impl<'a> CreateInvite<'a> {
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[cfg(feature = "http")]
-    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<RichInvite> {
+    pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<Invite> {
         http.create_invite(channel_id, &self, self.audit_log_reason).await
     }
 }

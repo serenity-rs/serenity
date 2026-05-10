@@ -98,7 +98,7 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-    pub async fn create_invite(self, http: &Http, builder: CreateInvite<'_>) -> Result<RichInvite> {
+    pub async fn create_invite(self, http: &Http, builder: CreateInvite<'_>) -> Result<Invite> {
         builder.execute(http, self).await
     }
 
@@ -215,7 +215,7 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn invites(self, http: &Http) -> Result<Vec<RichInvite>> {
+    pub async fn invites(self, http: &Http) -> Result<Vec<Invite>> {
         http.get_channel_invites(self).await
     }
 

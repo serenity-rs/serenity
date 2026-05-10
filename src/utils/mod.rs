@@ -22,7 +22,7 @@ use crate::model::prelude::*;
 ///
 /// # Examples
 ///
-/// Two formats of [invite][`RichInvite`] codes are supported, both regardless of protocol prefix.
+/// Two formats of [invite][`Invite`] codes are supported, both regardless of protocol prefix.
 /// Some examples:
 ///
 /// 1. Retrieving the code from the URL `"https://discord.gg/0cDvIgU2voY8RSYL"`:
@@ -45,7 +45,7 @@ use crate::model::prelude::*;
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// [`RichInvite`]: crate::model::invite::RichInvite
+/// [`Invite`]: crate::model::invite::Invite
 #[must_use]
 pub fn parse_invite(code: &str) -> &str {
     let code = code.trim_start_matches("http://").trim_start_matches("https://");

@@ -1016,7 +1016,8 @@ impl GuildId {
 
     /// Gets all of the guild's invites.
     ///
-    /// Requires the [Manage Guild] permission.
+    /// Requires the [Manage Guild] or [View Audit Log] permission. [`InviteMetadata`] is only
+    /// included with the [Manage Guild] permission.
     ///
     /// # Errors
     ///
@@ -1024,7 +1025,8 @@ impl GuildId {
     /// [`Error::Json`] if there is an error in deserializing the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
-    pub async fn invites(self, http: &Http) -> Result<Vec<RichInvite>> {
+    /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
+    pub async fn invites(self, http: &Http) -> Result<Vec<Invite>> {
         http.get_guild_invites(self).await
     }
 
