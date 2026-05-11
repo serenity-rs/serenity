@@ -3,28 +3,26 @@ use std::borrow::Cow;
 use reqwest::multipart::{Form, Part};
 use tokio::fs::File;
 
-use crate::builder::{AttachmentData, CreateAttachment};
+use crate::builder::{AttachmentData, AttachmentDataKind};
 use crate::internal::prelude::*;
 
-impl CreateAttachment<'_> {
-    async fn into_part(self) -> Result<Part> {
-        let mut part = match self.data {
-            AttachmentData::Bytes(bytes) => Part::stream(bytes),
-            AttachmentData::File(file) => Part::stream(file.try_clone().await?),
-            AttachmentData::Path(path) => Part::stream(File::open(path).await?),
-        };
-        part = guess_mime_str(part, &self.filename)?;
-        part = part.file_name(self.filename);
-        Ok(part)
-    }
+async fn create_part(attachment: AttachmentData<'_>) -> Result<Part> {
+    let mut part = match attachment.kind {
+        AttachmentDataKind::Bytes(bytes) => Part::stream(bytes),
+        AttachmentDataKind::File(file) => Part::stream(file.try_clone().await?),
+        AttachmentDataKind::Path(path) => Part::stream(File::open(path).await?),
+    };
+    part = guess_mime_str(part, &attachment.filename)?;
+    part = part.file_name(attachment.filename);
+    Ok(part)
 }
 
 #[derive(Clone, Debug)]
 pub enum MultipartUpload<'a> {
     /// A file sent with the form data as an individual upload. For example, a sticker.
-    File(CreateAttachment<'a>),
+    File(AttachmentData<'a>),
     /// Files sent with the form as message attachments.
-    Attachments(Vec<CreateAttachment<'a>>),
+    Attachments(Vec<AttachmentData<'a>>),
 }
 
 /// Holder for multipart body. Contains upload data, multipart fields, and payload_json for
@@ -45,11 +43,11 @@ impl Multipart<'_> {
 
         match self.upload {
             MultipartUpload::File(upload_file) => {
-                multipart = multipart.part("file", upload_file.into_part().await?);
+                multipart = multipart.part("file", create_part(upload_file).await?);
             },
             MultipartUpload::Attachments(attachment_files) => {
                 for (idx, file) in attachment_files.into_iter().enumerate() {
-                    let part = file.into_part().await?;
+                    let part = create_part(file).await?;
                     multipart = multipart.part(format!("files[{idx}]"), part);
                 }
             },

@@ -60,7 +60,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .send_message(
                 &ctx.http,
                 CreateMessage::new()
-                    .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
+                    .add_file(CreateAttachment::url(IMAGE_URL, "testing.png").await?),
             )
             .await?;
         // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
@@ -74,14 +74,14 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .send_message(
                 &ctx.http,
                 CreateMessage::new()
-                    .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
+                    .add_file(CreateAttachment::url(IMAGE_URL, "testing.png").await?),
             )
             .await?;
         msg.edit(
             ctx,
             EditMessage::new().attachments(
                 EditAttachments::keep_all(&msg)
-                    .add(CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?),
+                    .add(CreateAttachment::url(IMAGE_URL_2, "testing1.png").await?),
             ),
         )
         .await?;
@@ -195,7 +195,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         // As of 2023-04-20, bots are still not allowed to sending voice messages
         let builder = CreateMessage::new()
             .flags(MessageFlags::IS_VOICE_MESSAGE)
-            .add_file(CreateAttachment::url(&ctx.http, audio_url, "testing.ogg").await?);
+            .add_file(CreateAttachment::url(audio_url, "testing.ogg").await?);
 
         msg.author.id.dm(&ctx.http, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
@@ -246,9 +246,8 @@ async fn command_interaction(
             .create_response(
                 &ctx.http,
                 CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new().add_file(
-                        CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
-                    ),
+                    CreateInteractionResponseMessage::new()
+                        .add_file(CreateAttachment::url(IMAGE_URL, "testing.png").await?),
                 ),
             )
             .await?;
@@ -262,7 +261,7 @@ async fn command_interaction(
                 &ctx.http,
                 EditInteractionResponse::new().attachments(
                     EditAttachments::keep_all(&msg)
-                        .add(CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?),
+                        .add(CreateAttachment::url(IMAGE_URL_2, "testing1.png").await?),
                 ),
             )
             .await?;
@@ -318,9 +317,8 @@ async fn command_interaction(
             .create_response(
                 &ctx.http,
                 CreateInteractionResponse::Message(
-                    CreateInteractionResponseMessage::new().add_file(
-                        CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
-                    ),
+                    CreateInteractionResponseMessage::new()
+                        .add_file(CreateAttachment::url(IMAGE_URL, "testing.png").await?),
                 ),
             )
             .await?;
@@ -328,9 +326,8 @@ async fn command_interaction(
         interaction
             .edit_response(
                 &ctx.http,
-                EditInteractionResponse::new().new_attachment(
-                    CreateAttachment::url(&ctx.http, IMAGE_URL_2, "testing1.png").await?,
-                ),
+                EditInteractionResponse::new()
+                    .new_attachment(CreateAttachment::url(IMAGE_URL_2, "testing1.png").await?),
             )
             .await?;
 
@@ -338,7 +335,7 @@ async fn command_interaction(
             .create_followup(
                 &ctx.http,
                 CreateInteractionResponseFollowup::new()
-                    .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
+                    .add_file(CreateAttachment::url(IMAGE_URL, "testing.png").await?),
             )
             .await?;
     } else if interaction.data.name == "editembeds" {

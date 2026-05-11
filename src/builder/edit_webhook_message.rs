@@ -179,7 +179,8 @@ impl<'a> EditWebhookMessage<'a> {
     ) -> Result<Message> {
         self.check_length()?;
 
-        let files = self.attachments.as_ref().map_or(Vec::new(), EditAttachments::new_attachments);
+        let files =
+            self.attachments.as_ref().map_or(Vec::new(), EditAttachments::new_attachment_data);
 
         if self.allowed_mentions.is_none() {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);

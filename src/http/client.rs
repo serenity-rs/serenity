@@ -32,7 +32,7 @@ use super::{
     MessagePagination,
     UserPagination,
 };
-use crate::builder::{CreateAllowedMentions, CreateAttachment};
+use crate::builder::{AttachmentData, CreateAllowedMentions};
 use crate::constants;
 use crate::model::prelude::*;
 
@@ -471,7 +471,7 @@ impl Http {
         &self,
         channel_id: ChannelId,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<AttachmentData<'_>>,
         audit_log_reason: Option<&str>,
     ) -> Result<GuildThread> {
         self.fire(Request {
@@ -537,7 +537,7 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<AttachmentData<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -686,7 +686,7 @@ impl Http {
         interaction_id: InteractionId,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<AttachmentData<'_>>,
     ) -> Result<()> {
         let mut request = Request {
             body: None,
@@ -845,7 +845,7 @@ impl Http {
         &self,
         guild_id: GuildId,
         fields: Vec<(Cow<'static, str>, Cow<'static, str>)>,
-        file: CreateAttachment<'_>,
+        file: AttachmentData<'_>,
         audit_log_reason: Option<&str>,
     ) -> Result<Sticker> {
         self.fire(Request {
@@ -1475,7 +1475,7 @@ impl Http {
         interaction_token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment<'_>>,
+        new_attachments: Vec<AttachmentData<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -1732,7 +1732,7 @@ impl Http {
         channel_id: GenericChannelId,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment<'_>>,
+        new_attachments: Vec<AttachmentData<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -1844,7 +1844,7 @@ impl Http {
         &self,
         interaction_token: &str,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment<'_>>,
+        new_attachments: Vec<AttachmentData<'_>>,
     ) -> Result<Message> {
         let mut request = Request {
             body: None,
@@ -2112,7 +2112,7 @@ impl Http {
         thread_id: Option<ThreadId>,
         token: &str,
         wait: bool,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<AttachmentData<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
         self.execute_webhook_(webhook_id, thread_id, token, wait, files, map, false).await
@@ -2130,7 +2130,7 @@ impl Http {
         thread_id: Option<ThreadId>,
         token: &str,
         wait: bool,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<AttachmentData<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Option<Message>> {
         self.execute_webhook_(webhook_id, thread_id, token, wait, files, map, true).await
@@ -2143,7 +2143,7 @@ impl Http {
         thread_id: Option<ThreadId>,
         token: &str,
         wait: bool,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<AttachmentData<'_>>,
         map: &impl serde::Serialize,
         with_components: bool,
     ) -> Result<Option<Message>> {
@@ -2228,7 +2228,7 @@ impl Http {
         token: &str,
         message_id: MessageId,
         map: &impl serde::Serialize,
-        new_attachments: Vec<CreateAttachment<'_>>,
+        new_attachments: Vec<AttachmentData<'_>>,
     ) -> Result<Message> {
         let thread_id_str;
         let mut params = None;
@@ -4216,7 +4216,7 @@ impl Http {
     pub async fn send_message(
         &self,
         channel_id: GenericChannelId,
-        files: Vec<CreateAttachment<'_>>,
+        files: Vec<AttachmentData<'_>>,
         map: &impl serde::Serialize,
     ) -> Result<Message> {
         let mut request = Request {

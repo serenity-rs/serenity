@@ -2,18 +2,24 @@ use std::borrow::Cow;
 use std::path::Path;
 
 use bytes::Bytes;
+#[cfg(feature = "http")]
+use reqwest::{Client as ReqwestClient, IntoUrl};
 use serde::ser::{Serialize, SerializeSeq, Serializer};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
 use crate::error::{Error, Result, UrlError};
-#[cfg(feature = "http")]
-use crate::http::Http;
 use crate::model::channel::Message;
 use crate::model::id::AttachmentId;
 
 #[derive(Clone, Debug)]
-pub enum AttachmentData<'a> {
+pub struct AttachmentData<'a> {
+    pub filename: Cow<'static, str>,
+    pub kind: AttachmentDataKind<'a>,
+}
+
+#[derive(Clone, Debug)]
+pub enum AttachmentDataKind<'a> {
     Bytes(Bytes),
     File(&'a File),
     Path(&'a Path),
@@ -26,20 +32,21 @@ pub enum AttachmentData<'a> {
 #[non_exhaustive]
 #[must_use]
 pub struct CreateAttachment<'a> {
-    pub filename: Cow<'static, str>,
-    pub description: Option<Cow<'a, str>>,
-    pub spoiler: bool,
-    pub data: AttachmentData<'a>,
+    description: Option<Cow<'a, str>>,
+    spoiler: bool,
+    data: AttachmentData<'a>,
 }
 
 impl<'a> CreateAttachment<'a> {
     /// Builds an [`CreateAttachment`] from the raw attachment data.
     pub fn bytes(data: impl Into<Bytes>, filename: impl Into<Cow<'static, str>>) -> Self {
         CreateAttachment {
-            filename: filename.into(),
             description: None,
             spoiler: false,
-            data: AttachmentData::Bytes(data.into()),
+            data: AttachmentData {
+                filename: filename.into(),
+                kind: AttachmentDataKind::Bytes(data.into()),
+            },
         }
     }
 
@@ -55,20 +62,24 @@ impl<'a> CreateAttachment<'a> {
             .to_string_lossy()
             .into_owned();
         Ok(CreateAttachment {
-            filename: filename.into(),
             description: None,
             spoiler: false,
-            data: AttachmentData::Path(path),
+            data: AttachmentData {
+                filename: filename.into(),
+                kind: AttachmentDataKind::Path(path),
+            },
         })
     }
 
     /// Builds an [`CreateAttachment`] by reading from a file handler.
     pub fn file(file: &'a File, filename: impl Into<Cow<'static, str>>) -> Self {
         CreateAttachment {
-            filename: filename.into(),
             description: None,
             spoiler: false,
-            data: AttachmentData::File(file),
+            data: AttachmentData {
+                filename: filename.into(),
+                kind: AttachmentDataKind::File(file),
+            },
         }
     }
 
@@ -78,12 +89,8 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// Returns [`Error::Http`] if downloading the data fails.
     #[cfg(feature = "http")]
-    pub async fn url(
-        http: &Http,
-        url: impl reqwest::IntoUrl,
-        filename: impl Into<Cow<'static, str>>,
-    ) -> Result<Self> {
-        let response = http.client.get(url).send().await?;
+    pub async fn url(url: impl IntoUrl, filename: impl Into<Cow<'static, str>>) -> Result<Self> {
+        let response = ReqwestClient::new().get(url).send().await?;
         let data = response.bytes().await?;
 
         Ok(CreateAttachment::bytes(data, filename))
@@ -97,16 +104,16 @@ impl<'a> CreateAttachment<'a> {
     /// [`CreateAttachment::path`], then the file at the specified path was unable to be read. If
     /// instead it's [`CreateAttachment::file`], then cloning the handle to the file failed, likely
     /// due to hitting the system's limit on number of open file handles.
-    pub async fn get_data(&self) -> Result<Bytes> {
-        match &self.data {
-            AttachmentData::Bytes(bytes) => Ok(bytes.clone()),
-            AttachmentData::Path(path) => {
+    pub async fn as_bytes(&self) -> Result<Bytes> {
+        match &self.data.kind {
+            AttachmentDataKind::Bytes(bytes) => Ok(bytes.clone()),
+            AttachmentDataKind::Path(path) => {
                 let mut file = File::open(path).await?;
                 let mut data = Vec::new();
                 file.read_to_end(&mut data).await?;
                 Ok(data.into())
             },
-            AttachmentData::File(file) => {
+            AttachmentDataKind::File(file) => {
                 let mut data = Vec::new();
                 file.try_clone().await?.read_to_end(&mut data).await?;
                 Ok(data.into())
@@ -118,12 +125,12 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// # Errors
     ///
-    /// See [`CreateAttachment::get_data`] for details.
+    /// See [`CreateAttachment::as_bytes`] for details.
     pub async fn encode(&self, mimetype: &str) -> Result<DataUri<'_>> {
         use base64::engine::{Config, Engine};
 
         let prefix = format!("data:{mimetype};base64,");
-        let data = self.get_data().await?;
+        let data = self.as_bytes().await?;
 
         let engine = base64::prelude::BASE64_STANDARD;
         let encoded_size = base64::encoded_len(data.len(), engine.config().encode_padding())
@@ -146,6 +153,12 @@ impl<'a> CreateAttachment<'a> {
     pub fn spoiler(mut self, spoiler: bool) -> Self {
         self.spoiler = spoiler;
         self
+    }
+}
+
+impl<'a> From<CreateAttachment<'a>> for AttachmentData<'a> {
+    fn from(value: CreateAttachment<'a>) -> AttachmentData<'a> {
+        value.data
     }
 }
 
@@ -439,12 +452,12 @@ impl<'a> EditAttachments<'a> {
     /// Clones all new attachments into a new Vec, keeping only data and filename, because those
     /// are needed for the multipart form data.
     #[cfg(feature = "http")]
-    pub(crate) fn new_attachments(&self) -> Vec<CreateAttachment<'a>> {
+    pub(crate) fn new_attachment_data(&self) -> Vec<AttachmentData<'a>> {
         self.inner
             .iter()
             .filter_map(|attachment| {
                 if let EditAttachmentsInner::New(attachment) = &attachment {
-                    Some(attachment.clone())
+                    Some(attachment.data.clone())
                 } else {
                     None
                 }
@@ -482,7 +495,7 @@ impl Serialize for EditAttachments<'_> {
                 EditAttachmentsInner::New(new_attachment) => {
                     let attachment = NewAttachment {
                         id,
-                        filename: &new_attachment.filename,
+                        filename: &new_attachment.data.filename,
                         description: &new_attachment.description,
                         is_spoiler: new_attachment.spoiler,
                     };

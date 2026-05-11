@@ -178,7 +178,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     ) -> Result<Message> {
         self.check_length()?;
 
-        let files = self.attachments.new_attachments();
+        let files = self.attachments.new_attachment_data();
 
         if self.allowed_mentions.is_none() {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);

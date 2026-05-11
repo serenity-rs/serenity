@@ -279,7 +279,7 @@ impl<'a> CreateMessage<'a> {
     pub async fn execute(mut self, http: &Http, channel_id: GenericChannelId) -> Result<Message> {
         self.check_length()?;
 
-        let files = self.attachments.new_attachments();
+        let files = self.attachments.new_attachment_data();
         if self.allowed_mentions.is_none() {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
