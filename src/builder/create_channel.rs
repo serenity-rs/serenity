@@ -2,6 +2,7 @@ use std::borrow::Cow;
 
 use nonmax::NonMaxU16;
 
+use super::CreateForumTag;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
@@ -45,9 +46,13 @@ pub struct CreateChannel<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     default_reaction_emoji: Option<ForumEmoji>,
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
-    available_tags: Cow<'a, [ForumTag]>,
+    available_tags: Cow<'a, [CreateForumTag<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_sort_order: Option<SortOrder>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_forum_layout: Option<ForumLayoutType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    default_thread_rate_limit_per_user: Option<NonMaxU16>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -75,24 +80,26 @@ impl<'a> CreateChannel<'a> {
             default_reaction_emoji: None,
             available_tags: Cow::default(),
             default_sort_order: None,
+            default_forum_layout: None,
+            default_thread_rate_limit_per_user: None,
         }
     }
 
-    /// Specify how to call this new channel, replacing the current value as set in [`Self::new`].
+    /// Specify the channel name (1-100 characters).
     ///
-    /// **Note**: Must be between 2 and 100 characters long.
+    /// Replaces the current value set in [`Self::new`].
     pub fn name(mut self, name: impl Into<Cow<'a, str>>) -> Self {
         self.name = name.into();
         self
     }
 
-    /// Specify what type the channel is, whether it's a text, voice, category or news channel.
+    /// Specify the type of channel.
     pub fn kind(mut self, kind: ChannelType) -> Self {
         self.kind = kind;
         self
     }
 
-    /// Specify the category, the "parent" of this channel.
+    /// Specify the parent category for the channel.
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::Voice`], [`ChannelType::News`],
     /// [`ChannelType::Stage`], [`ChannelType::Forum`]
@@ -102,7 +109,7 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// Channel topic (0-1024 characters)
+    /// Specify the channel topic (0-1024 characters).
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::News`], [`ChannelType::Forum`]
     pub fn topic(mut self, topic: impl Into<Cow<'a, str>>) -> Self {
@@ -110,7 +117,7 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// Specify if this channel is NSFW (18+)
+    /// Specify whether the channel is age-restricted (18+).
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::Voice`], [`ChannelType::News`],
     /// [`ChannelType::Stage`], [`ChannelType::Forum`]
@@ -119,11 +126,11 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// The bitrate (in bits) of the voice or stage channel; min 8000
+    /// Specify the bitrate (in bits per second; minimum 8000) of the voice or stage channel.
     ///
     /// For voice channels, normal servers can set bitrate up to 96000, servers with Boost level 1
     /// can set up to 128000, servers with Boost level 2 can set up to 256000, and servers with
-    /// Boost level 3 or the VIP_REGIONS guild feature can set up to 384000. For stage channels,
+    /// Boost level 3 or the `VIP_REGIONS` guild feature can set up to 384000. For stage channels,
     /// bitrate can be set up to 64000.
     ///
     /// Only for [`ChannelType::Voice`] and [`ChannelType::Stage`]
@@ -132,7 +139,7 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// Set how many users may occupy this voice channel
+    /// Specify the user limit of the voice channel.
     ///
     /// Only for [`ChannelType::Voice`] and [`ChannelType::Stage`]
     pub fn user_limit(mut self, limit: NonMaxU16) -> Self {
@@ -140,22 +147,22 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// How many seconds must a user wait before sending another message.
+    /// Specify the amount of seconds a user has to wait before sending another message.
     ///
-    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are
-    /// exempt from this restriction.
+    /// Bots and users with the [`BYPASS_SLOWMODE`] permission are unaffected.
     ///
-    /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
+    /// **Note**: Must be between 0 and 21600 seconds (360 minutes, or 6 hours).
     ///
-    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
-    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
+    /// [`BYPASS_SLOWMODE`]: crate::model::permissions::Permissions::BYPASS_SLOWMODE
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(mut self, seconds: NonMaxU16) -> Self {
         self.rate_limit_per_user = Some(seconds);
         self
     }
 
-    /// Specify where the channel should be located.
+    /// Specify the sorting position of the channel.
+    ///
+    /// Channels with the same position are sorted by id.
     pub fn position(mut self, pos: u16) -> Self {
         self.position = Some(pos);
         self
@@ -197,13 +204,9 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
-        self
-    }
-
-    /// Channel voice region id of the voice or stage channel, automatic when not set
+    /// Specify the channel voice region id of the voice or stage channel.
+    ///
+    /// Automatic when left unset.
     ///
     /// Only for [`ChannelType::Voice`] and [`ChannelType::Stage`]
     pub fn rtc_region(mut self, rtc_region: Cow<'a, str>) -> Self {
@@ -211,7 +214,7 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// The camera video quality mode of the voice channel
+    /// Specify the camera video quality mode of the voice channel.
     ///
     /// Only for [`ChannelType::Voice`] and [`ChannelType::Stage`]
     pub fn video_quality_mode(mut self, video_quality_mode: VideoQualityMode) -> Self {
@@ -219,8 +222,8 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// The default duration that the clients use (not the API) for newly created threads in the
-    /// channel, in minutes, to automatically archive the thread after recent activity
+    /// Specify the default duration, in minutes, that the clients use (not the API) for newly
+    /// created threads in the channel to automatically archive the thread after recent activity.
     ///
     /// Only for [`ChannelType::Text`], [`ChannelType::News`], [`ChannelType::Forum`]
     pub fn default_auto_archive_duration(
@@ -231,7 +234,7 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// Emoji to show in the add reaction button on a thread in a forum
+    /// Specify the emoji to show in the add reaction button on a thread in a forum channel.
     ///
     /// Only for [`ChannelType::Forum`]
     pub fn default_reaction_emoji(mut self, default_reaction_emoji: ForumEmoji) -> Self {
@@ -239,15 +242,18 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
-    /// Set of tags that can be used in a forum channel
+    /// Specify the set of tags that can be used in a forum channel.
     ///
     /// Only for [`ChannelType::Forum`]
-    pub fn available_tags(mut self, available_tags: impl Into<Cow<'a, [ForumTag]>>) -> Self {
+    pub fn available_tags(
+        mut self,
+        available_tags: impl Into<Cow<'a, [CreateForumTag<'a>]>>,
+    ) -> Self {
         self.available_tags = available_tags.into();
         self
     }
 
-    /// The default sort order type used to order posts in forum channels
+    /// Specify the default sort order type used to order posts in forum channels.
     ///
     /// Only for [`ChannelType::Forum`]
     pub fn default_sort_order(mut self, default_sort_order: SortOrder) -> Self {
@@ -255,15 +261,42 @@ impl<'a> CreateChannel<'a> {
         self
     }
 
+    /// Specify the default forum layout view used to display posts in forum channels.
+    pub fn default_forum_layout(mut self, default_forum_layout: ForumLayoutType) -> Self {
+        self.default_forum_layout = Some(default_forum_layout);
+        self
+    }
+
+    /// Specify the initial `rate_limit_per_user` to set on newly created threads in a channel.
+    /// This field is copied to the thread at creation time and does not live update.
+    pub fn default_thread_rate_limit_per_user(
+        mut self,
+        default_thread_rate_limit_per_user: NonMaxU16,
+    ) -> Self {
+        self.default_thread_rate_limit_per_user = Some(default_thread_rate_limit_per_user);
+        self
+    }
+
+    /// Sets the request's audit log reason.
+    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
+        self.audit_log_reason = Some(reason);
+        self
+    }
+
     /// Creates a new [`Channel`] in the guild.
     ///
-    /// **Note**: Requires the [Manage Channels] permission.
+    /// **Note**: Requires the [Manage Channels] permission. If setting permission overwrites, only
+    /// permissions your bot has in the guild can be allowed/denied. Setting [Manage Roles]
+    /// permission in channels is only possible for guild administrators.
+    ///
+    /// Fires a [`ChannelCreateEvent`].
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<GuildChannel> {
         http.create_channel(guild_id, &self, self.audit_log_reason).await
