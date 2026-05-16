@@ -62,6 +62,8 @@ use crate::http::Http;
 ///
 /// If the `cache` feature is enabled, but an implementing type does not have access to a cache,
 /// the [`CacheHttp::cache`] method will simply return `None`.
+///
+/// **Note**: This trait is implemented by [`Http`] only if the `builder` feature is _disabled_.
 #[cfg(feature = "http")]
 pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
@@ -125,7 +127,7 @@ impl CacheHttp for (Option<&Arc<Cache>>, &Http) {
     }
 }
 
-#[cfg(feature = "http")]
+#[cfg(all(feature = "http", not(feature = "builder")))]
 impl CacheHttp for Http {
     fn http(&self) -> &Http {
         self

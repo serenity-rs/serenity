@@ -58,7 +58,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
     } else if msg.content == "edit" {
         let mut msg = channel_id
             .send_message(
-                &ctx.http,
+                &ctx,
                 CreateMessage::new()
                     .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
@@ -66,13 +66,12 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         // Pre-PR, this falsely triggered a MODEL_TYPE_CONVERT Discord error
         msg.edit(&ctx, EditMessage::new().attachments(EditAttachments::keep_all(&msg))).await?;
     } else if msg.content == "unifiedattachments" {
-        let mut msg =
-            channel_id.send_message(&ctx.http, CreateMessage::new().content("works")).await?;
+        let mut msg = channel_id.send_message(&ctx, CreateMessage::new().content("works")).await?;
         msg.edit(ctx, EditMessage::new().content("works still")).await?;
 
         let mut msg = channel_id
             .send_message(
-                &ctx.http,
+                &ctx,
                 CreateMessage::new()
                     .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
@@ -99,7 +98,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
     } else if msg.content == "actionrow" {
         channel_id
             .send_message(
-                &ctx.http,
+                &ctx,
                 CreateMessage::new()
                     .button(CreateButton::new("0").label("Foo"))
                     .button(CreateButton::new("1").emoji('🤗').style(ButtonStyle::Secondary))
@@ -119,7 +118,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         loop {
             let msg = channel_id
                 .send_message(
-                    &ctx.http,
+                    &ctx,
                     CreateMessage::new()
                         .button(CreateButton::new(custom_id.clone()).label(custom_id)),
                 )
@@ -127,7 +126,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             let button_press =
                 msg.id.collect_component_interactions(ctx).timeout(Duration::from_secs(10)).await;
             match button_press {
-                Some(x) => x.defer(&ctx.http).await?,
+                Some(x) => x.defer(&ctx).await?,
                 None => break,
             }
 
@@ -179,7 +178,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         use serenity::futures::StreamExt;
 
         let mut msg = channel_id
-            .say(&ctx.http, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id))
+            .say(&ctx, format!("https://codereview.stackexchange.com/questions/260653/very-slow-discord-bot-to-play-music{}", msg.id))
             .await?;
 
         let msg_id = msg.id;
@@ -197,7 +196,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
             .flags(MessageFlags::IS_VOICE_MESSAGE)
             .add_file(CreateAttachment::url(&ctx.http, audio_url, "testing.ogg").await?);
 
-        msg.author.id.dm(&ctx.http, builder).await?;
+        msg.author.id.dm(&ctx, builder).await?;
     } else if let Some(channel) = msg.content.strip_prefix("movetorootandback") {
         let mut channel = {
             let channel_id = channel.trim().parse::<ChannelId>().unwrap();
@@ -208,7 +207,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
         channel.edit(&ctx.http, EditChannel::new().category(None)).await?;
         channel.edit(&ctx.http, EditChannel::new().category(Some(parent_id))).await?;
     } else if msg.content == "channelperms" {
-        channel_id.say(&ctx.http, format!("{:?}", msg.author_permissions(&ctx.cache))).await?;
+        channel_id.say(&ctx, format!("{:?}", msg.author_permissions(&ctx.cache))).await?;
     } else if let Some(forum_channel_id) = msg.content.strip_prefix("createforumpostin ") {
         forum_channel_id
             .parse::<ChannelId>()
@@ -225,7 +224,7 @@ async fn message(ctx: &Context, msg: &Message) -> Result<(), serenity::Error> {
     } else if let Some(forum_post_url) = msg.content.strip_prefix("deleteforumpost ") {
         let (_guild_id, channel_id, _message_id) =
             serenity::utils::parse_message_url(forum_post_url).unwrap();
-        msg.channel_id.say(&ctx.http, format!("Deleting <#{channel_id}> in 10 seconds...")).await?;
+        msg.channel_id.say(&ctx, format!("Deleting <#{channel_id}> in 10 seconds...")).await?;
         tokio::time::sleep(Duration::from_secs(10)).await;
         channel_id.delete(&ctx.http, None).await?;
     } else {
@@ -244,7 +243,7 @@ async fn command_interaction(
         // Respond with an image
         interaction
             .create_response(
-                &ctx.http,
+                &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().add_file(
                         CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
@@ -280,7 +279,7 @@ async fn command_interaction(
     } else if interaction.data.name == "unifiedattachments1" {
         interaction
             .create_response(
-                &ctx.http,
+                &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().content("works"),
                 ),
@@ -293,14 +292,14 @@ async fn command_interaction(
 
         interaction
             .create_followup(
-                &ctx.http,
+                &ctx,
                 CreateInteractionResponseFollowup::new().content("still works still"),
             )
             .await?;
     } else if interaction.data.name == "unifiedattachments2" {
         interaction
             .create_response(
-                &ctx.http,
+                &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new().add_file(
                         CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?,
@@ -320,7 +319,7 @@ async fn command_interaction(
 
         interaction
             .create_followup(
-                &ctx.http,
+                &ctx,
                 CreateInteractionResponseFollowup::new()
                     .add_file(CreateAttachment::url(&ctx.http, IMAGE_URL, "testing.png").await?),
             )
@@ -328,7 +327,7 @@ async fn command_interaction(
     } else if interaction.data.name == "editembeds" {
         interaction
             .create_response(
-                &ctx.http,
+                &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
                         .content("hi")
@@ -342,7 +341,7 @@ async fn command_interaction(
     } else if interaction.data.name == "newselectmenu" {
         interaction
             .create_response(
-                &ctx.http,
+                &ctx,
                 CreateInteractionResponse::Message(
                     CreateInteractionResponseMessage::new()
                         .select_menu(CreateSelectMenu::new("0", CreateSelectMenuKind::String {
@@ -396,7 +395,7 @@ impl EventHandler for Handler {
                 Interaction::Component(i) => println!("{:#?}", i.data),
                 Interaction::Autocomplete(i) => {
                     i.create_response(
-                        &ctx.http,
+                        &ctx,
                         CreateInteractionResponse::Autocomplete(
                             CreateAutocompleteResponse::new().add_choice("suggestion"),
                         ),
