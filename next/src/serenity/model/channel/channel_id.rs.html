@@ -98,7 +98,7 @@
 <a href=#98 id=98 data-nosnippet>98</a>    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
 <a href=#99 id=99 data-nosnippet>99</a>    ///
 <a href=#100 id=100 data-nosnippet>100</a>    /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
-<a href=#101 id=101 data-nosnippet>101</a>    </span><span class="kw">pub async fn </span>create_invite(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateInvite&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;RichInvite&gt; {
+<a href=#101 id=101 data-nosnippet>101</a>    </span><span class="kw">pub async fn </span>create_invite(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateInvite&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Invite&gt; {
 <a href=#102 id=102 data-nosnippet>102</a>        builder.execute(http, <span class="self">self</span>).<span class="kw">await
 <a href=#103 id=103 data-nosnippet>103</a>    </span>}
 <a href=#104 id=104 data-nosnippet>104</a>
@@ -215,7 +215,7 @@
 <a href=#215 id=215 data-nosnippet>215</a>    /// Returns [`Error::Http`] if the current user lacks permission.
 <a href=#216 id=216 data-nosnippet>216</a>    ///
 <a href=#217 id=217 data-nosnippet>217</a>    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-<a href=#218 id=218 data-nosnippet>218</a>    </span><span class="kw">pub async fn </span>invites(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RichInvite&gt;&gt; {
+<a href=#218 id=218 data-nosnippet>218</a>    </span><span class="kw">pub async fn </span>invites(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Invite&gt;&gt; {
 <a href=#219 id=219 data-nosnippet>219</a>        http.get_channel_invites(<span class="self">self</span>).<span class="kw">await
 <a href=#220 id=220 data-nosnippet>220</a>    </span>}
 <a href=#221 id=221 data-nosnippet>221</a>

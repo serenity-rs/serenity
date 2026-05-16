@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Invite","InviteChannel","InviteGuild","InviteStageInstance","InviteTargetType","RichInvite"]};
+window.SIDEBAR_ITEMS = {"struct":["GuildInviteFlags","Invite","InviteChannel","InviteGuild","InviteMetadata","InviteRole","InviteTargetType","InviteType"]};
