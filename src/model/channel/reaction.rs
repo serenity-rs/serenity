@@ -90,7 +90,7 @@ impl Serialize for Reaction {
 
 #[cfg(feature = "model")]
 impl Reaction {
-    /// Retrieves the associated the reaction was made in.
+    /// Retrieves the [`Channel`] the reaction was made in.
     ///
     /// If the cache is enabled, this will search for the already-cached channel. If not - or the
     /// channel was not found - this will perform a request over the REST API for the channel.
@@ -153,14 +153,14 @@ impl Reaction {
         self.channel_id.message(cache_http, self.message_id).await
     }
 
-    /// Retrieves the user that made the reaction.
+    /// Retrieves the [`User`] who made this reaction.
     ///
     /// If the cache is enabled, this will search for the already-cached user. If not - or the user
     /// was not found - this will perform a request over the REST API for the user.
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the user that made the reaction is unable to be retrieved from
+    /// Returns [`Error::Http`] if the user who made the reaction is unable to be retrieved from
     /// the API.
     pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
         if let Some(id) = self.user_id {
@@ -179,11 +179,11 @@ impl Reaction {
         }
     }
 
-    /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
+    /// Retrieves the list of [`User`]s who made this reaction.
     ///
     /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
-    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
-    /// then it is automatically reduced.
+    /// users. The maximum that may be retrieved at a time is `100`. If a greater number is
+    /// provided then it is automatically reduced.
     ///
     /// The optional `after` attribute is to retrieve the users after a certain user. This is
     /// useful for pagination.
@@ -201,17 +201,6 @@ impl Reaction {
     pub async fn users(
         &self,
         http: &Http,
-        reaction_type: impl Into<ReactionType>,
-        limit: Option<NonMaxU8>,
-        after: Option<UserId>,
-    ) -> Result<Vec<User>> {
-        self.users_(http, &reaction_type.into(), limit, after).await
-    }
-
-    async fn users_(
-        &self,
-        http: &Http,
-        reaction_type: &ReactionType,
         limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
@@ -222,7 +211,15 @@ impl Reaction {
             warn!("Reaction users limit clamped to 100! (API Restriction)");
         }
 
-        http.get_reaction_users(self.channel_id, self.message_id, reaction_type, limit, after).await
+        http.get_reaction_users(
+            self.channel_id,
+            self.message_id,
+            &self.emoji,
+            Some(self.reaction_type),
+            limit,
+            after,
+        )
+        .await
     }
 }
 

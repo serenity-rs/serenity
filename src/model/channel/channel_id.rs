@@ -828,18 +828,21 @@ impl GenericChannelId {
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
+    /// The default `reaction_type` is [`ReactionTypes::Normal`]. Specify [`ReactionTypes::Burst`]
+    /// to get users who have reacted with the burst variation of the emoji (super reaction).
+    ///
     /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
-    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
-    /// then it is automatically reduced.
+    /// users. The maximum that may be retrieved at a time is `100`. If a greater number is
+    /// provided then it is automatically reduced.
     ///
     /// The optional `after` attribute is to retrieve the users after a certain user. This is
     /// useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name.
-    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
-    /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
+    /// **Note**: If the passed `emoji` is a custom guild emoji, it must contain the name.
+    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] will only work if
+    /// [`ReactionType::Custom::name`] is `Some`, and **[`EmojiId`] will never work**.
     ///
     /// # Errors
     ///
@@ -851,13 +854,14 @@ impl GenericChannelId {
         self,
         http: &Http,
         message_id: MessageId,
-        reaction_type: impl Into<ReactionType>,
+        emoji: impl Into<ReactionType>,
+        reaction_type: Option<ReactionTypes>,
         limit: Option<u8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        http.get_reaction_users(self, message_id, &reaction_type.into(), limit, after).await
+        http.get_reaction_users(self, message_id, &emoji.into(), reaction_type, limit, after).await
     }
 
     /// Sends a message with just the given message content in the channel.

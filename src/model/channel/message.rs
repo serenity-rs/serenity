@@ -383,18 +383,21 @@ impl Message {
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
     ///
+    /// The default `reaction_type` is [`ReactionTypes::Normal`]. Specify [`ReactionTypes::Burst`]
+    /// to get users who have reacted with the burst variation of the emoji (super reaction).
+    ///
     /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
-    /// users. The maximum that may be retrieve at a time is `100`, if a greater number is provided
-    /// then it is automatically reduced.
+    /// users. The maximum that may be retrieved at a time is `100`. If a greater number is
+    /// provided then it is automatically reduced.
     ///
     /// The optional `after` attribute is to retrieve the users after a certain user. This is
     /// useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// **Note**: If the passed reaction_type is a custom guild emoji, it must contain the name.
-    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] only if
-    /// [`ReactionType::Custom::name`] is Some, and **[`EmojiId`] will never work**.
+    /// **Note**: If the passed `emoji` is a custom guild emoji, it must contain the name.
+    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] will only work if
+    /// [`ReactionType::Custom::name`] is `Some`, and **[`EmojiId`] will never work**.
     ///
     /// # Errors
     ///
@@ -404,11 +407,12 @@ impl Message {
     pub async fn reaction_users(
         &self,
         http: &Http,
-        reaction_type: impl Into<ReactionType>,
+        emoji: impl Into<ReactionType>,
+        reaction_type: Option<ReactionTypes>,
         limit: Option<u8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
-        self.channel_id.reaction_users(http, self.id, reaction_type, limit, after).await
+        self.channel_id.reaction_users(http, self.id, emoji, reaction_type, limit, after).await
     }
 
     /// Returns the associated [`Guild`] for the message if one is in the cache.

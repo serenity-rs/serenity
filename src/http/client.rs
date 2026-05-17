@@ -3976,17 +3976,23 @@ impl Http {
         .await
     }
 
-    /// Gets user Ids based on their reaction to a message. This endpoint is dumb.
+    /// Gets a list of users who reacted with an emoji.
     pub async fn get_reaction_users(
         &self,
         channel_id: GenericChannelId,
         message_id: MessageId,
-        reaction_type: &ReactionType,
+        emoji: &ReactionType,
+        reaction_type: Option<ReactionTypes>,
         limit: u8,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
-        let (limit_str, after_str);
-        let mut params = ArrayVec::<_, 2>::new();
+        let (type_str, limit_str, after_str);
+        let mut params = ArrayVec::<_, 3>::new();
+
+        if let Some(reaction_type) = reaction_type {
+            type_str = reaction_type.0.to_arraystring();
+            params.push(("type", type_str.as_str()));
+        }
 
         limit_str = limit.to_arraystring();
         params.push(("limit", limit_str.as_str()));
@@ -4004,7 +4010,7 @@ impl Http {
             route: Route::ChannelMessageReactionEmoji {
                 channel_id,
                 message_id,
-                reaction: &reaction_type.as_data(),
+                reaction: &emoji.as_data(),
             },
             params: Some(&params),
         })
