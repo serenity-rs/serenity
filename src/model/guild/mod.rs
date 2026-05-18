@@ -1382,6 +1382,17 @@ pub enum GuildCreateGuild {
     Unavailable(UnavailableGuild),
 }
 
+impl GuildCreateGuild {
+    /// Returns the [`GuildId`] of the [`GuildCreateGuild`].
+    #[must_use]
+    pub fn id(&self) -> GuildId {
+        match self {
+            GuildCreateGuild::Present(guild) => guild.id,
+            GuildCreateGuild::Unavailable(unavailable_guild) => unavailable_guild.id,
+        }
+    }
+}
+
 enum_number! {
     /// Default message notification level for a guild.
     ///

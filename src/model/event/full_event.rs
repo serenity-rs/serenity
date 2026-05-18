@@ -517,10 +517,7 @@ impl FullEvent {
             },
             Event::GuildCreate(event) => {
                 #[cfg(feature = "cache")]
-                let is_new = Some(is_guild_new(cache, match &event.guild {
-                    GuildCreateGuild::Present(guild) => guild.id,
-                    GuildCreateGuild::Unavailable(unavailable_guild) => unavailable_guild.id,
-                }));
+                let is_new = Some(is_guild_new(cache, event.guild.id()));
                 #[cfg(not(feature = "cache"))]
                 let is_new = None;
 
