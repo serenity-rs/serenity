@@ -39,6 +39,7 @@ use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::prelude::*;
+use crate::model::utils::deserialize_present_guild;
 #[cfg(feature = "model")]
 use crate::model::utils::*;
 
@@ -1362,6 +1363,23 @@ pub struct UnavailableGuild {
     /// Indicator of whether the guild is unavailable.
     #[serde(default)]
     pub unavailable: bool,
+}
+
+/// Representation of the inner payload of a [`GuildCreateEvent`], which can include either a
+/// [`Guild`] or an [`UnavailableGuild`].
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-create).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+#[expect(
+    clippy::large_enum_variant,
+    reason = "Almost always Present so boxing would be counter-productive"
+)]
+pub enum GuildCreateGuild {
+    #[serde(deserialize_with = "deserialize_present_guild")]
+    Present(Guild),
+    Unavailable(UnavailableGuild),
 }
 
 enum_number! {

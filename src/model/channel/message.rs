@@ -1320,6 +1320,7 @@ mod tests {
     use super::{
         Guild,
         GuildChannel,
+        GuildCreateGuild,
         Member,
         Message,
         PermissionOverwrite,
@@ -1382,7 +1383,7 @@ mod tests {
         // Cache, with the guild setup.
         let cache = Cache::new();
         cache.update(&mut GuildCreateEvent {
-            guild,
+            guild: GuildCreateGuild::Present(guild),
         });
 
         // The author should only have the one permission, SEND_MESSAGES.
