@@ -5,6 +5,8 @@ use std::sync::Arc;
 
 #[cfg(feature = "model")]
 use futures::stream::Stream;
+#[cfg(feature = "model")]
+use nonmax::NonMaxU8;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -831,9 +833,8 @@ impl GenericChannelId {
     /// The default `reaction_type` is [`ReactionTypes::Normal`]. Specify [`ReactionTypes::Burst`]
     /// to get users who have reacted with the burst variation of the emoji (super reaction).
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
-    /// users. The maximum that may be retrieved at a time is `100`. If a greater number is
-    /// provided then it is automatically reduced.
+    /// The maximum number of users to retrieve is determined by `limit`. This defaults to `25`
+    /// and is automatically clamped to the API maximum of `100`.
     ///
     /// The optional `after` attribute is to retrieve the users after a certain user. This is
     /// useful for pagination.
@@ -856,11 +857,9 @@ impl GenericChannelId {
         message_id: MessageId,
         emoji: impl Into<ReactionType>,
         reaction_type: Option<ReactionTypes>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
-        let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
-
         http.get_reaction_users(self, message_id, &emoji.into(), reaction_type, limit, after).await
     }
 

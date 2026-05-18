@@ -5,6 +5,8 @@ use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Display;
 
+#[cfg(feature = "model")]
+use nonmax::NonMaxU8;
 use nonmax::NonMaxU64;
 use serde::de::Error as _;
 
@@ -386,9 +388,8 @@ impl Message {
     /// The default `reaction_type` is [`ReactionTypes::Normal`]. Specify [`ReactionTypes::Burst`]
     /// to get users who have reacted with the burst variation of the emoji (super reaction).
     ///
-    /// The default `limit` is `50` - specify otherwise to receive a different maximum number of
-    /// users. The maximum that may be retrieved at a time is `100`. If a greater number is
-    /// provided then it is automatically reduced.
+    /// The maximum number of users to retrieve is determined by `limit`. This defaults to `25`
+    /// and is automatically clamped to the API maximum of `100`.
     ///
     /// The optional `after` attribute is to retrieve the users after a certain user. This is
     /// useful for pagination.
@@ -409,7 +410,7 @@ impl Message {
         http: &Http,
         emoji: impl Into<ReactionType>,
         reaction_type: Option<ReactionTypes>,
-        limit: Option<u8>,
+        limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
         self.channel_id.reaction_users(http, self.id, emoji, reaction_type, limit, after).await

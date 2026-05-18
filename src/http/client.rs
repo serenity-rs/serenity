@@ -3983,7 +3983,7 @@ impl Http {
         message_id: MessageId,
         emoji: &ReactionType,
         reaction_type: Option<ReactionTypes>,
-        limit: u8,
+        limit: Option<NonMaxU8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
         let (type_str, limit_str, after_str);
@@ -3994,8 +3994,10 @@ impl Http {
             params.push(("type", type_str.as_str()));
         }
 
-        limit_str = limit.to_arraystring();
-        params.push(("limit", limit_str.as_str()));
+        if let Some(limit) = limit {
+            limit_str = limit.get().min(100).to_arraystring();
+            params.push(("limit", limit_str.as_str()));
+        }
 
         if let Some(after) = after {
             after_str = after.to_arraystring();
