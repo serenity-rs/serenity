@@ -911,7 +911,7 @@ impl PartialGuild {
         self.id.edit_role(cache_http, role_id, builder).await
     }
 
-    /// Edits the order of [`Role`]s. Requires the [Manage Roles] permission.
+    /// Edits the order of a single [`Role`]. Requires the [Manage Roles] permission.
     ///
     /// # Examples
     ///
@@ -935,6 +935,31 @@ impl PartialGuild {
         position: u16,
     ) -> Result<Vec<Role>> {
         self.id.edit_role_position(http, role_id, position).await
+    }
+
+    /// Edits the order of multiple [`Role`]s. Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// Change the order of a role:
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::id::RoleId;
+    /// partial_guild.edit_roles_positions(&context, Vec::new((RoleId::new(8), 2)));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[inline]
+    pub async fn edit_roles_positions(
+        &self,
+        http: impl AsRef<Http>,
+        roles: impl IntoIterator<Item = (RoleId, Option<u64>)>,
+    ) -> Result<Vec<Role>> {
+        self.id.edit_roles_positions(http, roles).await
     }
 
     /// Edits a sticker.

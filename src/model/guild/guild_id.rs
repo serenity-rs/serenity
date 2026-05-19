@@ -882,6 +882,42 @@ impl GuildId {
         http.as_ref().edit_role_position(self, role_id.into(), position, None).await
     }
 
+    /// Edit the position of [`Role`]s by the given positions in the [`Guild`].
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,ignore
+    /// use serenity::model::{GuildId, RoleId};
+    /// GuildId::new(7).edit_roles_positions(&context, Vec::new((RoleId::new(8), 2)));
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[inline]
+    pub async fn edit_roles_positions(
+        self,
+        http: impl AsRef<Http>,
+        roles: impl IntoIterator<Item = (RoleId, Option<u64>)>,
+    ) -> Result<Vec<Role>> {
+        let items: Value = roles
+            .into_iter()
+            .map(|(id, index)| {
+                json!({
+                    "id": id.get(),
+                    "position": index
+                })
+            })
+            .collect::<Vec<_>>()
+            .into();
+
+        http.as_ref().edit_guild_roles_positions(self, &items).await
+    }
+
     /// Edits the guild's welcome screen.
     ///
     /// **Note**: Requires the [Manage Guild] permission.

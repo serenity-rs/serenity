@@ -2209,6 +2209,31 @@ impl Http {
         from_value(value)
     }
 
+    /// Reorder roles for the provided [`Guild`] via its Id.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    pub async fn edit_guild_roles_positions(
+        &self,
+        guild_id: GuildId,
+        value: &Value,
+    ) -> Result<Vec<Role>> {
+        let body = to_vec(value)?;
+
+        self.fire(Request {
+            body: Some(body),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Patch,
+            route: Route::GuildRoles {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Modifies a scheduled event.
     ///
     /// **Note**: Requires the [Manage Events] permission.
