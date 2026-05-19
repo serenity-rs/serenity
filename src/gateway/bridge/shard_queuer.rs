@@ -73,6 +73,7 @@ pub struct ShardQueuer {
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
+    pub ws_proxy: Arc<Mutex<Option<String>>>,
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
@@ -164,6 +165,7 @@ impl ShardQueuer {
 
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
+            Arc::clone(&self.ws_proxy),
             self.http.token(),
             shard_info,
             self.intents,
