@@ -1034,7 +1034,7 @@ mod tests {
         assert!(!is_guild_new(&cache, guild_id));
 
         let event = Box::new(Event::GuildCreate(GuildCreateEvent {
-            guild: GuildCreateGuild::Present(Guild {
+            guild: GuildCreateGuild::Available(Guild {
                 __generated_flags: GuildGeneratedFlags::default(),
                 id: guild_id,
                 name: FixedString::new(),
@@ -1105,7 +1105,7 @@ mod tests {
         let guild_id2 = GuildId::new(2);
 
         let event = Box::new(Event::GuildCreate(GuildCreateEvent {
-            guild: GuildCreateGuild::Present(Guild {
+            guild: GuildCreateGuild::Available(Guild {
                 __generated_flags: GuildGeneratedFlags::default(),
                 id: guild_id2,
                 name: FixedString::new(),
@@ -1238,7 +1238,7 @@ mod tests {
         assert!(cache.unavailable_guilds().contains(&guild_id));
 
         let event = Box::new(Event::GuildCreate(GuildCreateEvent {
-            guild: GuildCreateGuild::Present(Guild {
+            guild: GuildCreateGuild::Available(Guild {
                 id: guild_id,
                 ..Default::default()
             }),

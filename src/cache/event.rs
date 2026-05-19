@@ -114,7 +114,7 @@ impl CacheUpdate for GuildCreateEvent {
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         match &self.guild {
-            GuildCreateGuild::Present(guild) => {
+            GuildCreateGuild::Available(guild) => {
                 cache.unavailable_guilds.remove(&guild.id);
 
                 cache.guilds.insert(guild.id, guild.clone());

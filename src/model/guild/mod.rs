@@ -1378,7 +1378,7 @@ pub struct UnavailableGuild {
 )]
 pub enum GuildCreateGuild {
     #[serde(deserialize_with = "deserialize_present_guild")]
-    Present(Guild),
+    Available(Guild),
     Unavailable(UnavailableGuild),
 }
 
@@ -1387,7 +1387,7 @@ impl GuildCreateGuild {
     #[must_use]
     pub fn id(&self) -> GuildId {
         match self {
-            GuildCreateGuild::Present(guild) => guild.id,
+            GuildCreateGuild::Available(guild) => guild.id,
             GuildCreateGuild::Unavailable(unavailable_guild) => unavailable_guild.id,
         }
     }

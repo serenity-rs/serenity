@@ -1383,7 +1383,7 @@ mod tests {
         // Cache, with the guild setup.
         let cache = Cache::new();
         cache.update(&mut GuildCreateEvent {
-            guild: GuildCreateGuild::Present(guild),
+            guild: GuildCreateGuild::Available(guild),
         });
 
         // The author should only have the one permission, SEND_MESSAGES.
