@@ -18,6 +18,7 @@ pub struct CreateBotAuthParameters<'a> {
     permissions: Permissions,
     guild_id: Option<GuildId>,
     disable_guild_select: bool,
+    integration_type: Option<InstallationContext>,
 }
 
 impl<'a> CreateBotAuthParameters<'a> {
@@ -30,9 +31,9 @@ impl<'a> CreateBotAuthParameters<'a> {
     #[must_use]
     pub fn build(self) -> String {
         // These bindings have to be defined before `valid_data`, due to Drop order.
-        let (client_id_str, guild_id_str, scope_str, bits_str);
+        let (client_id_str, guild_id_str, scope_str, bits_str, integration_type_str);
 
-        let mut valid_data = ArrayVec::<_, 5>::new();
+        let mut valid_data = ArrayVec::<_, 6>::new();
         let bits = self.permissions.bits();
 
         if let Some(client_id) = self.client_id {
@@ -57,6 +58,11 @@ impl<'a> CreateBotAuthParameters<'a> {
 
         if self.disable_guild_select {
             valid_data.push(("disable_guild_select", "true"));
+        }
+
+        if let Some(integration_type) = self.integration_type {
+            integration_type_str = integration_type.0.to_arraystring();
+            valid_data.push(("integration_type", &integration_type_str));
         }
 
         let url = Url::parse_with_params("https://discord.com/api/oauth2/authorize", &valid_data)
@@ -110,6 +116,16 @@ impl<'a> CreateBotAuthParameters<'a> {
     /// Specify whether the user cannot change the guild in the dropdown picker.
     pub fn disable_guild_select(mut self, disable: bool) -> Self {
         self.disable_guild_select = disable;
+        self
+    }
+
+    /// Specify the installation context for the authorization.
+    ///
+    /// If not set, the authorization will use the default install settings configured in the
+    /// developer portal. Specifying this or [`Self::scopes`] or `redirect_uri` will override the
+    /// behavior.
+    pub fn integration_type(mut self, integration_type: InstallationContext) -> Self {
+        self.integration_type = Some(integration_type);
         self
     }
 }
