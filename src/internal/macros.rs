@@ -199,20 +199,21 @@ macro_rules! http_response_codes {
             pub const $konst: Self = Self($code);
         )+
 
-        /// Returns the Discord-defined meaning of this HTTP response code.
+        /// Returns the Discord-defined meaning of this HTTP response code, if available.
         #[must_use]
-        pub const fn as_str(&self) -> Option<&'static str> {
-            Self::with_meaning(self.0)
+        pub const fn to_meaning(&self) -> Option<&'static str> {
+            Self::meaning_of(self.0)
         }
 
-        /// Returns an HTTP response code returned by the API with its Discord-defined meaning.
+        /// Returns an HTTP response code returned by the API with its Discord-defined meaning,
+        /// if available.
         #[must_use]
-        pub const fn with_meaning(code: u16) -> Option<&'static str> {
+        pub const fn meaning_of(code: u16) -> Option<&'static str> {
             match code {
                 $(
                 $code => Some($message),
                 )+
-                503 | 504 => HttpResponseCode::with_meaning(500),
+                503 | 504 => HttpResponseCode::meaning_of(500),
                 _ => None
             }
         }

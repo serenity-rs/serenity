@@ -325,8 +325,8 @@ impl ErrorResponse {
                     },
                 ]
                 .trunc_into(),
-                message: FixedString::from_str_trunc(
-                    "[Serenity] Could not decode json when receiving error response from discord",
+                message: FixedString::from_static_trunc(
+                    "could not decode JSON when receiving error response from Discord",
                 ),
             }),
         }
@@ -405,12 +405,18 @@ impl fmt::Display for HttpError {
                     f.write_str(" (")?;
                     // Return the verbose code and meaning in the alternate (`#`) format
                     if f.alternate() {
-                        f.write_str(&HttpResponseCode::from(e.status_code).as_str().map_or_else(
-                            || Cow::Owned(e.status_code.to_string().to_ascii_lowercase()),
-                            Cow::Borrowed,
-                        ))?;
+                        f.write_str(
+                            &HttpResponseCode::from(e.status_code).to_meaning().map_or_else(
+                                || {
+                                    let mut status_code = e.status_code.to_string();
+                                    status_code.make_ascii_lowercase();
+                                    Cow::Owned(status_code)
+                                },
+                                Cow::Borrowed,
+                            ),
+                        )?;
                     } else {
-                        f.write_str("http ")?;
+                        f.write_str("HTTP ")?;
                         f.write_str(e.status_code.as_str())?;
                     }
                     f.write_str(")")?;
@@ -603,31 +609,31 @@ mod test {
         let error_response = ErrorResponse::from_response(reqwest_response, Method::POST).await;
         let http_error = HttpError::from(error_response);
 
-        let expected = "[Serenity] Could not decode json when receiving error response from \
-            discord (502 gateway unavailable: there was not a gateway available to process your \
-            request): error decoding response body: EOF while parsing a value at line 1 column 0";
+        let expected = "could not decode JSON when receiving error response from Discord (502 \
+            gateway unavailable: there was not a gateway available to process your request): error \
+            decoding response body: EOF while parsing a value at line 1 column 0";
 
-        assert_eq!(format!("{http_error:#}"), expected.to_string());
+        assert_eq!(format!("{http_error:#}"), expected);
 
-        let expected = "[Serenity] Could not decode json when receiving error response from \
-            discord (http 502): error decoding response body";
+        let expected = "could not decode JSON when receiving error response from Discord (HTTP \
+            502): error decoding response body";
 
-        assert_eq!(http_error.to_string(), expected.to_string());
+        assert_eq!(http_error.to_string(), expected);
 
         let response = Builder::new().status(408).body("").unwrap();
         let reqwest_response: reqwest::Response = response.into();
         let error_response = ErrorResponse::from_response(reqwest_response, Method::POST).await;
         let http_error = HttpError::from(error_response);
 
-        let expected = "[Serenity] Could not decode json when receiving error response from \
-            discord (408 request timeout): error decoding response body: EOF while parsing a value \
-            at line 1 column 0";
+        let expected = "could not decode JSON when receiving error response from Discord (408 \
+            request timeout): error decoding response body: EOF while parsing a value at line 1 \
+            column 0";
 
-        assert_eq!(format!("{http_error:#}"), expected.to_string());
+        assert_eq!(format!("{http_error:#}"), expected);
 
-        let expected = "[Serenity] Could not decode json when receiving error response from \
-            discord (http 408): error decoding response body";
+        let expected = "could not decode JSON when receiving error response from Discord (HTTP \
+            408): error decoding response body";
 
-        assert_eq!(http_error.to_string(), expected.to_string());
+        assert_eq!(http_error.to_string(), expected);
     }
 }
