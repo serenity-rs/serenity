@@ -50,6 +50,7 @@ extract_map = { version = "0.3.1", features = ["serde"] }
 aformat = "0.1.8"
 bytes = "1.11.0"
 ref-cast = "1.0.25"
+smolbitset = { version = "0.1.0", features = ["serde"] }
 # Optional dependencies
 foldhash = { version = "0.2.0", optional = true }
 chrono = { version = "0.4.42", default-features = false, features = ["clock", "serde"], optional = true }
@@ -131,7 +132,7 @@ full = ["default", "collector", "voice", "interactions_endpoint"]
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka", "typesize?/mini_moka", "typesize?/dashmap"]
 
-typesize = ["dep:typesize", "dashmap/typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize", "extract_map/typesize"]
+typesize = ["dep:typesize", "dashmap/typesize", "small-fixed-array/typesize", "bool_to_bitflags/typesize", "extract_map/typesize", "smolbitset/typesize"]
 
 # Enables compile-time heavy instrument macros from tracing
 tracing_instrument = ["tracing/attributes"]

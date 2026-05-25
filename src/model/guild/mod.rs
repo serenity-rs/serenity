@@ -278,7 +278,7 @@ impl Guild {
                     .members
                     .iter()
                     .map(|member| self.user_permissions_in(channel, member))
-                    .all(Permissions::view_channel)
+                    .all(|perm| Permissions::view_channel(&perm))
         })
     }
 
@@ -894,17 +894,17 @@ impl Guild {
                 match overwrite.kind {
                     PermissionOverwriteType::Member(user_id) => {
                         if member_user_id == user_id {
-                            member_allow_overwrites = overwrite.allow;
-                            member_deny_overwrites = overwrite.deny;
+                            member_allow_overwrites = overwrite.allow.clone();
+                            member_deny_overwrites = overwrite.deny.clone();
                         }
                     },
                     PermissionOverwriteType::Role(role_id) => {
                         if role_id.get() == guild_id.get() {
-                            everyone_allow_overwrites = overwrite.allow;
-                            everyone_deny_overwrites = overwrite.deny;
+                            everyone_allow_overwrites = overwrite.allow.clone();
+                            everyone_deny_overwrites = overwrite.deny.clone();
                         } else if member_roles.contains(&role_id) {
-                            roles_allow_overwrites.push(overwrite.allow);
-                            roles_deny_overwrites.push(overwrite.deny);
+                            roles_allow_overwrites.push(overwrite.allow.clone());
+                            roles_deny_overwrites.push(overwrite.deny.clone());
                         }
                     },
                 }
@@ -915,7 +915,7 @@ impl Guild {
             is_guild_owner: member_user_id == guild_owner_id,
             everyone_permissions: if let Some(role) = guild_roles.get(&RoleId::new(guild_id.get()))
             {
-                role.permissions
+                role.permissions.clone()
             } else {
                 error!("@everyone role missing in {}", guild_id);
                 Permissions::empty()
@@ -924,7 +924,7 @@ impl Guild {
                 .iter()
                 .map(|role_id| {
                     if let Some(role) = guild_roles.get(role_id) {
-                        role.permissions
+                        role.permissions.clone()
                     } else {
                         warn!(
                             "{} on {} has non-existent role {:?}",
@@ -1043,7 +1043,7 @@ fn calculate_permissions(data: CalculatePermissions) -> Permissions {
     }
 
     // 3. Overwrites that deny permissions for @everyone are applied at a channel level
-    permissions &= !data.everyone_deny_overwrites;
+    permissions.and_not_assign(&data.everyone_deny_overwrites);
     // 4. Overwrites that allow permissions for @everyone are applied at a channel level
     permissions |= data.everyone_allow_overwrites;
 
@@ -1052,7 +1052,7 @@ fn calculate_permissions(data: CalculatePermissions) -> Permissions {
     for p in data.roles_deny_overwrites {
         role_deny_permissions |= p;
     }
-    permissions &= !role_deny_permissions;
+    permissions.and_not_assign(&role_deny_permissions);
 
     // 6. Overwrites that allow permissions for specific roles are applied at a channel level
     let mut role_allow_permissions = Permissions::empty();
@@ -1062,7 +1062,7 @@ fn calculate_permissions(data: CalculatePermissions) -> Permissions {
     permissions |= role_allow_permissions;
 
     // 7. Member-specific overwrites that deny permissions are applied at a channel level
-    permissions &= !data.member_deny_overwrites;
+    permissions.and_not_assign(&data.member_deny_overwrites);
     // 8. Member-specific overwrites that allow permissions are applied at a channel level
     permissions |= data.member_allow_overwrites;
 
