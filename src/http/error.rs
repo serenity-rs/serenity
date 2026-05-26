@@ -603,20 +603,29 @@ mod test {
     }
 
     #[tokio::test]
-    async fn test_http_response_codes() {
+    async fn test_json_decode_errors() {
         let response = Builder::new().status(502).body("").unwrap();
         let reqwest_response: reqwest::Response = response.into();
         let error_response = ErrorResponse::from_response(reqwest_response, Method::POST).await;
         let http_error = HttpError::from(error_response);
 
-        let expected = "could not decode JSON when receiving error response from Discord (502 \
-            gateway unavailable: there was not a gateway available to process your request): error \
-            decoding response body: EOF while parsing a value at line 1 column 0";
+        let response = Builder::new().status(502).body("").unwrap();
+        let reqwest_response: reqwest::Response = response.into();
+        let json_error = reqwest_response.json::<DiscordJsonError>().await.err().unwrap();
+        let json_error_source = json_error.source().unwrap();
+
+        let expected = format!(
+            "could not decode JSON when receiving error response from Discord (502 gateway \
+            unavailable: there was not a gateway available to process your request): \
+            {json_error}: {json_error_source}"
+        );
 
         assert_eq!(format!("{http_error:#}"), expected);
 
-        let expected = "could not decode JSON when receiving error response from Discord (HTTP \
-            502): error decoding response body";
+        let expected = format!(
+            "could not decode JSON when receiving error response from Discord (HTTP 502): \
+            {json_error}"
+        );
 
         assert_eq!(http_error.to_string(), expected);
 
@@ -625,14 +634,24 @@ mod test {
         let error_response = ErrorResponse::from_response(reqwest_response, Method::POST).await;
         let http_error = HttpError::from(error_response);
 
-        let expected = "could not decode JSON when receiving error response from Discord (408 \
-            request timeout): error decoding response body: EOF while parsing a value at line 1 \
-            column 0";
+        let response = Builder::new().status(408).body("").unwrap();
+        let reqwest_response: reqwest::Response = response.into();
+        let json_error = reqwest_response.json::<DiscordJsonError>().await.err().unwrap();
+        let json_error_source = json_error.source().unwrap();
+        let mut code_string = StatusCode::from_u16(408).unwrap().to_string();
+        code_string.make_ascii_lowercase();
+
+        let expected = format!(
+            "could not decode JSON when receiving error response from Discord ({code_string}): \
+            {json_error}: {json_error_source}"
+        );
 
         assert_eq!(format!("{http_error:#}"), expected);
 
-        let expected = "could not decode JSON when receiving error response from Discord (HTTP \
-            408): error decoding response body";
+        let expected = format!(
+            "could not decode JSON when receiving error response from Discord (HTTP 408): \
+            {json_error}"
+        );
 
         assert_eq!(http_error.to_string(), expected);
     }
