@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/error.rs`."><title>error.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.0-nightly (423e3d252 2026-05-24)" data-channel="nightly" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>error.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::borrow::Cow;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/http/error.rs`."><title>error.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-17e0aaed.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.0-nightly (31a9463c6 2026-05-25)" data-channel="nightly" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-fcd733ba.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/http/</div>error.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::borrow::Cow;
 <a href=#2 id=2 data-nosnippet>2</a><span class="kw">use </span>std::collections::HashMap;
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>std::fmt;
@@ -603,38 +603,57 @@
 <a href=#603 id=603 data-nosnippet>603</a>    }
 <a href=#604 id=604 data-nosnippet>604</a>
 <a href=#605 id=605 data-nosnippet>605</a>    <span class="attr">#[tokio::test]
-<a href=#606 id=606 data-nosnippet>606</a>    </span><span class="kw">async fn </span>test_http_response_codes() {
+<a href=#606 id=606 data-nosnippet>606</a>    </span><span class="kw">async fn </span>test_json_decode_errors() {
 <a href=#607 id=607 data-nosnippet>607</a>        <span class="kw">let </span>response = Builder::new().status(<span class="number">502</span>).body(<span class="string">""</span>).unwrap();
 <a href=#608 id=608 data-nosnippet>608</a>        <span class="kw">let </span>reqwest_response: reqwest::Response = response.into();
 <a href=#609 id=609 data-nosnippet>609</a>        <span class="kw">let </span>error_response = ErrorResponse::from_response(reqwest_response, Method::POST).<span class="kw">await</span>;
 <a href=#610 id=610 data-nosnippet>610</a>        <span class="kw">let </span>http_error = HttpError::from(error_response);
 <a href=#611 id=611 data-nosnippet>611</a>
-<a href=#612 id=612 data-nosnippet>612</a>        <span class="kw">let </span>expected = <span class="string">"could not decode JSON when receiving error response from Discord (502 \
-<a href=#613 id=613 data-nosnippet>613</a>            gateway unavailable: there was not a gateway available to process your request): error \
-<a href=#614 id=614 data-nosnippet>614</a>            decoding response body: EOF while parsing a value at line 1 column 0"</span>;
-<a href=#615 id=615 data-nosnippet>615</a>
-<a href=#616 id=616 data-nosnippet>616</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{http_error:#}"</span>), expected);
-<a href=#617 id=617 data-nosnippet>617</a>
-<a href=#618 id=618 data-nosnippet>618</a>        <span class="kw">let </span>expected = <span class="string">"could not decode JSON when receiving error response from Discord (HTTP \
-<a href=#619 id=619 data-nosnippet>619</a>            502): error decoding response body"</span>;
-<a href=#620 id=620 data-nosnippet>620</a>
-<a href=#621 id=621 data-nosnippet>621</a>        <span class="macro">assert_eq!</span>(http_error.to_string(), expected);
+<a href=#612 id=612 data-nosnippet>612</a>        <span class="kw">let </span>response = Builder::new().status(<span class="number">502</span>).body(<span class="string">""</span>).unwrap();
+<a href=#613 id=613 data-nosnippet>613</a>        <span class="kw">let </span>reqwest_response: reqwest::Response = response.into();
+<a href=#614 id=614 data-nosnippet>614</a>        <span class="kw">let </span>json_error = reqwest_response.json::&lt;DiscordJsonError&gt;().<span class="kw">await</span>.err().unwrap();
+<a href=#615 id=615 data-nosnippet>615</a>        <span class="kw">let </span>json_error_source = json_error.source().unwrap();
+<a href=#616 id=616 data-nosnippet>616</a>
+<a href=#617 id=617 data-nosnippet>617</a>        <span class="kw">let </span>expected = <span class="macro">format!</span>(
+<a href=#618 id=618 data-nosnippet>618</a>            <span class="string">"could not decode JSON when receiving error response from Discord (502 gateway \
+<a href=#619 id=619 data-nosnippet>619</a>            unavailable: there was not a gateway available to process your request): \
+<a href=#620 id=620 data-nosnippet>620</a>            {json_error}: {json_error_source}"
+<a href=#621 id=621 data-nosnippet>621</a>        </span>);
 <a href=#622 id=622 data-nosnippet>622</a>
-<a href=#623 id=623 data-nosnippet>623</a>        <span class="kw">let </span>response = Builder::new().status(<span class="number">408</span>).body(<span class="string">""</span>).unwrap();
-<a href=#624 id=624 data-nosnippet>624</a>        <span class="kw">let </span>reqwest_response: reqwest::Response = response.into();
-<a href=#625 id=625 data-nosnippet>625</a>        <span class="kw">let </span>error_response = ErrorResponse::from_response(reqwest_response, Method::POST).<span class="kw">await</span>;
-<a href=#626 id=626 data-nosnippet>626</a>        <span class="kw">let </span>http_error = HttpError::from(error_response);
-<a href=#627 id=627 data-nosnippet>627</a>
-<a href=#628 id=628 data-nosnippet>628</a>        <span class="kw">let </span>expected = <span class="string">"could not decode JSON when receiving error response from Discord (408 \
-<a href=#629 id=629 data-nosnippet>629</a>            request timeout): error decoding response body: EOF while parsing a value at line 1 \
-<a href=#630 id=630 data-nosnippet>630</a>            column 0"</span>;
+<a href=#623 id=623 data-nosnippet>623</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{http_error:#}"</span>), expected);
+<a href=#624 id=624 data-nosnippet>624</a>
+<a href=#625 id=625 data-nosnippet>625</a>        <span class="kw">let </span>expected = <span class="macro">format!</span>(
+<a href=#626 id=626 data-nosnippet>626</a>            <span class="string">"could not decode JSON when receiving error response from Discord (HTTP 502): \
+<a href=#627 id=627 data-nosnippet>627</a>            {json_error}"
+<a href=#628 id=628 data-nosnippet>628</a>        </span>);
+<a href=#629 id=629 data-nosnippet>629</a>
+<a href=#630 id=630 data-nosnippet>630</a>        <span class="macro">assert_eq!</span>(http_error.to_string(), expected);
 <a href=#631 id=631 data-nosnippet>631</a>
-<a href=#632 id=632 data-nosnippet>632</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{http_error:#}"</span>), expected);
-<a href=#633 id=633 data-nosnippet>633</a>
-<a href=#634 id=634 data-nosnippet>634</a>        <span class="kw">let </span>expected = <span class="string">"could not decode JSON when receiving error response from Discord (HTTP \
-<a href=#635 id=635 data-nosnippet>635</a>            408): error decoding response body"</span>;
+<a href=#632 id=632 data-nosnippet>632</a>        <span class="kw">let </span>response = Builder::new().status(<span class="number">408</span>).body(<span class="string">""</span>).unwrap();
+<a href=#633 id=633 data-nosnippet>633</a>        <span class="kw">let </span>reqwest_response: reqwest::Response = response.into();
+<a href=#634 id=634 data-nosnippet>634</a>        <span class="kw">let </span>error_response = ErrorResponse::from_response(reqwest_response, Method::POST).<span class="kw">await</span>;
+<a href=#635 id=635 data-nosnippet>635</a>        <span class="kw">let </span>http_error = HttpError::from(error_response);
 <a href=#636 id=636 data-nosnippet>636</a>
-<a href=#637 id=637 data-nosnippet>637</a>        <span class="macro">assert_eq!</span>(http_error.to_string(), expected);
-<a href=#638 id=638 data-nosnippet>638</a>    }
-<a href=#639 id=639 data-nosnippet>639</a>}
+<a href=#637 id=637 data-nosnippet>637</a>        <span class="kw">let </span>response = Builder::new().status(<span class="number">408</span>).body(<span class="string">""</span>).unwrap();
+<a href=#638 id=638 data-nosnippet>638</a>        <span class="kw">let </span>reqwest_response: reqwest::Response = response.into();
+<a href=#639 id=639 data-nosnippet>639</a>        <span class="kw">let </span>json_error = reqwest_response.json::&lt;DiscordJsonError&gt;().<span class="kw">await</span>.err().unwrap();
+<a href=#640 id=640 data-nosnippet>640</a>        <span class="kw">let </span>json_error_source = json_error.source().unwrap();
+<a href=#641 id=641 data-nosnippet>641</a>        <span class="kw">let </span><span class="kw-2">mut </span>code_string = StatusCode::from_u16(<span class="number">408</span>).unwrap().to_string();
+<a href=#642 id=642 data-nosnippet>642</a>        code_string.make_ascii_lowercase();
+<a href=#643 id=643 data-nosnippet>643</a>
+<a href=#644 id=644 data-nosnippet>644</a>        <span class="kw">let </span>expected = <span class="macro">format!</span>(
+<a href=#645 id=645 data-nosnippet>645</a>            <span class="string">"could not decode JSON when receiving error response from Discord ({code_string}): \
+<a href=#646 id=646 data-nosnippet>646</a>            {json_error}: {json_error_source}"
+<a href=#647 id=647 data-nosnippet>647</a>        </span>);
+<a href=#648 id=648 data-nosnippet>648</a>
+<a href=#649 id=649 data-nosnippet>649</a>        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{http_error:#}"</span>), expected);
+<a href=#650 id=650 data-nosnippet>650</a>
+<a href=#651 id=651 data-nosnippet>651</a>        <span class="kw">let </span>expected = <span class="macro">format!</span>(
+<a href=#652 id=652 data-nosnippet>652</a>            <span class="string">"could not decode JSON when receiving error response from Discord (HTTP 408): \
+<a href=#653 id=653 data-nosnippet>653</a>            {json_error}"
+<a href=#654 id=654 data-nosnippet>654</a>        </span>);
+<a href=#655 id=655 data-nosnippet>655</a>
+<a href=#656 id=656 data-nosnippet>656</a>        <span class="macro">assert_eq!</span>(http_error.to_string(), expected);
+<a href=#657 id=657 data-nosnippet>657</a>    }
+<a href=#658 id=658 data-nosnippet>658</a>}
 </code></pre></div></section></main></body></html>
