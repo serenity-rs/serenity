@@ -398,6 +398,12 @@ pub struct ShardInfo {
     pub total: NonZeroU16,
 }
 
+impl fmt::Display for ShardInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}/{}", self.id.0, self.total)
+    }
+}
+
 impl Default for ShardInfo {
     fn default() -> Self {
         Self {
