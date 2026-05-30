@@ -48,7 +48,7 @@ pub struct Embed {
     pub image: Option<EmbedImage>,
     /// Thumbnail information of the embed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub thumbnail: Option<EmbedThumbnail>,
+    pub thumbnail: Option<EmbedImage>,
     /// The embed's video information.
     ///
     /// This is present if the [`Self::kind`] is `"video"`.
@@ -175,6 +175,20 @@ pub struct EmbedImage {
     pub height: Option<NonMaxU32>,
     /// The width of the image.
     pub width: Option<NonMaxU32>,
+    /// The image's [media type].
+    ///
+    /// [media type]: https://en.wikipedia.org/wiki/Media_type
+    pub content_type: Option<FixedString>,
+    /// The [thumbhash] placeholder of the image.
+    ///
+    /// [thumbhash]: https://evanw.github.io/thumbhash/
+    pub placeholder: Option<FixedString>,
+    /// The version of the placeholder.
+    pub placeholder_version: Option<NonMaxU32>,
+    /// The description (alt text) for the image.
+    pub description: Option<FixedString>,
+    /// The embed media flags for the image.
+    pub flags: Option<EmbedMediaFlags>,
 }
 
 /// The provider of an embed.
@@ -190,25 +204,6 @@ pub struct EmbedProvider {
     pub url: Option<FixedString>,
 }
 
-/// The dimensions and URL of an embed thumbnail.
-///
-/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-thumbnail-structure).
-#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct EmbedThumbnail {
-    /// The source URL of the thumbnail.
-    ///
-    /// This only supports HTTP(S) and attachments.
-    pub url: FixedString,
-    /// A proxied URL of the thumbnail.
-    pub proxy_url: Option<FixedString>,
-    /// The height of the thumbnail in pixels.
-    pub height: Option<NonMaxU32>,
-    /// The width of the thumbnail in pixels.
-    pub width: Option<NonMaxU32>,
-}
-
 /// Video information for an embed.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-video-structure).
@@ -218,10 +213,36 @@ pub struct EmbedThumbnail {
 pub struct EmbedVideo {
     /// The source URL of the video.
     pub url: FixedString,
-    /// A proxied URL of the thumbnail.
+    /// A proxied URL of the video.
     pub proxy_url: Option<FixedString>,
-    /// The height of the video in pixels.
+    /// The height of the video.
     pub height: Option<NonMaxU32>,
-    /// The width of the video in pixels.
+    /// The width of the video.
     pub width: Option<NonMaxU32>,
+    /// The video's [media type].
+    ///
+    /// [media type]: https://en.wikipedia.org/wiki/Media_type
+    pub content_type: Option<FixedString>,
+    /// The [thumbhash] placeholder of the video.
+    ///
+    /// [thumbhash]: https://evanw.github.io/thumbhash/
+    pub placeholder: Option<FixedString>,
+    /// The version of the placeholder.
+    pub placeholder_version: Option<NonMaxU32>,
+    /// The description (alt text) for the video.
+    pub description: Option<FixedString>,
+    /// The embed media flags for the video.
+    pub flags: Option<EmbedMediaFlags>,
+}
+
+bitflags! {
+    /// Flags for embed media.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-media-flags).
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+    pub struct EmbedMediaFlags: u8 {
+        /// This image is animated.
+        const IS_ANIMATED = 1 << 5;
+    }
 }

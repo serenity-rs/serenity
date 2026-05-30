@@ -34,25 +34,38 @@ where
 pub struct Attachment {
     /// The unique ID given to this attachment.
     pub id: AttachmentId,
-    /// The filename of the file that was uploaded. This is equivalent to what the uploader had
-    /// their file named.
+    /// The name of the file attached.
+    ///
+    /// This `filename` supports ASCII printable characters only. If the original filename
+    /// satisfies this condition, it will be used here.
     pub filename: FixedString,
-    /// Description for the file (max 1024 characters).
+    /// The title of the file.
+    ///
+    /// When the original filename includes characters other than ASCII printable characters, a
+    /// sanitized name is assigned to `filename` and the original name is held in `title`.
+    pub title: Option<FixedString>,
+    /// Description (alt text) for the file (max 1024 characters).
     pub description: Option<FixedString<u16>>,
-    /// If the attachment is an image, then the height of the image is provided.
-    pub height: Option<NonMaxU32>,
-    /// If the attachment is an image, then the width of the image is provided.
-    pub width: Option<NonMaxU32>,
-    /// The proxy URL.
-    pub proxy_url: FixedString,
-    /// The size of the file in bytes.
-    pub size: u32,
-    /// The URL of the uploaded attachment.
-    pub url: FixedString,
     /// The attachment's [media type].
     ///
     /// [media type]: https://en.wikipedia.org/wiki/Media_type
     pub content_type: Option<FixedString>,
+    /// The size of the file in bytes.
+    pub size: u32,
+    /// The source URL of the file.
+    pub url: FixedString,
+    /// A proxied URL of the file.
+    pub proxy_url: FixedString,
+    /// The height of the file (if image or video).
+    pub height: Option<NonMaxU32>,
+    /// The width of the file (if image or video).
+    pub width: Option<NonMaxU32>,
+    /// The [thumbhash] placeholder of the attachment (if image or video).
+    ///
+    /// [thumbhash]: https://evanw.github.io/thumbhash/
+    pub placeholder: Option<FixedString>,
+    /// The version of the placeholder (if image or video).
+    pub placeholder_version: Option<NonMaxU32>,
     /// Whether this attachment is ephemeral.
     ///
     /// Ephemeral attachments will automatically be removed after a set period of time.
@@ -74,6 +87,15 @@ pub struct Attachment {
     /// documentation.
     #[serde(default, deserialize_with = "base64_bytes")]
     pub waveform: Option<Vec<u8>>,
+    /// The attachment flags for this attachment.
+    pub flags: Option<AttachmentFlags>,
+    /// For Clips, an array of the users who were in the stream.
+    #[serde(default)]
+    pub clip_participants: FixedArray<User>,
+    /// For Clips, when the clip was created.
+    pub clip_created_at: Option<Timestamp>,
+    /// For Clips, the application in the stream, if recognized.
+    pub application: Option<MessageApplication>,
 }
 
 #[cfg(feature = "model")]
@@ -154,5 +176,24 @@ impl Attachment {
 impl ExtractKey<AttachmentId> for Attachment {
     fn extract_key(&self) -> &AttachmentId {
         &self.id
+    }
+}
+
+bitflags! {
+    /// Flags for an attachment.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-flags).
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+    pub struct AttachmentFlags: u8 {
+        /// This attachment is a Clip from a stream.
+        const IS_CLIP = 1 << 0;
+        /// This attachment is the thumbnail of a thread in a media channel, displayed in the grid
+        /// but not on the message.
+        const IS_THUMBNAIL = 1 << 1;
+        /// This attachment was marked as a spoiler and is blurred until clicked.
+        const IS_SPOILER = 1 << 3;
+        /// This attachment is an animated image.
+        const IS_ANIMATED = 1 << 5;
     }
 }

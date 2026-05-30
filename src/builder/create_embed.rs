@@ -403,11 +403,3 @@ impl From<EmbedImage> for CreateEmbedImage<'_> {
         }
     }
 }
-
-impl From<EmbedThumbnail> for CreateEmbedImage<'_> {
-    fn from(field: EmbedThumbnail) -> Self {
-        Self {
-            url: field.url.into(),
-        }
-    }
-}

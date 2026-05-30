@@ -51,7 +51,6 @@ pub fn print_ranking() {
         ("EmbedFooter", std::mem::size_of::<EmbedFooter>()),
         ("EmbedImage", std::mem::size_of::<EmbedImage>()),
         ("EmbedProvider", std::mem::size_of::<EmbedProvider>()),
-        ("EmbedThumbnail", std::mem::size_of::<EmbedThumbnail>()),
         ("EmbedVideo", std::mem::size_of::<EmbedVideo>()),
         ("Emoji", std::mem::size_of::<Emoji>()),
         ("EmojiId", std::mem::size_of::<EmojiId>()),
