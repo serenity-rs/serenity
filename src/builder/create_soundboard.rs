@@ -1,8 +1,6 @@
 use std::borrow::Cow;
 
 use super::DataUri;
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
 use crate::model::prelude::*;
 
 /// A builder to create a soundboard sound.

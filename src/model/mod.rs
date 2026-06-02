@@ -45,10 +45,79 @@ pub mod user;
 pub mod voice;
 pub mod webhook;
 
+#[cfg(feature = "http")]
+use std::sync::Arc;
+
 pub use self::colour::{Color, Colour};
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
 pub use self::timestamp::Timestamp;
+#[cfg(all(feature = "http", feature = "cache"))]
+use crate::cache::Cache;
+#[cfg(feature = "http")]
+use crate::http::Http;
+
+/// This trait will be required by functions that need [`Http`] and can optionally use a [`Cache`]
+/// to potentially avoid REST-requests.
+///
+/// If the `cache` feature is enabled, but an implementing type does not have access to a cache,
+/// the [`CacheHttp::cache`] method will simply return `None`.
+#[cfg(feature = "http")]
+pub trait CacheHttp: Send + Sync {
+    fn http(&self) -> &Http;
+
+    #[cfg(feature = "cache")]
+    #[must_use]
+    fn cache(&self) -> Option<&Arc<Cache>> {
+        None
+    }
+}
+
+#[cfg(feature = "http")]
+impl<T> CacheHttp for &T
+where
+    T: CacheHttp,
+{
+    fn http(&self) -> &Http {
+        (*self).http()
+    }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&Arc<Cache>> {
+        (*self).cache()
+    }
+}
+
+#[cfg(feature = "http")]
+impl<T> CacheHttp for Arc<T>
+where
+    T: CacheHttp,
+{
+    fn http(&self) -> &Http {
+        (**self).http()
+    }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&Arc<Cache>> {
+        (**self).cache()
+    }
+}
+
+#[cfg(all(feature = "http", feature = "cache"))]
+impl CacheHttp for (Option<&Arc<Cache>>, &Http) {
+    fn cache(&self) -> Option<&Arc<Cache>> {
+        self.0
+    }
+
+    fn http(&self) -> &Http {
+        self.1
+    }
+}
+
+#[cfg(feature = "http")]
+impl CacheHttp for Http {
+    fn http(&self) -> &Http {
+        self
+    }
+}
 
 /// The model prelude re-exports all types in the model sub-modules.
 ///
@@ -64,6 +133,9 @@ pub use self::timestamp::Timestamp;
 pub mod prelude {
     pub(crate) use serde::{Deserialize, Deserializer};
 
+    #[cfg(feature = "http")]
+    #[doc(hidden)]
+    pub use super::CacheHttp;
     pub use super::guild::automod::EventType as AutomodEventType;
     #[doc(hidden)]
     pub use super::guild::automod::{

@@ -1,7 +1,7 @@
 use nonmax::NonMaxU8;
 
 #[cfg(feature = "http")]
-use crate::http::{CacheHttp, MessagePagination};
+use crate::http::MessagePagination;
 use crate::model::prelude::*;
 
 /// Builds a request to the API to retrieve messages.

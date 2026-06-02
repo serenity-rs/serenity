@@ -8,8 +8,6 @@ use super::{
     EditAttachment,
     EditAttachments,
 };
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
 use crate::model::prelude::*;
 
 /// A builder to specify the fields to edit in an existing message.

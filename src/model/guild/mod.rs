@@ -37,7 +37,7 @@ use crate::builder::EditGuild;
 #[cfg(doc)]
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::*;

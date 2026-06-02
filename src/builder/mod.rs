@@ -8,8 +8,6 @@
 #![allow(clippy::option_option)]
 
 #[cfg(feature = "http")]
-use crate::internal::prelude::*;
-#[cfg(feature = "http")]
 use crate::model::ModelError;
 
 #[cfg(feature = "http")]
@@ -17,7 +15,7 @@ pub(crate) fn check_lengths(
     content: Option<&str>,
     embeds: Option<&[CreateEmbed<'_>]>,
     stickers: usize,
-) -> StdResult<(), ModelError> {
+) -> Result<(), ModelError> {
     use crate::model::error::Maximum;
 
     if let Some(content) = content {

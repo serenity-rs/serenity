@@ -12,7 +12,9 @@ use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::model::CacheHttp;
 use crate::model::utils::deserialize_null_as_default;
 #[cfg(feature = "model")]
 use crate::model::utils::{avatar_url, user_banner_url};

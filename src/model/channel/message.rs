@@ -17,7 +17,7 @@ use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
 use crate::constants;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 use crate::model::utils::{StrOrInt, discord_colours};
 

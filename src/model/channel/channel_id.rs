@@ -27,7 +27,7 @@ use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "temp_cache", feature = "model"))]
 use crate::cache::MaybeOwnedArc;
 #[cfg(feature = "model")]
-use crate::http::{CacheHttp, Http};
+use crate::http::Http;
 use crate::model::prelude::*;
 
 impl ChannelId {

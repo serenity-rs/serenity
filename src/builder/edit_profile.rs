@@ -4,9 +4,7 @@ use super::DataUri;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(feature = "http")]
-use crate::internal::prelude::*;
-#[cfg(feature = "http")]
-use crate::model::user::CurrentUser;
+use crate::model::prelude::*;
 
 /// A builder to edit the current user's settings, to be used in conjunction with
 /// [`CurrentUser::edit`].
