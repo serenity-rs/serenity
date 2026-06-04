@@ -37,6 +37,10 @@ pub struct Message {
     /// The user that sent the message.
     pub author: User,
     /// The content of the message.
+    ///
+    /// Will be empty if the bot does not have the [`MESSAGE_CONTENT`] privileged intent.
+    ///
+    /// [`MESSAGE_CONTENT`]: GatewayIntents::MESSAGE_CONTENT
     pub content: FixedString<u16>,
     /// Initial message creation timestamp, calculated from its Id.
     pub timestamp: Timestamp,
@@ -45,10 +49,14 @@ pub struct Message {
     /// Indicator of whether the command is to be played back via text-to-speech.
     ///
     /// In the client, this is done via the `/tts` slash command.
+    ///
+    /// Always false in [`MessageUpdateEvent`].
     pub tts: bool,
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of users mentioned in the message.
+    ///
+    /// May include a [`PartialMember`] in [`MessageCreateEvent`] or [`MessageUpdateEvent`].
     pub mentions: FixedArray<User>,
     /// Array of [`Role`]s' Ids mentioned in the message.
     pub mention_roles: FixedArray<RoleId>,
@@ -73,8 +81,16 @@ pub struct Message {
     pub mention_channels: FixedArray<ChannelMention>,
     /// A vector of the files attached to a message that are not referenced in embeds or
     /// components.
+    ///
+    /// Will be empty if the bot does not have the [`MESSAGE_CONTENT`] privileged intent.
+    ///
+    /// [`MESSAGE_CONTENT`]: GatewayIntents::MESSAGE_CONTENT
     pub attachments: FixedArray<Attachment>,
     /// Array of embeds sent with the message.
+    ///
+    /// Will be empty if the bot does not have the [`MESSAGE_CONTENT`] privileged intent.
+    ///
+    /// [`MESSAGE_CONTENT`]: GatewayIntents::MESSAGE_CONTENT
     pub embeds: FixedArray<Embed>,
     /// Array of reactions performed on the message.
     #[serde(default)]
@@ -102,6 +118,14 @@ pub struct Message {
     /// Bit flags describing extra features of the message.
     pub flags: Option<MessageFlags>,
     /// The message that was replied to using this message.
+    ///
+    /// This is only returned for messages with a type of [`InlineReply`],
+    /// [`ThreadStarterMessage`], or [`ContextMenuCommand`]. If it is not present for one of
+    /// these, the referenced message was deleted or its state is unknown.
+    ///
+    /// [`InlineReply`]: MessageType::InlineReply
+    /// [`ThreadStarterMessage`]: MessageType::ThreadStarterMessage
+    /// [`ContextMenuCommand`]: MessageType::ContextMenuCommand
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recursion
     /// An array of message snapshots, known as forwarded messages.
     #[serde(default, deserialize_with = "deserialize_snapshots")]
@@ -114,12 +138,17 @@ pub struct Message {
     pub interaction_metadata: Option<Box<MessageInteractionMetadata>>,
     /// The thread that was started from this message, includes thread member object.
     pub thread: Option<Box<GuildThread>>,
-    /// The components of this message
+    /// The components of this message.
+    ///
+    /// Will be empty if the bot does not have the [`MESSAGE_CONTENT`] privileged intent.
+    ///
+    /// [`MESSAGE_CONTENT`]: GatewayIntents::MESSAGE_CONTENT
     #[serde(default)]
     pub components: FixedArray<Component>,
     /// Array of message sticker item objects.
     #[serde(default)]
     pub sticker_items: FixedArray<StickerItem>,
+    // Field omitted: stickers (it's deprecated by Discord)
     /// A generally increasing integer (there may be gaps or duplicates) that represents the
     /// approximate position of the message in a thread, it can be used to estimate the relative
     /// position of the message in a thread in company with total_message_sent on parent thread.
@@ -127,25 +156,33 @@ pub struct Message {
     /// Data of the role subscription purchase or renewal that prompted this
     /// [`MessageType::RoleSubscriptionPurchase`] message.
     pub role_subscription_data: Option<RoleSubscriptionData>,
-    // Field omitted: stickers (it's deprecated by Discord)
-    /// The Id of the [`Guild`] that the message was sent in. This value will only be present if
-    /// this message was received over the gateway, therefore **do not use this to check if message
-    /// is in DMs**, it is not a reliable method.
-    pub guild_id: Option<GuildId>,
-    /// A partial amount of data about the user's member data
-    ///
-    /// Only present in [`MessageCreateEvent`].
-    pub member: Option<Box<PartialMember>>,
     /// A poll that may be attached to a message.
     ///
-    /// This is often omitted, so is boxed to improve memory usage.
+    /// Will be omitted if the bot does not have the [`MESSAGE_CONTENT`] privileged intent. Due to
+    /// the frequency of omission, this is boxed to improve memory usage.
     ///
-    /// Only present in [`MessageCreateEvent`].
+    /// [`MESSAGE_CONTENT`]: GatewayIntents::MESSAGE_CONTENT
     pub poll: Option<Box<Poll>>,
+    /// The call associated with the message.
+    pub call: Option<Box<MessageCall>>,
     /// The custom client-side theme attached to a message.
-    ///
-    /// Only present in [`MessageCreateEvent`]
     pub shared_client_theme: Option<Box<SharedClientTheme>>,
+    // Fields below only present in [`MessageCreateEvent`] and [`MessageUpdateEvent`].
+    // https://docs.discord.com/developers/events/gateway-events#message-create-message-create-extra-fields
+    /// The Id of the [`Guild`] that the message was sent in - unless it is an ephemeral message.
+    ///
+    /// This value will only be present if this message was received over the gateway, therefore
+    /// **do not use this to check if message is in DMs**. It is not a reliable method.
+    pub guild_id: Option<GuildId>,
+    /// A partial amount of data about the user's member data. Missing for ephemeral messages and
+    /// messages from webhooks.
+    ///
+    /// Only present in [`MessageCreateEvent`] and [`MessageUpdateEvent`].
+    pub member: Option<Box<PartialMember>>,
+    /// The type of channel the message was sent in.
+    ///
+    /// Only present in [`MessageCreateEvent`] and [`MessageUpdateEvent`].
+    pub channel_type: Option<ChannelType>,
 }
 
 #[cfg(feature = "model")]
@@ -1243,6 +1280,19 @@ pub struct SharedClientTheme {
     pub base_mix: u16,
     /// The mode of the theme.
     pub base_theme: Option<BaseTheme>,
+}
+
+/// Information about a call in a private channel.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/message#message-call-object)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct MessageCall {
+    /// The users who participated in the call.
+    pub participants: FixedArray<UserId>,
+    /// The time when the call ended.
+    pub ended_timestamp: Option<Timestamp>,
 }
 
 // all tests here require cache, move if non-cache test is added
