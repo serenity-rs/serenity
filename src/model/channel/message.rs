@@ -727,17 +727,17 @@ enum_number! {
         MemberJoin = 7,
         /// An indicator that someone has boosted the guild.
         NitroBoost = 8,
-        /// An indicator that the guild has reached nitro tier 1
+        /// An indicator that the guild has reached nitro tier 1.
         NitroTier1 = 9,
-        /// An indicator that the guild has reached nitro tier 2
+        /// An indicator that the guild has reached nitro tier 2.
         NitroTier2 = 10,
-        /// An indicator that the guild has reached nitro tier 3
+        /// An indicator that the guild has reached nitro tier 3.
         NitroTier3 = 11,
-        /// An indicator that the channel is now following a news channel
+        /// An indicator that the channel is now following a news channel.
         ChannelFollowAdd = 12,
-        /// An indicator that the guild is disqualified for Discovery Feature
+        /// An indicator that the guild is disqualified for Discovery Feature.
         GuildDiscoveryDisqualified = 14,
-        /// An indicator that the guild is requalified for Discovery Feature
+        /// An indicator that the guild is requalified for Discovery Feature.
         GuildDiscoveryRequalified = 15,
         /// The first warning before guild discovery removal.
         GuildDiscoveryGracePeriodInitialWarning = 16,
@@ -759,16 +759,26 @@ enum_number! {
         AutoModAction = 24,
         RoleSubscriptionPurchase = 25,
         InteractionPremiumUpsell = 26,
+        /// An indicator that a stage has started.
         StageStart = 27,
+        /// An indicator that a stage has ended.
         StageEnd = 28,
+        /// An indicator that a user has become a speaker in a stage channel.
         StageSpeaker = 29,
+        /// An indicator that a stage topic has been changed.
         StageTopic = 31,
         GuildApplicationPremiumSubscription = 32,
+        /// An indicator that a security action was enabled.
         GuildIncidentAlertModeEnabled = 36,
+        /// An indicator that a security action was disabled.
         GuildIncidentAlertModeDisabled = 37,
+        /// An indicator that a raid was reported.
         GuildIncidentReportRaid = 38,
+        /// An indicator that a guild incident report was a false alarm.
         GuildIncidentReportFalseAlarm = 39,
         PurchaseNotification = 44,
+        /// An indicator that a poll has ended and the results have been finalized.
+        PollResult = 46,
         _ => Unknown(u8),
     }
 }
