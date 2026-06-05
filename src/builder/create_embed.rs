@@ -133,19 +133,39 @@ impl<'a> CreateEmbed<'a> {
 
     /// Set the image associated with the embed.
     ///
-    /// Refer [Discord Documentation](https://docs.discord.com/developers/reference#uploading-files)
+    /// Optionally, include a `description` to set the alt text for the image.
+    ///
+    /// Note that if you specify "attachment://filename.(jpg, png)" for the url, passing a value
+    /// to `description` will have no effect. Alt text for attachments must be set using
+    /// [`CreateAttachment::description`].
+    ///
+    /// Refer to [Discord Documentation](https://docs.discord.com/developers/reference#uploading-files)
     /// for rules on naming local attachments.
-    pub fn image(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+    ///
+    /// [`CreateAttachment::description`]: crate::builder::CreateAttachment::description
+    pub fn image(
+        mut self,
+        url: impl Into<Cow<'a, str>>,
+        description: Option<Cow<'a, str>>,
+    ) -> Self {
         self.image = Some(CreateEmbedImage {
             url: url.into(),
+            description,
         });
         self
     }
 
     /// Set the thumbnail of the embed.
-    pub fn thumbnail(mut self, url: impl Into<Cow<'a, str>>) -> Self {
+    ///
+    /// Optionally, include a `description` to set the alt text for the thumbnail.
+    pub fn thumbnail(
+        mut self,
+        url: impl Into<Cow<'a, str>>,
+        description: Option<Cow<'a, str>>,
+    ) -> Self {
         self.thumbnail = Some(CreateEmbedImage {
             url: url.into(),
+            description,
         });
         self
     }
@@ -183,15 +203,17 @@ impl<'a> CreateEmbed<'a> {
 
     /// Same as calling [`Self::image`] with "attachment://filename.(jpg, png)".
     ///
-    /// Remember to set an attachment with the provided filename via [`CreateAttachment`]
+    /// Remember to set an attachment with the provided filename via [`CreateAttachment`].
+    /// Alt text may be set with [`CreateAttachment::description`].
     ///
-    /// Refer [`Self::image`] for rules on naming local attachments.
+    /// Refer to [`Self::image`] for rules on naming local attachments.
     ///
     /// [`CreateAttachment`]: crate::builder::CreateAttachment
+    /// [`CreateAttachment::description`]: crate::builder::CreateAttachment::description
     pub fn attachment(self, filename: impl Into<String>) -> Self {
         let mut filename = filename.into();
         filename.insert_str(0, "attachment://");
-        self.image(filename)
+        self.image(filename, None)
     }
 
     #[cfg(feature = "http")]
@@ -394,12 +416,14 @@ impl From<EmbedField> for CreateEmbedField<'_> {
 #[derive(Clone, Debug, Serialize)]
 struct CreateEmbedImage<'a> {
     url: Cow<'a, str>,
+    description: Option<Cow<'a, str>>,
 }
 
 impl From<EmbedImage> for CreateEmbedImage<'_> {
     fn from(field: EmbedImage) -> Self {
         Self {
             url: field.url.into(),
+            description: field.description.map(Into::into),
         }
     }
 }

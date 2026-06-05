@@ -25,7 +25,7 @@ impl EventHandler for Handler {
                     let embed = CreateEmbed::new()
                         .title("This is a title")
                         .description("This is a description")
-                        .image("attachment://ferris_eyes.png")
+                        .image("attachment://ferris_eyes.png", Some("Ferris with big eyes".into()))
                         .fields([
                             ("This is the first field", "This is a field body", true),
                             ("This is the second field", "Both fields are inline", true),
