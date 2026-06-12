@@ -346,11 +346,16 @@ impl AutocompleteChoice {
     }
 }
 
-impl<S: Into<String>> From<S> for AutocompleteChoice {
-    fn from(value: S) -> Self {
-        let value = value.into();
+impl From<String> for AutocompleteChoice {
+    fn from(value: String) -> Self {
         let name = value.clone();
         Self::new(name, value)
+    }
+}
+
+impl From<&str> for AutocompleteChoice {
+    fn from(value: &str) -> Self {
+        Self::from(value.to_owned())
     }
 }
 

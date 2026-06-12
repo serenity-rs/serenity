@@ -1127,12 +1127,24 @@ impl std::fmt::Display for Content {
     }
 }
 
-impl<T: Into<String>> From<T> for Content {
-    fn from(t: T) -> Content {
+impl From<String> for Content {
+    fn from(t: String) -> Content {
         Content {
-            inner: t.into(),
+            inner: t,
             ..Default::default()
         }
+    }
+}
+
+impl From<&str> for Content {
+    fn from(t: &str) -> Content {
+        Self::from(t.to_owned())
+    }
+}
+
+impl From<char> for Content {
+    fn from(t: char) -> Content {
+        Self::from(t.to_string())
     }
 }
 
