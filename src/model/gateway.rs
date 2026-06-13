@@ -390,10 +390,16 @@ pub struct SessionStartLimit {
 }
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub struct ShardInfo {
     pub id: ShardId,
     pub total: u32,
+}
+
+impl std::fmt::Debug for ShardInfo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.id.0, self.total)
+    }
 }
 
 impl ShardInfo {
