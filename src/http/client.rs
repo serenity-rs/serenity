@@ -5210,6 +5210,10 @@ impl Http {
         fields(
             url.path = %req.route.path(),
             http.request.method = req.method.reqwest_method().as_str(),
+            // Setting these otel.* fields allows users of opentelemetry-tracing to have their spans be correctly annotated
+            otel.kind = "client",
+            otel.status_code,
+            otel.status_message,
             http.response.status,
         )
     )]
@@ -5223,11 +5227,17 @@ impl Http {
             self.client.execute(request).await?
         };
 
-        tracing::Span::current().record("http.response.status", response.status().as_u16());
+        let current_span = tracing::Span::current();
+        current_span.record("http.response.status", response.status().as_u16());
 
         if response.status().is_success() {
+            current_span.record("otel.status_code", "OK");
             Ok(response)
         } else {
+            current_span.record("otel.status_code", "ERROR");
+            current_span
+                .record("otel.status_message", format!("HTTP {}", response.status().as_u16()));
+
             Err(Error::Http(HttpError::UnsuccessfulRequest(
                 ErrorResponse::from_response(response, method).await,
             )))
