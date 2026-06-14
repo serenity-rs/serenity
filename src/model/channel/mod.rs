@@ -121,7 +121,6 @@ pub enum Channel {
     Private(PrivateChannel),
 }
 
-#[cfg(feature = "model")]
 impl Channel {
     /// If this is a guild channel, returns it.
     #[must_use]
@@ -164,6 +163,7 @@ impl Channel {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
+    #[cfg(feature = "model")]
     pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         match self {
             Self::Guild(public_channel) => {

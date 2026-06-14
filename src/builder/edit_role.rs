@@ -177,9 +177,21 @@ impl<'a> EditRole<'a> {
         };
 
         if let Some(position) = self.position {
-            guild_id
-                .edit_role_positions(http, [(role.id, position)], self.audit_log_reason)
-                .await?;
+            #[derive(Serialize)]
+            struct EditRolePosition {
+                id: RoleId,
+                position: i16,
+            }
+
+            http.edit_role_positions(
+                guild_id,
+                std::iter::once(EditRolePosition {
+                    id: role.id,
+                    position,
+                }),
+                self.audit_log_reason,
+            )
+            .await?;
         }
         Ok(role)
     }
