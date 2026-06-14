@@ -51,6 +51,9 @@ jobs:
           - name: builder without model
             features: builder
             dont-test: true
+          - name: http without model
+            features: http rustls_backend
+            dont-test: true
           - name: unstable Discord API (no default features)
             features: unstable_discord_api
             dont-test: true
