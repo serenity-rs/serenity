@@ -70,6 +70,7 @@ enum_number! {
         OnlyBotsCanUseThisEndpoint = 20002,
         ExplicitContentCannotBeSentToRecipient = 20009,
         NotAuthorizedForAction = 20012,
+        ActionRequiresPremiumSubscription = 20015,
         SlowmodeRateLimit = 20016,
         OnlyOwnerCanPerform = 20018,
         AnnouncementRateLimit = 20022,
@@ -206,6 +207,7 @@ enum_number! {
         MetadataRequiredForVoiceMessages = 50161,
         VoiceMessagesCannotBeEdited = 50162,
         CannotDeleteGuildSubscriptionIntegration = 50163,
+        CannotSendVoiceEffectWhenServerMutedDeafenedOrSuppressed = 50167,
         CannotSendVoiceMessagesInChannel = 50173,
         UserAccountMustBeVerified = 50178,
         InvalidFileDuration = 50192,
@@ -248,6 +250,7 @@ enum_number! {
         WebhookServicesCannotBeUsedInForumChannels = 220004,
         MessageBlockedByHarmfulLinksFilter = 240000,
 
+        AccessToJoiningNewServersLimited = 340015,
         OnboardingRequirementsNotMet = 350000,
         BelowOnboardingRequirements = 350001,
 
