@@ -1174,6 +1174,7 @@ pub enum GatewayEvent {
 impl<'de> Deserialize<'de> for GatewayEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
+        map.retain(|_, v| !v.is_null());
         let seq = remove_from_map_opt(&mut map, "s")?.flatten();
 
         Ok(match remove_from_map(&mut map, "op")? {
