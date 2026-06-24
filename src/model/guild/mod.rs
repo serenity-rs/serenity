@@ -39,7 +39,7 @@ use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::prelude::*;
-use crate::model::utils::deserialize_present_guild;
+use crate::model::utils::deserialize_available_guild;
 #[cfg(feature = "model")]
 use crate::model::utils::*;
 
@@ -1377,7 +1377,7 @@ pub struct UnavailableGuild {
     reason = "Almost always Present so boxing would be counter-productive"
 )]
 pub enum GuildCreateGuild {
-    #[serde(deserialize_with = "deserialize_present_guild")]
+    #[serde(deserialize_with = "deserialize_available_guild")]
     Available(Guild),
     Unavailable(UnavailableGuild),
 }

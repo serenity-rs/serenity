@@ -259,8 +259,8 @@ where
 }
 
 // Needed to insert guild_id fields in GuildChannel, GuildThread, Member, and Role when
-// deserializing a [`GuildCreateGuild::Present`] guild.
-pub(crate) fn deserialize_present_guild<'de, D>(deserializer: D) -> Result<Guild, D::Error>
+// deserializing a [`GuildCreateGuild::Available`] guild.
+pub(crate) fn deserialize_available_guild<'de, D>(deserializer: D) -> Result<Guild, D::Error>
 where
     D: Deserializer<'de>,
 {
