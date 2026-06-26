@@ -28,6 +28,7 @@ pub enum AttachmentData<'a> {
 pub struct CreateAttachment<'a> {
     pub filename: Cow<'static, str>,
     pub description: Option<Cow<'a, str>>,
+    pub is_spoiler: bool,
     pub data: AttachmentData<'a>,
 }
 
@@ -37,6 +38,7 @@ impl<'a> CreateAttachment<'a> {
         CreateAttachment {
             filename: filename.into(),
             description: None,
+            is_spoiler: false,
             data: AttachmentData::Bytes(data.into()),
         }
     }
@@ -55,6 +57,7 @@ impl<'a> CreateAttachment<'a> {
         Ok(CreateAttachment {
             filename: filename.into(),
             description: None,
+            is_spoiler: false,
             data: AttachmentData::Path(path),
         })
     }
@@ -64,6 +67,7 @@ impl<'a> CreateAttachment<'a> {
         CreateAttachment {
             filename: filename.into(),
             description: None,
+            is_spoiler: false,
             data: AttachmentData::File(file),
         }
     }
@@ -137,6 +141,13 @@ impl<'a> CreateAttachment<'a> {
         self.description = Some(description.into());
         self
     }
+
+    /// Whether the attachment should be marked as a spoiler and blurred until clicked.
+    #[expect(clippy::wrong_self_convention, reason = "Name reflects API")]
+    pub fn is_spoiler(mut self, is_spoiler: bool) -> Self {
+        self.is_spoiler = is_spoiler;
+        self
+    }
 }
 
 /// A wrapper around some base64-encoded data. Used when an endpoint expects a base64 payload
@@ -181,9 +192,16 @@ impl<'a> DataUri<'a> {
 }
 
 #[derive(Clone, Debug)]
+struct AttachmentEditRequest<'a> {
+    id: AttachmentId,
+    description: Option<Cow<'a, str>>,
+    is_spoiler: Option<bool>,
+}
+
+#[derive(Clone, Debug)]
 enum EditAttachmentsInner<'a> {
     New(CreateAttachment<'a>),
-    Existing(AttachmentId),
+    Existing(AttachmentEditRequest<'a>),
 }
 
 /// You can add new attachments and edit existing ones using this builder.
@@ -215,6 +233,23 @@ enum EditAttachmentsInner<'a> {
 /// # Ok(()) }
 /// ```
 ///
+/// ## Updating an existing attachment without deleting existing attachments
+///
+/// ```rust,no_run
+/// # use serenity::all::*;
+/// # async fn foo_(ctx: Http, mut msg: Message) -> Result<(), Error> {
+/// msg.edit(
+///     ctx,
+///     EditMessage::new().attachments(EditAttachments::keep_all(&msg).update(
+///         msg.attachments[0].id,
+///         Some("updated attachment".into()),
+///         Some(true),
+///     )),
+/// )
+/// .await?;
+/// # Ok(()) }
+/// ```
+///
 /// ## Delete all but the first attachment
 ///
 /// ```rust,no_run
@@ -222,6 +257,21 @@ enum EditAttachmentsInner<'a> {
 /// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::new().keep(msg.attachments[0].id)
+/// )).await?;
+/// # Ok(()) }
+/// ```
+///
+/// ## Delete all but the first attachment, add a description, and mark it as a spoiler
+///
+/// ```rust,no_run
+/// # use serenity::all::*;
+/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
+/// msg.edit(ctx, EditMessage::new().attachments(
+///     EditAttachments::new().keep_and_update(
+///         msg.attachments[0].id,
+///         Some("updated attachment".into()),
+///         Some(true),
+///     )
 /// )).await?;
 /// # Ok(()) }
 /// ```
@@ -261,14 +311,29 @@ impl<'a> EditAttachments<'a> {
     /// Shorthand for [`Self::new()`] and calling [`Self::keep()`] for every [`AttachmentId`] in
     /// [`Message::attachments`].
     ///
+    /// This method may be paired with [`Self::update()`] to update the `description` (alt text)
+    /// and/or [`IS_SPOILER`] flag of individual existing attachments being kept.
+    ///
     /// If you only want to keep a subset of attachments from the message, either implement this
     /// method manually, or use [`Self::remove()`].
     ///
     /// **Note: this EditAttachments must be run on the same message as is supplied here, or else
     /// Discord will throw an error!**
+    ///
+    /// [`IS_SPOILER`]: crate::model::channel::AttachmentFlags::IS_SPOILER
     pub fn keep_all(msg: &Message) -> Self {
         Self {
-            inner: msg.attachments.iter().map(|a| EditAttachmentsInner::Existing(a.id)).collect(),
+            inner: msg
+                .attachments
+                .iter()
+                .map(|a| {
+                    EditAttachmentsInner::Existing(AttachmentEditRequest {
+                        id: a.id,
+                        description: None,
+                        is_spoiler: None,
+                    })
+                })
+                .collect(),
         }
     }
 
@@ -277,7 +342,61 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::remove`].
     pub fn keep(mut self, id: AttachmentId) -> Self {
-        self.inner.push(EditAttachmentsInner::Existing(id));
+        self.inner.push(EditAttachmentsInner::Existing(AttachmentEditRequest {
+            id,
+            description: None,
+            is_spoiler: None,
+        }));
+        self
+    }
+
+    /// This method updates the `description` (alt text) and/or [`IS_SPOILER`] flag of an
+    /// existing attachment.
+    ///
+    /// This will also add the existing attachment to the list of attachments that are kept
+    /// after editing if not already done explicitly via [`Self::keep_all()`] or [`Self::keep()`],
+    /// or implicitly via [`Self::remove()`]. However, when keeping and updating a single
+    /// attachment, [`Self::keep_and_update()`] should be the preferred method.
+    ///
+    /// [`IS_SPOILER`]: crate::model::channel::AttachmentFlags::IS_SPOILER
+    pub fn update(
+        mut self,
+        id: AttachmentId,
+        description: Option<Cow<'a, str>>,
+        is_spoiler: Option<bool>,
+    ) -> Self {
+        for inner in &mut self.inner {
+            if let EditAttachmentsInner::Existing(existing) = inner
+                && existing.id == id
+            {
+                existing.description = description;
+                existing.is_spoiler = is_spoiler;
+                return self;
+            }
+        }
+        self.inner.push(EditAttachmentsInner::Existing(AttachmentEditRequest {
+            id,
+            description,
+            is_spoiler,
+        }));
+        self
+    }
+
+    /// This method adds an existing attachment to the list of attachments that are kept after
+    /// editing, and optionally updates the `description` (alt text) and/or [`IS_SPOILER`] flag.
+    ///
+    /// [`IS_SPOILER`]: crate::model::channel::AttachmentFlags::IS_SPOILER
+    pub fn keep_and_update(
+        mut self,
+        id: AttachmentId,
+        description: Option<Cow<'a, str>>,
+        is_spoiler: Option<bool>,
+    ) -> Self {
+        self.inner.push(EditAttachmentsInner::Existing(AttachmentEditRequest {
+            id,
+            description,
+            is_spoiler,
+        }));
         self
     }
 
@@ -287,7 +406,7 @@ impl<'a> EditAttachments<'a> {
     /// Opposite of [`Self::keep`].
     pub fn remove(mut self, id: AttachmentId) -> Self {
         self.inner.retain(|a| match a {
-            EditAttachmentsInner::Existing(existing_id) => *existing_id != id,
+            EditAttachmentsInner::Existing(attachment) => attachment.id != id,
             EditAttachmentsInner::New(_) => true,
         });
         self
@@ -324,11 +443,16 @@ impl Serialize for EditAttachments<'_> {
             id: u64,
             filename: &'a Cow<'static, str>,
             description: &'a Option<Cow<'a, str>>,
+            is_spoiler: bool,
         }
 
         #[derive(Serialize)]
-        struct ExistingAttachment {
+        struct ExistingAttachment<'a> {
             id: AttachmentId,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            description: &'a Option<Cow<'a, str>>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            is_spoiler: Option<bool>,
         }
 
         // Instead of an `AttachmentId`, the `id` field for new attachments corresponds to the
@@ -343,13 +467,16 @@ impl Serialize for EditAttachments<'_> {
                         id,
                         filename: &new_attachment.filename,
                         description: &new_attachment.description,
+                        is_spoiler: new_attachment.is_spoiler,
                     };
                     id += 1;
                     seq.serialize_element(&attachment)?;
                 },
-                EditAttachmentsInner::Existing(id) => {
+                EditAttachmentsInner::Existing(attachment) => {
                     seq.serialize_element(&ExistingAttachment {
-                        id: *id,
+                        id: attachment.id,
+                        description: &attachment.description,
+                        is_spoiler: attachment.is_spoiler,
                     })?;
                 },
             }

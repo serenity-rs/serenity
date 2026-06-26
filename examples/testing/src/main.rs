@@ -277,6 +277,20 @@ async fn command_interaction(
                     .attachments(EditAttachments::new().keep(msg.attachments[1].id)),
             )
             .await?;
+
+        tokio::time::sleep(Duration::from_secs(1)).await;
+
+        // Update the kept image, adding a description and spoilering it
+        let _msg = interaction
+            .edit_response(
+                &ctx.http,
+                EditInteractionResponse::new().attachments(EditAttachments::new().keep_and_update(
+                    msg.attachments[1].id,
+                    Some("my alt text".into()),
+                    Some(true),
+                )),
+            )
+            .await?;
     } else if interaction.data.name == "unifiedattachments1" {
         interaction
             .create_response(

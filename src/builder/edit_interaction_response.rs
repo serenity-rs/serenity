@@ -96,6 +96,16 @@ impl<'a> EditInteractionResponse<'a> {
         Self(self.0.keep_existing_attachment(id))
     }
 
+    /// Shorthand for [`EditAttachments::keep_and_update`].
+    pub fn keep_and_update_existing_attachment(
+        self,
+        id: AttachmentId,
+        description: Option<Cow<'a, str>>,
+        is_spoiler: Option<bool>,
+    ) -> Self {
+        Self(self.0.keep_and_update_existing_attachment(id, description, is_spoiler))
+    }
+
     /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
     pub fn clear_attachments(self) -> Self {
         Self(self.0.clear_attachments())

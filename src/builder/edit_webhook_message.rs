@@ -142,6 +142,19 @@ impl<'a> EditWebhookMessage<'a> {
         self
     }
 
+    /// Shorthand for [`EditAttachments::keep_and_update`].
+    pub fn keep_and_update_existing_attachment(
+        mut self,
+        id: AttachmentId,
+        description: Option<Cow<'a, str>>,
+        is_spoiler: Option<bool>,
+    ) -> Self {
+        let attachments = self.attachments.get_or_insert_with(Default::default);
+        self.attachments =
+            Some(std::mem::take(attachments).keep_and_update(id, description, is_spoiler));
+        self
+    }
+
     /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].
     pub fn clear_attachments(mut self) -> Self {
         self.attachments = Some(EditAttachments::new());

@@ -74,7 +74,8 @@ pub struct Attachment {
     /// itself exists.
     #[serde(default, skip_serializing_if = "is_false")]
     pub ephemeral: bool,
-    /// The duration of the audio file (present if [`MessageFlags::IS_VOICE_MESSAGE`]).
+    /// The duration of the audio or video file (guaranteed to be present if
+    /// [`MessageFlags::IS_VOICE_MESSAGE`]).
     pub duration_secs: Option<f64>,
     /// List of bytes representing a sampled waveform (present if
     /// [`MessageFlags::IS_VOICE_MESSAGE`]).
