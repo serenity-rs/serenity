@@ -5,6 +5,7 @@ use super::{
     CreateAttachment,
     CreateComponent,
     CreateEmbed,
+    EditAttachment,
     EditAttachments,
     EditWebhookMessage,
 };
@@ -97,13 +98,8 @@ impl<'a> EditInteractionResponse<'a> {
     }
 
     /// Shorthand for [`EditAttachments::keep_and_update`].
-    pub fn keep_and_update_existing_attachment(
-        self,
-        id: AttachmentId,
-        description: Option<Cow<'a, str>>,
-        is_spoiler: Option<bool>,
-    ) -> Self {
-        Self(self.0.keep_and_update_existing_attachment(id, description, is_spoiler))
+    pub fn keep_and_update_existing_attachment(self, attachment: EditAttachment<'a>) -> Self {
+        Self(self.0.keep_and_update_existing_attachment(attachment))
     }
 
     /// Shorthand for calling [`Self::attachments`] with [`EditAttachments::new`].

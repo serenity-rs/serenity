@@ -284,11 +284,13 @@ async fn command_interaction(
         let _msg = interaction
             .edit_response(
                 &ctx.http,
-                EditInteractionResponse::new().attachments(EditAttachments::new().keep_and_update(
-                    msg.attachments[1].id,
-                    Some("my alt text".into()),
-                    Some(true),
-                )),
+                EditInteractionResponse::new().attachments(
+                    EditAttachments::new().keep_and_update(
+                        EditAttachment::new(msg.attachments[1].id)
+                            .description("my alt text")
+                            .spoiler(true),
+                    ),
+                ),
             )
             .await?;
     } else if interaction.data.name == "unifiedattachments1" {

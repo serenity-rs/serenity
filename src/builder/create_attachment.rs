@@ -28,7 +28,7 @@ pub enum AttachmentData<'a> {
 pub struct CreateAttachment<'a> {
     pub filename: Cow<'static, str>,
     pub description: Option<Cow<'a, str>>,
-    pub is_spoiler: bool,
+    pub spoiler: bool,
     pub data: AttachmentData<'a>,
 }
 
@@ -38,7 +38,7 @@ impl<'a> CreateAttachment<'a> {
         CreateAttachment {
             filename: filename.into(),
             description: None,
-            is_spoiler: false,
+            spoiler: false,
             data: AttachmentData::Bytes(data.into()),
         }
     }
@@ -57,7 +57,7 @@ impl<'a> CreateAttachment<'a> {
         Ok(CreateAttachment {
             filename: filename.into(),
             description: None,
-            is_spoiler: false,
+            spoiler: false,
             data: AttachmentData::Path(path),
         })
     }
@@ -67,7 +67,7 @@ impl<'a> CreateAttachment<'a> {
         CreateAttachment {
             filename: filename.into(),
             description: None,
-            is_spoiler: false,
+            spoiler: false,
             data: AttachmentData::File(file),
         }
     }
@@ -143,9 +143,8 @@ impl<'a> CreateAttachment<'a> {
     }
 
     /// Whether the attachment should be marked as a spoiler and blurred until clicked.
-    #[expect(clippy::wrong_self_convention, reason = "Name reflects API")]
-    pub fn is_spoiler(mut self, is_spoiler: bool) -> Self {
-        self.is_spoiler = is_spoiler;
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = spoiler;
         self
     }
 }
@@ -191,17 +190,47 @@ impl<'a> DataUri<'a> {
     }
 }
 
+/// A builder for updating metadata for an existing attachment.
+///
+/// See the documentation for [`EditAttachments`] for details and examples.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-request-structure).
 #[derive(Clone, Debug)]
-struct AttachmentEditRequest<'a> {
+#[non_exhaustive]
+#[must_use]
+pub struct EditAttachment<'a> {
     id: AttachmentId,
     description: Option<Cow<'a, str>>,
-    is_spoiler: Option<bool>,
+    spoiler: Option<bool>,
+}
+
+impl<'a> EditAttachment<'a> {
+    /// Constructs a new builder with the given [`AttachmentId`], leaving all other fields empty.
+    pub fn new(id: AttachmentId) -> Self {
+        Self {
+            id,
+            description: None,
+            spoiler: None,
+        }
+    }
+
+    /// Sets a description for the file (max 1024 characters).
+    pub fn description(mut self, description: impl Into<Cow<'a, str>>) -> Self {
+        self.description = Some(description.into());
+        self
+    }
+
+    /// Whether the attachment should be marked as a spoiler and blurred until clicked.
+    pub fn spoiler(mut self, spoiler: bool) -> Self {
+        self.spoiler = Some(spoiler);
+        self
+    }
 }
 
 #[derive(Clone, Debug)]
 enum EditAttachmentsInner<'a> {
     New(CreateAttachment<'a>),
-    Existing(AttachmentEditRequest<'a>),
+    Existing(EditAttachment<'a>),
 }
 
 /// You can add new attachments and edit existing ones using this builder.
@@ -237,16 +266,14 @@ enum EditAttachmentsInner<'a> {
 ///
 /// ```rust,no_run
 /// # use serenity::all::*;
-/// # async fn foo_(ctx: Http, mut msg: Message) -> Result<(), Error> {
-/// msg.edit(
-///     ctx,
-///     EditMessage::new().attachments(EditAttachments::keep_all(&msg).update(
-///         msg.attachments[0].id,
-///         Some("updated attachment".into()),
-///         Some(true),
-///     )),
-/// )
-/// .await?;
+/// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
+/// msg.edit(ctx, EditMessage::new().attachments(
+///     EditAttachments::keep_all(&msg).update(
+///         EditAttachment::new(msg.attachments[0].id)
+///             .description("updated attachment")
+///             .spoiler(true),
+///     ),
+/// )).await?;
 /// # Ok(()) }
 /// ```
 ///
@@ -268,10 +295,10 @@ enum EditAttachmentsInner<'a> {
 /// # async fn foo_(ctx: Http, mut msg: Message, my_attachment: CreateAttachment<'_>) -> Result<(), Error> {
 /// msg.edit(ctx, EditMessage::new().attachments(
 ///     EditAttachments::new().keep_and_update(
-///         msg.attachments[0].id,
-///         Some("updated attachment".into()),
-///         Some(true),
-///     )
+///         EditAttachment::new(msg.attachments[0].id)
+///             .description("updated attachment")
+///             .spoiler(true),
+///     ),
 /// )).await?;
 /// # Ok(()) }
 /// ```
@@ -327,10 +354,10 @@ impl<'a> EditAttachments<'a> {
                 .attachments
                 .iter()
                 .map(|a| {
-                    EditAttachmentsInner::Existing(AttachmentEditRequest {
+                    EditAttachmentsInner::Existing(EditAttachment {
                         id: a.id,
                         description: None,
-                        is_spoiler: None,
+                        spoiler: None,
                     })
                 })
                 .collect(),
@@ -342,10 +369,10 @@ impl<'a> EditAttachments<'a> {
     ///
     /// Opposite of [`Self::remove`].
     pub fn keep(mut self, id: AttachmentId) -> Self {
-        self.inner.push(EditAttachmentsInner::Existing(AttachmentEditRequest {
+        self.inner.push(EditAttachmentsInner::Existing(EditAttachment {
             id,
             description: None,
-            is_spoiler: None,
+            spoiler: None,
         }));
         self
     }
@@ -359,25 +386,20 @@ impl<'a> EditAttachments<'a> {
     /// attachment, [`Self::keep_and_update()`] should be the preferred method.
     ///
     /// [`IS_SPOILER`]: crate::model::channel::AttachmentFlags::IS_SPOILER
-    pub fn update(
-        mut self,
-        id: AttachmentId,
-        description: Option<Cow<'a, str>>,
-        is_spoiler: Option<bool>,
-    ) -> Self {
+    pub fn update(mut self, attachment: EditAttachment<'a>) -> Self {
         for inner in &mut self.inner {
             if let EditAttachmentsInner::Existing(existing) = inner
-                && existing.id == id
+                && existing.id == attachment.id
             {
-                existing.description = description;
-                existing.is_spoiler = is_spoiler;
+                existing.description = attachment.description;
+                existing.spoiler = attachment.spoiler;
                 return self;
             }
         }
-        self.inner.push(EditAttachmentsInner::Existing(AttachmentEditRequest {
-            id,
-            description,
-            is_spoiler,
+        self.inner.push(EditAttachmentsInner::Existing(EditAttachment {
+            id: attachment.id,
+            description: attachment.description,
+            spoiler: attachment.spoiler,
         }));
         self
     }
@@ -386,16 +408,11 @@ impl<'a> EditAttachments<'a> {
     /// editing, and optionally updates the `description` (alt text) and/or [`IS_SPOILER`] flag.
     ///
     /// [`IS_SPOILER`]: crate::model::channel::AttachmentFlags::IS_SPOILER
-    pub fn keep_and_update(
-        mut self,
-        id: AttachmentId,
-        description: Option<Cow<'a, str>>,
-        is_spoiler: Option<bool>,
-    ) -> Self {
-        self.inner.push(EditAttachmentsInner::Existing(AttachmentEditRequest {
-            id,
-            description,
-            is_spoiler,
+    pub fn keep_and_update(mut self, attachment: EditAttachment<'a>) -> Self {
+        self.inner.push(EditAttachmentsInner::Existing(EditAttachment {
+            id: attachment.id,
+            description: attachment.description,
+            spoiler: attachment.spoiler,
         }));
         self
     }
@@ -467,7 +484,7 @@ impl Serialize for EditAttachments<'_> {
                         id,
                         filename: &new_attachment.filename,
                         description: &new_attachment.description,
-                        is_spoiler: new_attachment.is_spoiler,
+                        is_spoiler: new_attachment.spoiler,
                     };
                     id += 1;
                     seq.serialize_element(&attachment)?;
@@ -476,7 +493,7 @@ impl Serialize for EditAttachments<'_> {
                     seq.serialize_element(&ExistingAttachment {
                         id: attachment.id,
                         description: &attachment.description,
-                        is_spoiler: attachment.is_spoiler,
+                        is_spoiler: attachment.spoiler,
                     })?;
                 },
             }
