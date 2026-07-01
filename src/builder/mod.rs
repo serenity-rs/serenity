@@ -36,9 +36,9 @@ pub(crate) fn check_lengths(
 }
 
 mod add_member;
+mod attachments;
 mod bot_auth_parameters;
 mod create_allowed_mentions;
-mod create_attachment;
 mod create_channel;
 mod create_command;
 mod create_command_permission;
@@ -83,9 +83,9 @@ mod get_entitlements;
 mod get_messages;
 
 pub use add_member::*;
+pub use attachments::*;
 pub use bot_auth_parameters::*;
 pub use create_allowed_mentions::*;
-pub use create_attachment::*;
 pub use create_channel::*;
 pub use create_command::*;
 pub use create_command_permission::*;
