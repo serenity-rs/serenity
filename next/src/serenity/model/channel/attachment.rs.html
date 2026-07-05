@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/attachment.rs`."><title>attachment.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.0-nightly (f428d123a 2026-06-19)" data-channel="nightly" data-search-js="search-fd9372ac.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-e779430a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/channel/</div>attachment.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>nonmax::NonMaxU32;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/attachment.rs`."><title>attachment.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.0-nightly (c397dae80 2026-07-02)" data-channel="nightly" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/channel/</div>attachment.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>nonmax::NonMaxU32;
 <a href=#2 id=2 data-nosnippet>2</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span>reqwest::Client <span class="kw">as </span>ReqwestClient;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>serde_cow::CowStr;
@@ -74,127 +74,128 @@
 <a href=#74 id=74 data-nosnippet>74</a>    /// itself exists.
 <a href=#75 id=75 data-nosnippet>75</a>    </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">"is_false"</span>)]
 <a href=#76 id=76 data-nosnippet>76</a>    </span><span class="kw">pub </span>ephemeral: bool,
-<a href=#77 id=77 data-nosnippet>77</a>    <span class="doccomment">/// The duration of the audio file (present if [`MessageFlags::IS_VOICE_MESSAGE`]).
-<a href=#78 id=78 data-nosnippet>78</a>    </span><span class="kw">pub </span>duration_secs: <span class="prelude-ty">Option</span>&lt;f64&gt;,
-<a href=#79 id=79 data-nosnippet>79</a>    <span class="doccomment">/// List of bytes representing a sampled waveform (present if
-<a href=#80 id=80 data-nosnippet>80</a>    /// [`MessageFlags::IS_VOICE_MESSAGE`]).
-<a href=#81 id=81 data-nosnippet>81</a>    ///
-<a href=#82 id=82 data-nosnippet>82</a>    /// The waveform is intended to be a preview of the entire voice message, with 1 byte per
-<a href=#83 id=83 data-nosnippet>83</a>    /// datapoint. Clients sample the recording at most once per 100 milliseconds, but will
-<a href=#84 id=84 data-nosnippet>84</a>    /// downsample so that no more than 256 datapoints are in the waveform.
-<a href=#85 id=85 data-nosnippet>85</a>    ///
-<a href=#86 id=86 data-nosnippet>86</a>    /// The waveform details are a Discord implementation detail and may change without warning or
-<a href=#87 id=87 data-nosnippet>87</a>    /// documentation.
-<a href=#88 id=88 data-nosnippet>88</a>    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"base64_bytes"</span>)]
-<a href=#89 id=89 data-nosnippet>89</a>    </span><span class="kw">pub </span>waveform: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
-<a href=#90 id=90 data-nosnippet>90</a>    <span class="doccomment">/// The attachment flags for this attachment.
-<a href=#91 id=91 data-nosnippet>91</a>    </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;AttachmentFlags&gt;,
-<a href=#92 id=92 data-nosnippet>92</a>    <span class="doccomment">/// For Clips, an array of the users who were in the stream.
-<a href=#93 id=93 data-nosnippet>93</a>    </span><span class="attr">#[serde(default)]
-<a href=#94 id=94 data-nosnippet>94</a>    </span><span class="kw">pub </span>clip_participants: FixedArray&lt;User&gt;,
-<a href=#95 id=95 data-nosnippet>95</a>    <span class="doccomment">/// For Clips, when the clip was created.
-<a href=#96 id=96 data-nosnippet>96</a>    </span><span class="kw">pub </span>clip_created_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-<a href=#97 id=97 data-nosnippet>97</a>    <span class="doccomment">/// For Clips, the application in the stream, if recognized.
-<a href=#98 id=98 data-nosnippet>98</a>    </span><span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;MessageApplication&gt;,
-<a href=#99 id=99 data-nosnippet>99</a>}
-<a href=#100 id=100 data-nosnippet>100</a>
-<a href=#101 id=101 data-nosnippet>101</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#102 id=102 data-nosnippet>102</a></span><span class="kw">impl </span>Attachment {
-<a href=#103 id=103 data-nosnippet>103</a>    <span class="doccomment">/// If this attachment is an image, then a tuple of the width and height in pixels is returned.
-<a href=#104 id=104 data-nosnippet>104</a>    </span><span class="attr">#[must_use]
-<a href=#105 id=105 data-nosnippet>105</a>    </span><span class="kw">pub fn </span>dimensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(NonMaxU32, NonMaxU32)&gt; {
-<a href=#106 id=106 data-nosnippet>106</a>        <span class="self">self</span>.width.zip(<span class="self">self</span>.height)
-<a href=#107 id=107 data-nosnippet>107</a>    }
-<a href=#108 id=108 data-nosnippet>108</a>
-<a href=#109 id=109 data-nosnippet>109</a>    <span class="doccomment">/// Downloads the attachment, returning back a vector of bytes.
-<a href=#110 id=110 data-nosnippet>110</a>    ///
-<a href=#111 id=111 data-nosnippet>111</a>    /// # Examples
-<a href=#112 id=112 data-nosnippet>112</a>    ///
-<a href=#113 id=113 data-nosnippet>113</a>    /// Download all of the attachments associated with a [`Message`]:
-<a href=#114 id=114 data-nosnippet>114</a>    ///
-<a href=#115 id=115 data-nosnippet>115</a>    /// ```rust,no_run
-<a href=#116 id=116 data-nosnippet>116</a>    /// use std::io::Write;
-<a href=#117 id=117 data-nosnippet>117</a>    /// use std::path::Path;
-<a href=#118 id=118 data-nosnippet>118</a>    ///
-<a href=#119 id=119 data-nosnippet>119</a>    /// # use serenity::http::Http;
-<a href=#120 id=120 data-nosnippet>120</a>    /// use serenity::model::prelude::*;
-<a href=#121 id=121 data-nosnippet>121</a>    /// use serenity::prelude::*;
-<a href=#122 id=122 data-nosnippet>122</a>    /// use tokio::fs::File;
-<a href=#123 id=123 data-nosnippet>123</a>    /// use tokio::io::AsyncWriteExt;
-<a href=#124 id=124 data-nosnippet>124</a>    ///
-<a href=#125 id=125 data-nosnippet>125</a>    /// # async fn run() {
-<a href=#126 id=126 data-nosnippet>126</a>    /// # let http: Http = unimplemented!();
-<a href=#127 id=127 data-nosnippet>127</a>    /// # let message: Message = unimplemented!();
-<a href=#128 id=128 data-nosnippet>128</a>    ///
-<a href=#129 id=129 data-nosnippet>129</a>    /// for attachment in message.attachments {
-<a href=#130 id=130 data-nosnippet>130</a>    ///     let content = match attachment.download().await {
-<a href=#131 id=131 data-nosnippet>131</a>    ///         Ok(content) =&gt; content,
-<a href=#132 id=132 data-nosnippet>132</a>    ///         Err(why) =&gt; {
-<a href=#133 id=133 data-nosnippet>133</a>    ///             println!("Error downloading attachment: {:?}", why);
-<a href=#134 id=134 data-nosnippet>134</a>    ///             let _ = message.channel_id.say(&amp;http, "Error downloading attachment").await;
-<a href=#135 id=135 data-nosnippet>135</a>    ///
-<a href=#136 id=136 data-nosnippet>136</a>    ///             return;
-<a href=#137 id=137 data-nosnippet>137</a>    ///         },
-<a href=#138 id=138 data-nosnippet>138</a>    ///     };
-<a href=#139 id=139 data-nosnippet>139</a>    ///
-<a href=#140 id=140 data-nosnippet>140</a>    ///     let mut file = match File::create(&amp;attachment.filename).await {
-<a href=#141 id=141 data-nosnippet>141</a>    ///         Ok(file) =&gt; file,
-<a href=#142 id=142 data-nosnippet>142</a>    ///         Err(why) =&gt; {
-<a href=#143 id=143 data-nosnippet>143</a>    ///             println!("Error creating file: {:?}", why);
-<a href=#144 id=144 data-nosnippet>144</a>    ///             let _ = message.channel_id.say(&amp;http, "Error creating file").await;
-<a href=#145 id=145 data-nosnippet>145</a>    ///
-<a href=#146 id=146 data-nosnippet>146</a>    ///             return;
-<a href=#147 id=147 data-nosnippet>147</a>    ///         },
-<a href=#148 id=148 data-nosnippet>148</a>    ///     };
-<a href=#149 id=149 data-nosnippet>149</a>    ///
-<a href=#150 id=150 data-nosnippet>150</a>    ///     if let Err(why) = file.write_all(&amp;content).await {
-<a href=#151 id=151 data-nosnippet>151</a>    ///         println!("Error writing to file: {:?}", why);
-<a href=#152 id=152 data-nosnippet>152</a>    ///
-<a href=#153 id=153 data-nosnippet>153</a>    ///         return;
-<a href=#154 id=154 data-nosnippet>154</a>    ///     }
-<a href=#155 id=155 data-nosnippet>155</a>    ///
-<a href=#156 id=156 data-nosnippet>156</a>    ///     let _ = message.channel_id.say(&amp;http, format!("Saved {:?}", attachment.filename)).await;
-<a href=#157 id=157 data-nosnippet>157</a>    /// }
-<a href=#158 id=158 data-nosnippet>158</a>    ///
-<a href=#159 id=159 data-nosnippet>159</a>    /// # }
-<a href=#160 id=160 data-nosnippet>160</a>    /// ```
-<a href=#161 id=161 data-nosnippet>161</a>    ///
-<a href=#162 id=162 data-nosnippet>162</a>    /// # Errors
-<a href=#163 id=163 data-nosnippet>163</a>    ///
-<a href=#164 id=164 data-nosnippet>164</a>    /// Returns an [`Error::Io`] when there is a problem reading the contents of the HTTP response.
-<a href=#165 id=165 data-nosnippet>165</a>    ///
-<a href=#166 id=166 data-nosnippet>166</a>    /// Returns an [`Error::Http`] when there is a problem retrieving the attachment.
-<a href=#167 id=167 data-nosnippet>167</a>    ///
-<a href=#168 id=168 data-nosnippet>168</a>    /// [`Message`]: super::Message
-<a href=#169 id=169 data-nosnippet>169</a>    </span><span class="kw">pub async fn </span>download(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
-<a href=#170 id=170 data-nosnippet>170</a>        <span class="kw">let </span>reqwest = ReqwestClient::new();
-<a href=#171 id=171 data-nosnippet>171</a>        <span class="kw">let </span>bytes = reqwest.get(<span class="kw-2">&amp;*</span><span class="self">self</span>.url).send().<span class="kw">await</span><span class="question-mark">?</span>.bytes().<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#172 id=172 data-nosnippet>172</a>        <span class="prelude-val">Ok</span>(bytes.to_vec())
-<a href=#173 id=173 data-nosnippet>173</a>    }
-<a href=#174 id=174 data-nosnippet>174</a>}
-<a href=#175 id=175 data-nosnippet>175</a>
-<a href=#176 id=176 data-nosnippet>176</a><span class="kw">impl </span>ExtractKey&lt;AttachmentId&gt; <span class="kw">for </span>Attachment {
-<a href=#177 id=177 data-nosnippet>177</a>    <span class="kw">fn </span>extract_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>AttachmentId {
-<a href=#178 id=178 data-nosnippet>178</a>        <span class="kw-2">&amp;</span><span class="self">self</span>.id
-<a href=#179 id=179 data-nosnippet>179</a>    }
-<a href=#180 id=180 data-nosnippet>180</a>}
-<a href=#181 id=181 data-nosnippet>181</a>
-<a href=#182 id=182 data-nosnippet>182</a><span class="macro">bitflags!</span> {
-<a href=#183 id=183 data-nosnippet>183</a>    <span class="doccomment">/// Flags for an attachment.
-<a href=#184 id=184 data-nosnippet>184</a>    ///
-<a href=#185 id=185 data-nosnippet>185</a>    /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-flags).
-<a href=#186 id=186 data-nosnippet>186</a>    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#187 id=187 data-nosnippet>187</a>    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-<a href=#188 id=188 data-nosnippet>188</a>    </span><span class="kw">pub struct </span>AttachmentFlags: u8 {
-<a href=#189 id=189 data-nosnippet>189</a>        <span class="doccomment">/// This attachment is a Clip from a stream.
-<a href=#190 id=190 data-nosnippet>190</a>        </span><span class="kw">const </span>IS_CLIP = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
-<a href=#191 id=191 data-nosnippet>191</a>        <span class="doccomment">/// This attachment is the thumbnail of a thread in a media channel, displayed in the grid
-<a href=#192 id=192 data-nosnippet>192</a>        /// but not on the message.
-<a href=#193 id=193 data-nosnippet>193</a>        </span><span class="kw">const </span>IS_THUMBNAIL = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
-<a href=#194 id=194 data-nosnippet>194</a>        <span class="doccomment">/// This attachment was marked as a spoiler and is blurred until clicked.
-<a href=#195 id=195 data-nosnippet>195</a>        </span><span class="kw">const </span>IS_SPOILER = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
-<a href=#196 id=196 data-nosnippet>196</a>        <span class="doccomment">/// This attachment is an animated image.
-<a href=#197 id=197 data-nosnippet>197</a>        </span><span class="kw">const </span>IS_ANIMATED = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
-<a href=#198 id=198 data-nosnippet>198</a>    }
-<a href=#199 id=199 data-nosnippet>199</a>}
+<a href=#77 id=77 data-nosnippet>77</a>    <span class="doccomment">/// The duration of the audio or video file (guaranteed to be present if
+<a href=#78 id=78 data-nosnippet>78</a>    /// [`MessageFlags::IS_VOICE_MESSAGE`]).
+<a href=#79 id=79 data-nosnippet>79</a>    </span><span class="kw">pub </span>duration_secs: <span class="prelude-ty">Option</span>&lt;f64&gt;,
+<a href=#80 id=80 data-nosnippet>80</a>    <span class="doccomment">/// List of bytes representing a sampled waveform (present if
+<a href=#81 id=81 data-nosnippet>81</a>    /// [`MessageFlags::IS_VOICE_MESSAGE`]).
+<a href=#82 id=82 data-nosnippet>82</a>    ///
+<a href=#83 id=83 data-nosnippet>83</a>    /// The waveform is intended to be a preview of the entire voice message, with 1 byte per
+<a href=#84 id=84 data-nosnippet>84</a>    /// datapoint. Clients sample the recording at most once per 100 milliseconds, but will
+<a href=#85 id=85 data-nosnippet>85</a>    /// downsample so that no more than 256 datapoints are in the waveform.
+<a href=#86 id=86 data-nosnippet>86</a>    ///
+<a href=#87 id=87 data-nosnippet>87</a>    /// The waveform details are a Discord implementation detail and may change without warning or
+<a href=#88 id=88 data-nosnippet>88</a>    /// documentation.
+<a href=#89 id=89 data-nosnippet>89</a>    </span><span class="attr">#[serde(default, deserialize_with = <span class="string">"base64_bytes"</span>)]
+<a href=#90 id=90 data-nosnippet>90</a>    </span><span class="kw">pub </span>waveform: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
+<a href=#91 id=91 data-nosnippet>91</a>    <span class="doccomment">/// The attachment flags for this attachment.
+<a href=#92 id=92 data-nosnippet>92</a>    </span><span class="kw">pub </span>flags: <span class="prelude-ty">Option</span>&lt;AttachmentFlags&gt;,
+<a href=#93 id=93 data-nosnippet>93</a>    <span class="doccomment">/// For Clips, an array of the users who were in the stream.
+<a href=#94 id=94 data-nosnippet>94</a>    </span><span class="attr">#[serde(default)]
+<a href=#95 id=95 data-nosnippet>95</a>    </span><span class="kw">pub </span>clip_participants: FixedArray&lt;User&gt;,
+<a href=#96 id=96 data-nosnippet>96</a>    <span class="doccomment">/// For Clips, when the clip was created.
+<a href=#97 id=97 data-nosnippet>97</a>    </span><span class="kw">pub </span>clip_created_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+<a href=#98 id=98 data-nosnippet>98</a>    <span class="doccomment">/// For Clips, the application in the stream, if recognized.
+<a href=#99 id=99 data-nosnippet>99</a>    </span><span class="kw">pub </span>application: <span class="prelude-ty">Option</span>&lt;MessageApplication&gt;,
+<a href=#100 id=100 data-nosnippet>100</a>}
+<a href=#101 id=101 data-nosnippet>101</a>
+<a href=#102 id=102 data-nosnippet>102</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#103 id=103 data-nosnippet>103</a></span><span class="kw">impl </span>Attachment {
+<a href=#104 id=104 data-nosnippet>104</a>    <span class="doccomment">/// If this attachment is an image, then a tuple of the width and height in pixels is returned.
+<a href=#105 id=105 data-nosnippet>105</a>    </span><span class="attr">#[must_use]
+<a href=#106 id=106 data-nosnippet>106</a>    </span><span class="kw">pub fn </span>dimensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(NonMaxU32, NonMaxU32)&gt; {
+<a href=#107 id=107 data-nosnippet>107</a>        <span class="self">self</span>.width.zip(<span class="self">self</span>.height)
+<a href=#108 id=108 data-nosnippet>108</a>    }
+<a href=#109 id=109 data-nosnippet>109</a>
+<a href=#110 id=110 data-nosnippet>110</a>    <span class="doccomment">/// Downloads the attachment, returning back a vector of bytes.
+<a href=#111 id=111 data-nosnippet>111</a>    ///
+<a href=#112 id=112 data-nosnippet>112</a>    /// # Examples
+<a href=#113 id=113 data-nosnippet>113</a>    ///
+<a href=#114 id=114 data-nosnippet>114</a>    /// Download all of the attachments associated with a [`Message`]:
+<a href=#115 id=115 data-nosnippet>115</a>    ///
+<a href=#116 id=116 data-nosnippet>116</a>    /// ```rust,no_run
+<a href=#117 id=117 data-nosnippet>117</a>    /// use std::io::Write;
+<a href=#118 id=118 data-nosnippet>118</a>    /// use std::path::Path;
+<a href=#119 id=119 data-nosnippet>119</a>    ///
+<a href=#120 id=120 data-nosnippet>120</a>    /// # use serenity::http::Http;
+<a href=#121 id=121 data-nosnippet>121</a>    /// use serenity::model::prelude::*;
+<a href=#122 id=122 data-nosnippet>122</a>    /// use serenity::prelude::*;
+<a href=#123 id=123 data-nosnippet>123</a>    /// use tokio::fs::File;
+<a href=#124 id=124 data-nosnippet>124</a>    /// use tokio::io::AsyncWriteExt;
+<a href=#125 id=125 data-nosnippet>125</a>    ///
+<a href=#126 id=126 data-nosnippet>126</a>    /// # async fn run() {
+<a href=#127 id=127 data-nosnippet>127</a>    /// # let http: Http = unimplemented!();
+<a href=#128 id=128 data-nosnippet>128</a>    /// # let message: Message = unimplemented!();
+<a href=#129 id=129 data-nosnippet>129</a>    ///
+<a href=#130 id=130 data-nosnippet>130</a>    /// for attachment in message.attachments {
+<a href=#131 id=131 data-nosnippet>131</a>    ///     let content = match attachment.download().await {
+<a href=#132 id=132 data-nosnippet>132</a>    ///         Ok(content) =&gt; content,
+<a href=#133 id=133 data-nosnippet>133</a>    ///         Err(why) =&gt; {
+<a href=#134 id=134 data-nosnippet>134</a>    ///             println!("Error downloading attachment: {:?}", why);
+<a href=#135 id=135 data-nosnippet>135</a>    ///             let _ = message.channel_id.say(&amp;http, "Error downloading attachment").await;
+<a href=#136 id=136 data-nosnippet>136</a>    ///
+<a href=#137 id=137 data-nosnippet>137</a>    ///             return;
+<a href=#138 id=138 data-nosnippet>138</a>    ///         },
+<a href=#139 id=139 data-nosnippet>139</a>    ///     };
+<a href=#140 id=140 data-nosnippet>140</a>    ///
+<a href=#141 id=141 data-nosnippet>141</a>    ///     let mut file = match File::create(&amp;attachment.filename).await {
+<a href=#142 id=142 data-nosnippet>142</a>    ///         Ok(file) =&gt; file,
+<a href=#143 id=143 data-nosnippet>143</a>    ///         Err(why) =&gt; {
+<a href=#144 id=144 data-nosnippet>144</a>    ///             println!("Error creating file: {:?}", why);
+<a href=#145 id=145 data-nosnippet>145</a>    ///             let _ = message.channel_id.say(&amp;http, "Error creating file").await;
+<a href=#146 id=146 data-nosnippet>146</a>    ///
+<a href=#147 id=147 data-nosnippet>147</a>    ///             return;
+<a href=#148 id=148 data-nosnippet>148</a>    ///         },
+<a href=#149 id=149 data-nosnippet>149</a>    ///     };
+<a href=#150 id=150 data-nosnippet>150</a>    ///
+<a href=#151 id=151 data-nosnippet>151</a>    ///     if let Err(why) = file.write_all(&amp;content).await {
+<a href=#152 id=152 data-nosnippet>152</a>    ///         println!("Error writing to file: {:?}", why);
+<a href=#153 id=153 data-nosnippet>153</a>    ///
+<a href=#154 id=154 data-nosnippet>154</a>    ///         return;
+<a href=#155 id=155 data-nosnippet>155</a>    ///     }
+<a href=#156 id=156 data-nosnippet>156</a>    ///
+<a href=#157 id=157 data-nosnippet>157</a>    ///     let _ = message.channel_id.say(&amp;http, format!("Saved {:?}", attachment.filename)).await;
+<a href=#158 id=158 data-nosnippet>158</a>    /// }
+<a href=#159 id=159 data-nosnippet>159</a>    ///
+<a href=#160 id=160 data-nosnippet>160</a>    /// # }
+<a href=#161 id=161 data-nosnippet>161</a>    /// ```
+<a href=#162 id=162 data-nosnippet>162</a>    ///
+<a href=#163 id=163 data-nosnippet>163</a>    /// # Errors
+<a href=#164 id=164 data-nosnippet>164</a>    ///
+<a href=#165 id=165 data-nosnippet>165</a>    /// Returns an [`Error::Io`] when there is a problem reading the contents of the HTTP response.
+<a href=#166 id=166 data-nosnippet>166</a>    ///
+<a href=#167 id=167 data-nosnippet>167</a>    /// Returns an [`Error::Http`] when there is a problem retrieving the attachment.
+<a href=#168 id=168 data-nosnippet>168</a>    ///
+<a href=#169 id=169 data-nosnippet>169</a>    /// [`Message`]: super::Message
+<a href=#170 id=170 data-nosnippet>170</a>    </span><span class="kw">pub async fn </span>download(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+<a href=#171 id=171 data-nosnippet>171</a>        <span class="kw">let </span>reqwest = ReqwestClient::new();
+<a href=#172 id=172 data-nosnippet>172</a>        <span class="kw">let </span>bytes = reqwest.get(<span class="kw-2">&amp;*</span><span class="self">self</span>.url).send().<span class="kw">await</span><span class="question-mark">?</span>.bytes().<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#173 id=173 data-nosnippet>173</a>        <span class="prelude-val">Ok</span>(bytes.to_vec())
+<a href=#174 id=174 data-nosnippet>174</a>    }
+<a href=#175 id=175 data-nosnippet>175</a>}
+<a href=#176 id=176 data-nosnippet>176</a>
+<a href=#177 id=177 data-nosnippet>177</a><span class="kw">impl </span>ExtractKey&lt;AttachmentId&gt; <span class="kw">for </span>Attachment {
+<a href=#178 id=178 data-nosnippet>178</a>    <span class="kw">fn </span>extract_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>AttachmentId {
+<a href=#179 id=179 data-nosnippet>179</a>        <span class="kw-2">&amp;</span><span class="self">self</span>.id
+<a href=#180 id=180 data-nosnippet>180</a>    }
+<a href=#181 id=181 data-nosnippet>181</a>}
+<a href=#182 id=182 data-nosnippet>182</a>
+<a href=#183 id=183 data-nosnippet>183</a><span class="macro">bitflags!</span> {
+<a href=#184 id=184 data-nosnippet>184</a>    <span class="doccomment">/// Flags for an attachment.
+<a href=#185 id=185 data-nosnippet>185</a>    ///
+<a href=#186 id=186 data-nosnippet>186</a>    /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-flags).
+<a href=#187 id=187 data-nosnippet>187</a>    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#188 id=188 data-nosnippet>188</a>    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+<a href=#189 id=189 data-nosnippet>189</a>    </span><span class="kw">pub struct </span>AttachmentFlags: u8 {
+<a href=#190 id=190 data-nosnippet>190</a>        <span class="doccomment">/// This attachment is a Clip from a stream.
+<a href=#191 id=191 data-nosnippet>191</a>        </span><span class="kw">const </span>IS_CLIP = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+<a href=#192 id=192 data-nosnippet>192</a>        <span class="doccomment">/// This attachment is the thumbnail of a thread in a media channel, displayed in the grid
+<a href=#193 id=193 data-nosnippet>193</a>        /// but not on the message.
+<a href=#194 id=194 data-nosnippet>194</a>        </span><span class="kw">const </span>IS_THUMBNAIL = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+<a href=#195 id=195 data-nosnippet>195</a>        <span class="doccomment">/// This attachment was marked as a spoiler and is blurred until clicked.
+<a href=#196 id=196 data-nosnippet>196</a>        </span><span class="kw">const </span>IS_SPOILER = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+<a href=#197 id=197 data-nosnippet>197</a>        <span class="doccomment">/// This attachment is an animated image.
+<a href=#198 id=198 data-nosnippet>198</a>        </span><span class="kw">const </span>IS_ANIMATED = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+<a href=#199 id=199 data-nosnippet>199</a>    }
+<a href=#200 id=200 data-nosnippet>200</a>}
 </code></pre></div></section></main></body></html>
