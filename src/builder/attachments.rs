@@ -104,7 +104,7 @@ impl<'a> CreateAttachment<'a> {
     /// [`CreateAttachment::path`], then the file at the specified path was unable to be read. If
     /// instead it's [`CreateAttachment::file`], then cloning the handle to the file failed, likely
     /// due to hitting the system's limit on number of open file handles.
-    pub async fn as_bytes(&self) -> Result<Bytes> {
+    pub async fn to_bytes(&self) -> Result<Bytes> {
         match &self.data.kind {
             AttachmentDataKind::Bytes(bytes) => Ok(bytes.clone()),
             AttachmentDataKind::Path(path) => {
@@ -130,7 +130,7 @@ impl<'a> CreateAttachment<'a> {
         use base64::engine::{Config, Engine};
 
         let prefix = format!("data:{mimetype};base64,");
-        let data = self.as_bytes().await?;
+        let data = self.to_bytes().await?;
 
         let engine = base64::prelude::BASE64_STANDARD;
         let encoded_size = base64::encoded_len(data.len(), engine.config().encode_padding())
