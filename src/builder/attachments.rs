@@ -125,7 +125,7 @@ impl<'a> CreateAttachment<'a> {
     ///
     /// # Errors
     ///
-    /// See [`CreateAttachment::as_bytes`] for details.
+    /// See [`CreateAttachment::to_bytes`] for details.
     pub async fn encode(&self, mimetype: &str) -> Result<DataUri<'_>> {
         use base64::engine::{Config, Engine};
 
