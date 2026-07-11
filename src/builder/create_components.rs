@@ -438,11 +438,7 @@ impl CreateInputText {
     }
 }
 
-/// A top-level component that can be used in messages with the `IS_COMPONENTS_V2` flag.
-///
-/// This allows you to use the new Component V2 layout system. Create a message with
-/// `MessageFlags::IS_COMPONENTS_V2` and then use these components instead of
-/// `content` and `embeds`.
+/// Top-level component for messages using `IS_COMPONENTS_V2`.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum CreateComponents {
@@ -573,10 +569,7 @@ pub struct CreateSection {
     accessory: CreateSectionAccessory,
 }
 
-/// Accessory for a section component — either a button or a thumbnail.
-///
-/// Used with [`CreateSection`] to associate an interactive element or visual
-/// accessory with the section's text content.
+/// Section accessory — a button or thumbnail shown alongside the text.
 #[derive(Clone, Debug, PartialEq)]
 #[non_exhaustive]
 pub enum CreateSectionAccessory {
