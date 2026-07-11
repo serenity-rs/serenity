@@ -2840,6 +2840,76 @@ pub struct UnavailableGuild {
     pub unavailable: bool,
 }
 
+/// A guild's onboarding configuration.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-onboarding-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildOnboarding {
+    pub guild_id: GuildId,
+    pub prompts: Vec<OnboardingPrompt>,
+    pub default_channel_ids: Vec<ChannelId>,
+    pub enabled: bool,
+    pub mode: GuildOnboardingMode,
+}
+
+/// An onboarding prompt.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#onboarding-prompt-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct OnboardingPrompt {
+    pub id: OnboardingPromptId,
+    pub options: Vec<OnboardingOption>,
+    pub title: String,
+    #[serde(default)]
+    pub single_select: bool,
+    #[serde(default)]
+    pub required: bool,
+    #[serde(default)]
+    pub in_onboarding: bool,
+}
+
+/// An onboarding prompt option.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#onboarding-prompt-option-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct OnboardingOption {
+    pub id: OnboardingOptionId,
+    pub emoji: Option<ReactionType>,
+    pub title: String,
+    pub channel_ids: Vec<ChannelId>,
+    #[serde(default)]
+    pub role_ids: Vec<RoleId>,
+    #[serde(default)]
+    pub default: bool,
+    #[serde(default)]
+    pub link: bool,
+    #[serde(default)]
+    pub role_ids_required: bool,
+    #[serde(default)]
+    pub values: Vec<String>,
+}
+
+enum_number! {
+    /// The mode of guild onboarding.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-onboarding-mode).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum GuildOnboardingMode {
+        OnboardingDefault = 0,
+        OnboardingPreOnboarding = 1,
+        _ => Unknown(u8),
+    }
+}
+
 enum_number! {
     /// Default message notification level for a guild.
     ///

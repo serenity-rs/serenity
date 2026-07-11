@@ -326,6 +326,10 @@ routes! ('a, {
     api!("/guilds/{}/scheduled-events/{}/users", guild_id, event_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));
 
+    GuildOnboarding { guild_id: GuildId },
+    api!("/guilds/{}/onboarding", guild_id),
+    Some(RatelimitingKind::PathAndId(guild_id.into()));
+
     GuildSticker { guild_id: GuildId, sticker_id: StickerId },
     api!("/guilds/{}/stickers/{}", guild_id, sticker_id),
     Some(RatelimitingKind::PathAndId(guild_id.into()));
@@ -480,6 +484,10 @@ routes! ('a, {
 
     Commands { application_id: ApplicationId },
     api!("/applications/{}/commands", application_id),
+    Some(RatelimitingKind::PathAndId(application_id.into()));
+
+    ApplicationRoleConnectionMetadata { application_id: ApplicationId },
+    api!("/applications/{}/role-connections/metadata", application_id),
     Some(RatelimitingKind::PathAndId(application_id.into()));
 
     GuildCommand { application_id: ApplicationId, guild_id: GuildId, command_id: CommandId },

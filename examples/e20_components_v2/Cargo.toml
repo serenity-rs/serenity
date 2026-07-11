@@ -1,0 +1,9 @@
+[package]
+name = "e20_components_v2"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serenity = { path = "../../", default-features = false, features = ["client", "gateway", "rustls_backend", "model"] }
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+dotenv = { version = "0.15.0" }

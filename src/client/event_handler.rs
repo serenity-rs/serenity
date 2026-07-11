@@ -498,6 +498,31 @@ event_handler! {
     /// Dispatched when a user removes a previous vote on a poll.
     MessagePollVoteRemove { event: MessagePollVoteRemoveEvent } => async fn poll_vote_remove(&self, ctx: Context);
 
+    /// Dispatched when a voice channel effect is sent.
+    ///
+    /// Provides data about the voice channel effect.
+    VoiceChannelEffectSend { event: VoiceChannelEffectSendEvent } => async fn voice_channel_effect_send(&self, ctx: Context);
+
+    /// Dispatched when a scheduled event reminder is created.
+    ///
+    /// Provides data about the scheduled event reminder.
+    ScheduledEventReminderCreate { event: ScheduledEventReminderCreateEvent } => async fn scheduled_event_reminder_create(&self, ctx: Context);
+
+    /// Dispatched when a guild's onboarding is updated.
+    ///
+    /// Provides data about the updated onboarding.
+    GuildOnboardingUpdate { event: GuildOnboardingUpdateEvent } => async fn guild_onboarding_update(&self, ctx: Context);
+
+    /// Dispatched when a guild role subscription is purchased.
+    ///
+    /// Provides data about the role subscription purchase.
+    GuildRoleSubscriptionPurchaseCreate { event: GuildRoleSubscriptionPurchaseCreateEvent } => async fn guild_role_subscription_purchase_create(&self, ctx: Context);
+
+    /// Dispatched when a guild role subscription is renewed.
+    ///
+    /// Provides data about the role subscription renewal.
+    GuildRoleSubscriptionRenewalCreate { event: GuildRoleSubscriptionRenewalCreateEvent } => async fn guild_role_subscription_renewal_create(&self, ctx: Context);
+
     /// Dispatched when an HTTP rate limit is hit
     Ratelimit { data: RatelimitInfo } => async fn ratelimit(&self);
 }

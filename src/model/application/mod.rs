@@ -280,6 +280,40 @@ pub struct InstallParams {
     pub permissions: Permissions,
 }
 
+/// Application role connection metadata record.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ApplicationRoleConnectionMetadata {
+    #[serde(rename = "type")]
+    pub kind: ApplicationRoleConnectionMetadataType,
+    pub key: String,
+    pub name: String,
+    #[serde(default)]
+    pub name_localizations: Option<HashMap<String, String>>,
+    pub description: String,
+    #[serde(default)]
+    pub description_localizations: Option<HashMap<String, String>>,
+}
+
+/// The type of application role connection metadata value.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object-metadata-types).
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Eq, Hash, PartialEq)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum ApplicationRoleConnectionMetadataType {
+    IntegerLessThanOrEqual,
+    IntegerGreaterThanOrEqual,
+    IntegerEqual,
+    IntegerNotEqual,
+    StringEqual,
+    StringNotEqual,
+    StringContains,
+    StringNotContains,
+}
+
 #[cfg(test)]
 mod team_role_ordering {
     use super::TeamMemberRole;

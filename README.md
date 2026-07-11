@@ -6,6 +6,70 @@
 
 Serenity is a Rust library for the Discord API.
 
+This is a **fork** with additional features and bug fixes on top of the upstream serenity-rs/serenity.
+
+## What's New in This Fork
+
+### Component V2 (Complete)
+
+Full support for Discord's new Component V2 layout system:
+
+- **Container** — Box with accent color, spoiler, padding (1=small, 2=large)
+- **TextDisplay** — Markdown text
+- **Section** — Text + Button/Thumbnail accessory (right-aligned)
+- **Thumbnail** — Image as Section accessory
+- **MediaGallery** — Image grid (1-10 items, with descriptions & spoilers)
+- **Separator** — Divider with spacing control
+- **File** — Attachment reference
+- **ActionRow** — Button & Select Menu container
+- **Label** — Modal wrapper for inputs
+- **FileUpload** — Modal file upload
+- **RadioGroup** — Modal single-choice
+- **CheckboxGroup** — Modal multi-choice
+- **Checkbox** — Modal yes/no toggle
+
+**Bug fixes:**
+- `CreateSectionAccessory` now correctly serializes with `type` field
+- `CreateMessage.components_v2()` method for V2 messages
+- `CreateContainer.add_label()` and `add_input_text()` methods
+- `CreateSelectMenu.required()` for modal context
+
+### New Events
+
+- `VOICE_CHANNEL_EFFECT_SEND` — Emoji reactions in voice channels
+- `GUILD_ONBOARDING_UPDATE` — Guild onboarding configuration changes
+- `SCHEDULED_EVENT_REMINDER_CREATE` — Scheduled event reminders
+- `GUILD_ROLE_SUBSCRIPTION_PURCHASE_CREATE` — Role subscription purchases
+- `GUILD_ROLE_SUBSCRIPTION_RENEWAL_CREATE` — Role subscription renewals
+
+### New Models
+
+- `GuildOnboarding` — Guild onboarding configuration
+- `OnboardingPrompt` — Onboarding prompt with options
+- `OnboardingOption` — Onboarding prompt option
+- `GuildOnboardingMode` — Onboarding mode enum
+- `VoiceChannelEffectAnimationType` — Voice effect animation type
+- `ApplicationRoleConnectionMetadata` — Role connection metadata
+- `ApplicationRoleConnectionMetadataType` — Metadata value type enum
+
+### New HTTP Methods
+
+- `create_bulk_dm(recipient_ids)` — Multi-recipient DMs
+- `get_guild_onboarding(guild_id)` — Get guild onboarding
+- `edit_guild_onboarding(guild_id, map)` — Edit guild onboarding
+- `get_application_role_connection_metadata(application_id)` — Get role connection metadata
+- `update_application_role_connection_metadata(application_id, metadata)` — Update role connection metadata
+
+### Other Additions
+
+- `ChannelType::GuildMedia` (type 16) — Guild media channels
+- `OnboardingPromptId` and `OnboardingOptionId` ID types
+- Routing: `GuildOnboarding`, `ApplicationRoleConnectionMetadata`
+
+---
+
+## Upstream Features
+
 View the [examples] on how to use serenity's API. To make a bot with slash commands or text
 commands, see the [poise](https://github.com/serenity-rs/poise) framework built on top of serenity.
 To send and receive data from voice channels, see the
@@ -36,6 +100,41 @@ Note that - although this documentation will try to be as up-to-date and
 accurate as possible - Discord hosts [official documentation][discord docs]. If
 you need to be sure that some information piece is accurate, refer to their
 docs.
+
+# What's New in This Fork
+
+This fork adds support for Discord's newer features that weren't in the
+upstream serenity at the time of forking. The main additions are:
+
+**Component V2** -- the new message layout system that lets you build
+rich, interactive UIs with containers, sections, media galleries, and more.
+Everything works: Container, TextDisplay, Section, Thumbnail, MediaGallery,
+Separator, File, ActionRow, Label, FileUpload, RadioGroup, CheckboxGroup,
+Checkbox. There's also a working example in `examples/e20_components_v2/`.
+
+A few bugs were fixed along the way:
+- `CreateSectionAccessory` wasn't serializing the `type` field correctly,
+  which broke Section components entirely.
+- `CreateMessage` didn't have a `components_v2()` method, so you couldn't
+  actually send V2 messages through the builder.
+- `CreateContainer` was missing `add_label()` and `add_input_text()` methods.
+- `CreateSelectMenu` didn't have a `required` field for modal context.
+
+**New gateway events** -- `VOICE_CHANNEL_EFFECT_SEND` (the emoji pop-ups in
+voice channels), `GUILD_ONBOARDING_UPDATE`, `SCHEDULED_EVENT_REMINDER_CREATE`,
+and two role subscription events (`PURCHASE_CREATE` and `RENEWAL_CREATE`).
+
+**New models** -- `GuildOnboarding` and related structs for guild onboarding
+configuration, `VoiceChannelEffectAnimationType`, and
+`ApplicationRoleConnectionMetadata` for the role connections API.
+
+**New HTTP methods** -- `create_bulk_dm()` for multi-recipient DMs,
+`get_guild_onboarding()` / `edit_guild_onboarding()`, and
+`get_application_role_connection_metadata()` /
+`update_application_role_connection_metadata()`.
+
+**Other bits** -- `ChannelType::GuildMedia` (type 16) for the newer media
+channel type, plus the `OnboardingPromptId` and `OnboardingOptionId` ID types.
 
 # Example Bot
 

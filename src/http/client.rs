@@ -5224,6 +5224,108 @@ impl Http {
         }
     }
 
+    /// Creates a DM channel with a user.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/user#create-dm).
+    pub async fn create_dm_channel(&self, user_id: UserId) -> Result<PrivateChannel> {
+        self.fire(Request {
+            body: Some(to_vec(&json!({ "recipient_id": user_id }))?.into()),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Post,
+            route: Route::UserMeDmChannels,
+            params: None,
+        })
+        .await
+    }
+
+    /// Creates a bulk DM channel with multiple recipients.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/user#create-dm).
+    pub async fn create_bulk_dm(&self, recipient_ids: Vec<UserId>) -> Result<PrivateChannel> {
+        let recipient_strs: Vec<String> = recipient_ids.into_iter().map(|id| id.to_string()).collect();
+        self.fire(Request {
+            body: Some(to_vec(&json!({ "recipients": recipient_strs }))?.into()),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Post,
+            route: Route::UserMeDmChannels,
+            params: None,
+        })
+        .await
+    }
+
+    /// Gets guild onboarding data.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild#get-guild-onboarding).
+    pub async fn get_guild_onboarding(&self, guild_id: GuildId) -> Result<GuildOnboarding> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildOnboarding { guild_id },
+            params: None,
+        })
+        .await
+    }
+
+    /// Edits guild onboarding data.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/guild#modify-guild-onboarding).
+    pub async fn edit_guild_onboarding(
+        &self,
+        guild_id: GuildId,
+        map: &impl serde::Serialize,
+    ) -> Result<GuildOnboarding> {
+        self.fire(Request {
+            body: Some(to_vec(map)?.into()),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Patch,
+            route: Route::GuildOnboarding { guild_id },
+            params: None,
+        })
+        .await
+    }
+
+    /// Gets application role connection metadata.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/application-role-connection-metadata#get-application-role-connection-metadata-records).
+    pub async fn get_application_role_connection_metadata(
+        &self,
+        application_id: ApplicationId,
+    ) -> Result<Vec<ApplicationRoleConnectionMetadata>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::ApplicationRoleConnectionMetadata { application_id },
+            params: None,
+        })
+        .await
+    }
+
+    /// Updates application role connection metadata.
+    ///
+    /// [Discord docs](https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records).
+    pub async fn update_application_role_connection_metadata(
+        &self,
+        application_id: ApplicationId,
+        metadata: &[ApplicationRoleConnectionMetadata],
+    ) -> Result<Vec<ApplicationRoleConnectionMetadata>> {
+        self.fire(Request {
+            body: Some(to_vec(metadata)?.into()),
+            multipart: None,
+            headers: None,
+            method: LightMethod::Put,
+            route: Route::ApplicationRoleConnectionMetadata { application_id },
+            params: None,
+        })
+        .await
+    }
+
     /// Performs a request and then verifies that the response status code is equal to the expected
     /// value.
     ///
