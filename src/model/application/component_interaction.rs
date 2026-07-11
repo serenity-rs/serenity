@@ -1,5 +1,5 @@
 use serde::de::Error as DeError;
-use serde::ser::{Serialize, SerializeMap as _};
+use serde::ser::Serialize;
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -259,6 +259,16 @@ pub enum ComponentInteractionDataKind {
     RoleSelect { values: Vec<RoleId> },
     MentionableSelect { values: Vec<GenericId> },
     ChannelSelect { values: Vec<ChannelId> },
+    /// A modal text input submission.
+    TextDisplay,
+    /// A radio group selection.
+    RadioGroup { value: Option<String> },
+    /// A checkbox group selection.
+    CheckboxGroup { values: Vec<String> },
+    /// A checkbox toggle.
+    Checkbox { value: bool },
+    /// A file upload submission.
+    FileUpload { values: Vec<AttachmentId> },
     Unknown(u8),
 }
 
@@ -297,7 +307,34 @@ impl<'de> Deserialize<'de> for ComponentInteractionDataKind {
                 values: parse_values!(),
             },
             ComponentType::Unknown(x) => Self::Unknown(x),
-            x @ (ComponentType::ActionRow | ComponentType::InputText) => {
+            ComponentType::TextDisplay => Self::TextDisplay,
+            ComponentType::RadioGroup => Self::RadioGroup {
+                value: json.values.map(|v| {
+                    v.as_str().map(String::from).unwrap_or_default()
+                }),
+            },
+            ComponentType::CheckboxGroup => Self::CheckboxGroup {
+                values: parse_values!(),
+            },
+            ComponentType::Checkbox => Self::Checkbox {
+                value: json.values
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false),
+            },
+            ComponentType::FileUpload => Self::FileUpload {
+                values: parse_values!(),
+            },
+            x @ (
+                ComponentType::ActionRow
+                | ComponentType::InputText
+                | ComponentType::Section
+                | ComponentType::Thumbnail
+                | ComponentType::MediaGallery
+                | ComponentType::File
+                | ComponentType::Separator
+                | ComponentType::Container
+                | ComponentType::Label
+            ) => {
                 return Err(D::Error::custom(format_args!(
                     "invalid message component type in this context: {x:?}",
                 )));
@@ -309,6 +346,7 @@ impl<'de> Deserialize<'de> for ComponentInteractionDataKind {
 impl Serialize for ComponentInteractionDataKind {
     #[rustfmt::skip] // Remove this for horror.
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> StdResult<S::Ok, S::Error> {
+        use serde::ser::SerializeMap as _;
         let mut map = serializer.serialize_map(Some(2))?;
         map.serialize_entry("component_type", &match self {
             Self::Button { .. } => 2,
@@ -317,6 +355,11 @@ impl Serialize for ComponentInteractionDataKind {
             Self::RoleSelect { .. } => 6,
             Self::MentionableSelect { .. } => 7,
             Self::ChannelSelect { .. } => 8,
+            Self::TextDisplay => 10,
+            Self::RadioGroup { .. } => 21,
+            Self::CheckboxGroup { .. } => 22,
+            Self::Checkbox { .. } => 23,
+            Self::FileUpload { .. } => 19,
             Self::Unknown(x) => *x,
         })?;
 
@@ -326,7 +369,13 @@ impl Serialize for ComponentInteractionDataKind {
             Self::RoleSelect { values } => map.serialize_entry("values", values)?,
             Self::MentionableSelect { values } => map.serialize_entry("values", values)?,
             Self::ChannelSelect { values } => map.serialize_entry("values", values)?,
-            Self::Button | Self::Unknown(_) => map.serialize_entry("values", &None::<()>)?,
+            Self::RadioGroup { value } => map.serialize_entry("value", value)?,
+            Self::CheckboxGroup { values } => map.serialize_entry("values", values)?,
+            Self::Checkbox { value } => map.serialize_entry("value", value)?,
+            Self::FileUpload { values } => map.serialize_entry("values", values)?,
+            Self::Button | Self::TextDisplay | Self::Unknown(_) => {
+                map.serialize_entry("values", &None::<()>)?
+            },
         }
 
         map.end()

@@ -280,6 +280,54 @@ pub struct InstallParams {
     pub permissions: Permissions,
 }
 
+/// Application role connection metadata record.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[non_exhaustive]
+pub struct ApplicationRoleConnectionMetadata {
+    /// Type of metadata value.
+    #[serde(rename = "type")]
+    pub kind: ApplicationRoleConnectionMetadataType,
+    /// Dictionary key for the metadata field.
+    pub key: String,
+    /// Name of the metadata field.
+    pub name: String,
+    /// Description of the metadata field.
+    #[serde(default)]
+    pub name_localizations: Option<HashMap<String, String>>,
+    /// Description of the metadata field.
+    pub description: String,
+    /// Descriptions of the metadata value.
+    #[serde(default)]
+    pub description_localizations: Option<HashMap<String, String>>,
+}
+
+/// The type of application role connection metadata value.
+///
+/// [Discord docs](https://discord.com/developers/docs/resources/application-role-connection-metadata#application-role-connection-metadata-object-metadata-types).
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Eq, Hash, PartialEq)]
+#[serde(rename_all = "snake_case")]
+#[non_exhaustive]
+pub enum ApplicationRoleConnectionMetadataType {
+    /// The metadata value is an integer less than or equal to the configured value.
+    IntegerLessThanOrEqual,
+    /// The metadata value is an integer greater than or equal to the configured value.
+    IntegerGreaterThanOrEqual,
+    /// The metadata value is an integer equal to the configured value.
+    IntegerEqual,
+    /// The metadata value is an integer not equal to the configured value.
+    IntegerNotEqual,
+    /// The metadata value is a string equal to the configured value.
+    StringEqual,
+    /// The metadata value is a string not equal to the configured value.
+    StringNotEqual,
+    /// The metadata value is a string containing the configured value.
+    StringContains,
+    /// The metadata value is a string not containing the configured value.
+    StringNotContains,
+}
+
 #[cfg(test)]
 mod team_role_ordering {
     use super::TeamMemberRole;

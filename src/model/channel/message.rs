@@ -1275,6 +1275,19 @@ bitflags! {
         /// As of 2023-04-20, bots are currently not able to send voice messages
         /// ([source](https://github.com/discord/discord-api-docs/pull/6082)).
         const IS_VOICE_MESSAGE = 1 << 13;
+        /// This message uses the components v2 API.
+        ///
+        /// Once a message has been sent with this flag, it cannot be removed from that message.
+        /// This enables the new components system with the following changes:
+        /// - The `content` and `embeds` fields will no longer work but you'll be able to use
+        ///   [`TextDisplay`] and [`Container`] as replacements.
+        /// - Attachments won't show by default - they must be exposed through components.
+        /// - The poll and stickers fields are disabled.
+        /// - Messages allow up to 40 total components.
+        ///
+        /// [`TextDisplay`]: crate::model::application::component::TextDisplay
+        /// [`Container`]: crate::model::application::component::Container
+        const IS_COMPONENTS_V2 = 1 << 15;
     }
 }
 

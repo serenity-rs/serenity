@@ -5,6 +5,7 @@ use super::{
     CreateActionRow,
     CreateAllowedMentions,
     CreateAttachment,
+    CreateComponents,
     CreateEmbed,
     CreatePoll,
     EditAttachments,
@@ -66,6 +67,9 @@ pub struct CreateMessage {
     message_reference: Option<MessageReference>,
     #[serde(skip_serializing_if = "Option::is_none")]
     components: Option<Vec<CreateActionRow>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "components")]
+    components_v2: Option<Vec<CreateComponents>>,
     sticker_ids: Vec<StickerId>,
     #[serde(skip_serializing_if = "Option::is_none")]
     flags: Option<MessageFlags>,
@@ -220,6 +224,15 @@ impl CreateMessage {
         self
     }
     super::button_and_select_menu_convenience_methods!(self.components);
+
+    /// Sets the components v2 of this message.
+    ///
+    /// When using this, you must also set [`Self::flags`] to include
+    /// [`MessageFlags::IS_COMPONENTS_V2`].
+    pub fn components_v2(mut self, components: Vec<CreateComponents>) -> Self {
+        self.components_v2 = Some(components);
+        self
+    }
 
     /// Sets the flags for the message.
     pub fn flags(mut self, flags: MessageFlags) -> Self {

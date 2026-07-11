@@ -213,6 +213,8 @@ id_u64! {
     RuleId: "An identifier for an auto moderation rule";
     ForumTagId: "An identifier for a forum tag.";
     EntitlementId: "An identifier for an entitlement.";
+    OnboardingPromptId: "An identifier for an onboarding prompt.";
+    OnboardingOptionId: "An identifier for an onboarding option.";
 }
 
 /// An identifier for a Shard.

@@ -312,6 +312,103 @@ impl Serialize for GuildMembersChunkEvent {
 }
 
 /// Requires no gateway intents.
+/// A scheduled event reminder was created.
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#scheduled-event-reminder).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ScheduledEventReminderCreateEvent {
+    /// The scheduled event.
+    pub scheduled_event: ScheduledEvent,
+}
+
+/// A guild's onboarding was updated.
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-onboarding-update).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(transparent)]
+#[non_exhaustive]
+pub struct GuildOnboardingUpdateEvent {
+    /// The updated guild onboarding.
+    pub onboarding: GuildOnboarding,
+}
+
+/// A guild role subscription was purchased.
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-role-subscription-purchase).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildRoleSubscriptionPurchaseCreateEvent {
+    /// ID of the guild.
+    pub guild_id: GuildId,
+    /// ID of the user.
+    pub user_id: UserId,
+    /// ID of the role subscription listing.
+    pub role_subscription_listing_id: SkuId,
+    /// Whether this is a renewal.
+    pub is_renewal: bool,
+}
+
+/// A guild role subscription was renewed.
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-role-subscription-renewal).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildRoleSubscriptionRenewalCreateEvent {
+    /// ID of the guild.
+    pub guild_id: GuildId,
+    /// ID of the user.
+    pub user_id: UserId,
+    /// ID of the role subscription listing.
+    pub role_subscription_listing_id: SkuId,
+    /// Whether this is a renewal.
+    pub is_renewal: bool,
+}
+
+/// A voice channel effect was sent.
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-effect-send).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct VoiceChannelEffectSendEvent {
+    /// ID of the channel.
+    pub channel_id: ChannelId,
+    /// ID of the guild.
+    pub guild_id: Option<GuildId>,
+    /// ID of the user.
+    pub user_id: UserId,
+    /// The emoji.
+    pub emoji: Emoji,
+    /// The type of emoji animation.
+    pub animation_type: Option<VoiceChannelEffectAnimationType>,
+    /// The total duration of the animation in milliseconds.
+    pub animation_duration: Option<u32>,
+    /// The id of the emoji.
+    pub emoji_id: Option<EmojiId>,
+    /// Whether the emoji is animated.
+    pub animated: Option<bool>,
+}
+
+enum_number! {
+    /// The type of animation for a voice channel effect.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-effect-animation-types).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum VoiceChannelEffectAnimationType {
+        Fun = 0,
+        Joy = 1,
+        _ => Unknown(u8),
+    }
+}
+
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#soundboard-sounds).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -1366,6 +1463,21 @@ pub enum Event {
     TypingStart(TypingStartEvent),
     /// Update to the logged-in user's information
     UserUpdate(UserUpdateEvent),
+    /// A scheduled event reminder was sent.
+    #[serde(rename = "SCHEDULED_EVENT_REMINDER_CREATE")]
+    ScheduledEventReminderCreate(ScheduledEventReminderCreateEvent),
+    /// A guild's onboarding was updated.
+    #[serde(rename = "GUILD_ONBOARDING_UPDATE")]
+    GuildOnboardingUpdate(GuildOnboardingUpdateEvent),
+    /// A guild role was purchased.
+    #[serde(rename = "GUILD_ROLE_SUBSCRIPTION_PURCHASE_CREATE")]
+    GuildRoleSubscriptionPurchaseCreate(GuildRoleSubscriptionPurchaseCreateEvent),
+    /// A guild role subscription was renewed.
+    #[serde(rename = "GUILD_ROLE_SUBSCRIPTION_RENEWAL_CREATE")]
+    GuildRoleSubscriptionRenewalCreate(GuildRoleSubscriptionRenewalCreateEvent),
+    /// A voice channel effect was sent.
+    #[serde(rename = "VOICE_CHANNEL_EFFECT_SEND")]
+    VoiceChannelEffectSend(VoiceChannelEffectSendEvent),
     /// A member's voice state has changed
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available

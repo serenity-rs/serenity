@@ -253,6 +253,8 @@ enum_number! {
         Directory = 14,
         /// An indicator that the channel is a forum [`GuildChannel`].
         Forum = 15,
+        /// An indicator that the channel is a guild media [`GuildChannel`].
+        GuildMedia = 16,
         _ => Unknown(u8),
     } // Make sure to update [`GuildChannel::is_text_based`].
 }
@@ -274,6 +276,7 @@ impl ChannelType {
             Self::Stage => "stage",
             Self::Directory => "directory",
             Self::Forum => "forum",
+            Self::GuildMedia => "guild_media",
             Self::Unknown(_) => "unknown",
         }
     }

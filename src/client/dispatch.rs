@@ -506,6 +506,21 @@ fn update_cache_with_event(
         Event::MessagePollVoteRemove(event) => FullEvent::MessagePollVoteRemove {
             event,
         },
+        Event::VoiceChannelEffectSend(event) => FullEvent::VoiceChannelEffectSend {
+            event,
+        },
+        Event::ScheduledEventReminderCreate(event) => FullEvent::ScheduledEventReminderCreate {
+            event,
+        },
+        Event::GuildOnboardingUpdate(event) => FullEvent::GuildOnboardingUpdate {
+            event,
+        },
+        Event::GuildRoleSubscriptionPurchaseCreate(event) => FullEvent::GuildRoleSubscriptionPurchaseCreate {
+            event,
+        },
+        Event::GuildRoleSubscriptionRenewalCreate(event) => FullEvent::GuildRoleSubscriptionRenewalCreate {
+            event,
+        },
     };
 
     Some((event, extra_event))

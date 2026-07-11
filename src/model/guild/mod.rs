@@ -2840,6 +2840,98 @@ pub struct UnavailableGuild {
     pub unavailable: bool,
 }
 
+/// A guild's onboarding configuration.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-onboarding-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildOnboarding {
+    /// ID of the guild this onboarding belongs to.
+    pub guild_id: GuildId,
+    /// Guild onboarding prompts.
+    pub prompts: Vec<OnboardingPrompt>,
+    /// Channel IDs to add to the default channel list.
+    pub default_channel_ids: Vec<ChannelId>,
+    /// Whether onboarding is enabled in the guild.
+    pub enabled: bool,
+    /// The current mode of onboarding.
+    pub mode: GuildOnboardingMode,
+}
+
+/// An onboarding prompt.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#onboarding-prompt-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct OnboardingPrompt {
+    /// ID of the prompt.
+    pub id: OnboardingPromptId,
+    /// Options for the prompt.
+    pub options: Vec<OnboardingOption>,
+    /// The prompt title.
+    pub title: String,
+    /// Whether users are single-select.
+    #[serde(default)]
+    pub single_select: bool,
+    /// Whether the prompt is required for onboarding.
+    #[serde(default)]
+    pub required: bool,
+    /// Whether the prompt is included in onboarding.
+    #[serde(default)]
+    pub in_onboarding: bool,
+}
+
+/// An onboarding prompt option.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/guild#onboarding-prompt-option-object).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct OnboardingOption {
+    /// ID of the option.
+    pub id: OnboardingOptionId,
+    /// The option emoji.
+    pub emoji: Option<ReactionType>,
+    /// The option title.
+    pub title: String,
+    /// IDs of the channels that are selected.
+    pub channel_ids: Vec<ChannelId>,
+    /// The role IDs of the roles that are selected.
+    #[serde(default)]
+    pub role_ids: Vec<RoleId>,
+    /// Whether the option is selected by default.
+    #[serde(default)]
+    pub default: bool,
+    /// Whether the option describes a link.
+    #[serde(default)]
+    pub link: bool,
+    /// Whether the option is a type that allows free-form input.
+    #[serde(default)]
+    pub role_ids_required: bool,
+    /// Values the user must select.
+    #[serde(default)]
+    pub values: Vec<String>,
+}
+
+enum_number! {
+    /// The mode of guild onboarding.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-onboarding-mode).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[serde(from = "u8", into = "u8")]
+    #[non_exhaustive]
+    pub enum GuildOnboardingMode {
+        /// Only members with the Onboarding default role will be able to see the onboarding channel list.
+        OnboardingDefault = 0,
+        /// Members who have completed onboarding will see the onboarding channel list.
+        OnboardingPreOnboarding = 1,
+        _ => Unknown(u8),
+    }
+}
+
 enum_number! {
     /// Default message notification level for a guild.
     ///
