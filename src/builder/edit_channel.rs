@@ -270,7 +270,8 @@ impl<'a> EditChannel<'a> {
         self
     }
 
-    /// Channel flags combined as a bitfield. Currently only [`ChannelFlags::REQUIRE_TAG`] is
+    /// Channel flags combined as a bitfield. Currently only [`ChannelFlags::REQUIRE_TAG`]
+    /// (forum only) and [`ChannelFlags::IS_SPOILER_CHANNEL`] (text-based and voice only) are
     /// supported.
     pub fn flags(mut self, flags: ChannelFlags) -> Self {
         self.flags = Some(flags);
