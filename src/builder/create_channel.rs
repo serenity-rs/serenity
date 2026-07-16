@@ -51,6 +51,8 @@ pub struct CreateChannel<'a> {
     default_forum_layout: Option<ForumLayoutType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_thread_rate_limit_per_user: Option<NonMaxU16>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    flags: Option<ChannelFlags>,
 
     #[serde(skip)]
     audit_log_reason: Option<&'a str>,
@@ -80,6 +82,7 @@ impl<'a> CreateChannel<'a> {
             default_sort_order: None,
             default_forum_layout: None,
             default_thread_rate_limit_per_user: None,
+            flags: None,
         }
     }
 
@@ -272,6 +275,14 @@ impl<'a> CreateChannel<'a> {
         default_thread_rate_limit_per_user: NonMaxU16,
     ) -> Self {
         self.default_thread_rate_limit_per_user = Some(default_thread_rate_limit_per_user);
+        self
+    }
+
+    /// Channel flags combined as a bitfield. Currently only [`ChannelFlags::REQUIRE_TAG`]
+    /// (forum only) and [`ChannelFlags::IS_SPOILER_CHANNEL`] (text-based and voice only) are
+    /// supported.
+    pub fn flags(mut self, flags: ChannelFlags) -> Self {
+        self.flags = Some(flags);
         self
     }
 
