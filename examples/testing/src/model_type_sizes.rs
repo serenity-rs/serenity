@@ -63,6 +63,7 @@ pub fn print_ranking() {
         ("HttpError", std::mem::size_of::<serenity::http::HttpError>()),
         ("FollowedChannel", std::mem::size_of::<FollowedChannel>()),
         ("Gateway", std::mem::size_of::<Gateway>()),
+        ("GatewayCapabilities", std::mem::size_of::<GatewayCapabilities>()),
         ("GatewayIntents", std::mem::size_of::<GatewayIntents>()),
         ("GenericId", std::mem::size_of::<GenericId>()),
         ("Guild", std::mem::size_of::<Guild>()),

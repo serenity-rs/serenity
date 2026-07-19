@@ -861,3 +861,21 @@ impl Default for GatewayIntents {
         Self::non_privileged()
     }
 }
+
+bitflags! {
+    /// A bitfield used to opt a bot client into gateway behaviors.
+    ///
+    /// This is an `Identify` bitfield, similar to [`GatewayIntents`] but distinct:
+    /// `intents` control which events your bot client receives, while `capabilities`
+    /// affect gateway behaviors.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#identify-gateway-capabilities).
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+    pub struct GatewayCapabilities: u16 {
+        /// Opts the client into receiving [obfuscated channel metadata] over the Gateway for
+        /// channels it can't view.
+        #[deprecated = "This is a temporary, testing-only opt-in for channel obfuscation. This opt-in mechanism will change before the feature reaches general availability on October 12, 2026. Obfuscation is then planned to apply to all bots automatically, even when they don't provide this capability."]
+        const CHANNEL_OBFUSCATION = 1 << 15;
+    }
+}
