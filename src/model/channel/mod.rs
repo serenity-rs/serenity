@@ -584,6 +584,13 @@ bitflags! {
         /// Whether a tag is required to be specified when creating a thread in a `GUILD_FORUM`
         /// channel. Tags are specified in the `applied_tags` field.
         const REQUIRE_TAG = 1 << 4;
+        /// This channel's metadata has been obfuscated because the current user cannot view it.
+        ///
+        /// Only ever set on channels received over the Gateway; the HTTP API never sets this flag.
+        /// See [Obfuscated Channels].
+        ///
+        /// [Obfuscated Channels]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
+        const CHANNEL_OBFUSCATED = 1 << 17;
         /// Whether the channel is a spoiler channel. Can be set on text-based guild channels and
         /// voice channels. Cannot be set if `nsfw` is true.
         const IS_SPOILER_CHANNEL = 1 << 21;
