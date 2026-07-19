@@ -875,6 +875,8 @@ bitflags! {
     pub struct GatewayCapabilities: u16 {
         /// Opts the client into receiving [obfuscated channel metadata] over the Gateway for
         /// channels it can't view.
+        ///
+        /// [obfuscated channel metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
         #[deprecated = "This is a temporary, testing-only opt-in for channel obfuscation. This opt-in mechanism will change before the feature reaches general availability on October 12, 2026. Obfuscation is then planned to apply to all bots automatically, even when they don't provide this capability."]
         const CHANNEL_OBFUSCATION = 1 << 15;
     }
