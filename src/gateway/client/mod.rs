@@ -60,7 +60,7 @@ use crate::framework::Framework;
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::GatewayIntents;
+use crate::model::gateway::{GatewayCapabilities, GatewayIntents};
 #[cfg(feature = "voice")]
 use crate::model::id::UserId;
 use crate::model::user::OnlineStatus;
@@ -72,6 +72,7 @@ pub struct ClientBuilder {
     data: Option<Arc<dyn std::any::Any + Send + Sync>>,
     http: Arc<Http>,
     intents: GatewayIntents,
+    capabilities: Option<GatewayCapabilities>,
     #[cfg(feature = "cache")]
     cache_settings: CacheSettings,
     #[cfg(feature = "framework")]
@@ -107,6 +108,7 @@ impl ClientBuilder {
             token,
             http,
             intents,
+            capabilities: None,
             data: None,
             #[cfg(feature = "cache")]
             cache_settings: CacheSettings::default(),
@@ -231,6 +233,15 @@ impl ClientBuilder {
         self.intents
     }
 
+    /// Sets the [gateway capabilities]. Capabilities are a bitflag; you can combine them by
+    /// performing the `|`-operator.
+    ///
+    /// [gateway capabilities]: https://docs.discord.com/developers/events/gateway-events#identify-gateway-capabilities
+    pub fn capabilities(mut self, capabilities: GatewayCapabilities) -> Self {
+        self.capabilities = Some(capabilities);
+        self
+    }
+
     /// Sets the event handler where all received gateway events will be dispatched.
     pub fn event_handler(mut self, event_handler: Arc<dyn EventHandler>) -> Self {
         self.event_handler = Some(event_handler);
@@ -286,6 +297,7 @@ impl IntoFuture for ClientBuilder {
         #[cfg(feature = "framework")]
         let framework = self.framework;
         let intents = self.intents;
+        let capabilities = self.capabilities;
         let presence = self.presence;
         let http = self.http;
 
@@ -337,6 +349,7 @@ impl IntoFuture for ClientBuilder {
                 cache: Arc::clone(&cache),
                 http: Arc::clone(&http),
                 intents,
+                capabilities,
                 presence: Some(presence),
                 wait_time_between_shard_start: self.wait_time_between_shard_start,
             });
