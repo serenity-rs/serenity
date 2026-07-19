@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-1ed95124.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.98.0-nightly (c397dae80 2026-07-02)" data-channel="nightly" data-search-js="search-9944d736.js" data-stringdex-js="stringdex-2da4960a.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/channel/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Models relating to channels and types within channels.
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/mod.rs`."><title>mod.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-ddecd707.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.99.0-nightly (eff8269f7 2026-07-18)" data-channel="nightly" data-search-js="search-cf4fc35e.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/channel/</div>mod.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Models relating to channels and types within channels.
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">mod </span>attachment;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">mod </span>channel_id;
@@ -578,43 +578,46 @@
 <a href=#578 id=578 data-nosnippet>578</a>    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-channel-flags).
 <a href=#579 id=579 data-nosnippet>579</a>    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#580 id=580 data-nosnippet>580</a>    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-<a href=#581 id=581 data-nosnippet>581</a>    </span><span class="kw">pub struct </span>ChannelFlags: u8 {
-<a href=#582 id=582 data-nosnippet>582</a>        <span class="doccomment">/// This thread is pinned to the top of its parent GUILD_FORUM channel
+<a href=#581 id=581 data-nosnippet>581</a>    </span><span class="kw">pub struct </span>ChannelFlags: u32 {
+<a href=#582 id=582 data-nosnippet>582</a>        <span class="doccomment">/// This thread is pinned to the top of its parent `GUILD_FORUM` channel.
 <a href=#583 id=583 data-nosnippet>583</a>        </span><span class="kw">const </span>PINNED = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
-<a href=#584 id=584 data-nosnippet>584</a>        <span class="doccomment">/// Whether a tag is required to be specified when creating a
-<a href=#585 id=585 data-nosnippet>585</a>        /// thread in a GUILD_FORUM channel. Tags are specified in the applied_tags field.
+<a href=#584 id=584 data-nosnippet>584</a>        <span class="doccomment">/// Whether a tag is required to be specified when creating a thread in a `GUILD_FORUM`
+<a href=#585 id=585 data-nosnippet>585</a>        /// channel. Tags are specified in the `applied_tags` field.
 <a href=#586 id=586 data-nosnippet>586</a>        </span><span class="kw">const </span>REQUIRE_TAG = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
-<a href=#587 id=587 data-nosnippet>587</a>    }
-<a href=#588 id=588 data-nosnippet>588</a>}
-<a href=#589 id=589 data-nosnippet>589</a>
-<a href=#590 id=590 data-nosnippet>590</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#channel-info-channel-info-channel-structure).
-<a href=#591 id=591 data-nosnippet>591</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#592 id=592 data-nosnippet>592</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-<a href=#593 id=593 data-nosnippet>593</a></span><span class="kw">pub struct </span>ChannelInfoChannel {
-<a href=#594 id=594 data-nosnippet>594</a>    <span class="kw">pub </span>id: ChannelId,
-<a href=#595 id=595 data-nosnippet>595</a>    <span class="attr">#[serde(default)]
-<a href=#596 id=596 data-nosnippet>596</a>    </span><span class="kw">pub </span>status: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u16&gt;&gt;,
-<a href=#597 id=597 data-nosnippet>597</a>    <span class="attr">#[serde(default)]
-<a href=#598 id=598 data-nosnippet>598</a>    </span><span class="kw">pub </span>voice_start_time: <span class="prelude-ty">Option</span>&lt;i64&gt;,
-<a href=#599 id=599 data-nosnippet>599</a>}
-<a href=#600 id=600 data-nosnippet>600</a>
-<a href=#601 id=601 data-nosnippet>601</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#request-channel-info-request-channel-info-structure).
-<a href=#602 id=602 data-nosnippet>602</a></span><span class="attr">#[derive(Debug)]
-<a href=#603 id=603 data-nosnippet>603</a></span><span class="kw">pub enum </span>ChannelInfoField {
-<a href=#604 id=604 data-nosnippet>604</a>    All,
-<a href=#605 id=605 data-nosnippet>605</a>    Status,
-<a href=#606 id=606 data-nosnippet>606</a>    VoiceStartTime,
-<a href=#607 id=607 data-nosnippet>607</a>}
-<a href=#608 id=608 data-nosnippet>608</a>
-<a href=#609 id=609 data-nosnippet>609</a><span class="kw">impl </span>From&lt;ChannelInfoField&gt; <span class="kw">for </span>Vec&lt;String&gt; {
-<a href=#610 id=610 data-nosnippet>610</a>    <span class="kw">fn </span>from(field: ChannelInfoField) -&gt; <span class="self">Self </span>{
-<a href=#611 id=611 data-nosnippet>611</a>        <span class="kw">match </span>field {
-<a href=#612 id=612 data-nosnippet>612</a>            ChannelInfoField::All =&gt; {
-<a href=#613 id=613 data-nosnippet>613</a>                Vec::from([String::from(<span class="string">"status"</span>), String::from(<span class="string">"voice_start_time"</span>)])
-<a href=#614 id=614 data-nosnippet>614</a>            },
-<a href=#615 id=615 data-nosnippet>615</a>            ChannelInfoField::Status =&gt; Vec::from([String::from(<span class="string">"status"</span>)]),
-<a href=#616 id=616 data-nosnippet>616</a>            ChannelInfoField::VoiceStartTime =&gt; Vec::from([String::from(<span class="string">"voice_start_time"</span>)]),
-<a href=#617 id=617 data-nosnippet>617</a>        }
-<a href=#618 id=618 data-nosnippet>618</a>    }
-<a href=#619 id=619 data-nosnippet>619</a>}
+<a href=#587 id=587 data-nosnippet>587</a>        <span class="doccomment">/// Whether the channel is a spoiler channel. Can be set on text-based guild channels and
+<a href=#588 id=588 data-nosnippet>588</a>        /// voice channels. Cannot be set if `nsfw` is true.
+<a href=#589 id=589 data-nosnippet>589</a>        </span><span class="kw">const </span>IS_SPOILER_CHANNEL = <span class="number">1 </span>&lt;&lt; <span class="number">21</span>;
+<a href=#590 id=590 data-nosnippet>590</a>    }
+<a href=#591 id=591 data-nosnippet>591</a>}
+<a href=#592 id=592 data-nosnippet>592</a>
+<a href=#593 id=593 data-nosnippet>593</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#channel-info-channel-info-channel-structure).
+<a href=#594 id=594 data-nosnippet>594</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#595 id=595 data-nosnippet>595</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+<a href=#596 id=596 data-nosnippet>596</a></span><span class="kw">pub struct </span>ChannelInfoChannel {
+<a href=#597 id=597 data-nosnippet>597</a>    <span class="kw">pub </span>id: ChannelId,
+<a href=#598 id=598 data-nosnippet>598</a>    <span class="attr">#[serde(default)]
+<a href=#599 id=599 data-nosnippet>599</a>    </span><span class="kw">pub </span>status: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u16&gt;&gt;,
+<a href=#600 id=600 data-nosnippet>600</a>    <span class="attr">#[serde(default)]
+<a href=#601 id=601 data-nosnippet>601</a>    </span><span class="kw">pub </span>voice_start_time: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+<a href=#602 id=602 data-nosnippet>602</a>}
+<a href=#603 id=603 data-nosnippet>603</a>
+<a href=#604 id=604 data-nosnippet>604</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#request-channel-info-request-channel-info-structure).
+<a href=#605 id=605 data-nosnippet>605</a></span><span class="attr">#[derive(Debug)]
+<a href=#606 id=606 data-nosnippet>606</a></span><span class="kw">pub enum </span>ChannelInfoField {
+<a href=#607 id=607 data-nosnippet>607</a>    All,
+<a href=#608 id=608 data-nosnippet>608</a>    Status,
+<a href=#609 id=609 data-nosnippet>609</a>    VoiceStartTime,
+<a href=#610 id=610 data-nosnippet>610</a>}
+<a href=#611 id=611 data-nosnippet>611</a>
+<a href=#612 id=612 data-nosnippet>612</a><span class="kw">impl </span>From&lt;ChannelInfoField&gt; <span class="kw">for </span>Vec&lt;String&gt; {
+<a href=#613 id=613 data-nosnippet>613</a>    <span class="kw">fn </span>from(field: ChannelInfoField) -&gt; <span class="self">Self </span>{
+<a href=#614 id=614 data-nosnippet>614</a>        <span class="kw">match </span>field {
+<a href=#615 id=615 data-nosnippet>615</a>            ChannelInfoField::All =&gt; {
+<a href=#616 id=616 data-nosnippet>616</a>                Vec::from([String::from(<span class="string">"status"</span>), String::from(<span class="string">"voice_start_time"</span>)])
+<a href=#617 id=617 data-nosnippet>617</a>            },
+<a href=#618 id=618 data-nosnippet>618</a>            ChannelInfoField::Status =&gt; Vec::from([String::from(<span class="string">"status"</span>)]),
+<a href=#619 id=619 data-nosnippet>619</a>            ChannelInfoField::VoiceStartTime =&gt; Vec::from([String::from(<span class="string">"voice_start_time"</span>)]),
+<a href=#620 id=620 data-nosnippet>620</a>        }
+<a href=#621 id=621 data-nosnippet>621</a>    }
+<a href=#622 id=622 data-nosnippet>622</a>}
 </code></pre></div></section></main></body></html>
