@@ -178,7 +178,7 @@
 <a href=#178 id=178 data-nosnippet>178</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
 <a href=#179 id=179 data-nosnippet>179</a>        <span class="self">self</span>.check_length()<span class="question-mark">?</span>;
 <a href=#180 id=180 data-nosnippet>180</a>
-<a href=#181 id=181 data-nosnippet>181</a>        <span class="kw">let </span>files = <span class="self">self</span>.attachments.new_attachments();
+<a href=#181 id=181 data-nosnippet>181</a>        <span class="kw">let </span>files = <span class="self">self</span>.attachments.new_attachment_data();
 <a href=#182 id=182 data-nosnippet>182</a>
 <a href=#183 id=183 data-nosnippet>183</a>        <span class="kw">if </span><span class="self">self</span>.allowed_mentions.is_none() {
 <a href=#184 id=184 data-nosnippet>184</a>            <span class="self">self</span>.allowed_mentions.clone_from(<span class="kw-2">&amp;</span>http.default_allowed_mentions);

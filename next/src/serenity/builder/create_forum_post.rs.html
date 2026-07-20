@@ -97,7 +97,7 @@
 <a href=#97 id=97 data-nosnippet>97</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
 <a href=#98 id=98 data-nosnippet>98</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
 <a href=#99 id=99 data-nosnippet>99</a>    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildThread&gt; {
-<a href=#100 id=100 data-nosnippet>100</a>        <span class="kw">let </span>files = <span class="self">self</span>.message.attachments.new_attachments();
+<a href=#100 id=100 data-nosnippet>100</a>        <span class="kw">let </span>files = <span class="self">self</span>.message.attachments.new_attachment_data();
 <a href=#101 id=101 data-nosnippet>101</a>        http.create_forum_post(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, files, <span class="self">self</span>.audit_log_reason).<span class="kw">await
 <a href=#102 id=102 data-nosnippet>102</a>    </span>}
 <a href=#103 id=103 data-nosnippet>103</a>}

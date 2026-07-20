@@ -35,7 +35,7 @@ direction from the message in time.</p>
 larger than 100 is supplied, it will be truncated.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.execute" class="method"><a class="src rightside" href="../../src/serenity/builder/get_messages.rs.html#104-119">Source</a><h4 class="code-header">pub async fn <a href="#method.execute" class="fn">execute</a>(
     self,
-    cache_http: impl <a class="trait" href="../http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>,
+    cache_http: impl <a class="trait" href="../model/trait.CacheHttp.html" title="trait serenity::model::CacheHttp">CacheHttp</a>,
     channel_id: <a class="struct" href="../model/id/struct.GenericChannelId.html" title="struct serenity::model::id::GenericChannelId">GenericChannelId</a>,
 ) -&gt; <a class="type" href="../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../model/channel/struct.Message.html" title="struct serenity::model::channel::Message">Message</a>&gt;&gt;</h4></section><span class="item-info"><div class="stab portability">Available on <strong>crate feature <code>http</code></strong> only.</div></span></summary><div class="docblock"><p>Gets messages from the channel.</p>
 <p>If the cache is enabled, this method will fill up the message cache for the channel, if the

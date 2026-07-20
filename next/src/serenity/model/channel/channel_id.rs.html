@@ -27,7 +27,7 @@
 <a href=#27 id=27 data-nosnippet>27</a><span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"temp_cache"</span>, feature = <span class="string">"model"</span>))]
 <a href=#28 id=28 data-nosnippet>28</a></span><span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
 <a href=#29 id=29 data-nosnippet>29</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#30 id=30 data-nosnippet>30</a></span><span class="kw">use </span><span class="kw">crate</span>::http::{CacheHttp, Http, Typing};
+<a href=#30 id=30 data-nosnippet>30</a></span><span class="kw">use </span><span class="kw">crate</span>::http::Http;
 <a href=#31 id=31 data-nosnippet>31</a><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <a href=#32 id=32 data-nosnippet>32</a>
 <a href=#33 id=33 data-nosnippet>33</a><span class="kw">impl </span>ChannelId {
@@ -476,7 +476,7 @@
 <a href=#476 id=476 data-nosnippet>476</a>        message_id: MessageId,
 <a href=#477 id=477 data-nosnippet>477</a>        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
 <a href=#478 id=478 data-nosnippet>478</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-<a href=#479 id=479 data-nosnippet>479</a>        http.create_reaction(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
+<a href=#479 id=479 data-nosnippet>479</a>        http.create_reaction(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into().as_data()).<span class="kw">await
 <a href=#480 id=480 data-nosnippet>480</a>    </span>}
 <a href=#481 id=481 data-nosnippet>481</a>
 <a href=#482 id=482 data-nosnippet>482</a>    <span class="doccomment">/// Deletes this channel, returning the channel on a successful deletion.
@@ -577,656 +577,666 @@
 <a href=#577 id=577 data-nosnippet>577</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
 <a href=#578 id=578 data-nosnippet>578</a>        <span class="kw">let </span>reaction_type = reaction_type.into();
 <a href=#579 id=579 data-nosnippet>579</a>        <span class="kw">match </span>user_id {
-<a href=#580 id=580 data-nosnippet>580</a>            <span class="prelude-val">Some</span>(user_id) =&gt; http.delete_reaction(<span class="self">self</span>, message_id, user_id, <span class="kw-2">&amp;</span>reaction_type).<span class="kw">await</span>,
-<a href=#581 id=581 data-nosnippet>581</a>            <span class="prelude-val">None </span>=&gt; http.delete_reaction_me(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type).<span class="kw">await</span>,
-<a href=#582 id=582 data-nosnippet>582</a>        }
-<a href=#583 id=583 data-nosnippet>583</a>    }
-<a href=#584 id=584 data-nosnippet>584</a>    <span class="doccomment">/// Deletes all of the [`Reaction`]s associated with the provided message id.
-<a href=#585 id=585 data-nosnippet>585</a>    ///
-<a href=#586 id=586 data-nosnippet>586</a>    /// **Note**: Requires the [Manage Messages] permission.
+<a href=#580 id=580 data-nosnippet>580</a>            <span class="prelude-val">Some</span>(user_id) =&gt; {
+<a href=#581 id=581 data-nosnippet>581</a>                http.delete_reaction(<span class="self">self</span>, message_id, user_id, <span class="kw-2">&amp;</span>reaction_type.as_data()).<span class="kw">await
+<a href=#582 id=582 data-nosnippet>582</a>            </span>},
+<a href=#583 id=583 data-nosnippet>583</a>            <span class="prelude-val">None </span>=&gt; http.delete_reaction_me(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.as_data()).<span class="kw">await</span>,
+<a href=#584 id=584 data-nosnippet>584</a>        }
+<a href=#585 id=585 data-nosnippet>585</a>    }
+<a href=#586 id=586 data-nosnippet>586</a>    <span class="doccomment">/// Deletes all of the [`Reaction`]s associated with the provided message id.
 <a href=#587 id=587 data-nosnippet>587</a>    ///
-<a href=#588 id=588 data-nosnippet>588</a>    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+<a href=#588 id=588 data-nosnippet>588</a>    /// **Note**: Requires the [Manage Messages] permission.
 <a href=#589 id=589 data-nosnippet>589</a>    ///
-<a href=#590 id=590 data-nosnippet>590</a>    /// # Errors
+<a href=#590 id=590 data-nosnippet>590</a>    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
 <a href=#591 id=591 data-nosnippet>591</a>    ///
-<a href=#592 id=592 data-nosnippet>592</a>    /// Returns [`Error::Http`] if the current user lacks permission
+<a href=#592 id=592 data-nosnippet>592</a>    /// # Errors
 <a href=#593 id=593 data-nosnippet>593</a>    ///
-<a href=#594 id=594 data-nosnippet>594</a>    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-<a href=#595 id=595 data-nosnippet>595</a>    </span><span class="kw">pub async fn </span>delete_reactions(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-<a href=#596 id=596 data-nosnippet>596</a>        http.delete_message_reactions(<span class="self">self</span>, message_id).<span class="kw">await
-<a href=#597 id=597 data-nosnippet>597</a>    </span>}
-<a href=#598 id=598 data-nosnippet>598</a>
-<a href=#599 id=599 data-nosnippet>599</a>    <span class="doccomment">/// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
-<a href=#600 id=600 data-nosnippet>600</a>    ///
-<a href=#601 id=601 data-nosnippet>601</a>    /// **Note**: Requires the [Manage Messages] permission.
+<a href=#594 id=594 data-nosnippet>594</a>    /// Returns [`Error::Http`] if the current user lacks permission
+<a href=#595 id=595 data-nosnippet>595</a>    ///
+<a href=#596 id=596 data-nosnippet>596</a>    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+<a href=#597 id=597 data-nosnippet>597</a>    </span><span class="kw">pub async fn </span>delete_reactions(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#598 id=598 data-nosnippet>598</a>        http.delete_message_reactions(<span class="self">self</span>, message_id).<span class="kw">await
+<a href=#599 id=599 data-nosnippet>599</a>    </span>}
+<a href=#600 id=600 data-nosnippet>600</a>
+<a href=#601 id=601 data-nosnippet>601</a>    <span class="doccomment">/// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
 <a href=#602 id=602 data-nosnippet>602</a>    ///
-<a href=#603 id=603 data-nosnippet>603</a>    /// # Errors
+<a href=#603 id=603 data-nosnippet>603</a>    /// **Note**: Requires the [Manage Messages] permission.
 <a href=#604 id=604 data-nosnippet>604</a>    ///
-<a href=#605 id=605 data-nosnippet>605</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#605 id=605 data-nosnippet>605</a>    /// # Errors
 <a href=#606 id=606 data-nosnippet>606</a>    ///
-<a href=#607 id=607 data-nosnippet>607</a>    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-<a href=#608 id=608 data-nosnippet>608</a>    </span><span class="kw">pub async fn </span>delete_reaction_emoji(
-<a href=#609 id=609 data-nosnippet>609</a>        <span class="self">self</span>,
-<a href=#610 id=610 data-nosnippet>610</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#611 id=611 data-nosnippet>611</a>        message_id: MessageId,
-<a href=#612 id=612 data-nosnippet>612</a>        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
-<a href=#613 id=613 data-nosnippet>613</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-<a href=#614 id=614 data-nosnippet>614</a>        http.delete_message_reaction_emoji(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into()).<span class="kw">await
-<a href=#615 id=615 data-nosnippet>615</a>    </span>}
-<a href=#616 id=616 data-nosnippet>616</a>
-<a href=#617 id=617 data-nosnippet>617</a>    <span class="doccomment">/// Edits a [`Message`] in the channel given its Id.
-<a href=#618 id=618 data-nosnippet>618</a>    ///
-<a href=#619 id=619 data-nosnippet>619</a>    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
-<a href=#620 id=620 data-nosnippet>620</a>    /// attachments.
-<a href=#621 id=621 data-nosnippet>621</a>    ///
-<a href=#622 id=622 data-nosnippet>622</a>    /// **Note**: In most cases requires that the current user be the author of the message.
+<a href=#607 id=607 data-nosnippet>607</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#608 id=608 data-nosnippet>608</a>    ///
+<a href=#609 id=609 data-nosnippet>609</a>    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
+<a href=#610 id=610 data-nosnippet>610</a>    </span><span class="kw">pub async fn </span>delete_reaction_emoji(
+<a href=#611 id=611 data-nosnippet>611</a>        <span class="self">self</span>,
+<a href=#612 id=612 data-nosnippet>612</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#613 id=613 data-nosnippet>613</a>        message_id: MessageId,
+<a href=#614 id=614 data-nosnippet>614</a>        reaction_type: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+<a href=#615 id=615 data-nosnippet>615</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#616 id=616 data-nosnippet>616</a>        http.delete_message_reaction_emoji(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>reaction_type.into().as_data()).<span class="kw">await
+<a href=#617 id=617 data-nosnippet>617</a>    </span>}
+<a href=#618 id=618 data-nosnippet>618</a>
+<a href=#619 id=619 data-nosnippet>619</a>    <span class="doccomment">/// Edits a [`Message`] in the channel given its Id.
+<a href=#620 id=620 data-nosnippet>620</a>    ///
+<a href=#621 id=621 data-nosnippet>621</a>    /// Message editing preserves all unchanged message data, with some exceptions for embeds and
+<a href=#622 id=622 data-nosnippet>622</a>    /// attachments.
 <a href=#623 id=623 data-nosnippet>623</a>    ///
-<a href=#624 id=624 data-nosnippet>624</a>    /// Refer to the documentation for [`EditMessage`] for information regarding content
-<a href=#625 id=625 data-nosnippet>625</a>    /// restrictions and requirements.
-<a href=#626 id=626 data-nosnippet>626</a>    ///
-<a href=#627 id=627 data-nosnippet>627</a>    /// # Errors
+<a href=#624 id=624 data-nosnippet>624</a>    /// **Note**: In most cases requires that the current user be the author of the message.
+<a href=#625 id=625 data-nosnippet>625</a>    ///
+<a href=#626 id=626 data-nosnippet>626</a>    /// Refer to the documentation for [`EditMessage`] for information regarding content
+<a href=#627 id=627 data-nosnippet>627</a>    /// restrictions and requirements.
 <a href=#628 id=628 data-nosnippet>628</a>    ///
-<a href=#629 id=629 data-nosnippet>629</a>    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
-<a href=#630 id=630 data-nosnippet>630</a>    /// reasons.
-<a href=#631 id=631 data-nosnippet>631</a>    </span><span class="kw">pub async fn </span>edit_message(
-<a href=#632 id=632 data-nosnippet>632</a>        <span class="self">self</span>,
-<a href=#633 id=633 data-nosnippet>633</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#634 id=634 data-nosnippet>634</a>        message_id: MessageId,
-<a href=#635 id=635 data-nosnippet>635</a>        builder: EditMessage&lt;<span class="lifetime">'_</span>&gt;,
-<a href=#636 id=636 data-nosnippet>636</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-<a href=#637 id=637 data-nosnippet>637</a>        builder.execute(http, <span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
-<a href=#638 id=638 data-nosnippet>638</a>    </span>}
-<a href=#639 id=639 data-nosnippet>639</a>
-<a href=#640 id=640 data-nosnippet>640</a>    <span class="doccomment">/// Attempts to retrieve the channel from the guild cache, otherwise from HTTP/temp cache.
-<a href=#641 id=641 data-nosnippet>641</a>    ///
-<a href=#642 id=642 data-nosnippet>642</a>    /// # Errors
+<a href=#629 id=629 data-nosnippet>629</a>    /// # Errors
+<a href=#630 id=630 data-nosnippet>630</a>    ///
+<a href=#631 id=631 data-nosnippet>631</a>    /// See [`EditMessage::execute`] for a list of possible errors, and their corresponding
+<a href=#632 id=632 data-nosnippet>632</a>    /// reasons.
+<a href=#633 id=633 data-nosnippet>633</a>    </span><span class="kw">pub async fn </span>edit_message(
+<a href=#634 id=634 data-nosnippet>634</a>        <span class="self">self</span>,
+<a href=#635 id=635 data-nosnippet>635</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#636 id=636 data-nosnippet>636</a>        message_id: MessageId,
+<a href=#637 id=637 data-nosnippet>637</a>        builder: EditMessage&lt;<span class="lifetime">'_</span>&gt;,
+<a href=#638 id=638 data-nosnippet>638</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#639 id=639 data-nosnippet>639</a>        builder.execute(http, <span class="self">self</span>, message_id, <span class="prelude-val">None</span>).<span class="kw">await
+<a href=#640 id=640 data-nosnippet>640</a>    </span>}
+<a href=#641 id=641 data-nosnippet>641</a>
+<a href=#642 id=642 data-nosnippet>642</a>    <span class="doccomment">/// Attempts to retrieve the channel from the guild cache, otherwise from HTTP/temp cache.
 <a href=#643 id=643 data-nosnippet>643</a>    ///
-<a href=#644 id=644 data-nosnippet>644</a>    /// Returns [`Error::Http`] if the channel retrieval request failed.
-<a href=#645 id=645 data-nosnippet>645</a>    </span><span class="attr">#[cfg_attr(not(feature = <span class="string">"cache"</span>), expect(unused_variables))]
-<a href=#646 id=646 data-nosnippet>646</a>    </span><span class="kw">pub async fn </span>to_channel(
-<a href=#647 id=647 data-nosnippet>647</a>        <span class="self">self</span>,
-<a href=#648 id=648 data-nosnippet>648</a>        cache_http: <span class="kw">impl </span>CacheHttp,
-<a href=#649 id=649 data-nosnippet>649</a>        guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
-<a href=#650 id=650 data-nosnippet>650</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
-<a href=#651 id=651 data-nosnippet>651</a>        <span class="attr">#[cfg_attr(not(feature = <span class="string">"temp_cache"</span>), expect(unused_variables))]
-<a href=#652 id=652 data-nosnippet>652</a>        </span><span class="kw">let </span>(channel_id, thread_id) = <span class="self">self</span>.split();
-<a href=#653 id=653 data-nosnippet>653</a>
-<a href=#654 id=654 data-nosnippet>654</a>        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-<a href=#655 id=655 data-nosnippet>655</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-<a href=#656 id=656 data-nosnippet>656</a>            <span class="kw">match </span>guild_id.and_then(|id| cache.guild(id)).as_ref().and_then(|g| g.channel(<span class="self">self</span>)) {
-<a href=#657 id=657 data-nosnippet>657</a>                <span class="prelude-val">Some</span>(GenericGuildChannelRef::Channel(chan)) =&gt; {
-<a href=#658 id=658 data-nosnippet>658</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(chan.clone()));
-<a href=#659 id=659 data-nosnippet>659</a>                },
-<a href=#660 id=660 data-nosnippet>660</a>                <span class="prelude-val">Some</span>(GenericGuildChannelRef::Thread(th)) =&gt; {
-<a href=#661 id=661 data-nosnippet>661</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::GuildThread(th.clone()));
-<a href=#662 id=662 data-nosnippet>662</a>                },
-<a href=#663 id=663 data-nosnippet>663</a>                <span class="prelude-val">None </span>=&gt; {},
-<a href=#664 id=664 data-nosnippet>664</a>            }
-<a href=#665 id=665 data-nosnippet>665</a>
-<a href=#666 id=666 data-nosnippet>666</a>            <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
-<a href=#667 id=667 data-nosnippet>667</a>            </span>{
-<a href=#668 id=668 data-nosnippet>668</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.temp_channels.get(<span class="kw-2">&amp;</span>channel_id) {
-<a href=#669 id=669 data-nosnippet>669</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(GuildChannel::clone(<span class="kw-2">&amp;*</span>channel)));
-<a href=#670 id=670 data-nosnippet>670</a>                }
-<a href=#671 id=671 data-nosnippet>671</a>
-<a href=#672 id=672 data-nosnippet>672</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(thread) = cache.temp_threads.get(<span class="kw-2">&amp;</span>thread_id) {
-<a href=#673 id=673 data-nosnippet>673</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::GuildThread(GuildThread::clone(<span class="kw-2">&amp;*</span>thread)));
-<a href=#674 id=674 data-nosnippet>674</a>                }
-<a href=#675 id=675 data-nosnippet>675</a>            }
-<a href=#676 id=676 data-nosnippet>676</a>        }
-<a href=#677 id=677 data-nosnippet>677</a>
-<a href=#678 id=678 data-nosnippet>678</a>        <span class="kw">let </span>channel = cache_http.http().get_channel(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#644 id=644 data-nosnippet>644</a>    /// # Errors
+<a href=#645 id=645 data-nosnippet>645</a>    ///
+<a href=#646 id=646 data-nosnippet>646</a>    /// Returns [`Error::Http`] if the channel retrieval request failed.
+<a href=#647 id=647 data-nosnippet>647</a>    </span><span class="attr">#[cfg_attr(not(feature = <span class="string">"cache"</span>), expect(unused_variables))]
+<a href=#648 id=648 data-nosnippet>648</a>    </span><span class="kw">pub async fn </span>to_channel(
+<a href=#649 id=649 data-nosnippet>649</a>        <span class="self">self</span>,
+<a href=#650 id=650 data-nosnippet>650</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#651 id=651 data-nosnippet>651</a>        guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
+<a href=#652 id=652 data-nosnippet>652</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Channel&gt; {
+<a href=#653 id=653 data-nosnippet>653</a>        <span class="attr">#[cfg_attr(not(feature = <span class="string">"temp_cache"</span>), expect(unused_variables))]
+<a href=#654 id=654 data-nosnippet>654</a>        </span><span class="kw">let </span>(channel_id, thread_id) = <span class="self">self</span>.split();
+<a href=#655 id=655 data-nosnippet>655</a>
+<a href=#656 id=656 data-nosnippet>656</a>        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+<a href=#657 id=657 data-nosnippet>657</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+<a href=#658 id=658 data-nosnippet>658</a>            <span class="kw">match </span>guild_id.and_then(|id| cache.guild(id)).as_ref().and_then(|g| g.channel(<span class="self">self</span>)) {
+<a href=#659 id=659 data-nosnippet>659</a>                <span class="prelude-val">Some</span>(GenericGuildChannelRef::Channel(chan)) =&gt; {
+<a href=#660 id=660 data-nosnippet>660</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(chan.clone()));
+<a href=#661 id=661 data-nosnippet>661</a>                },
+<a href=#662 id=662 data-nosnippet>662</a>                <span class="prelude-val">Some</span>(GenericGuildChannelRef::Thread(th)) =&gt; {
+<a href=#663 id=663 data-nosnippet>663</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::GuildThread(th.clone()));
+<a href=#664 id=664 data-nosnippet>664</a>                },
+<a href=#665 id=665 data-nosnippet>665</a>                <span class="prelude-val">None </span>=&gt; {},
+<a href=#666 id=666 data-nosnippet>666</a>            }
+<a href=#667 id=667 data-nosnippet>667</a>
+<a href=#668 id=668 data-nosnippet>668</a>            <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+<a href=#669 id=669 data-nosnippet>669</a>            </span>{
+<a href=#670 id=670 data-nosnippet>670</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = cache.temp_channels.get(<span class="kw-2">&amp;</span>channel_id) {
+<a href=#671 id=671 data-nosnippet>671</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::Guild(GuildChannel::clone(<span class="kw-2">&amp;*</span>channel)));
+<a href=#672 id=672 data-nosnippet>672</a>                }
+<a href=#673 id=673 data-nosnippet>673</a>
+<a href=#674 id=674 data-nosnippet>674</a>                <span class="kw">if let </span><span class="prelude-val">Some</span>(thread) = cache.temp_threads.get(<span class="kw-2">&amp;</span>thread_id) {
+<a href=#675 id=675 data-nosnippet>675</a>                    <span class="kw">return </span><span class="prelude-val">Ok</span>(Channel::GuildThread(GuildThread::clone(<span class="kw-2">&amp;*</span>thread)));
+<a href=#676 id=676 data-nosnippet>676</a>                }
+<a href=#677 id=677 data-nosnippet>677</a>            }
+<a href=#678 id=678 data-nosnippet>678</a>        }
 <a href=#679 id=679 data-nosnippet>679</a>
-<a href=#680 id=680 data-nosnippet>680</a>        <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"temp_cache"</span>))]
-<a href=#681 id=681 data-nosnippet>681</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-<a href=#682 id=682 data-nosnippet>682</a>            <span class="kw">match </span><span class="kw-2">&amp;</span>channel {
-<a href=#683 id=683 data-nosnippet>683</a>                Channel::Guild(guild_channel) =&gt; {
-<a href=#684 id=684 data-nosnippet>684</a>                    <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(guild_channel.clone());
-<a href=#685 id=685 data-nosnippet>685</a>                    cache.temp_channels.insert(channel_id, cached_channel);
-<a href=#686 id=686 data-nosnippet>686</a>                },
-<a href=#687 id=687 data-nosnippet>687</a>                Channel::GuildThread(guild_thread) =&gt; {
-<a href=#688 id=688 data-nosnippet>688</a>                    <span class="kw">let </span>cached_thread = MaybeOwnedArc::new(guild_thread.clone());
-<a href=#689 id=689 data-nosnippet>689</a>                    cache.temp_threads.insert(thread_id, cached_thread);
-<a href=#690 id=690 data-nosnippet>690</a>                },
-<a href=#691 id=691 data-nosnippet>691</a>                <span class="comment">// No access to `UserId`, so this can't cache.
-<a href=#692 id=692 data-nosnippet>692</a>                </span>Channel::Private(<span class="kw">_</span>) =&gt; {},
-<a href=#693 id=693 data-nosnippet>693</a>            }
-<a href=#694 id=694 data-nosnippet>694</a>        }
-<a href=#695 id=695 data-nosnippet>695</a>
-<a href=#696 id=696 data-nosnippet>696</a>        <span class="prelude-val">Ok</span>(channel)
-<a href=#697 id=697 data-nosnippet>697</a>    }
-<a href=#698 id=698 data-nosnippet>698</a>
-<a href=#699 id=699 data-nosnippet>699</a>    <span class="doccomment">/// Gets a message from the channel.
-<a href=#700 id=700 data-nosnippet>700</a>    ///
-<a href=#701 id=701 data-nosnippet>701</a>    /// If the cache feature is enabled the cache will be checked first. If not found it will
-<a href=#702 id=702 data-nosnippet>702</a>    /// resort to an http request.
-<a href=#703 id=703 data-nosnippet>703</a>    ///
-<a href=#704 id=704 data-nosnippet>704</a>    /// Requires the [Read Message History] permission.
+<a href=#680 id=680 data-nosnippet>680</a>        <span class="kw">let </span>channel = cache_http.http().get_channel(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#681 id=681 data-nosnippet>681</a>
+<a href=#682 id=682 data-nosnippet>682</a>        <span class="attr">#[cfg(all(feature = <span class="string">"cache"</span>, feature = <span class="string">"temp_cache"</span>))]
+<a href=#683 id=683 data-nosnippet>683</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+<a href=#684 id=684 data-nosnippet>684</a>            <span class="kw">match </span><span class="kw-2">&amp;</span>channel {
+<a href=#685 id=685 data-nosnippet>685</a>                Channel::Guild(guild_channel) =&gt; {
+<a href=#686 id=686 data-nosnippet>686</a>                    <span class="kw">let </span>cached_channel = MaybeOwnedArc::new(guild_channel.clone());
+<a href=#687 id=687 data-nosnippet>687</a>                    cache.temp_channels.insert(channel_id, cached_channel);
+<a href=#688 id=688 data-nosnippet>688</a>                },
+<a href=#689 id=689 data-nosnippet>689</a>                Channel::GuildThread(guild_thread) =&gt; {
+<a href=#690 id=690 data-nosnippet>690</a>                    <span class="kw">let </span>cached_thread = MaybeOwnedArc::new(guild_thread.clone());
+<a href=#691 id=691 data-nosnippet>691</a>                    cache.temp_threads.insert(thread_id, cached_thread);
+<a href=#692 id=692 data-nosnippet>692</a>                },
+<a href=#693 id=693 data-nosnippet>693</a>                <span class="comment">// No access to `UserId`, so this can't cache.
+<a href=#694 id=694 data-nosnippet>694</a>                </span>Channel::Private(<span class="kw">_</span>) =&gt; {},
+<a href=#695 id=695 data-nosnippet>695</a>            }
+<a href=#696 id=696 data-nosnippet>696</a>        }
+<a href=#697 id=697 data-nosnippet>697</a>
+<a href=#698 id=698 data-nosnippet>698</a>        <span class="prelude-val">Ok</span>(channel)
+<a href=#699 id=699 data-nosnippet>699</a>    }
+<a href=#700 id=700 data-nosnippet>700</a>
+<a href=#701 id=701 data-nosnippet>701</a>    <span class="doccomment">/// Gets a message from the channel.
+<a href=#702 id=702 data-nosnippet>702</a>    ///
+<a href=#703 id=703 data-nosnippet>703</a>    /// If the cache feature is enabled the cache will be checked first. If not found it will
+<a href=#704 id=704 data-nosnippet>704</a>    /// resort to an http request.
 <a href=#705 id=705 data-nosnippet>705</a>    ///
-<a href=#706 id=706 data-nosnippet>706</a>    /// # Errors
+<a href=#706 id=706 data-nosnippet>706</a>    /// Requires the [Read Message History] permission.
 <a href=#707 id=707 data-nosnippet>707</a>    ///
-<a href=#708 id=708 data-nosnippet>708</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#708 id=708 data-nosnippet>708</a>    /// # Errors
 <a href=#709 id=709 data-nosnippet>709</a>    ///
-<a href=#710 id=710 data-nosnippet>710</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-<a href=#711 id=711 data-nosnippet>711</a>    </span><span class="kw">pub async fn </span>message(
-<a href=#712 id=712 data-nosnippet>712</a>        <span class="self">self</span>,
-<a href=#713 id=713 data-nosnippet>713</a>        cache_http: <span class="kw">impl </span>CacheHttp,
-<a href=#714 id=714 data-nosnippet>714</a>        message_id: MessageId,
-<a href=#715 id=715 data-nosnippet>715</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-<a href=#716 id=716 data-nosnippet>716</a>        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-<a href=#717 id=717 data-nosnippet>717</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache()
-<a href=#718 id=718 data-nosnippet>718</a>            &amp;&amp; <span class="kw">let </span><span class="prelude-val">Some</span>(message) = cache.message(<span class="self">self</span>, message_id)
-<a href=#719 id=719 data-nosnippet>719</a>        {
-<a href=#720 id=720 data-nosnippet>720</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(message.clone());
-<a href=#721 id=721 data-nosnippet>721</a>        }
-<a href=#722 id=722 data-nosnippet>722</a>
-<a href=#723 id=723 data-nosnippet>723</a>        <span class="kw">let </span>message = cache_http.http().get_message(<span class="self">self</span>, message_id).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#710 id=710 data-nosnippet>710</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#711 id=711 data-nosnippet>711</a>    ///
+<a href=#712 id=712 data-nosnippet>712</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+<a href=#713 id=713 data-nosnippet>713</a>    </span><span class="kw">pub async fn </span>message(
+<a href=#714 id=714 data-nosnippet>714</a>        <span class="self">self</span>,
+<a href=#715 id=715 data-nosnippet>715</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#716 id=716 data-nosnippet>716</a>        message_id: MessageId,
+<a href=#717 id=717 data-nosnippet>717</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#718 id=718 data-nosnippet>718</a>        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+<a href=#719 id=719 data-nosnippet>719</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache()
+<a href=#720 id=720 data-nosnippet>720</a>            &amp;&amp; <span class="kw">let </span><span class="prelude-val">Some</span>(message) = cache.message(<span class="self">self</span>, message_id)
+<a href=#721 id=721 data-nosnippet>721</a>        {
+<a href=#722 id=722 data-nosnippet>722</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(message.clone());
+<a href=#723 id=723 data-nosnippet>723</a>        }
 <a href=#724 id=724 data-nosnippet>724</a>
-<a href=#725 id=725 data-nosnippet>725</a>        <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
-<a href=#726 id=726 data-nosnippet>726</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-<a href=#727 id=727 data-nosnippet>727</a>            <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
-<a href=#728 id=728 data-nosnippet>728</a>
-<a href=#729 id=729 data-nosnippet>729</a>            <span class="kw">let </span>message = MaybeOwnedArc::new(message.clone());
-<a href=#730 id=730 data-nosnippet>730</a>            cache.temp_messages.insert(message_id, message);
-<a href=#731 id=731 data-nosnippet>731</a>        }
-<a href=#732 id=732 data-nosnippet>732</a>
-<a href=#733 id=733 data-nosnippet>733</a>        <span class="prelude-val">Ok</span>(message)
-<a href=#734 id=734 data-nosnippet>734</a>    }
-<a href=#735 id=735 data-nosnippet>735</a>
-<a href=#736 id=736 data-nosnippet>736</a>    <span class="doccomment">/// Gets messages from the channel.
-<a href=#737 id=737 data-nosnippet>737</a>    ///
-<a href=#738 id=738 data-nosnippet>738</a>    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
-<a href=#739 id=739 data-nosnippet>739</a>    /// [`Vec`].
-<a href=#740 id=740 data-nosnippet>740</a>    ///
-<a href=#741 id=741 data-nosnippet>741</a>    /// # Errors
+<a href=#725 id=725 data-nosnippet>725</a>        <span class="kw">let </span>message = cache_http.http().get_message(<span class="self">self</span>, message_id).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#726 id=726 data-nosnippet>726</a>
+<a href=#727 id=727 data-nosnippet>727</a>        <span class="attr">#[cfg(feature = <span class="string">"temp_cache"</span>)]
+<a href=#728 id=728 data-nosnippet>728</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+<a href=#729 id=729 data-nosnippet>729</a>            <span class="kw">use </span><span class="kw">crate</span>::cache::MaybeOwnedArc;
+<a href=#730 id=730 data-nosnippet>730</a>
+<a href=#731 id=731 data-nosnippet>731</a>            <span class="kw">let </span>message = MaybeOwnedArc::new(message.clone());
+<a href=#732 id=732 data-nosnippet>732</a>            cache.temp_messages.insert(message_id, message);
+<a href=#733 id=733 data-nosnippet>733</a>        }
+<a href=#734 id=734 data-nosnippet>734</a>
+<a href=#735 id=735 data-nosnippet>735</a>        <span class="prelude-val">Ok</span>(message)
+<a href=#736 id=736 data-nosnippet>736</a>    }
+<a href=#737 id=737 data-nosnippet>737</a>
+<a href=#738 id=738 data-nosnippet>738</a>    <span class="doccomment">/// Gets messages from the channel.
+<a href=#739 id=739 data-nosnippet>739</a>    ///
+<a href=#740 id=740 data-nosnippet>740</a>    /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
+<a href=#741 id=741 data-nosnippet>741</a>    /// [`Vec`].
 <a href=#742 id=742 data-nosnippet>742</a>    ///
-<a href=#743 id=743 data-nosnippet>743</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#743 id=743 data-nosnippet>743</a>    /// # Errors
 <a href=#744 id=744 data-nosnippet>744</a>    ///
-<a href=#745 id=745 data-nosnippet>745</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-<a href=#746 id=746 data-nosnippet>746</a>    </span><span class="kw">pub async fn </span>messages(
-<a href=#747 id=747 data-nosnippet>747</a>        <span class="self">self</span>,
-<a href=#748 id=748 data-nosnippet>748</a>        cache_http: <span class="kw">impl </span>CacheHttp,
-<a href=#749 id=749 data-nosnippet>749</a>        builder: GetMessages,
-<a href=#750 id=750 data-nosnippet>750</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
-<a href=#751 id=751 data-nosnippet>751</a>        builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
-<a href=#752 id=752 data-nosnippet>752</a>    </span>}
-<a href=#753 id=753 data-nosnippet>753</a>
-<a href=#754 id=754 data-nosnippet>754</a>    <span class="doccomment">/// Streams over all the messages in a channel.
-<a href=#755 id=755 data-nosnippet>755</a>    ///
-<a href=#756 id=756 data-nosnippet>756</a>    /// This is accomplished and equivalent to repeated calls to [`Self::messages`]. A buffer of at
-<a href=#757 id=757 data-nosnippet>757</a>    /// most 100 messages is used to reduce the number of calls necessary.
-<a href=#758 id=758 data-nosnippet>758</a>    ///
-<a href=#759 id=759 data-nosnippet>759</a>    /// The stream returns the newest message first, followed by older messages.
+<a href=#745 id=745 data-nosnippet>745</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#746 id=746 data-nosnippet>746</a>    ///
+<a href=#747 id=747 data-nosnippet>747</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+<a href=#748 id=748 data-nosnippet>748</a>    </span><span class="kw">pub async fn </span>messages(
+<a href=#749 id=749 data-nosnippet>749</a>        <span class="self">self</span>,
+<a href=#750 id=750 data-nosnippet>750</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#751 id=751 data-nosnippet>751</a>        builder: GetMessages,
+<a href=#752 id=752 data-nosnippet>752</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Message&gt;&gt; {
+<a href=#753 id=753 data-nosnippet>753</a>        builder.execute(cache_http, <span class="self">self</span>).<span class="kw">await
+<a href=#754 id=754 data-nosnippet>754</a>    </span>}
+<a href=#755 id=755 data-nosnippet>755</a>
+<a href=#756 id=756 data-nosnippet>756</a>    <span class="doccomment">/// Streams over all the messages in a channel.
+<a href=#757 id=757 data-nosnippet>757</a>    ///
+<a href=#758 id=758 data-nosnippet>758</a>    /// This is accomplished and equivalent to repeated calls to [`Self::messages`]. A buffer of at
+<a href=#759 id=759 data-nosnippet>759</a>    /// most 100 messages is used to reduce the number of calls necessary.
 <a href=#760 id=760 data-nosnippet>760</a>    ///
-<a href=#761 id=761 data-nosnippet>761</a>    /// # Examples
+<a href=#761 id=761 data-nosnippet>761</a>    /// The stream returns the newest message first, followed by older messages.
 <a href=#762 id=762 data-nosnippet>762</a>    ///
-<a href=#763 id=763 data-nosnippet>763</a>    /// ```rust,no_run
-<a href=#764 id=764 data-nosnippet>764</a>    /// # use serenity::model::id::GenericChannelId;
-<a href=#765 id=765 data-nosnippet>765</a>    /// # use serenity::http::Http;
-<a href=#766 id=766 data-nosnippet>766</a>    /// #
-<a href=#767 id=767 data-nosnippet>767</a>    /// # async fn run() {
-<a href=#768 id=768 data-nosnippet>768</a>    /// # let channel_id = GenericChannelId::new(1);
-<a href=#769 id=769 data-nosnippet>769</a>    /// # let ctx: Http = unimplemented!();
-<a href=#770 id=770 data-nosnippet>770</a>    /// use serenity::futures::StreamExt;
-<a href=#771 id=771 data-nosnippet>771</a>    /// use serenity::model::channel::MessagesIter;
-<a href=#772 id=772 data-nosnippet>772</a>    ///
-<a href=#773 id=773 data-nosnippet>773</a>    /// let mut messages = channel_id.messages_iter(&amp;ctx).boxed();
-<a href=#774 id=774 data-nosnippet>774</a>    /// while let Some(message_result) = messages.next().await {
-<a href=#775 id=775 data-nosnippet>775</a>    ///     match message_result {
-<a href=#776 id=776 data-nosnippet>776</a>    ///         Ok(message) =&gt; println!("{} said \"{}\".", message.author.name, message.content,),
-<a href=#777 id=777 data-nosnippet>777</a>    ///         Err(error) =&gt; eprintln!("Uh oh! Error: {}", error),
-<a href=#778 id=778 data-nosnippet>778</a>    ///     }
-<a href=#779 id=779 data-nosnippet>779</a>    /// }
-<a href=#780 id=780 data-nosnippet>780</a>    /// # }
-<a href=#781 id=781 data-nosnippet>781</a>    /// ```
-<a href=#782 id=782 data-nosnippet>782</a>    </span><span class="kw">pub fn </span>messages_iter(
-<a href=#783 id=783 data-nosnippet>783</a>        <span class="self">self</span>,
-<a href=#784 id=784 data-nosnippet>784</a>        cache_http: <span class="kw-2">&amp;</span><span class="kw">impl </span>CacheHttp,
-<a href=#785 id=785 data-nosnippet>785</a>    ) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; + <span class="lifetime">'_ </span>{
-<a href=#786 id=786 data-nosnippet>786</a>        MessagesIter::stream(cache_http, <span class="self">self</span>)
-<a href=#787 id=787 data-nosnippet>787</a>    }
-<a href=#788 id=788 data-nosnippet>788</a>
-<a href=#789 id=789 data-nosnippet>789</a>    <span class="doccomment">/// Pins a [`Message`] to the channel.
-<a href=#790 id=790 data-nosnippet>790</a>    ///
-<a href=#791 id=791 data-nosnippet>791</a>    /// **Note**: Requires the [Pin Messages] permission.
+<a href=#763 id=763 data-nosnippet>763</a>    /// # Examples
+<a href=#764 id=764 data-nosnippet>764</a>    ///
+<a href=#765 id=765 data-nosnippet>765</a>    /// ```rust,no_run
+<a href=#766 id=766 data-nosnippet>766</a>    /// # use serenity::model::id::GenericChannelId;
+<a href=#767 id=767 data-nosnippet>767</a>    /// # use serenity::http::Http;
+<a href=#768 id=768 data-nosnippet>768</a>    /// #
+<a href=#769 id=769 data-nosnippet>769</a>    /// # async fn run() {
+<a href=#770 id=770 data-nosnippet>770</a>    /// # let channel_id = GenericChannelId::new(1);
+<a href=#771 id=771 data-nosnippet>771</a>    /// # let ctx: Http = unimplemented!();
+<a href=#772 id=772 data-nosnippet>772</a>    /// use serenity::futures::StreamExt;
+<a href=#773 id=773 data-nosnippet>773</a>    /// use serenity::model::channel::MessagesIter;
+<a href=#774 id=774 data-nosnippet>774</a>    ///
+<a href=#775 id=775 data-nosnippet>775</a>    /// let mut messages = channel_id.messages_iter(&amp;ctx).boxed();
+<a href=#776 id=776 data-nosnippet>776</a>    /// while let Some(message_result) = messages.next().await {
+<a href=#777 id=777 data-nosnippet>777</a>    ///     match message_result {
+<a href=#778 id=778 data-nosnippet>778</a>    ///         Ok(message) =&gt; println!("{} said \"{}\".", message.author.name, message.content,),
+<a href=#779 id=779 data-nosnippet>779</a>    ///         Err(error) =&gt; eprintln!("Uh oh! Error: {}", error),
+<a href=#780 id=780 data-nosnippet>780</a>    ///     }
+<a href=#781 id=781 data-nosnippet>781</a>    /// }
+<a href=#782 id=782 data-nosnippet>782</a>    /// # }
+<a href=#783 id=783 data-nosnippet>783</a>    /// ```
+<a href=#784 id=784 data-nosnippet>784</a>    </span><span class="kw">pub fn </span>messages_iter(
+<a href=#785 id=785 data-nosnippet>785</a>        <span class="self">self</span>,
+<a href=#786 id=786 data-nosnippet>786</a>        cache_http: <span class="kw-2">&amp;</span><span class="kw">impl </span>CacheHttp,
+<a href=#787 id=787 data-nosnippet>787</a>    ) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; + <span class="lifetime">'_ </span>{
+<a href=#788 id=788 data-nosnippet>788</a>        MessagesIter::stream(cache_http, <span class="self">self</span>)
+<a href=#789 id=789 data-nosnippet>789</a>    }
+<a href=#790 id=790 data-nosnippet>790</a>
+<a href=#791 id=791 data-nosnippet>791</a>    <span class="doccomment">/// Pins a [`Message`] to the channel.
 <a href=#792 id=792 data-nosnippet>792</a>    ///
-<a href=#793 id=793 data-nosnippet>793</a>    /// # Errors
+<a href=#793 id=793 data-nosnippet>793</a>    /// **Note**: Requires the [Pin Messages] permission.
 <a href=#794 id=794 data-nosnippet>794</a>    ///
-<a href=#795 id=795 data-nosnippet>795</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel has too
-<a href=#796 id=796 data-nosnippet>796</a>    /// many pinned messages.
-<a href=#797 id=797 data-nosnippet>797</a>    ///
-<a href=#798 id=798 data-nosnippet>798</a>    /// [Pin Messages]: Permissions::PIN_MESSAGES
-<a href=#799 id=799 data-nosnippet>799</a>    </span><span class="kw">pub async fn </span>pin(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-<a href=#800 id=800 data-nosnippet>800</a>        http.pin_message(<span class="self">self</span>, message_id, reason).<span class="kw">await
-<a href=#801 id=801 data-nosnippet>801</a>    </span>}
-<a href=#802 id=802 data-nosnippet>802</a>
-<a href=#803 id=803 data-nosnippet>803</a>    <span class="doccomment">/// Gets the list of [`Message`]s which are pinned to the channel.
-<a href=#804 id=804 data-nosnippet>804</a>    ///
-<a href=#805 id=805 data-nosnippet>805</a>    /// If the cache is enabled, this method will fill up the message cache for the channel, if the
-<a href=#806 id=806 data-nosnippet>806</a>    /// messages returned are newer than the existing cached messages or the cache is not full yet.
-<a href=#807 id=807 data-nosnippet>807</a>    ///
-<a href=#808 id=808 data-nosnippet>808</a>    /// **Note**: Returns an empty [`Vec`] if the current user does not have the [Read Message
-<a href=#809 id=809 data-nosnippet>809</a>    /// History] permission.
-<a href=#810 id=810 data-nosnippet>810</a>    ///
-<a href=#811 id=811 data-nosnippet>811</a>    /// # Errors
+<a href=#795 id=795 data-nosnippet>795</a>    /// # Errors
+<a href=#796 id=796 data-nosnippet>796</a>    ///
+<a href=#797 id=797 data-nosnippet>797</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if the channel has too
+<a href=#798 id=798 data-nosnippet>798</a>    /// many pinned messages.
+<a href=#799 id=799 data-nosnippet>799</a>    ///
+<a href=#800 id=800 data-nosnippet>800</a>    /// [Pin Messages]: Permissions::PIN_MESSAGES
+<a href=#801 id=801 data-nosnippet>801</a>    </span><span class="kw">pub async fn </span>pin(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId, reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#802 id=802 data-nosnippet>802</a>        http.pin_message(<span class="self">self</span>, message_id, reason).<span class="kw">await
+<a href=#803 id=803 data-nosnippet>803</a>    </span>}
+<a href=#804 id=804 data-nosnippet>804</a>
+<a href=#805 id=805 data-nosnippet>805</a>    <span class="doccomment">/// Gets the list of [`Message`]s which are pinned to the channel.
+<a href=#806 id=806 data-nosnippet>806</a>    ///
+<a href=#807 id=807 data-nosnippet>807</a>    /// If the cache is enabled, this method will fill up the message cache for the channel, if the
+<a href=#808 id=808 data-nosnippet>808</a>    /// messages returned are newer than the existing cached messages or the cache is not full yet.
+<a href=#809 id=809 data-nosnippet>809</a>    ///
+<a href=#810 id=810 data-nosnippet>810</a>    /// **Note**: Returns an empty [`Vec`] if the current user does not have the [Read Message
+<a href=#811 id=811 data-nosnippet>811</a>    /// History] permission.
 <a href=#812 id=812 data-nosnippet>812</a>    ///
-<a href=#813 id=813 data-nosnippet>813</a>    /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
+<a href=#813 id=813 data-nosnippet>813</a>    /// # Errors
 <a href=#814 id=814 data-nosnippet>814</a>    ///
-<a href=#815 id=815 data-nosnippet>815</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-<a href=#816 id=816 data-nosnippet>816</a>    </span><span class="kw">pub async fn </span>pins(
-<a href=#817 id=817 data-nosnippet>817</a>        <span class="self">self</span>,
-<a href=#818 id=818 data-nosnippet>818</a>        cache_http: <span class="kw">impl </span>CacheHttp,
-<a href=#819 id=819 data-nosnippet>819</a>        before: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-<a href=#820 id=820 data-nosnippet>820</a>        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
-<a href=#821 id=821 data-nosnippet>821</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MessagePinsPage&gt; {
-<a href=#822 id=822 data-nosnippet>822</a>        <span class="kw">let </span>page = cache_http.http().get_pins(<span class="self">self</span>, before, limit).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#823 id=823 data-nosnippet>823</a>
-<a href=#824 id=824 data-nosnippet>824</a>        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-<a href=#825 id=825 data-nosnippet>825</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
-<a href=#826 id=826 data-nosnippet>826</a>            cache.fill_message_cache(<span class="self">self</span>, page.items.iter().map(|m| m.message.clone()));
-<a href=#827 id=827 data-nosnippet>827</a>        }
-<a href=#828 id=828 data-nosnippet>828</a>
-<a href=#829 id=829 data-nosnippet>829</a>        <span class="prelude-val">Ok</span>(page)
-<a href=#830 id=830 data-nosnippet>830</a>    }
-<a href=#831 id=831 data-nosnippet>831</a>
-<a href=#832 id=832 data-nosnippet>832</a>    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
-<a href=#833 id=833 data-nosnippet>833</a>    ///
-<a href=#834 id=834 data-nosnippet>834</a>    /// The default `reaction_type` is [`ReactionTypes::Normal`]. Specify [`ReactionTypes::Burst`]
-<a href=#835 id=835 data-nosnippet>835</a>    /// to get users who have reacted with the burst variation of the emoji (super reaction).
-<a href=#836 id=836 data-nosnippet>836</a>    ///
-<a href=#837 id=837 data-nosnippet>837</a>    /// The maximum number of users to retrieve is determined by `limit`. This defaults to `25`
-<a href=#838 id=838 data-nosnippet>838</a>    /// and is automatically clamped to the API maximum of `100`.
-<a href=#839 id=839 data-nosnippet>839</a>    ///
-<a href=#840 id=840 data-nosnippet>840</a>    /// The optional `after` attribute is to retrieve the users after a certain user. This is
-<a href=#841 id=841 data-nosnippet>841</a>    /// useful for pagination.
-<a href=#842 id=842 data-nosnippet>842</a>    ///
-<a href=#843 id=843 data-nosnippet>843</a>    /// **Note**: Requires the [Read Message History] permission.
+<a href=#815 id=815 data-nosnippet>815</a>    /// Returns [`Error::Http`] if the current user lacks permission to view the channel.
+<a href=#816 id=816 data-nosnippet>816</a>    ///
+<a href=#817 id=817 data-nosnippet>817</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+<a href=#818 id=818 data-nosnippet>818</a>    </span><span class="kw">pub async fn </span>pins(
+<a href=#819 id=819 data-nosnippet>819</a>        <span class="self">self</span>,
+<a href=#820 id=820 data-nosnippet>820</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#821 id=821 data-nosnippet>821</a>        before: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+<a href=#822 id=822 data-nosnippet>822</a>        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+<a href=#823 id=823 data-nosnippet>823</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MessagePinsPage&gt; {
+<a href=#824 id=824 data-nosnippet>824</a>        <span class="kw">let </span>page = cache_http.http().get_pins(<span class="self">self</span>, before, limit).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#825 id=825 data-nosnippet>825</a>
+<a href=#826 id=826 data-nosnippet>826</a>        <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+<a href=#827 id=827 data-nosnippet>827</a>        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = cache_http.cache() {
+<a href=#828 id=828 data-nosnippet>828</a>            cache.fill_message_cache(<span class="self">self</span>, page.items.iter().map(|m| m.message.clone()));
+<a href=#829 id=829 data-nosnippet>829</a>        }
+<a href=#830 id=830 data-nosnippet>830</a>
+<a href=#831 id=831 data-nosnippet>831</a>        <span class="prelude-val">Ok</span>(page)
+<a href=#832 id=832 data-nosnippet>832</a>    }
+<a href=#833 id=833 data-nosnippet>833</a>
+<a href=#834 id=834 data-nosnippet>834</a>    <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a certain [`Emoji`].
+<a href=#835 id=835 data-nosnippet>835</a>    ///
+<a href=#836 id=836 data-nosnippet>836</a>    /// The default `reaction_type` is [`ReactionTypes::Normal`]. Specify [`ReactionTypes::Burst`]
+<a href=#837 id=837 data-nosnippet>837</a>    /// to get users who have reacted with the burst variation of the emoji (super reaction).
+<a href=#838 id=838 data-nosnippet>838</a>    ///
+<a href=#839 id=839 data-nosnippet>839</a>    /// The maximum number of users to retrieve is determined by `limit`. This defaults to `25`
+<a href=#840 id=840 data-nosnippet>840</a>    /// and is automatically clamped to the API maximum of `100`.
+<a href=#841 id=841 data-nosnippet>841</a>    ///
+<a href=#842 id=842 data-nosnippet>842</a>    /// The optional `after` attribute is to retrieve the users after a certain user. This is
+<a href=#843 id=843 data-nosnippet>843</a>    /// useful for pagination.
 <a href=#844 id=844 data-nosnippet>844</a>    ///
-<a href=#845 id=845 data-nosnippet>845</a>    /// **Note**: If the passed `emoji` is a custom guild emoji, it must contain the name.
-<a href=#846 id=846 data-nosnippet>846</a>    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] will only work if
-<a href=#847 id=847 data-nosnippet>847</a>    /// [`ReactionType::Custom::name`] is `Some`, and **[`EmojiId`] will never work**.
-<a href=#848 id=848 data-nosnippet>848</a>    ///
-<a href=#849 id=849 data-nosnippet>849</a>    /// # Errors
+<a href=#845 id=845 data-nosnippet>845</a>    /// **Note**: Requires the [Read Message History] permission.
+<a href=#846 id=846 data-nosnippet>846</a>    ///
+<a href=#847 id=847 data-nosnippet>847</a>    /// **Note**: If the passed `emoji` is a custom guild emoji, it must contain the name.
+<a href=#848 id=848 data-nosnippet>848</a>    /// So, [`Emoji`] or [`EmojiIdentifier`] will always work, [`ReactionType`] will only work if
+<a href=#849 id=849 data-nosnippet>849</a>    /// [`ReactionType::Custom::name`] is `Some`, and **[`EmojiId`] will never work**.
 <a href=#850 id=850 data-nosnippet>850</a>    ///
-<a href=#851 id=851 data-nosnippet>851</a>    /// Returns [`Error::Http`] if the current user lacks permission to read messages in the
-<a href=#852 id=852 data-nosnippet>852</a>    /// channel.
-<a href=#853 id=853 data-nosnippet>853</a>    ///
-<a href=#854 id=854 data-nosnippet>854</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-<a href=#855 id=855 data-nosnippet>855</a>    </span><span class="kw">pub async fn </span>reaction_users(
-<a href=#856 id=856 data-nosnippet>856</a>        <span class="self">self</span>,
-<a href=#857 id=857 data-nosnippet>857</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#858 id=858 data-nosnippet>858</a>        message_id: MessageId,
-<a href=#859 id=859 data-nosnippet>859</a>        emoji: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
-<a href=#860 id=860 data-nosnippet>860</a>        reaction_type: <span class="prelude-ty">Option</span>&lt;ReactionTypes&gt;,
-<a href=#861 id=861 data-nosnippet>861</a>        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
-<a href=#862 id=862 data-nosnippet>862</a>        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
-<a href=#863 id=863 data-nosnippet>863</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
-<a href=#864 id=864 data-nosnippet>864</a>        http.get_reaction_users(<span class="self">self</span>, message_id, <span class="kw-2">&amp;</span>emoji.into(), reaction_type, limit, after).<span class="kw">await
-<a href=#865 id=865 data-nosnippet>865</a>    </span>}
-<a href=#866 id=866 data-nosnippet>866</a>
-<a href=#867 id=867 data-nosnippet>867</a>    <span class="doccomment">/// Sends a message with just the given message content in the channel.
-<a href=#868 id=868 data-nosnippet>868</a>    ///
-<a href=#869 id=869 data-nosnippet>869</a>    /// **Note**: Message content must be under 2000 unicode code points.
-<a href=#870 id=870 data-nosnippet>870</a>    ///
-<a href=#871 id=871 data-nosnippet>871</a>    /// # Errors
-<a href=#872 id=872 data-nosnippet>872</a>    ///
-<a href=#873 id=873 data-nosnippet>873</a>    /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
-<a href=#874 id=874 data-nosnippet>874</a>    /// [`CreateMessage::execute`] for more details.
-<a href=#875 id=875 data-nosnippet>875</a>    </span><span class="kw">pub async fn </span>say(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-<a href=#876 id=876 data-nosnippet>876</a>        <span class="kw">let </span>builder = CreateMessage::new().content(content);
-<a href=#877 id=877 data-nosnippet>877</a>        <span class="self">self</span>.send_message(http, builder).<span class="kw">await
-<a href=#878 id=878 data-nosnippet>878</a>    </span>}
-<a href=#879 id=879 data-nosnippet>879</a>
-<a href=#880 id=880 data-nosnippet>880</a>    <span class="doccomment">/// Sends file(s) along with optional message contents. The filename _must_ be specified.
-<a href=#881 id=881 data-nosnippet>881</a>    ///
-<a href=#882 id=882 data-nosnippet>882</a>    /// Message contents may be passed using the `builder` argument.
-<a href=#883 id=883 data-nosnippet>883</a>    ///
-<a href=#884 id=884 data-nosnippet>884</a>    /// Refer to the documentation for [`CreateMessage`] for information regarding content
-<a href=#885 id=885 data-nosnippet>885</a>    /// restrictions and requirements.
-<a href=#886 id=886 data-nosnippet>886</a>    ///
-<a href=#887 id=887 data-nosnippet>887</a>    /// # Examples
-<a href=#888 id=888 data-nosnippet>888</a>    ///
-<a href=#889 id=889 data-nosnippet>889</a>    /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
-<a href=#890 id=890 data-nosnippet>890</a>    ///
-<a href=#891 id=891 data-nosnippet>891</a>    /// ```rust,no_run
-<a href=#892 id=892 data-nosnippet>892</a>    /// # use serenity::http::Http;
-<a href=#893 id=893 data-nosnippet>893</a>    /// # use std::sync::Arc;
-<a href=#894 id=894 data-nosnippet>894</a>    /// #
-<a href=#895 id=895 data-nosnippet>895</a>    /// # async fn run() -&gt; Result&lt;(), serenity::Error&gt; {
-<a href=#896 id=896 data-nosnippet>896</a>    /// # let http: Arc&lt;Http&gt; = unimplemented!();
-<a href=#897 id=897 data-nosnippet>897</a>    /// use serenity::builder::{CreateAttachment, CreateMessage};
-<a href=#898 id=898 data-nosnippet>898</a>    /// use serenity::model::id::GenericChannelId;
-<a href=#899 id=899 data-nosnippet>899</a>    ///
-<a href=#900 id=900 data-nosnippet>900</a>    /// let channel_id = GenericChannelId::new(7);
-<a href=#901 id=901 data-nosnippet>901</a>    ///
-<a href=#902 id=902 data-nosnippet>902</a>    /// let paths = [
-<a href=#903 id=903 data-nosnippet>903</a>    ///     CreateAttachment::path("/path/to/file.jpg".as_ref())?,
-<a href=#904 id=904 data-nosnippet>904</a>    ///     CreateAttachment::path("/path/to/file2.jpg".as_ref())?,
-<a href=#905 id=905 data-nosnippet>905</a>    /// ];
-<a href=#906 id=906 data-nosnippet>906</a>    ///
-<a href=#907 id=907 data-nosnippet>907</a>    /// let builder = CreateMessage::new().content("some files");
-<a href=#908 id=908 data-nosnippet>908</a>    /// channel_id.send_files(&amp;http, paths, builder).await?;
-<a href=#909 id=909 data-nosnippet>909</a>    /// # Ok(()) }
-<a href=#910 id=910 data-nosnippet>910</a>    /// ```
+<a href=#851 id=851 data-nosnippet>851</a>    /// # Errors
+<a href=#852 id=852 data-nosnippet>852</a>    ///
+<a href=#853 id=853 data-nosnippet>853</a>    /// Returns [`Error::Http`] if the current user lacks permission to read messages in the
+<a href=#854 id=854 data-nosnippet>854</a>    /// channel.
+<a href=#855 id=855 data-nosnippet>855</a>    ///
+<a href=#856 id=856 data-nosnippet>856</a>    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+<a href=#857 id=857 data-nosnippet>857</a>    </span><span class="kw">pub async fn </span>reaction_users(
+<a href=#858 id=858 data-nosnippet>858</a>        <span class="self">self</span>,
+<a href=#859 id=859 data-nosnippet>859</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#860 id=860 data-nosnippet>860</a>        message_id: MessageId,
+<a href=#861 id=861 data-nosnippet>861</a>        emoji: <span class="kw">impl </span>Into&lt;ReactionType&gt;,
+<a href=#862 id=862 data-nosnippet>862</a>        reaction_type: <span class="prelude-ty">Option</span>&lt;ReactionTypes&gt;,
+<a href=#863 id=863 data-nosnippet>863</a>        limit: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
+<a href=#864 id=864 data-nosnippet>864</a>        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+<a href=#865 id=865 data-nosnippet>865</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
+<a href=#866 id=866 data-nosnippet>866</a>        http.get_reaction_users(
+<a href=#867 id=867 data-nosnippet>867</a>            <span class="self">self</span>,
+<a href=#868 id=868 data-nosnippet>868</a>            message_id,
+<a href=#869 id=869 data-nosnippet>869</a>            <span class="kw-2">&amp;</span>emoji.into().as_data(),
+<a href=#870 id=870 data-nosnippet>870</a>            reaction_type,
+<a href=#871 id=871 data-nosnippet>871</a>            limit,
+<a href=#872 id=872 data-nosnippet>872</a>            after,
+<a href=#873 id=873 data-nosnippet>873</a>        )
+<a href=#874 id=874 data-nosnippet>874</a>        .<span class="kw">await
+<a href=#875 id=875 data-nosnippet>875</a>    </span>}
+<a href=#876 id=876 data-nosnippet>876</a>
+<a href=#877 id=877 data-nosnippet>877</a>    <span class="doccomment">/// Sends a message with just the given message content in the channel.
+<a href=#878 id=878 data-nosnippet>878</a>    ///
+<a href=#879 id=879 data-nosnippet>879</a>    /// **Note**: Message content must be under 2000 unicode code points.
+<a href=#880 id=880 data-nosnippet>880</a>    ///
+<a href=#881 id=881 data-nosnippet>881</a>    /// # Errors
+<a href=#882 id=882 data-nosnippet>882</a>    ///
+<a href=#883 id=883 data-nosnippet>883</a>    /// Returns a [`ModelError::TooLarge`] if the content length is over the above limit. See
+<a href=#884 id=884 data-nosnippet>884</a>    /// [`CreateMessage::execute`] for more details.
+<a href=#885 id=885 data-nosnippet>885</a>    </span><span class="kw">pub async fn </span>say(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, content: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'_</span>, str&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#886 id=886 data-nosnippet>886</a>        <span class="kw">let </span>builder = CreateMessage::new().content(content);
+<a href=#887 id=887 data-nosnippet>887</a>        <span class="self">self</span>.send_message(http, builder).<span class="kw">await
+<a href=#888 id=888 data-nosnippet>888</a>    </span>}
+<a href=#889 id=889 data-nosnippet>889</a>
+<a href=#890 id=890 data-nosnippet>890</a>    <span class="doccomment">/// Sends file(s) along with optional message contents. The filename _must_ be specified.
+<a href=#891 id=891 data-nosnippet>891</a>    ///
+<a href=#892 id=892 data-nosnippet>892</a>    /// Message contents may be passed using the `builder` argument.
+<a href=#893 id=893 data-nosnippet>893</a>    ///
+<a href=#894 id=894 data-nosnippet>894</a>    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+<a href=#895 id=895 data-nosnippet>895</a>    /// restrictions and requirements.
+<a href=#896 id=896 data-nosnippet>896</a>    ///
+<a href=#897 id=897 data-nosnippet>897</a>    /// # Examples
+<a href=#898 id=898 data-nosnippet>898</a>    ///
+<a href=#899 id=899 data-nosnippet>899</a>    /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
+<a href=#900 id=900 data-nosnippet>900</a>    ///
+<a href=#901 id=901 data-nosnippet>901</a>    /// ```rust,no_run
+<a href=#902 id=902 data-nosnippet>902</a>    /// # use serenity::http::Http;
+<a href=#903 id=903 data-nosnippet>903</a>    /// # use std::sync::Arc;
+<a href=#904 id=904 data-nosnippet>904</a>    /// #
+<a href=#905 id=905 data-nosnippet>905</a>    /// # async fn run() -&gt; Result&lt;(), serenity::Error&gt; {
+<a href=#906 id=906 data-nosnippet>906</a>    /// # let http: Arc&lt;Http&gt; = unimplemented!();
+<a href=#907 id=907 data-nosnippet>907</a>    /// use serenity::builder::{CreateAttachment, CreateMessage};
+<a href=#908 id=908 data-nosnippet>908</a>    /// use serenity::model::id::GenericChannelId;
+<a href=#909 id=909 data-nosnippet>909</a>    ///
+<a href=#910 id=910 data-nosnippet>910</a>    /// let channel_id = GenericChannelId::new(7);
 <a href=#911 id=911 data-nosnippet>911</a>    ///
-<a href=#912 id=912 data-nosnippet>912</a>    /// Send files using [`File`]:
-<a href=#913 id=913 data-nosnippet>913</a>    ///
-<a href=#914 id=914 data-nosnippet>914</a>    /// ```rust,no_run
-<a href=#915 id=915 data-nosnippet>915</a>    /// # use serenity::http::Http;
-<a href=#916 id=916 data-nosnippet>916</a>    /// # use std::sync::Arc;
-<a href=#917 id=917 data-nosnippet>917</a>    /// #
-<a href=#918 id=918 data-nosnippet>918</a>    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-<a href=#919 id=919 data-nosnippet>919</a>    /// # let http: Arc&lt;Http&gt; = unimplemented!();
-<a href=#920 id=920 data-nosnippet>920</a>    /// use serenity::builder::{CreateAttachment, CreateMessage};
-<a href=#921 id=921 data-nosnippet>921</a>    /// use serenity::model::id::GenericChannelId;
-<a href=#922 id=922 data-nosnippet>922</a>    /// use tokio::fs::File;
+<a href=#912 id=912 data-nosnippet>912</a>    /// let paths = [
+<a href=#913 id=913 data-nosnippet>913</a>    ///     CreateAttachment::path("/path/to/file.jpg".as_ref())?,
+<a href=#914 id=914 data-nosnippet>914</a>    ///     CreateAttachment::path("/path/to/file2.jpg".as_ref())?,
+<a href=#915 id=915 data-nosnippet>915</a>    /// ];
+<a href=#916 id=916 data-nosnippet>916</a>    ///
+<a href=#917 id=917 data-nosnippet>917</a>    /// let builder = CreateMessage::new().content("some files");
+<a href=#918 id=918 data-nosnippet>918</a>    /// channel_id.send_files(&amp;http, paths, builder).await?;
+<a href=#919 id=919 data-nosnippet>919</a>    /// # Ok(()) }
+<a href=#920 id=920 data-nosnippet>920</a>    /// ```
+<a href=#921 id=921 data-nosnippet>921</a>    ///
+<a href=#922 id=922 data-nosnippet>922</a>    /// Send files using [`File`]:
 <a href=#923 id=923 data-nosnippet>923</a>    ///
-<a href=#924 id=924 data-nosnippet>924</a>    /// let channel_id = GenericChannelId::new(7);
-<a href=#925 id=925 data-nosnippet>925</a>    ///
-<a href=#926 id=926 data-nosnippet>926</a>    /// let f1 = File::open("/path/to/file.jpg").await?;
-<a href=#927 id=927 data-nosnippet>927</a>    /// let f2 = File::open("/path/to/file2.jpg").await?;
-<a href=#928 id=928 data-nosnippet>928</a>    ///
-<a href=#929 id=929 data-nosnippet>929</a>    /// let files = [
-<a href=#930 id=930 data-nosnippet>930</a>    ///     CreateAttachment::file(&amp;f1, "test_file1.jpg"),
-<a href=#931 id=931 data-nosnippet>931</a>    ///     CreateAttachment::file(&amp;f2, "test_file2.jpg"),
-<a href=#932 id=932 data-nosnippet>932</a>    /// ];
+<a href=#924 id=924 data-nosnippet>924</a>    /// ```rust,no_run
+<a href=#925 id=925 data-nosnippet>925</a>    /// # use serenity::http::Http;
+<a href=#926 id=926 data-nosnippet>926</a>    /// # use std::sync::Arc;
+<a href=#927 id=927 data-nosnippet>927</a>    /// #
+<a href=#928 id=928 data-nosnippet>928</a>    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+<a href=#929 id=929 data-nosnippet>929</a>    /// # let http: Arc&lt;Http&gt; = unimplemented!();
+<a href=#930 id=930 data-nosnippet>930</a>    /// use serenity::builder::{CreateAttachment, CreateMessage};
+<a href=#931 id=931 data-nosnippet>931</a>    /// use serenity::model::id::GenericChannelId;
+<a href=#932 id=932 data-nosnippet>932</a>    /// use tokio::fs::File;
 <a href=#933 id=933 data-nosnippet>933</a>    ///
-<a href=#934 id=934 data-nosnippet>934</a>    /// let builder = CreateMessage::new().content("some files");
-<a href=#935 id=935 data-nosnippet>935</a>    /// let _ = channel_id.send_files(&amp;http, files, builder).await;
-<a href=#936 id=936 data-nosnippet>936</a>    /// # Ok(())
-<a href=#937 id=937 data-nosnippet>937</a>    /// # }
-<a href=#938 id=938 data-nosnippet>938</a>    /// ```
-<a href=#939 id=939 data-nosnippet>939</a>    ///
-<a href=#940 id=940 data-nosnippet>940</a>    /// # Errors
-<a href=#941 id=941 data-nosnippet>941</a>    ///
-<a href=#942 id=942 data-nosnippet>942</a>    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
-<a href=#943 id=943 data-nosnippet>943</a>    /// reasons.
-<a href=#944 id=944 data-nosnippet>944</a>    ///
-<a href=#945 id=945 data-nosnippet>945</a>    /// [`File`]: tokio::fs::File
-<a href=#946 id=946 data-nosnippet>946</a>    </span><span class="kw">pub async fn </span>send_files&lt;<span class="lifetime">'a</span>&gt;(
-<a href=#947 id=947 data-nosnippet>947</a>        <span class="self">self</span>,
-<a href=#948 id=948 data-nosnippet>948</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#949 id=949 data-nosnippet>949</a>        files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;,
-<a href=#950 id=950 data-nosnippet>950</a>        builder: CreateMessage&lt;<span class="lifetime">'a</span>&gt;,
-<a href=#951 id=951 data-nosnippet>951</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-<a href=#952 id=952 data-nosnippet>952</a>        <span class="self">self</span>.send_message(http, builder.files(files)).<span class="kw">await
-<a href=#953 id=953 data-nosnippet>953</a>    </span>}
-<a href=#954 id=954 data-nosnippet>954</a>
-<a href=#955 id=955 data-nosnippet>955</a>    <span class="doccomment">/// Sends a message to the channel.
-<a href=#956 id=956 data-nosnippet>956</a>    ///
-<a href=#957 id=957 data-nosnippet>957</a>    /// Refer to the documentation for [`CreateMessage`] for information regarding content
-<a href=#958 id=958 data-nosnippet>958</a>    /// restrictions and requirements.
-<a href=#959 id=959 data-nosnippet>959</a>    ///
-<a href=#960 id=960 data-nosnippet>960</a>    /// # Errors
-<a href=#961 id=961 data-nosnippet>961</a>    ///
-<a href=#962 id=962 data-nosnippet>962</a>    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
-<a href=#963 id=963 data-nosnippet>963</a>    /// reasons.
-<a href=#964 id=964 data-nosnippet>964</a>    </span><span class="kw">pub async fn </span>send_message(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-<a href=#965 id=965 data-nosnippet>965</a>        builder.execute(http, <span class="self">self</span>).<span class="kw">await
-<a href=#966 id=966 data-nosnippet>966</a>    </span>}
-<a href=#967 id=967 data-nosnippet>967</a>
-<a href=#968 id=968 data-nosnippet>968</a>    <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
+<a href=#934 id=934 data-nosnippet>934</a>    /// let channel_id = GenericChannelId::new(7);
+<a href=#935 id=935 data-nosnippet>935</a>    ///
+<a href=#936 id=936 data-nosnippet>936</a>    /// let f1 = File::open("/path/to/file.jpg").await?;
+<a href=#937 id=937 data-nosnippet>937</a>    /// let f2 = File::open("/path/to/file2.jpg").await?;
+<a href=#938 id=938 data-nosnippet>938</a>    ///
+<a href=#939 id=939 data-nosnippet>939</a>    /// let files = [
+<a href=#940 id=940 data-nosnippet>940</a>    ///     CreateAttachment::file(&amp;f1, "test_file1.jpg"),
+<a href=#941 id=941 data-nosnippet>941</a>    ///     CreateAttachment::file(&amp;f2, "test_file2.jpg"),
+<a href=#942 id=942 data-nosnippet>942</a>    /// ];
+<a href=#943 id=943 data-nosnippet>943</a>    ///
+<a href=#944 id=944 data-nosnippet>944</a>    /// let builder = CreateMessage::new().content("some files");
+<a href=#945 id=945 data-nosnippet>945</a>    /// let _ = channel_id.send_files(&amp;http, files, builder).await;
+<a href=#946 id=946 data-nosnippet>946</a>    /// # Ok(())
+<a href=#947 id=947 data-nosnippet>947</a>    /// # }
+<a href=#948 id=948 data-nosnippet>948</a>    /// ```
+<a href=#949 id=949 data-nosnippet>949</a>    ///
+<a href=#950 id=950 data-nosnippet>950</a>    /// # Errors
+<a href=#951 id=951 data-nosnippet>951</a>    ///
+<a href=#952 id=952 data-nosnippet>952</a>    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+<a href=#953 id=953 data-nosnippet>953</a>    /// reasons.
+<a href=#954 id=954 data-nosnippet>954</a>    ///
+<a href=#955 id=955 data-nosnippet>955</a>    /// [`File`]: tokio::fs::File
+<a href=#956 id=956 data-nosnippet>956</a>    </span><span class="kw">pub async fn </span>send_files&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#957 id=957 data-nosnippet>957</a>        <span class="self">self</span>,
+<a href=#958 id=958 data-nosnippet>958</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#959 id=959 data-nosnippet>959</a>        files: <span class="kw">impl </span>IntoIterator&lt;Item = CreateAttachment&lt;<span class="lifetime">'a</span>&gt;&gt;,
+<a href=#960 id=960 data-nosnippet>960</a>        builder: CreateMessage&lt;<span class="lifetime">'a</span>&gt;,
+<a href=#961 id=961 data-nosnippet>961</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#962 id=962 data-nosnippet>962</a>        <span class="self">self</span>.send_message(http, builder.files(files)).<span class="kw">await
+<a href=#963 id=963 data-nosnippet>963</a>    </span>}
+<a href=#964 id=964 data-nosnippet>964</a>
+<a href=#965 id=965 data-nosnippet>965</a>    <span class="doccomment">/// Sends a message to the channel.
+<a href=#966 id=966 data-nosnippet>966</a>    ///
+<a href=#967 id=967 data-nosnippet>967</a>    /// Refer to the documentation for [`CreateMessage`] for information regarding content
+<a href=#968 id=968 data-nosnippet>968</a>    /// restrictions and requirements.
 <a href=#969 id=969 data-nosnippet>969</a>    ///
-<a href=#970 id=970 data-nosnippet>970</a>    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
-<a href=#971 id=971 data-nosnippet>971</a>    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
-<a href=#972 id=972 data-nosnippet>972</a>    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
-<a href=#973 id=973 data-nosnippet>973</a>    /// dropped.
-<a href=#974 id=974 data-nosnippet>974</a>    ///
-<a href=#975 id=975 data-nosnippet>975</a>    /// If a message is sent while typing is triggered, the user will stop typing for a brief
-<a href=#976 id=976 data-nosnippet>976</a>    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
-<a href=#977 id=977 data-nosnippet>977</a>    /// is dropped.
-<a href=#978 id=978 data-nosnippet>978</a>    ///
-<a href=#979 id=979 data-nosnippet>979</a>    /// This should rarely be used for bots, although it is a good indicator that a long-running
-<a href=#980 id=980 data-nosnippet>980</a>    /// command is still being processed.
-<a href=#981 id=981 data-nosnippet>981</a>    ///
-<a href=#982 id=982 data-nosnippet>982</a>    /// ## Examples
-<a href=#983 id=983 data-nosnippet>983</a>    ///
-<a href=#984 id=984 data-nosnippet>984</a>    /// ```rust,no_run
-<a href=#985 id=985 data-nosnippet>985</a>    /// # use serenity::{http::Http, Result, model::id::GenericChannelId};
-<a href=#986 id=986 data-nosnippet>986</a>    /// # use std::sync::Arc;
-<a href=#987 id=987 data-nosnippet>987</a>    /// #
-<a href=#988 id=988 data-nosnippet>988</a>    /// # fn long_process() {}
-<a href=#989 id=989 data-nosnippet>989</a>    /// # fn main() {
-<a href=#990 id=990 data-nosnippet>990</a>    /// # let http: Arc&lt;Http&gt; = unimplemented!();
-<a href=#991 id=991 data-nosnippet>991</a>    /// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)
-<a href=#992 id=992 data-nosnippet>992</a>    /// let typing = GenericChannelId::new(7).start_typing(http);
+<a href=#970 id=970 data-nosnippet>970</a>    /// # Errors
+<a href=#971 id=971 data-nosnippet>971</a>    ///
+<a href=#972 id=972 data-nosnippet>972</a>    /// See [`CreateMessage::execute`] for a list of possible errors, and their corresponding
+<a href=#973 id=973 data-nosnippet>973</a>    /// reasons.
+<a href=#974 id=974 data-nosnippet>974</a>    </span><span class="kw">pub async fn </span>send_message(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, builder: CreateMessage&lt;<span class="lifetime">'_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#975 id=975 data-nosnippet>975</a>        builder.execute(http, <span class="self">self</span>).<span class="kw">await
+<a href=#976 id=976 data-nosnippet>976</a>    </span>}
+<a href=#977 id=977 data-nosnippet>977</a>
+<a href=#978 id=978 data-nosnippet>978</a>    <span class="doccomment">/// Starts typing in the channel for an indefinite period of time.
+<a href=#979 id=979 data-nosnippet>979</a>    ///
+<a href=#980 id=980 data-nosnippet>980</a>    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called on
+<a href=#981 id=981 data-nosnippet>981</a>    /// the returned struct to stop typing. Note that on some clients, typing may persist for a few
+<a href=#982 id=982 data-nosnippet>982</a>    /// seconds after [`Typing::stop`] is called. Typing is also stopped when the struct is
+<a href=#983 id=983 data-nosnippet>983</a>    /// dropped.
+<a href=#984 id=984 data-nosnippet>984</a>    ///
+<a href=#985 id=985 data-nosnippet>985</a>    /// If a message is sent while typing is triggered, the user will stop typing for a brief
+<a href=#986 id=986 data-nosnippet>986</a>    /// period of time and then resume again until either [`Typing::stop`] is called or the struct
+<a href=#987 id=987 data-nosnippet>987</a>    /// is dropped.
+<a href=#988 id=988 data-nosnippet>988</a>    ///
+<a href=#989 id=989 data-nosnippet>989</a>    /// This should rarely be used for bots, although it is a good indicator that a long-running
+<a href=#990 id=990 data-nosnippet>990</a>    /// command is still being processed.
+<a href=#991 id=991 data-nosnippet>991</a>    ///
+<a href=#992 id=992 data-nosnippet>992</a>    /// ## Examples
 <a href=#993 id=993 data-nosnippet>993</a>    ///
-<a href=#994 id=994 data-nosnippet>994</a>    /// // Run some long-running process
-<a href=#995 id=995 data-nosnippet>995</a>    /// long_process();
-<a href=#996 id=996 data-nosnippet>996</a>    ///
-<a href=#997 id=997 data-nosnippet>997</a>    /// // Stop typing
-<a href=#998 id=998 data-nosnippet>998</a>    /// typing.stop();
-<a href=#999 id=999 data-nosnippet>999</a>    /// # }
-<a href=#1000 id=1000 data-nosnippet>1000</a>    /// ```
-<a href=#1001 id=1001 data-nosnippet>1001</a>    ///
-<a href=#1002 id=1002 data-nosnippet>1002</a>    /// # Errors
+<a href=#994 id=994 data-nosnippet>994</a>    /// ```rust,no_run
+<a href=#995 id=995 data-nosnippet>995</a>    /// # use serenity::{http::Http, Result, model::id::GenericChannelId};
+<a href=#996 id=996 data-nosnippet>996</a>    /// # use std::sync::Arc;
+<a href=#997 id=997 data-nosnippet>997</a>    /// #
+<a href=#998 id=998 data-nosnippet>998</a>    /// # fn long_process() {}
+<a href=#999 id=999 data-nosnippet>999</a>    /// # fn main() {
+<a href=#1000 id=1000 data-nosnippet>1000</a>    /// # let http: Arc&lt;Http&gt; = unimplemented!();
+<a href=#1001 id=1001 data-nosnippet>1001</a>    /// // Initiate typing (assuming http is `Arc&lt;Http&gt;`)
+<a href=#1002 id=1002 data-nosnippet>1002</a>    /// let typing = GenericChannelId::new(7).start_typing(http);
 <a href=#1003 id=1003 data-nosnippet>1003</a>    ///
-<a href=#1004 id=1004 data-nosnippet>1004</a>    /// Returns [`Error::Http`] if the current user lacks permission
-<a href=#1005 id=1005 data-nosnippet>1005</a>    /// to send messages in this channel.
-<a href=#1006 id=1006 data-nosnippet>1006</a>    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>, http: Arc&lt;Http&gt;) -&gt; Typing {
-<a href=#1007 id=1007 data-nosnippet>1007</a>        Typing::start(http, <span class="self">self</span>)
-<a href=#1008 id=1008 data-nosnippet>1008</a>    }
-<a href=#1009 id=1009 data-nosnippet>1009</a>
-<a href=#1010 id=1010 data-nosnippet>1010</a>    <span class="doccomment">/// Unpins a [`Message`] in the channel given by its Id.
+<a href=#1004 id=1004 data-nosnippet>1004</a>    /// // Run some long-running process
+<a href=#1005 id=1005 data-nosnippet>1005</a>    /// long_process();
+<a href=#1006 id=1006 data-nosnippet>1006</a>    ///
+<a href=#1007 id=1007 data-nosnippet>1007</a>    /// // Stop typing
+<a href=#1008 id=1008 data-nosnippet>1008</a>    /// typing.stop();
+<a href=#1009 id=1009 data-nosnippet>1009</a>    /// # }
+<a href=#1010 id=1010 data-nosnippet>1010</a>    /// ```
 <a href=#1011 id=1011 data-nosnippet>1011</a>    ///
-<a href=#1012 id=1012 data-nosnippet>1012</a>    /// Requires the [Pin Messages] permission.
+<a href=#1012 id=1012 data-nosnippet>1012</a>    /// # Errors
 <a href=#1013 id=1013 data-nosnippet>1013</a>    ///
-<a href=#1014 id=1014 data-nosnippet>1014</a>    /// # Errors
-<a href=#1015 id=1015 data-nosnippet>1015</a>    ///
-<a href=#1016 id=1016 data-nosnippet>1016</a>    /// Returns [`Error::Http`] if the current user lacks permission.
-<a href=#1017 id=1017 data-nosnippet>1017</a>    ///
-<a href=#1018 id=1018 data-nosnippet>1018</a>    /// [Pin Messages]: Permissions::PIN_MESSAGES
-<a href=#1019 id=1019 data-nosnippet>1019</a>    </span><span class="kw">pub async fn </span>unpin(
-<a href=#1020 id=1020 data-nosnippet>1020</a>        <span class="self">self</span>,
-<a href=#1021 id=1021 data-nosnippet>1021</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#1022 id=1022 data-nosnippet>1022</a>        message_id: MessageId,
-<a href=#1023 id=1023 data-nosnippet>1023</a>        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
-<a href=#1024 id=1024 data-nosnippet>1024</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-<a href=#1025 id=1025 data-nosnippet>1025</a>        http.unpin_message(<span class="self">self</span>, message_id, reason).<span class="kw">await
-<a href=#1026 id=1026 data-nosnippet>1026</a>    </span>}
-<a href=#1027 id=1027 data-nosnippet>1027</a>
-<a href=#1028 id=1028 data-nosnippet>1028</a>    <span class="doccomment">/// Get a list of users that voted for this specific answer.
-<a href=#1029 id=1029 data-nosnippet>1029</a>    ///
-<a href=#1030 id=1030 data-nosnippet>1030</a>    /// # Errors
-<a href=#1031 id=1031 data-nosnippet>1031</a>    ///
-<a href=#1032 id=1032 data-nosnippet>1032</a>    /// If the message does not have a poll.
-<a href=#1033 id=1033 data-nosnippet>1033</a>    </span><span class="kw">pub async fn </span>get_poll_answer_voters(
-<a href=#1034 id=1034 data-nosnippet>1034</a>        <span class="self">self</span>,
-<a href=#1035 id=1035 data-nosnippet>1035</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#1036 id=1036 data-nosnippet>1036</a>        message_id: MessageId,
-<a href=#1037 id=1037 data-nosnippet>1037</a>        answer_id: AnswerId,
-<a href=#1038 id=1038 data-nosnippet>1038</a>        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
-<a href=#1039 id=1039 data-nosnippet>1039</a>        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
-<a href=#1040 id=1040 data-nosnippet>1040</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
-<a href=#1041 id=1041 data-nosnippet>1041</a>        http.get_poll_answer_voters(<span class="self">self</span>, message_id, answer_id, after, limit).<span class="kw">await
-<a href=#1042 id=1042 data-nosnippet>1042</a>    </span>}
-<a href=#1043 id=1043 data-nosnippet>1043</a>
-<a href=#1044 id=1044 data-nosnippet>1044</a>    <span class="doccomment">/// Ends the [`Poll`] on a given [`MessageId`], if there is one.
-<a href=#1045 id=1045 data-nosnippet>1045</a>    ///
-<a href=#1046 id=1046 data-nosnippet>1046</a>    /// # Errors
-<a href=#1047 id=1047 data-nosnippet>1047</a>    ///
-<a href=#1048 id=1048 data-nosnippet>1048</a>    /// If the message does not have a poll, or if the poll was not created by the current user.
-<a href=#1049 id=1049 data-nosnippet>1049</a>    </span><span class="kw">pub async fn </span>end_poll(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
-<a href=#1050 id=1050 data-nosnippet>1050</a>        http.expire_poll(<span class="self">self</span>, message_id).<span class="kw">await
-<a href=#1051 id=1051 data-nosnippet>1051</a>    </span>}
-<a href=#1052 id=1052 data-nosnippet>1052</a>}
+<a href=#1014 id=1014 data-nosnippet>1014</a>    /// Returns [`Error::Http`] if the current user lacks permission
+<a href=#1015 id=1015 data-nosnippet>1015</a>    /// to send messages in this channel.
+<a href=#1016 id=1016 data-nosnippet>1016</a>    </span><span class="kw">pub fn </span>start_typing(<span class="self">self</span>, http: Arc&lt;Http&gt;) -&gt; Typing {
+<a href=#1017 id=1017 data-nosnippet>1017</a>        Typing::start(http, <span class="self">self</span>)
+<a href=#1018 id=1018 data-nosnippet>1018</a>    }
+<a href=#1019 id=1019 data-nosnippet>1019</a>
+<a href=#1020 id=1020 data-nosnippet>1020</a>    <span class="doccomment">/// Unpins a [`Message`] in the channel given by its Id.
+<a href=#1021 id=1021 data-nosnippet>1021</a>    ///
+<a href=#1022 id=1022 data-nosnippet>1022</a>    /// Requires the [Pin Messages] permission.
+<a href=#1023 id=1023 data-nosnippet>1023</a>    ///
+<a href=#1024 id=1024 data-nosnippet>1024</a>    /// # Errors
+<a href=#1025 id=1025 data-nosnippet>1025</a>    ///
+<a href=#1026 id=1026 data-nosnippet>1026</a>    /// Returns [`Error::Http`] if the current user lacks permission.
+<a href=#1027 id=1027 data-nosnippet>1027</a>    ///
+<a href=#1028 id=1028 data-nosnippet>1028</a>    /// [Pin Messages]: Permissions::PIN_MESSAGES
+<a href=#1029 id=1029 data-nosnippet>1029</a>    </span><span class="kw">pub async fn </span>unpin(
+<a href=#1030 id=1030 data-nosnippet>1030</a>        <span class="self">self</span>,
+<a href=#1031 id=1031 data-nosnippet>1031</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#1032 id=1032 data-nosnippet>1032</a>        message_id: MessageId,
+<a href=#1033 id=1033 data-nosnippet>1033</a>        reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+<a href=#1034 id=1034 data-nosnippet>1034</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#1035 id=1035 data-nosnippet>1035</a>        http.unpin_message(<span class="self">self</span>, message_id, reason).<span class="kw">await
+<a href=#1036 id=1036 data-nosnippet>1036</a>    </span>}
+<a href=#1037 id=1037 data-nosnippet>1037</a>
+<a href=#1038 id=1038 data-nosnippet>1038</a>    <span class="doccomment">/// Get a list of users that voted for this specific answer.
+<a href=#1039 id=1039 data-nosnippet>1039</a>    ///
+<a href=#1040 id=1040 data-nosnippet>1040</a>    /// # Errors
+<a href=#1041 id=1041 data-nosnippet>1041</a>    ///
+<a href=#1042 id=1042 data-nosnippet>1042</a>    /// If the message does not have a poll.
+<a href=#1043 id=1043 data-nosnippet>1043</a>    </span><span class="kw">pub async fn </span>get_poll_answer_voters(
+<a href=#1044 id=1044 data-nosnippet>1044</a>        <span class="self">self</span>,
+<a href=#1045 id=1045 data-nosnippet>1045</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#1046 id=1046 data-nosnippet>1046</a>        message_id: MessageId,
+<a href=#1047 id=1047 data-nosnippet>1047</a>        answer_id: AnswerId,
+<a href=#1048 id=1048 data-nosnippet>1048</a>        after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+<a href=#1049 id=1049 data-nosnippet>1049</a>        limit: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+<a href=#1050 id=1050 data-nosnippet>1050</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;User&gt;&gt; {
+<a href=#1051 id=1051 data-nosnippet>1051</a>        http.get_poll_answer_voters(<span class="self">self</span>, message_id, answer_id, after, limit).<span class="kw">await
+<a href=#1052 id=1052 data-nosnippet>1052</a>    </span>}
 <a href=#1053 id=1053 data-nosnippet>1053</a>
-<a href=#1054 id=1054 data-nosnippet>1054</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1055 id=1055 data-nosnippet>1055</a></span><span class="kw">impl </span>From&lt;Channel&gt; <span class="kw">for </span>GenericChannelId {
-<a href=#1056 id=1056 data-nosnippet>1056</a>    <span class="doccomment">/// Gets the Id of a [`Channel`].
-<a href=#1057 id=1057 data-nosnippet>1057</a>    </span><span class="kw">fn </span>from(channel: Channel) -&gt; <span class="self">Self </span>{
-<a href=#1058 id=1058 data-nosnippet>1058</a>        channel.id()
-<a href=#1059 id=1059 data-nosnippet>1059</a>    }
-<a href=#1060 id=1060 data-nosnippet>1060</a>}
-<a href=#1061 id=1061 data-nosnippet>1061</a>
-<a href=#1062 id=1062 data-nosnippet>1062</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1063 id=1063 data-nosnippet>1063</a></span><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>Channel&gt; <span class="kw">for </span>GenericChannelId {
-<a href=#1064 id=1064 data-nosnippet>1064</a>    <span class="doccomment">/// Gets the Id of a [`Channel`].
-<a href=#1065 id=1065 data-nosnippet>1065</a>    </span><span class="kw">fn </span>from(channel: <span class="kw-2">&amp;</span>Channel) -&gt; <span class="self">Self </span>{
-<a href=#1066 id=1066 data-nosnippet>1066</a>        channel.id()
-<a href=#1067 id=1067 data-nosnippet>1067</a>    }
-<a href=#1068 id=1068 data-nosnippet>1068</a>}
-<a href=#1069 id=1069 data-nosnippet>1069</a>
-<a href=#1070 id=1070 data-nosnippet>1070</a><span class="kw">impl </span>From&lt;PrivateChannel&gt; <span class="kw">for </span>ChannelId {
-<a href=#1071 id=1071 data-nosnippet>1071</a>    <span class="doccomment">/// Gets the Id of a private channel.
-<a href=#1072 id=1072 data-nosnippet>1072</a>    </span><span class="kw">fn </span>from(private_channel: PrivateChannel) -&gt; ChannelId {
-<a href=#1073 id=1073 data-nosnippet>1073</a>        private_channel.id
-<a href=#1074 id=1074 data-nosnippet>1074</a>    }
-<a href=#1075 id=1075 data-nosnippet>1075</a>}
-<a href=#1076 id=1076 data-nosnippet>1076</a>
-<a href=#1077 id=1077 data-nosnippet>1077</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>PrivateChannel&gt; <span class="kw">for </span>ChannelId {
-<a href=#1078 id=1078 data-nosnippet>1078</a>    <span class="doccomment">/// Gets the Id of a private channel.
-<a href=#1079 id=1079 data-nosnippet>1079</a>    </span><span class="kw">fn </span>from(private_channel: <span class="kw-2">&amp;</span>PrivateChannel) -&gt; ChannelId {
-<a href=#1080 id=1080 data-nosnippet>1080</a>        private_channel.id
-<a href=#1081 id=1081 data-nosnippet>1081</a>    }
-<a href=#1082 id=1082 data-nosnippet>1082</a>}
-<a href=#1083 id=1083 data-nosnippet>1083</a>
-<a href=#1084 id=1084 data-nosnippet>1084</a><span class="kw">impl </span>From&lt;GuildChannel&gt; <span class="kw">for </span>ChannelId {
-<a href=#1085 id=1085 data-nosnippet>1085</a>    <span class="doccomment">/// Gets the Id of a guild channel.
-<a href=#1086 id=1086 data-nosnippet>1086</a>    </span><span class="kw">fn </span>from(public_channel: GuildChannel) -&gt; ChannelId {
-<a href=#1087 id=1087 data-nosnippet>1087</a>        public_channel.id
-<a href=#1088 id=1088 data-nosnippet>1088</a>    }
-<a href=#1089 id=1089 data-nosnippet>1089</a>}
-<a href=#1090 id=1090 data-nosnippet>1090</a>
-<a href=#1091 id=1091 data-nosnippet>1091</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>GuildChannel&gt; <span class="kw">for </span>ChannelId {
-<a href=#1092 id=1092 data-nosnippet>1092</a>    <span class="doccomment">/// Gets the Id of a guild channel.
-<a href=#1093 id=1093 data-nosnippet>1093</a>    </span><span class="kw">fn </span>from(public_channel: <span class="kw-2">&amp;</span>GuildChannel) -&gt; ChannelId {
-<a href=#1094 id=1094 data-nosnippet>1094</a>        public_channel.id
-<a href=#1095 id=1095 data-nosnippet>1095</a>    }
-<a href=#1096 id=1096 data-nosnippet>1096</a>}
-<a href=#1097 id=1097 data-nosnippet>1097</a>
-<a href=#1098 id=1098 data-nosnippet>1098</a><span class="kw">impl </span>From&lt;WebhookChannel&gt; <span class="kw">for </span>ChannelId {
-<a href=#1099 id=1099 data-nosnippet>1099</a>    <span class="doccomment">/// Gets the Id of a webhook channel.
-<a href=#1100 id=1100 data-nosnippet>1100</a>    </span><span class="kw">fn </span>from(webhook_channel: WebhookChannel) -&gt; ChannelId {
-<a href=#1101 id=1101 data-nosnippet>1101</a>        webhook_channel.id
-<a href=#1102 id=1102 data-nosnippet>1102</a>    }
-<a href=#1103 id=1103 data-nosnippet>1103</a>}
-<a href=#1104 id=1104 data-nosnippet>1104</a>
-<a href=#1105 id=1105 data-nosnippet>1105</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>WebhookChannel&gt; <span class="kw">for </span>ChannelId {
-<a href=#1106 id=1106 data-nosnippet>1106</a>    <span class="doccomment">/// Gets the Id of a webhook channel.
-<a href=#1107 id=1107 data-nosnippet>1107</a>    </span><span class="kw">fn </span>from(webhook_channel: <span class="kw-2">&amp;</span>WebhookChannel) -&gt; ChannelId {
-<a href=#1108 id=1108 data-nosnippet>1108</a>        webhook_channel.id
-<a href=#1109 id=1109 data-nosnippet>1109</a>    }
-<a href=#1110 id=1110 data-nosnippet>1110</a>}
-<a href=#1111 id=1111 data-nosnippet>1111</a>
-<a href=#1112 id=1112 data-nosnippet>1112</a><span class="doccomment">/// A helper class returned by [`GenericChannelId::messages_iter`]
-<a href=#1113 id=1113 data-nosnippet>1113</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#1114 id=1114 data-nosnippet>1114</a>#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1115 id=1115 data-nosnippet>1115</a></span><span class="kw">pub struct </span>MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#1116 id=1116 data-nosnippet>1116</a>    http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http,
-<a href=#1117 id=1117 data-nosnippet>1117</a>    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-<a href=#1118 id=1118 data-nosnippet>1118</a>    </span>cache: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Arc&lt;Cache&gt;&gt;,
-<a href=#1119 id=1119 data-nosnippet>1119</a>    channel_id: GenericChannelId,
-<a href=#1120 id=1120 data-nosnippet>1120</a>    buffer: Vec&lt;Message&gt;,
-<a href=#1121 id=1121 data-nosnippet>1121</a>    before: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
-<a href=#1122 id=1122 data-nosnippet>1122</a>    tried_fetch: bool,
-<a href=#1123 id=1123 data-nosnippet>1123</a>}
-<a href=#1124 id=1124 data-nosnippet>1124</a>
-<a href=#1125 id=1125 data-nosnippet>1125</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1126 id=1126 data-nosnippet>1126</a></span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#1127 id=1127 data-nosnippet>1127</a>    <span class="kw">fn </span>new(cache_http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">impl </span>CacheHttp, channel_id: GenericChannelId) -&gt; MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#1128 id=1128 data-nosnippet>1128</a>        MessagesIter {
-<a href=#1129 id=1129 data-nosnippet>1129</a>            http: cache_http.http(),
-<a href=#1130 id=1130 data-nosnippet>1130</a>            <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-<a href=#1131 id=1131 data-nosnippet>1131</a>            </span>cache: cache_http.cache(),
-<a href=#1132 id=1132 data-nosnippet>1132</a>            channel_id,
-<a href=#1133 id=1133 data-nosnippet>1133</a>            buffer: Vec::new(),
-<a href=#1134 id=1134 data-nosnippet>1134</a>            before: <span class="prelude-val">None</span>,
-<a href=#1135 id=1135 data-nosnippet>1135</a>            tried_fetch: <span class="bool-val">false</span>,
-<a href=#1136 id=1136 data-nosnippet>1136</a>        }
-<a href=#1137 id=1137 data-nosnippet>1137</a>    }
-<a href=#1138 id=1138 data-nosnippet>1138</a>
-<a href=#1139 id=1139 data-nosnippet>1139</a>    <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
-<a href=#1140 id=1140 data-nosnippet>1140</a>    </span><span class="kw">fn </span>cache_http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>CacheHttp + <span class="lifetime">'_ </span>{
-<a href=#1141 id=1141 data-nosnippet>1141</a>        <span class="self">self</span>.http
-<a href=#1142 id=1142 data-nosnippet>1142</a>    }
-<a href=#1143 id=1143 data-nosnippet>1143</a>
-<a href=#1144 id=1144 data-nosnippet>1144</a>    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
-<a href=#1145 id=1145 data-nosnippet>1145</a>    </span><span class="kw">fn </span>cache_http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>CacheHttp + <span class="lifetime">'_ </span>{
-<a href=#1146 id=1146 data-nosnippet>1146</a>        (<span class="self">self</span>.cache, <span class="self">self</span>.http)
+<a href=#1054 id=1054 data-nosnippet>1054</a>    <span class="doccomment">/// Ends the [`Poll`] on a given [`MessageId`], if there is one.
+<a href=#1055 id=1055 data-nosnippet>1055</a>    ///
+<a href=#1056 id=1056 data-nosnippet>1056</a>    /// # Errors
+<a href=#1057 id=1057 data-nosnippet>1057</a>    ///
+<a href=#1058 id=1058 data-nosnippet>1058</a>    /// If the message does not have a poll, or if the poll was not created by the current user.
+<a href=#1059 id=1059 data-nosnippet>1059</a>    </span><span class="kw">pub async fn </span>end_poll(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, message_id: MessageId) -&gt; <span class="prelude-ty">Result</span>&lt;Message&gt; {
+<a href=#1060 id=1060 data-nosnippet>1060</a>        http.expire_poll(<span class="self">self</span>, message_id).<span class="kw">await
+<a href=#1061 id=1061 data-nosnippet>1061</a>    </span>}
+<a href=#1062 id=1062 data-nosnippet>1062</a>}
+<a href=#1063 id=1063 data-nosnippet>1063</a>
+<a href=#1064 id=1064 data-nosnippet>1064</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1065 id=1065 data-nosnippet>1065</a></span><span class="kw">impl </span>From&lt;Channel&gt; <span class="kw">for </span>GenericChannelId {
+<a href=#1066 id=1066 data-nosnippet>1066</a>    <span class="doccomment">/// Gets the Id of a [`Channel`].
+<a href=#1067 id=1067 data-nosnippet>1067</a>    </span><span class="kw">fn </span>from(channel: Channel) -&gt; <span class="self">Self </span>{
+<a href=#1068 id=1068 data-nosnippet>1068</a>        channel.id()
+<a href=#1069 id=1069 data-nosnippet>1069</a>    }
+<a href=#1070 id=1070 data-nosnippet>1070</a>}
+<a href=#1071 id=1071 data-nosnippet>1071</a>
+<a href=#1072 id=1072 data-nosnippet>1072</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1073 id=1073 data-nosnippet>1073</a></span><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>Channel&gt; <span class="kw">for </span>GenericChannelId {
+<a href=#1074 id=1074 data-nosnippet>1074</a>    <span class="doccomment">/// Gets the Id of a [`Channel`].
+<a href=#1075 id=1075 data-nosnippet>1075</a>    </span><span class="kw">fn </span>from(channel: <span class="kw-2">&amp;</span>Channel) -&gt; <span class="self">Self </span>{
+<a href=#1076 id=1076 data-nosnippet>1076</a>        channel.id()
+<a href=#1077 id=1077 data-nosnippet>1077</a>    }
+<a href=#1078 id=1078 data-nosnippet>1078</a>}
+<a href=#1079 id=1079 data-nosnippet>1079</a>
+<a href=#1080 id=1080 data-nosnippet>1080</a><span class="kw">impl </span>From&lt;PrivateChannel&gt; <span class="kw">for </span>ChannelId {
+<a href=#1081 id=1081 data-nosnippet>1081</a>    <span class="doccomment">/// Gets the Id of a private channel.
+<a href=#1082 id=1082 data-nosnippet>1082</a>    </span><span class="kw">fn </span>from(private_channel: PrivateChannel) -&gt; ChannelId {
+<a href=#1083 id=1083 data-nosnippet>1083</a>        private_channel.id
+<a href=#1084 id=1084 data-nosnippet>1084</a>    }
+<a href=#1085 id=1085 data-nosnippet>1085</a>}
+<a href=#1086 id=1086 data-nosnippet>1086</a>
+<a href=#1087 id=1087 data-nosnippet>1087</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>PrivateChannel&gt; <span class="kw">for </span>ChannelId {
+<a href=#1088 id=1088 data-nosnippet>1088</a>    <span class="doccomment">/// Gets the Id of a private channel.
+<a href=#1089 id=1089 data-nosnippet>1089</a>    </span><span class="kw">fn </span>from(private_channel: <span class="kw-2">&amp;</span>PrivateChannel) -&gt; ChannelId {
+<a href=#1090 id=1090 data-nosnippet>1090</a>        private_channel.id
+<a href=#1091 id=1091 data-nosnippet>1091</a>    }
+<a href=#1092 id=1092 data-nosnippet>1092</a>}
+<a href=#1093 id=1093 data-nosnippet>1093</a>
+<a href=#1094 id=1094 data-nosnippet>1094</a><span class="kw">impl </span>From&lt;GuildChannel&gt; <span class="kw">for </span>ChannelId {
+<a href=#1095 id=1095 data-nosnippet>1095</a>    <span class="doccomment">/// Gets the Id of a guild channel.
+<a href=#1096 id=1096 data-nosnippet>1096</a>    </span><span class="kw">fn </span>from(public_channel: GuildChannel) -&gt; ChannelId {
+<a href=#1097 id=1097 data-nosnippet>1097</a>        public_channel.id
+<a href=#1098 id=1098 data-nosnippet>1098</a>    }
+<a href=#1099 id=1099 data-nosnippet>1099</a>}
+<a href=#1100 id=1100 data-nosnippet>1100</a>
+<a href=#1101 id=1101 data-nosnippet>1101</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>GuildChannel&gt; <span class="kw">for </span>ChannelId {
+<a href=#1102 id=1102 data-nosnippet>1102</a>    <span class="doccomment">/// Gets the Id of a guild channel.
+<a href=#1103 id=1103 data-nosnippet>1103</a>    </span><span class="kw">fn </span>from(public_channel: <span class="kw-2">&amp;</span>GuildChannel) -&gt; ChannelId {
+<a href=#1104 id=1104 data-nosnippet>1104</a>        public_channel.id
+<a href=#1105 id=1105 data-nosnippet>1105</a>    }
+<a href=#1106 id=1106 data-nosnippet>1106</a>}
+<a href=#1107 id=1107 data-nosnippet>1107</a>
+<a href=#1108 id=1108 data-nosnippet>1108</a><span class="kw">impl </span>From&lt;WebhookChannel&gt; <span class="kw">for </span>ChannelId {
+<a href=#1109 id=1109 data-nosnippet>1109</a>    <span class="doccomment">/// Gets the Id of a webhook channel.
+<a href=#1110 id=1110 data-nosnippet>1110</a>    </span><span class="kw">fn </span>from(webhook_channel: WebhookChannel) -&gt; ChannelId {
+<a href=#1111 id=1111 data-nosnippet>1111</a>        webhook_channel.id
+<a href=#1112 id=1112 data-nosnippet>1112</a>    }
+<a href=#1113 id=1113 data-nosnippet>1113</a>}
+<a href=#1114 id=1114 data-nosnippet>1114</a>
+<a href=#1115 id=1115 data-nosnippet>1115</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>WebhookChannel&gt; <span class="kw">for </span>ChannelId {
+<a href=#1116 id=1116 data-nosnippet>1116</a>    <span class="doccomment">/// Gets the Id of a webhook channel.
+<a href=#1117 id=1117 data-nosnippet>1117</a>    </span><span class="kw">fn </span>from(webhook_channel: <span class="kw-2">&amp;</span>WebhookChannel) -&gt; ChannelId {
+<a href=#1118 id=1118 data-nosnippet>1118</a>        webhook_channel.id
+<a href=#1119 id=1119 data-nosnippet>1119</a>    }
+<a href=#1120 id=1120 data-nosnippet>1120</a>}
+<a href=#1121 id=1121 data-nosnippet>1121</a>
+<a href=#1122 id=1122 data-nosnippet>1122</a><span class="doccomment">/// A helper class returned by [`GenericChannelId::messages_iter`]
+<a href=#1123 id=1123 data-nosnippet>1123</a></span><span class="attr">#[derive(Clone, Debug)]
+<a href=#1124 id=1124 data-nosnippet>1124</a>#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1125 id=1125 data-nosnippet>1125</a></span><span class="kw">pub struct </span>MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#1126 id=1126 data-nosnippet>1126</a>    http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http,
+<a href=#1127 id=1127 data-nosnippet>1127</a>    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+<a href=#1128 id=1128 data-nosnippet>1128</a>    </span>cache: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Arc&lt;Cache&gt;&gt;,
+<a href=#1129 id=1129 data-nosnippet>1129</a>    channel_id: GenericChannelId,
+<a href=#1130 id=1130 data-nosnippet>1130</a>    buffer: Vec&lt;Message&gt;,
+<a href=#1131 id=1131 data-nosnippet>1131</a>    before: <span class="prelude-ty">Option</span>&lt;MessageId&gt;,
+<a href=#1132 id=1132 data-nosnippet>1132</a>    tried_fetch: bool,
+<a href=#1133 id=1133 data-nosnippet>1133</a>}
+<a href=#1134 id=1134 data-nosnippet>1134</a>
+<a href=#1135 id=1135 data-nosnippet>1135</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1136 id=1136 data-nosnippet>1136</a></span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#1137 id=1137 data-nosnippet>1137</a>    <span class="kw">fn </span>new(cache_http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">impl </span>CacheHttp, channel_id: GenericChannelId) -&gt; MessagesIter&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#1138 id=1138 data-nosnippet>1138</a>        MessagesIter {
+<a href=#1139 id=1139 data-nosnippet>1139</a>            http: cache_http.http(),
+<a href=#1140 id=1140 data-nosnippet>1140</a>            <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+<a href=#1141 id=1141 data-nosnippet>1141</a>            </span>cache: cache_http.cache(),
+<a href=#1142 id=1142 data-nosnippet>1142</a>            channel_id,
+<a href=#1143 id=1143 data-nosnippet>1143</a>            buffer: Vec::new(),
+<a href=#1144 id=1144 data-nosnippet>1144</a>            before: <span class="prelude-val">None</span>,
+<a href=#1145 id=1145 data-nosnippet>1145</a>            tried_fetch: <span class="bool-val">false</span>,
+<a href=#1146 id=1146 data-nosnippet>1146</a>        }
 <a href=#1147 id=1147 data-nosnippet>1147</a>    }
 <a href=#1148 id=1148 data-nosnippet>1148</a>
-<a href=#1149 id=1149 data-nosnippet>1149</a>    <span class="doccomment">/// Fills the `self.buffer` cache with [`Message`]s.
-<a href=#1150 id=1150 data-nosnippet>1150</a>    ///
-<a href=#1151 id=1151 data-nosnippet>1151</a>    /// This drops any messages that were currently in the buffer. Ideally, it should only be
-<a href=#1152 id=1152 data-nosnippet>1152</a>    /// called when `self.buffer` is empty. Additionally, this updates `self.before` so that the
-<a href=#1153 id=1153 data-nosnippet>1153</a>    /// next call does not return duplicate items.
-<a href=#1154 id=1154 data-nosnippet>1154</a>    ///
-<a href=#1155 id=1155 data-nosnippet>1155</a>    /// If there are no more messages to be fetched, then this sets `self.before` as [`None`],
-<a href=#1156 id=1156 data-nosnippet>1156</a>    /// indicating that no more calls ought to be made.
-<a href=#1157 id=1157 data-nosnippet>1157</a>    ///
-<a href=#1158 id=1158 data-nosnippet>1158</a>    /// If this method is called with `self.before` as None, the last 100 (or lower) messages sent
-<a href=#1159 id=1159 data-nosnippet>1159</a>    /// in the channel are added in the buffer.
+<a href=#1149 id=1149 data-nosnippet>1149</a>    <span class="attr">#[cfg(not(feature = <span class="string">"cache"</span>))]
+<a href=#1150 id=1150 data-nosnippet>1150</a>    </span><span class="kw">fn </span>cache_http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>CacheHttp + <span class="lifetime">'_ </span>{
+<a href=#1151 id=1151 data-nosnippet>1151</a>        <span class="self">self</span>.http
+<a href=#1152 id=1152 data-nosnippet>1152</a>    }
+<a href=#1153 id=1153 data-nosnippet>1153</a>
+<a href=#1154 id=1154 data-nosnippet>1154</a>    <span class="attr">#[cfg(feature = <span class="string">"cache"</span>)]
+<a href=#1155 id=1155 data-nosnippet>1155</a>    </span><span class="kw">fn </span>cache_http(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>CacheHttp + <span class="lifetime">'_ </span>{
+<a href=#1156 id=1156 data-nosnippet>1156</a>        (<span class="self">self</span>.cache, <span class="self">self</span>.http)
+<a href=#1157 id=1157 data-nosnippet>1157</a>    }
+<a href=#1158 id=1158 data-nosnippet>1158</a>
+<a href=#1159 id=1159 data-nosnippet>1159</a>    <span class="doccomment">/// Fills the `self.buffer` cache with [`Message`]s.
 <a href=#1160 id=1160 data-nosnippet>1160</a>    ///
-<a href=#1161 id=1161 data-nosnippet>1161</a>    /// The messages are sorted such that the newest message is the first element of the buffer and
-<a href=#1162 id=1162 data-nosnippet>1162</a>    /// the newest message is the last.
-<a href=#1163 id=1163 data-nosnippet>1163</a>    ///
-<a href=#1164 id=1164 data-nosnippet>1164</a>    /// [`Message`]: crate::model::channel::Message
-<a href=#1165 id=1165 data-nosnippet>1165</a>    </span><span class="kw">async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-<a href=#1166 id=1166 data-nosnippet>1166</a>        <span class="comment">// Number of messages to fetch.
-<a href=#1167 id=1167 data-nosnippet>1167</a>        </span><span class="kw">let </span>grab_size = <span class="number">100</span>;
-<a href=#1168 id=1168 data-nosnippet>1168</a>
-<a href=#1169 id=1169 data-nosnippet>1169</a>        <span class="comment">// If `self.before` is not set yet, we can use `.messages` to fetch the last message after
-<a href=#1170 id=1170 data-nosnippet>1170</a>        // very first fetch from last.
-<a href=#1171 id=1171 data-nosnippet>1171</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>builder = GetMessages::new().limit(grab_size);
-<a href=#1172 id=1172 data-nosnippet>1172</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="self">self</span>.before {
-<a href=#1173 id=1173 data-nosnippet>1173</a>            builder = builder.before(before);
-<a href=#1174 id=1174 data-nosnippet>1174</a>        }
-<a href=#1175 id=1175 data-nosnippet>1175</a>        <span class="self">self</span>.buffer = <span class="self">self</span>.channel_id.messages(<span class="self">self</span>.cache_http(), builder).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#1176 id=1176 data-nosnippet>1176</a>
-<a href=#1177 id=1177 data-nosnippet>1177</a>        <span class="self">self</span>.buffer.reverse();
+<a href=#1161 id=1161 data-nosnippet>1161</a>    /// This drops any messages that were currently in the buffer. Ideally, it should only be
+<a href=#1162 id=1162 data-nosnippet>1162</a>    /// called when `self.buffer` is empty. Additionally, this updates `self.before` so that the
+<a href=#1163 id=1163 data-nosnippet>1163</a>    /// next call does not return duplicate items.
+<a href=#1164 id=1164 data-nosnippet>1164</a>    ///
+<a href=#1165 id=1165 data-nosnippet>1165</a>    /// If there are no more messages to be fetched, then this sets `self.before` as [`None`],
+<a href=#1166 id=1166 data-nosnippet>1166</a>    /// indicating that no more calls ought to be made.
+<a href=#1167 id=1167 data-nosnippet>1167</a>    ///
+<a href=#1168 id=1168 data-nosnippet>1168</a>    /// If this method is called with `self.before` as None, the last 100 (or lower) messages sent
+<a href=#1169 id=1169 data-nosnippet>1169</a>    /// in the channel are added in the buffer.
+<a href=#1170 id=1170 data-nosnippet>1170</a>    ///
+<a href=#1171 id=1171 data-nosnippet>1171</a>    /// The messages are sorted such that the newest message is the first element of the buffer and
+<a href=#1172 id=1172 data-nosnippet>1172</a>    /// the newest message is the last.
+<a href=#1173 id=1173 data-nosnippet>1173</a>    ///
+<a href=#1174 id=1174 data-nosnippet>1174</a>    /// [`Message`]: crate::model::channel::Message
+<a href=#1175 id=1175 data-nosnippet>1175</a>    </span><span class="kw">async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#1176 id=1176 data-nosnippet>1176</a>        <span class="comment">// Number of messages to fetch.
+<a href=#1177 id=1177 data-nosnippet>1177</a>        </span><span class="kw">let </span>grab_size = <span class="number">100</span>;
 <a href=#1178 id=1178 data-nosnippet>1178</a>
-<a href=#1179 id=1179 data-nosnippet>1179</a>        <span class="self">self</span>.before = <span class="self">self</span>.buffer.first().map(|m| m.id);
-<a href=#1180 id=1180 data-nosnippet>1180</a>
-<a href=#1181 id=1181 data-nosnippet>1181</a>        <span class="self">self</span>.tried_fetch = <span class="bool-val">true</span>;
-<a href=#1182 id=1182 data-nosnippet>1182</a>
-<a href=#1183 id=1183 data-nosnippet>1183</a>        <span class="prelude-val">Ok</span>(())
-<a href=#1184 id=1184 data-nosnippet>1184</a>    }
-<a href=#1185 id=1185 data-nosnippet>1185</a>
-<a href=#1186 id=1186 data-nosnippet>1186</a>    <span class="doccomment">/// Streams over all the messages in a channel.
-<a href=#1187 id=1187 data-nosnippet>1187</a>    ///
-<a href=#1188 id=1188 data-nosnippet>1188</a>    /// This is accomplished and equivalent to repeated calls to [`GenericChannelId::messages`]. A
-<a href=#1189 id=1189 data-nosnippet>1189</a>    /// buffer of at most 100 messages is used to reduce the number of calls necessary.
-<a href=#1190 id=1190 data-nosnippet>1190</a>    ///
-<a href=#1191 id=1191 data-nosnippet>1191</a>    /// The stream returns the newest message first, followed by older messages.
-<a href=#1192 id=1192 data-nosnippet>1192</a>    ///
-<a href=#1193 id=1193 data-nosnippet>1193</a>    /// # Examples
-<a href=#1194 id=1194 data-nosnippet>1194</a>    ///
-<a href=#1195 id=1195 data-nosnippet>1195</a>    /// ```rust,no_run
-<a href=#1196 id=1196 data-nosnippet>1196</a>    /// # use serenity::model::id::GenericChannelId;
-<a href=#1197 id=1197 data-nosnippet>1197</a>    /// # use serenity::http::Http;
-<a href=#1198 id=1198 data-nosnippet>1198</a>    /// #
-<a href=#1199 id=1199 data-nosnippet>1199</a>    /// # async fn run() {
-<a href=#1200 id=1200 data-nosnippet>1200</a>    /// # let channel_id = GenericChannelId::new(1);
-<a href=#1201 id=1201 data-nosnippet>1201</a>    /// # let http: Http = unimplemented!();
-<a href=#1202 id=1202 data-nosnippet>1202</a>    /// use serenity::futures::StreamExt;
-<a href=#1203 id=1203 data-nosnippet>1203</a>    /// use serenity::model::channel::MessagesIter;
+<a href=#1179 id=1179 data-nosnippet>1179</a>        <span class="comment">// If `self.before` is not set yet, we can use `.messages` to fetch the last message after
+<a href=#1180 id=1180 data-nosnippet>1180</a>        // very first fetch from last.
+<a href=#1181 id=1181 data-nosnippet>1181</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>builder = GetMessages::new().limit(grab_size);
+<a href=#1182 id=1182 data-nosnippet>1182</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(before) = <span class="self">self</span>.before {
+<a href=#1183 id=1183 data-nosnippet>1183</a>            builder = builder.before(before);
+<a href=#1184 id=1184 data-nosnippet>1184</a>        }
+<a href=#1185 id=1185 data-nosnippet>1185</a>        <span class="self">self</span>.buffer = <span class="self">self</span>.channel_id.messages(<span class="self">self</span>.cache_http(), builder).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#1186 id=1186 data-nosnippet>1186</a>
+<a href=#1187 id=1187 data-nosnippet>1187</a>        <span class="self">self</span>.buffer.reverse();
+<a href=#1188 id=1188 data-nosnippet>1188</a>
+<a href=#1189 id=1189 data-nosnippet>1189</a>        <span class="self">self</span>.before = <span class="self">self</span>.buffer.first().map(|m| m.id);
+<a href=#1190 id=1190 data-nosnippet>1190</a>
+<a href=#1191 id=1191 data-nosnippet>1191</a>        <span class="self">self</span>.tried_fetch = <span class="bool-val">true</span>;
+<a href=#1192 id=1192 data-nosnippet>1192</a>
+<a href=#1193 id=1193 data-nosnippet>1193</a>        <span class="prelude-val">Ok</span>(())
+<a href=#1194 id=1194 data-nosnippet>1194</a>    }
+<a href=#1195 id=1195 data-nosnippet>1195</a>
+<a href=#1196 id=1196 data-nosnippet>1196</a>    <span class="doccomment">/// Streams over all the messages in a channel.
+<a href=#1197 id=1197 data-nosnippet>1197</a>    ///
+<a href=#1198 id=1198 data-nosnippet>1198</a>    /// This is accomplished and equivalent to repeated calls to [`GenericChannelId::messages`]. A
+<a href=#1199 id=1199 data-nosnippet>1199</a>    /// buffer of at most 100 messages is used to reduce the number of calls necessary.
+<a href=#1200 id=1200 data-nosnippet>1200</a>    ///
+<a href=#1201 id=1201 data-nosnippet>1201</a>    /// The stream returns the newest message first, followed by older messages.
+<a href=#1202 id=1202 data-nosnippet>1202</a>    ///
+<a href=#1203 id=1203 data-nosnippet>1203</a>    /// # Examples
 <a href=#1204 id=1204 data-nosnippet>1204</a>    ///
-<a href=#1205 id=1205 data-nosnippet>1205</a>    /// let mut messages = MessagesIter::stream(&amp;http, channel_id).boxed();
-<a href=#1206 id=1206 data-nosnippet>1206</a>    /// while let Some(message_result) = messages.next().await {
-<a href=#1207 id=1207 data-nosnippet>1207</a>    ///     match message_result {
-<a href=#1208 id=1208 data-nosnippet>1208</a>    ///         Ok(message) =&gt; println!("{} said \"{}\"", message.author.name, message.content,),
-<a href=#1209 id=1209 data-nosnippet>1209</a>    ///         Err(error) =&gt; eprintln!("Uh oh! Error: {}", error),
-<a href=#1210 id=1210 data-nosnippet>1210</a>    ///     }
-<a href=#1211 id=1211 data-nosnippet>1211</a>    /// }
-<a href=#1212 id=1212 data-nosnippet>1212</a>    /// # }
-<a href=#1213 id=1213 data-nosnippet>1213</a>    /// ```
-<a href=#1214 id=1214 data-nosnippet>1214</a>    </span><span class="kw">pub fn </span>stream(
-<a href=#1215 id=1215 data-nosnippet>1215</a>        cache_http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">impl </span>CacheHttp,
-<a href=#1216 id=1216 data-nosnippet>1216</a>        channel_id: GenericChannelId,
-<a href=#1217 id=1217 data-nosnippet>1217</a>    ) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; + <span class="lifetime">'a </span>{
-<a href=#1218 id=1218 data-nosnippet>1218</a>        <span class="kw">let </span>init_state = MessagesIter::new(cache_http, channel_id);
-<a href=#1219 id=1219 data-nosnippet>1219</a>
-<a href=#1220 id=1220 data-nosnippet>1220</a>        futures::stream::unfold(init_state, |<span class="kw-2">mut </span>state| <span class="kw">async </span>{
-<a href=#1221 id=1221 data-nosnippet>1221</a>            <span class="kw">if </span>(state.buffer.is_empty() &amp;&amp; state.before.is_some() || !state.tried_fetch)
-<a href=#1222 id=1222 data-nosnippet>1222</a>                &amp;&amp; <span class="kw">let </span><span class="prelude-val">Err</span>(error) = state.refresh().<span class="kw">await
-<a href=#1223 id=1223 data-nosnippet>1223</a>            </span>{
-<a href=#1224 id=1224 data-nosnippet>1224</a>                <span class="kw">return </span><span class="prelude-val">Some</span>((<span class="prelude-val">Err</span>(error), state));
-<a href=#1225 id=1225 data-nosnippet>1225</a>            }
-<a href=#1226 id=1226 data-nosnippet>1226</a>
-<a href=#1227 id=1227 data-nosnippet>1227</a>            <span class="comment">// the resultant stream goes from newest to oldest.
-<a href=#1228 id=1228 data-nosnippet>1228</a>            </span>state.buffer.pop().map(|entry| (<span class="prelude-val">Ok</span>(entry), state))
-<a href=#1229 id=1229 data-nosnippet>1229</a>        })
-<a href=#1230 id=1230 data-nosnippet>1230</a>    }
-<a href=#1231 id=1231 data-nosnippet>1231</a>}
+<a href=#1205 id=1205 data-nosnippet>1205</a>    /// ```rust,no_run
+<a href=#1206 id=1206 data-nosnippet>1206</a>    /// # use serenity::model::id::GenericChannelId;
+<a href=#1207 id=1207 data-nosnippet>1207</a>    /// # use serenity::http::Http;
+<a href=#1208 id=1208 data-nosnippet>1208</a>    /// #
+<a href=#1209 id=1209 data-nosnippet>1209</a>    /// # async fn run() {
+<a href=#1210 id=1210 data-nosnippet>1210</a>    /// # let channel_id = GenericChannelId::new(1);
+<a href=#1211 id=1211 data-nosnippet>1211</a>    /// # let http: Http = unimplemented!();
+<a href=#1212 id=1212 data-nosnippet>1212</a>    /// use serenity::futures::StreamExt;
+<a href=#1213 id=1213 data-nosnippet>1213</a>    /// use serenity::model::channel::MessagesIter;
+<a href=#1214 id=1214 data-nosnippet>1214</a>    ///
+<a href=#1215 id=1215 data-nosnippet>1215</a>    /// let mut messages = MessagesIter::stream(&amp;http, channel_id).boxed();
+<a href=#1216 id=1216 data-nosnippet>1216</a>    /// while let Some(message_result) = messages.next().await {
+<a href=#1217 id=1217 data-nosnippet>1217</a>    ///     match message_result {
+<a href=#1218 id=1218 data-nosnippet>1218</a>    ///         Ok(message) =&gt; println!("{} said \"{}\"", message.author.name, message.content,),
+<a href=#1219 id=1219 data-nosnippet>1219</a>    ///         Err(error) =&gt; eprintln!("Uh oh! Error: {}", error),
+<a href=#1220 id=1220 data-nosnippet>1220</a>    ///     }
+<a href=#1221 id=1221 data-nosnippet>1221</a>    /// }
+<a href=#1222 id=1222 data-nosnippet>1222</a>    /// # }
+<a href=#1223 id=1223 data-nosnippet>1223</a>    /// ```
+<a href=#1224 id=1224 data-nosnippet>1224</a>    </span><span class="kw">pub fn </span>stream(
+<a href=#1225 id=1225 data-nosnippet>1225</a>        cache_http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw">impl </span>CacheHttp,
+<a href=#1226 id=1226 data-nosnippet>1226</a>        channel_id: GenericChannelId,
+<a href=#1227 id=1227 data-nosnippet>1227</a>    ) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Message&gt;&gt; + <span class="lifetime">'a </span>{
+<a href=#1228 id=1228 data-nosnippet>1228</a>        <span class="kw">let </span>init_state = MessagesIter::new(cache_http, channel_id);
+<a href=#1229 id=1229 data-nosnippet>1229</a>
+<a href=#1230 id=1230 data-nosnippet>1230</a>        futures::stream::unfold(init_state, |<span class="kw-2">mut </span>state| <span class="kw">async </span>{
+<a href=#1231 id=1231 data-nosnippet>1231</a>            <span class="kw">if </span>(state.buffer.is_empty() &amp;&amp; state.before.is_some() || !state.tried_fetch)
+<a href=#1232 id=1232 data-nosnippet>1232</a>                &amp;&amp; <span class="kw">let </span><span class="prelude-val">Err</span>(error) = state.refresh().<span class="kw">await
+<a href=#1233 id=1233 data-nosnippet>1233</a>            </span>{
+<a href=#1234 id=1234 data-nosnippet>1234</a>                <span class="kw">return </span><span class="prelude-val">Some</span>((<span class="prelude-val">Err</span>(error), state));
+<a href=#1235 id=1235 data-nosnippet>1235</a>            }
+<a href=#1236 id=1236 data-nosnippet>1236</a>
+<a href=#1237 id=1237 data-nosnippet>1237</a>            <span class="comment">// the resultant stream goes from newest to oldest.
+<a href=#1238 id=1238 data-nosnippet>1238</a>            </span>state.buffer.pop().map(|entry| (<span class="prelude-val">Ok</span>(entry), state))
+<a href=#1239 id=1239 data-nosnippet>1239</a>        })
+<a href=#1240 id=1240 data-nosnippet>1240</a>    }
+<a href=#1241 id=1241 data-nosnippet>1241</a>}
 </code></pre></div></section></main></body></html>
