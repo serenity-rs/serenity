@@ -569,7 +569,7 @@ mod tests {
 
     #[test]
     fn string_to_reaction_type_empty() {
-        let emoji_string = "".to_string();
+        let emoji_string = String::new();
         ReactionType::try_from(emoji_string).unwrap_err();
     }
 
