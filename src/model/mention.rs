@@ -189,6 +189,7 @@ mentionable!(value: Channel, value.id());
 
 mentionable!(value: GuildChannel, value.id.widen());
 mentionable!(value: GuildThread, value.id.widen());
+mentionable!(value: ObfuscatedChannel, value.id.widen());
 mentionable!(value: PrivateChannel, value.id.widen());
 mentionable!(value: Member, value.user.id);
 mentionable!(value: CurrentUser, value.id);

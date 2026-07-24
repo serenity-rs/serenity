@@ -489,3 +489,89 @@ impl ExtractKey<ChannelId> for GuildChannel {
         &self.id
     }
 }
+
+impl From<ObfuscatedChannel> for GuildChannel {
+    fn from(obfuscated_channel: ObfuscatedChannel) -> Self {
+        Self {
+            base: BaseGuildChannel {
+                guild_id: obfuscated_channel.guild_id,
+                kind: obfuscated_channel.kind,
+                name: FixedString::from_static_trunc("___hidden___"),
+                ..Default::default()
+            },
+            id: obfuscated_channel.id,
+            parent_id: obfuscated_channel.parent_id,
+            permission_overwrites: FixedArray::from_vec_trunc(vec![PermissionOverwrite {
+                allow: Permissions::empty(),
+                deny: Permissions::VIEW_CHANNEL,
+                kind: PermissionOverwriteType::Role(RoleId::new(obfuscated_channel.guild_id.get())),
+            }]),
+            position: obfuscated_channel.position,
+            flags: ChannelFlags::CHANNEL_OBFUSCATED,
+            ..Default::default()
+        }
+    }
+}
+
+/// Represents an obfuscated channel in a [`Guild`].
+///
+/// Only includes data guaranteed to be available; obfuscated metadata is omitted.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Copy, Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ObfuscatedChannel {
+    /// The Id of the guild the channel is located in.
+    #[serde(default)]
+    pub guild_id: GuildId,
+    /// The type of the channel.
+    #[serde(rename = "type")]
+    pub kind: ChannelType,
+    /// The unique Id of the channel.
+    pub id: ChannelId,
+    /// The Id of the parent category the channel belongs to.
+    ///
+    /// **Note**: This is only available for channels in a category.
+    pub parent_id: Option<ChannelId>,
+    /// The position of the channel.
+    #[serde(default)]
+    pub position: u16,
+}
+
+impl fmt::Display for ObfuscatedChannel {
+    /// Formats the channel, creating a mention of it.
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.mention(), f)
+    }
+}
+
+impl ExtractKey<ChannelId> for ObfuscatedChannel {
+    fn extract_key(&self) -> &ChannelId {
+        &self.id
+    }
+}
+
+impl From<GuildChannel> for ObfuscatedChannel {
+    fn from(guild_channel: GuildChannel) -> Self {
+        Self {
+            guild_id: guild_channel.base.guild_id,
+            kind: guild_channel.base.kind,
+            id: guild_channel.id,
+            parent_id: guild_channel.parent_id,
+            position: guild_channel.position,
+        }
+    }
+}
+
+impl From<&GuildChannel> for ObfuscatedChannel {
+    fn from(guild_channel: &GuildChannel) -> Self {
+        Self {
+            guild_id: guild_channel.base.guild_id,
+            kind: guild_channel.base.kind,
+            id: guild_channel.id,
+            parent_id: guild_channel.parent_id,
+            position: guild_channel.position,
+        }
+    }
+}
