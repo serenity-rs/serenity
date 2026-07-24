@@ -10,10 +10,13 @@ impl CacheUpdate for ChannelCreateEvent {
     type Output = GuildChannel;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
-        cache
-            .guilds
-            .get_mut(&self.channel.base.guild_id)
-            .and_then(|mut g| g.channels.insert(self.channel.clone()))
+        cache.guilds.get_mut(&self.channel.base.guild_id).and_then(|mut g| {
+            if self.channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+                g.obfuscated_channels.insert((&self.channel).into()).map(Into::into)
+            } else {
+                g.channels.insert(self.channel.clone())
+            }
+        })
     }
 }
 
@@ -23,7 +26,11 @@ impl CacheUpdate for ChannelDeleteEvent {
     fn update(&self, cache: &Cache) -> Option<VecDeque<Message>> {
         let (channel_id, guild_id) = (self.channel.id, self.channel.base.guild_id);
 
-        cache.guilds.get_mut(&guild_id).map(|mut g| g.channels.remove(&channel_id));
+        if let Some(mut guild) = cache.guilds.get_mut(&guild_id)
+            && guild.channels.remove(&channel_id).is_none()
+        {
+            guild.obfuscated_channels.remove(&channel_id);
+        }
 
         // Remove the cached messages for the channel.
         cache.messages.remove(&channel_id.widen()).map(|(_, messages)| messages)
@@ -34,10 +41,18 @@ impl CacheUpdate for ChannelUpdateEvent {
     type Output = GuildChannel;
 
     fn update(&self, cache: &Cache) -> Option<GuildChannel> {
-        cache
-            .guilds
-            .get_mut(&self.channel.base.guild_id)
-            .and_then(|mut g| g.channels.insert(self.channel.clone()))
+        cache.guilds.get_mut(&self.channel.base.guild_id).and_then(|mut g| {
+            if self.channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+                g.obfuscated_channels
+                    .insert((&self.channel).into())
+                    .map(Into::into)
+                    .or_else(|| g.channels.remove(&self.channel.id))
+            } else {
+                g.channels
+                    .insert(self.channel.clone())
+                    .or_else(|| g.obfuscated_channels.remove(&self.channel.id).map(Into::into))
+            }
+        })
     }
 }
 
@@ -174,59 +189,74 @@ impl CacheUpdate for GuildMemberUpdateEvent {
     type Output = Member;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
-            let item = if let Some(mut member) = guild.members.get_mut(&self.user.id) {
-                let item = Some(member.clone());
+        let mut guild = cache.guilds.get_mut(&self.guild_id)?;
+        let old_member = guild.members.get_mut(&self.user.id).and_then(|mut member| {
+            let old_member = Some(member.clone());
 
-                member.joined_at.clone_from(&self.joined_at);
-                member.nick.clone_from(&self.nick);
-                member.roles.clone_from(&self.roles);
-                member.user.clone_from(&self.user);
-                member.premium_since.clone_from(&self.premium_since);
-                member.avatar.clone_from(&self.avatar);
-                member.banner.clone_from(&self.banner);
-                member.communication_disabled_until.clone_from(&self.communication_disabled_until);
-                member.unusual_dm_activity_until.clone_from(&self.unusual_dm_activity_until);
-                member.collectibles.clone_from(&self.collectibles);
-                member.set_pending(self.pending());
-                member.set_deaf(self.deaf());
-                member.set_mute(self.mute());
+            member.joined_at.clone_from(&self.joined_at);
+            member.nick.clone_from(&self.nick);
+            member.roles.clone_from(&self.roles);
+            member.user.clone_from(&self.user);
+            member.premium_since.clone_from(&self.premium_since);
+            member.avatar.clone_from(&self.avatar);
+            member.banner.clone_from(&self.banner);
+            member.communication_disabled_until.clone_from(&self.communication_disabled_until);
+            member.unusual_dm_activity_until.clone_from(&self.unusual_dm_activity_until);
+            member.collectibles.clone_from(&self.collectibles);
+            member.set_pending(self.pending());
+            member.set_deaf(self.deaf());
+            member.set_mute(self.mute());
 
-                item
-            } else {
-                None
+            old_member
+        });
+
+        if self.user.id == cache.current_user().id
+            && let Some(old_member) = &old_member
+        {
+            let mut to_obfuscate: Vec<ChannelId> = Vec::new();
+            if let Some(new_member) = guild.members.get(&self.user.id)
+                && old_member.roles.iter().any(|role| !new_member.roles.contains(role))
+            {
+                for channel in &guild.channels {
+                    if !guild.user_permissions_in(channel, new_member).view_channel() {
+                        to_obfuscate.push(channel.id);
+                    }
+                }
+            }
+            for id in to_obfuscate {
+                if let Some(channel) = guild.channels.remove(&id) {
+                    guild.obfuscated_channels.insert(channel.into());
+                }
+            }
+        }
+
+        if old_member.is_none() {
+            let mut new_member = Member {
+                __generated_flags: MemberGeneratedFlags::empty(),
+                guild_id: self.guild_id,
+                joined_at: self.joined_at,
+                nick: self.nick.clone(),
+                roles: self.roles.clone(),
+                user: self.user.clone(),
+                premium_since: self.premium_since,
+                permissions: None,
+                avatar: self.avatar,
+                banner: self.banner,
+                communication_disabled_until: self.communication_disabled_until,
+                flags: self.flags.unwrap_or_default(),
+                unusual_dm_activity_until: self.unusual_dm_activity_until,
+                avatar_decoration_data: self.avatar_decoration_data,
+                collectibles: self.collectibles.clone(),
             };
 
-            if item.is_none() {
-                let mut new_member = Member {
-                    __generated_flags: MemberGeneratedFlags::empty(),
-                    guild_id: self.guild_id,
-                    joined_at: self.joined_at,
-                    nick: self.nick.clone(),
-                    roles: self.roles.clone(),
-                    user: self.user.clone(),
-                    premium_since: self.premium_since,
-                    permissions: None,
-                    avatar: self.avatar,
-                    banner: self.banner,
-                    communication_disabled_until: self.communication_disabled_until,
-                    flags: self.flags.unwrap_or_default(),
-                    unusual_dm_activity_until: self.unusual_dm_activity_until,
-                    avatar_decoration_data: self.avatar_decoration_data,
-                    collectibles: self.collectibles.clone(),
-                };
+            new_member.set_pending(self.pending());
+            new_member.set_deaf(self.deaf());
+            new_member.set_mute(self.mute());
 
-                new_member.set_pending(self.pending());
-                new_member.set_deaf(self.deaf());
-                new_member.set_mute(self.mute());
-
-                guild.members.insert(new_member);
-            }
-
-            item
-        } else {
-            None
+            guild.members.insert(new_member);
         }
+
+        old_member
     }
 }
 
@@ -263,13 +293,32 @@ impl CacheUpdate for GuildRoleUpdateEvent {
     type Output = Role;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
-        if let Some(mut guild) = cache.guilds.get_mut(&self.role.guild_id)
-            && let Some(mut role) = guild.roles.get_mut(&self.role.id)
+        let mut guild = cache.guilds.get_mut(&self.role.guild_id)?;
+        let old_role = guild
+            .roles
+            .get_mut(&self.role.id)
+            .map(|mut role| std::mem::replace(&mut *role, self.role.clone()));
+
+        if let Some(old_role) = &old_role
+            && let Some(member) = guild.members.get(&cache.current_user().id)
+            && member.roles.contains(&self.role.id)
+            && (old_role.permissions.view_channel() && !self.role.permissions.view_channel()
+                || old_role.permissions.administrator() && !self.role.permissions.administrator())
         {
-            return Some(std::mem::replace(&mut *role, self.role.clone()));
+            let mut to_obfuscate: Vec<ChannelId> = Vec::new();
+            for channel in &guild.channels {
+                if !guild.user_permissions_in(channel, member).view_channel() {
+                    to_obfuscate.push(channel.id);
+                }
+            }
+            for id in to_obfuscate {
+                if let Some(channel) = guild.channels.remove(&id) {
+                    guild.obfuscated_channels.insert(channel.into());
+                }
+            }
         }
 
-        None
+        old_role
     }
 }
 
@@ -576,27 +625,30 @@ impl CacheUpdate for VoiceStateUpdateEvent {
     type Output = VoiceState;
 
     fn update(&self, cache: &Cache) -> Option<VoiceState> {
-        if let Some(guild_id) = self.voice_state.guild_id {
-            if let Some(mut guild) = cache.guilds.get_mut(&guild_id) {
-                if let Some(member) = &self.voice_state.member {
-                    guild.members.insert(member.clone());
-                }
+        let guild_id = self.voice_state.guild_id?;
+        let mut guild = cache.guilds.get_mut(&guild_id)?;
 
-                if self.voice_state.channel_id.is_some() {
-                    // Update or add to the voice state list
-                    let old_state = guild.voice_states.remove(&self.voice_state.user_id);
-                    guild.voice_states.insert(self.voice_state.clone());
-                    old_state
-                } else {
-                    // Remove the user from the voice state list
-                    guild.voice_states.remove(&self.voice_state.user_id)
-                }
-            } else {
-                None
-            }
-        } else {
-            None
+        if let Some(member) = &self.voice_state.member {
+            guild.members.insert(member.clone());
         }
+
+        let old_state = guild.voice_states.remove(&self.voice_state.user_id);
+        if self.voice_state.channel_id.is_some() {
+            guild.voice_states.insert(self.voice_state.clone());
+        }
+
+        if self.voice_state.user_id == cache.current_user().id
+            && let Some(old_state) = &old_state
+            && let Some(channel_id) = &old_state.channel_id
+            && let Some(channel) = guild.channels.get(channel_id)
+            && let Some(member) = guild.members.get(&self.voice_state.user_id)
+            && !guild.user_permissions_in(channel, member).view_channel()
+            && let Some(removed_channel) = guild.channels.remove(channel_id)
+        {
+            guild.obfuscated_channels.insert(removed_channel.into());
+        }
+
+        old_state
     }
 }
 

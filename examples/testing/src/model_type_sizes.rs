@@ -140,6 +140,7 @@ pub fn print_ranking() {
         ("GenericInteractionChannel", std::mem::size_of::<GenericInteractionChannel>()),
         ("InteractionChannel", std::mem::size_of::<InteractionChannel>()),
         ("InteractionGuildThread", std::mem::size_of::<InteractionGuildThread>()),
+        ("ObfuscatedChannel", std::mem::size_of::<ObfuscatedChannel>()),
         ("PartialCurrentApplicationInfo", std::mem::size_of::<PartialCurrentApplicationInfo>()),
         ("PartialGuild", std::mem::size_of::<PartialGuild>()),
         ("PartialGuildThread", std::mem::size_of::<PartialGuildThread>()),

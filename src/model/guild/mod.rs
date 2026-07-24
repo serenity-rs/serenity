@@ -88,7 +88,7 @@ pub(crate) type MemberCount = NonMaxU32;
 /// [extension](https://docs.discord.com/developers/events/gateway-events#guild-create).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, serde::Serialize)]
 #[non_exhaustive]
 pub struct Guild {
     /// The unique Id identifying the guild.
@@ -118,11 +118,16 @@ pub struct Guild {
     // Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
     /// Information about the voice afk channel.
-    #[serde(flatten)]
     pub afk_metadata: Option<AfkMetadata>,
     /// Whether or not the guild widget is enabled.
+    ///
+    /// **Note:** This field is not present in the `GUILD_CREATE` event. It is included in the
+    /// `GUILD_UPDATE` event and when fetching a guild via the REST API.
     pub widget_enabled: Option<bool>,
-    /// The channel id that the widget will generate an invite to, or null if set to no invite
+    /// The channel id that the widget will generate an invite to, or `None` if set to no invite.
+    ///
+    /// **Note:** This field is not present in the `GUILD_CREATE` event. It is included in the
+    /// `GUILD_UPDATE` event and when fetching a guild via the REST API.
     pub widget_channel_id: Option<ChannelId>,
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
@@ -206,7 +211,6 @@ pub struct Guild {
     /// Indicator of whether the guild is considered "large" by Discord.
     pub large: bool,
     /// Whether this guild is unavailable due to an outage.
-    #[serde(default)]
     pub unavailable: bool,
     /// The number of members in the guild.
     pub member_count: MemberCount,
@@ -217,11 +221,20 @@ pub struct Guild {
     /// Members might not all be available when the [`ReadyEvent`] is received if the
     /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
     pub members: ExtractMap<UserId, Member>,
-    /// All voice and text channels contained within a guild.
+    /// All channels with full metadata contained within a guild.
     ///
-    /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
-    /// from or connect to them).
+    /// The bot must have permission to view a channel to receive its full metadata. For channels
+    /// with [obfuscated metadata], see the `obfuscated_channels` field.
+    ///
+    /// [obfuscated metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
     pub channels: ExtractMap<ChannelId, GuildChannel>,
+    /// All channels with [obfuscated metadata] contained within a guild.
+    ///
+    /// Channel metadata is obfuscated when the bot does not have permission to view that channel.
+    /// Only the `id`, `type`, `position`, and `parent_id` fields are guaranteed to be available.
+    ///
+    /// [obfuscated metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
+    pub obfuscated_channels: ExtractMap<ChannelId, ObfuscatedChannel>,
     /// All active threads in this guild that current user has permission to view.
     ///
     /// A thread is guaranteed (for errors, not for panics) to be cached if a `MESSAGE_CREATE`
@@ -235,7 +248,6 @@ pub struct Guild {
     /// The stage instances in this guild.
     pub stage_instances: FixedArray<StageInstance>,
     /// The scheduled events in this guild.
-    #[serde(rename = "guild_scheduled_events")]
     pub scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
     /// The id of the channel where this guild will recieve safety alerts.
     pub safety_alerts_channel_id: Option<ChannelId>,
@@ -980,6 +992,142 @@ impl Guild {
     #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.iter().find(|role| role_name == &*role.name)
+    }
+}
+
+impl<'de> Deserialize<'de> for Guild {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[bool_to_bitflags::bool_to_bitflags]
+        #[derive(serde::Deserialize)]
+        struct GuildRaw {
+            id: GuildId,
+            name: FixedString,
+            icon: Option<ImageHash>,
+            icon_hash: Option<ImageHash>,
+            splash: Option<ImageHash>,
+            discovery_splash: Option<ImageHash>,
+            owner_id: UserId,
+            #[serde(flatten)]
+            afk_metadata: Option<AfkMetadata>,
+            widget_enabled: Option<bool>,
+            widget_channel_id: Option<ChannelId>,
+            verification_level: VerificationLevel,
+            default_message_notifications: DefaultMessageNotificationLevel,
+            explicit_content_filter: ExplicitContentFilter,
+            roles: ExtractMap<RoleId, Role>,
+            emojis: ExtractMap<EmojiId, Emoji>,
+            features: FixedArray<FixedString>,
+            mfa_level: MfaLevel,
+            application_id: Option<ApplicationId>,
+            system_channel_id: Option<ChannelId>,
+            system_channel_flags: SystemChannelFlags,
+            rules_channel_id: Option<ChannelId>,
+            max_presences: Option<MemberCount>,
+            max_members: Option<MemberCount>,
+            vanity_url_code: Option<FixedString<u8>>,
+            description: Option<FixedString>,
+            banner: Option<ImageHash>,
+            premium_tier: PremiumTier,
+            premium_subscription_count: Option<MemberCount>,
+            preferred_locale: FixedString<u8>,
+            public_updates_channel_id: Option<ChannelId>,
+            max_video_channel_users: Option<MemberCount>,
+            max_stage_video_channel_users: Option<MemberCount>,
+            approximate_member_count: Option<MemberCount>,
+            approximate_presence_count: Option<MemberCount>,
+            welcome_screen: Option<GuildWelcomeScreen>,
+            nsfw_level: NsfwLevel,
+            stickers: ExtractMap<StickerId, Sticker>,
+            premium_progress_bar_enabled: bool,
+            joined_at: Timestamp,
+            large: bool,
+            #[serde(default)]
+            unavailable: bool,
+            member_count: MemberCount,
+            voice_states: ExtractMap<UserId, VoiceState>,
+            members: ExtractMap<UserId, Member>,
+            channels: Vec<GuildChannel>,
+            threads: ExtractMap<ThreadId, GuildThread>,
+            presences: ExtractMap<UserId, Presence>,
+            stage_instances: FixedArray<StageInstance>,
+            #[serde(rename = "guild_scheduled_events")]
+            scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
+            safety_alerts_channel_id: Option<ChannelId>,
+            incidents_data: Option<Box<IncidentsData>>,
+        }
+
+        let raw = GuildRaw::deserialize(deserializer)?;
+        let large = raw.large();
+        let premium_progress_bar_enabled = raw.premium_progress_bar_enabled();
+        let unavailable = raw.unavailable();
+        let widget_enabled = raw.widget_enabled();
+
+        let mut guild = Guild {
+            id: raw.id,
+            name: raw.name,
+            icon: raw.icon,
+            icon_hash: raw.icon_hash,
+            splash: raw.splash,
+            discovery_splash: raw.discovery_splash,
+            owner_id: raw.owner_id,
+            afk_metadata: raw.afk_metadata,
+            widget_channel_id: raw.widget_channel_id,
+            verification_level: raw.verification_level,
+            default_message_notifications: raw.default_message_notifications,
+            explicit_content_filter: raw.explicit_content_filter,
+            roles: raw.roles,
+            emojis: raw.emojis,
+            features: raw.features,
+            mfa_level: raw.mfa_level,
+            application_id: raw.application_id,
+            system_channel_id: raw.system_channel_id,
+            system_channel_flags: raw.system_channel_flags,
+            rules_channel_id: raw.rules_channel_id,
+            max_presences: raw.max_presences,
+            max_members: raw.max_members,
+            vanity_url_code: raw.vanity_url_code,
+            description: raw.description,
+            banner: raw.banner,
+            premium_tier: raw.premium_tier,
+            premium_subscription_count: raw.premium_subscription_count,
+            preferred_locale: raw.preferred_locale,
+            public_updates_channel_id: raw.public_updates_channel_id,
+            max_video_channel_users: raw.max_video_channel_users,
+            max_stage_video_channel_users: raw.max_stage_video_channel_users,
+            approximate_member_count: raw.approximate_member_count,
+            approximate_presence_count: raw.approximate_presence_count,
+            welcome_screen: raw.welcome_screen,
+            nsfw_level: raw.nsfw_level,
+            stickers: raw.stickers,
+            joined_at: raw.joined_at,
+            member_count: raw.member_count,
+            voice_states: raw.voice_states,
+            members: raw.members,
+            channels: ExtractMap::new(),
+            obfuscated_channels: ExtractMap::new(),
+            threads: raw.threads,
+            presences: raw.presences,
+            stage_instances: raw.stage_instances,
+            scheduled_events: raw.scheduled_events,
+            safety_alerts_channel_id: raw.safety_alerts_channel_id,
+            incidents_data: raw.incidents_data,
+            __generated_flags: GuildGeneratedFlags::empty(),
+        };
+
+        guild.set_large(large);
+        guild.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
+        guild.set_unavailable(unavailable);
+        guild.set_widget_enabled(widget_enabled);
+
+        for channel in raw.channels {
+            if channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+                guild.obfuscated_channels.insert(channel.into());
+            } else {
+                guild.channels.insert(channel);
+            }
+        }
+
+        Ok(guild)
     }
 }
 
