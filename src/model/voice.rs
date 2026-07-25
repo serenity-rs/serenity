@@ -75,3 +75,41 @@ impl Serialize for VoiceStateGeneratedOriginal {
         Self::serialize(self, serializer)
     }
 }
+
+/// Information about an effect, such as an emoji reaction or a soundboard sound, sent in a voice
+/// channel.
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-effect-send).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct VoiceChannelEffect {
+    /// The Id of the channel the effect was sent in.
+    pub channel_id: ChannelId,
+    /// The Id of the guild the effect was sent in.
+    pub guild_id: GuildId,
+    /// The Id of the user who sent the effect.
+    pub user_id: UserId,
+    /// The emoji sent, for emoji reaction and soundboard effects.
+    pub emoji: Option<ReactionType>,
+    /// The type of emoji animation, for emoji reaction and soundboard effects.
+    pub animation_type: Option<AnimationType>,
+    /// The Id of the emoji animation, for emoji reaction and soundboard effects.
+    pub animation_id: Option<u32>,
+    /// The Id of the soundboard sound, for soundboard effects.
+    pub sound_id: Option<SoundId>,
+    /// The volume of the soundboard sound, from 0 to 1, for soundboard effects.
+    pub sound_volume: Option<f64>,
+}
+
+enum_number! {
+    /// The type of emoji animation, for emoji reaction and soundboard effects.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum AnimationType {
+        Premium = 0,
+        Basic = 1,
+        _ => Unknown(u8),
+    }
+}

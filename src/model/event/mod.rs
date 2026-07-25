@@ -692,6 +692,17 @@ pub struct VoiceStateUpdateEvent {
     pub voice_state: VoiceState,
 }
 
+/// Requires [`GatewayIntents::GUILD_VOICE_STATES`].
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-effect-send).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct VoiceChannelEffectSendEvent {
+    #[serde(flatten)]
+    pub effect: VoiceChannelEffect,
+}
+
 /// Requires [`GatewayIntents::GUILDS`].
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-start-time-update).
@@ -1235,6 +1246,9 @@ pub enum Event {
     VoiceStateUpdate(VoiceStateUpdateEvent),
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
+    /// Sent when someone sends an effect, such as an emoji reaction or a soundboard sound,
+    /// in a voice channel the current user is connected to.
+    VoiceChannelEffectSend(VoiceChannelEffectSendEvent),
     /// Sent when the voice channel start time changes.
     VoiceChannelStartTimeUpdate(VoiceChannelStartTimeUpdateEvent),
     /// Sent when the voice channel status changes.

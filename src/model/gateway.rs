@@ -596,7 +596,8 @@ bitflags! {
         /// - INVITE_CREATE
         /// - INVITE_DELETE
         const GUILD_INVITES = 1 << 6;
-        /// Enables the following gateway event:
+        /// Enables the following gateway events:
+        /// - VOICE_CHANNEL_EFFECT_SEND
         /// - VOICE_STATE_UPDATE
         ///
         /// **Note**: this intent is mandatory for `songbird` to function properly.

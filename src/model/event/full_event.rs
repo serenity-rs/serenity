@@ -292,6 +292,11 @@ full_event! {
     /// [`GatewayIntents::GUILDS`] is enabled) and the new state of the guild's voice channels.
     VoiceStateUpdate { old: Option<VoiceState>, new: VoiceState };
 
+    /// Dispatched when an effect, such as an emoji reaction or a soundboard sound, is sent in a
+    /// voice channel the current user is connected to.
+    ///
+    /// Provides data about the voice channel effect.
+    VoiceChannelEffectSend { effect: VoiceChannelEffect };
     /// Dispatched when a voice channel's start time is updated.
     ///
     /// Provides the start time, channel's id and the guild's id.
@@ -791,6 +796,9 @@ impl FullEvent {
                     old: before,
                     new: event.voice_state,
                 }
+            },
+            Event::VoiceChannelEffectSend(event) => Self::VoiceChannelEffectSend {
+                effect: event.effect,
             },
             Event::VoiceChannelStartTimeUpdate(event) => {
                 #[cfg(feature = "cache")]
