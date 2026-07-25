@@ -192,13 +192,11 @@ impl<'a> EditChannel<'a> {
 
     /// How many seconds must a user wait before sending another message.
     ///
-    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are
-    /// exempt from this restriction.
+    /// Bots, or users with the [`BYPASS_SLOWMODE`] permission, are exempt from this restriction.
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
     ///
-    /// [`MANAGE_MESSAGES`]: Permissions::MANAGE_MESSAGES
-    /// [`MANAGE_CHANNELS`]: Permissions::MANAGE_CHANNELS
+    /// [`BYPASS_SLOWMODE`]: crate::model::permissions::Permissions::BYPASS_SLOWMODE
     #[doc(alias = "slowmode")]
     pub fn rate_limit_per_user(mut self, seconds: NonMaxU16) -> Self {
         self.rate_limit_per_user = Some(seconds);
