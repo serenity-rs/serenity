@@ -131,6 +131,8 @@ full_event! {
     GuildIntegrationsUpdate { guild_id: GuildId };
     /// Dispatched when a user joins a guild.
     ///
+    /// This event may also be sent for users who are already members of the guild.
+    ///
     /// Provides the guild's id and the user's member data.
     ///
     /// Note: This event will not trigger unless the "guild members" privileged intent is enabled
