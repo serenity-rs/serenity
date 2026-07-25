@@ -122,7 +122,7 @@ impl Action {
             146 => Action::AutoMod(AutoModAction::QuarantineUser),
             150 => Action::CreatorMonetization(CreatorMonetizationAction::RequestCreated),
             151 => Action::CreatorMonetization(CreatorMonetizationAction::TermsAccepted),
-            192 => Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusUpdate),
+            192 => Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusCreate),
             193 => Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusDelete),
             _ => Action::Unknown(value),
         }
@@ -308,7 +308,7 @@ pub enum CreatorMonetizationAction {
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 pub enum VoiceChannelStatusAction {
-    StatusUpdate = 192,
+    StatusCreate = 192,
     StatusDelete = 193,
 }
 
@@ -487,7 +487,7 @@ mod tests {
         assert_action!(Action::AutoMod(AutoModAction::QuarantineUser), 146);
         assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::RequestCreated), 150);
         assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::TermsAccepted), 151);
-        assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusUpdate), 192);
+        assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusCreate), 192);
         assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusDelete), 193);
         assert_action!(Action::Unknown(234), 234);
     }
