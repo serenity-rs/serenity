@@ -176,6 +176,8 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Set the message this reply or forward is referring to.
+    ///
+    /// **Note**: The bot must be able to read a message's content in order to forward it.
     pub fn reference_message(mut self, reference: impl Into<MessageReference>) -> Self {
         self.message_reference = Some(reference.into());
         self
