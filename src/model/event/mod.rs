@@ -142,7 +142,7 @@ pub struct GuildAuditLogEntryCreateEvent {
     pub entry: AuditLogEntry,
 }
 
-/// Requires [`GatewayIntents::GUILD_MODERATION`].
+/// Requires [`GatewayIntents::GUILD_MODERATION`] or [`Permissions::VIEW_AUDIT_LOG`].
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-ban-add).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -153,7 +153,7 @@ pub struct GuildBanAddEvent {
     pub user: User,
 }
 
-/// Requires [`GatewayIntents::GUILD_MODERATION`].
+/// Requires [`GatewayIntents::GUILD_MODERATION`] or [`Permissions::VIEW_AUDIT_LOG`].
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-ban-remove).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
