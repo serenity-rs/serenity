@@ -362,7 +362,7 @@ pub struct CommandPermissions {
 ///
 /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct CommandPermission {
     /// The [`RoleId`] or [`UserId`], depends on `kind` value.

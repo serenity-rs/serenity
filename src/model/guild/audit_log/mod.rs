@@ -32,8 +32,13 @@ pub enum Action {
     Sticker(StickerAction),
     ScheduledEvent(ScheduledEventAction),
     Thread(ThreadAction),
+    CommandPermissions(CommandPermissionsAction),
+    SoundboardSound(SoundboardSoundAction),
     AutoMod(AutoModAction),
     CreatorMonetization(CreatorMonetizationAction),
+    OnboardingPrompt(OnboardingPromptAction),
+    Onboarding(OnboardingAction),
+    ServerGuide(ServerGuideAction),
     VoiceChannelStatus(VoiceChannelStatusAction),
     Unknown(u16),
 }
@@ -56,8 +61,13 @@ impl Action {
             Self::Sticker(x) => x as u16,
             Self::ScheduledEvent(x) => x as u16,
             Self::Thread(x) => x as u16,
+            Self::CommandPermissions(x) => x as u16,
+            Self::SoundboardSound(x) => x as u16,
             Self::AutoMod(x) => x as u16,
             Self::CreatorMonetization(x) => x as u16,
+            Self::OnboardingPrompt(x) => x as u16,
+            Self::Onboarding(x) => x as u16,
+            Self::ServerGuide(x) => x as u16,
             Self::VoiceChannelStatus(x) => x as u16,
             Self::Unknown(x) => x,
         }
@@ -113,6 +123,10 @@ impl Action {
             110 => Action::Thread(ThreadAction::Create),
             111 => Action::Thread(ThreadAction::Update),
             112 => Action::Thread(ThreadAction::Delete),
+            121 => Action::CommandPermissions(CommandPermissionsAction::Update),
+            130 => Action::SoundboardSound(SoundboardSoundAction::Create),
+            131 => Action::SoundboardSound(SoundboardSoundAction::Update),
+            132 => Action::SoundboardSound(SoundboardSoundAction::Delete),
             140 => Action::AutoMod(AutoModAction::RuleCreate),
             141 => Action::AutoMod(AutoModAction::RuleUpdate),
             142 => Action::AutoMod(AutoModAction::RuleDelete),
@@ -122,6 +136,13 @@ impl Action {
             146 => Action::AutoMod(AutoModAction::QuarantineUser),
             150 => Action::CreatorMonetization(CreatorMonetizationAction::RequestCreated),
             151 => Action::CreatorMonetization(CreatorMonetizationAction::TermsAccepted),
+            163 => Action::OnboardingPrompt(OnboardingPromptAction::Create),
+            164 => Action::OnboardingPrompt(OnboardingPromptAction::Update),
+            165 => Action::OnboardingPrompt(OnboardingPromptAction::Delete),
+            166 => Action::Onboarding(OnboardingAction::Create),
+            167 => Action::Onboarding(OnboardingAction::Update),
+            190 => Action::ServerGuide(ServerGuideAction::Create),
+            191 => Action::ServerGuide(ServerGuideAction::Update),
             192 => Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusCreate),
             193 => Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusDelete),
             _ => Action::Unknown(value),
@@ -282,6 +303,24 @@ pub enum ThreadAction {
 
 /// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+pub enum CommandPermissionsAction {
+    Update = 121,
+}
+
+/// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+pub enum SoundboardSoundAction {
+    Create = 130,
+    Update = 131,
+    Delete = 132,
+}
+
+/// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug)]
 #[non_exhaustive]
 pub enum AutoModAction {
@@ -301,6 +340,34 @@ pub enum AutoModAction {
 pub enum CreatorMonetizationAction {
     RequestCreated = 150,
     TermsAccepted = 151,
+}
+
+/// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+pub enum OnboardingPromptAction {
+    Create = 163,
+    Update = 164,
+    Delete = 165,
+}
+
+/// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Copy, Debug)]
+#[non_exhaustive]
+pub enum OnboardingAction {
+    Create = 166,
+    Update = 167,
+}
+
+/// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Copy, Clone, Debug)]
+#[non_exhaustive]
+pub enum ServerGuideAction {
+    Create = 190,
+    Update = 191,
 }
 
 /// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
@@ -330,8 +397,8 @@ pub struct AuditLogs {
     pub integrations: FixedArray<PartialIntegration>,
     /// List of threads referenced in the audit log.
     ///
-    /// Threads referenced in THREAD_CREATE and THREAD_UPDATE events are included in the threads
-    /// map since archived threads might not be kept in memory by clients.
+    /// Threads referenced in `THREAD_CREATE` and `THREAD_UPDATE` events are included in the
+    /// threads map since archived threads might not be kept in memory by clients.
     pub threads: FixedArray<GuildThread>,
     /// List of users referenced in the audit log.
     pub users: ExtractMap<UserId, User>,
@@ -359,21 +426,21 @@ pub struct PartialIntegration {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 #[non_exhaustive]
 pub struct AuditLogEntry {
-    /// Determines to what entity an [`Self::action`] was used on.
+    /// The Id of the affected entity (webhook, user, role, etc.).
     pub target_id: Option<GenericId>,
-    /// Determines what action was done on a [`Self::target_id`]
+    /// The type of action that occurred.
     #[serde(rename = "action_type")]
     pub action: Action,
-    /// What was the reasoning by doing an action on a target? If there was one.
+    /// The reason for the change (1-512 characters).
     pub reason: Option<FixedString>,
-    /// The user that did this action on a target.
+    /// The user or app that made the changes.
     pub user_id: Option<UserId>,
-    /// What changes were made.
+    /// The changes made to the `target_id`.
     #[serde(default)]
     pub changes: Vec<Change>,
-    /// The id of this entry.
+    /// The Id of this entry.
     pub id: AuditLogEntryId,
-    /// Some optional data associated with this entry.
+    /// Additional info for certain event types.
     pub options: Option<AuditLogEntryOptions>,
 }
 
@@ -386,33 +453,36 @@ pub struct AuditLogEntryOptions {
     pub auto_moderation_rule_name: Option<FixedString>,
     /// Trigger type of the Auto Moderation rule that was triggered.
     pub auto_moderation_rule_trigger_type: Option<FixedString>,
-    /// ID of the app whose permissions were targeted.
+    /// Id of the app whose permissions were targeted.
     pub application_id: Option<ApplicationId>,
     /// Number of days after which inactive members were kicked.
     #[serde(default, with = "optional_string")]
     pub delete_member_days: Option<NonMaxU32>,
-    /// Number of members removed by the prune
+    /// Number of members removed by the prune.
     #[serde(default, with = "optional_string")]
     pub members_removed: Option<NonMaxU64>,
-    /// Channel in which the messages were deleted
+    /// Channel in which the entities were targeted.
     #[serde(default)]
     pub channel_id: Option<GenericChannelId>,
-    /// Number of deleted messages.
+    /// Number of entities that were targeted.
     #[serde(default, with = "optional_string")]
     pub count: Option<NonMaxU64>,
-    /// Id of the overwritten entity
+    /// Id of the overwritten entity.
     #[serde(default)]
     pub id: Option<GenericId>,
     /// Type of overwritten entity ("member" or "role").
     #[serde(default, rename = "type")]
     pub kind: Option<FixedString>,
-    /// Message that was pinned or unpinned.
+    /// Id of the message that was targeted.
     #[serde(default)]
     pub message_id: Option<MessageId>,
-    /// Name of the role if type is "role"
+    /// Name of the role if type is "role".
     #[serde(default)]
     pub role_name: Option<FixedString>,
-    /// The status of a voice channel when set.
+    /// The type of integration which performed the action.
+    #[serde(default)]
+    pub integration_type: Option<FixedString>,
+    /// The new voice channel status.
     #[serde(default)]
     pub status: Option<FixedString>,
 }
@@ -478,6 +548,10 @@ mod tests {
         assert_action!(Action::Thread(ThreadAction::Create), 110);
         assert_action!(Action::Thread(ThreadAction::Update), 111);
         assert_action!(Action::Thread(ThreadAction::Delete), 112);
+        assert_action!(Action::CommandPermissions(CommandPermissionsAction::Update), 121);
+        assert_action!(Action::SoundboardSound(SoundboardSoundAction::Create), 130);
+        assert_action!(Action::SoundboardSound(SoundboardSoundAction::Update), 131);
+        assert_action!(Action::SoundboardSound(SoundboardSoundAction::Delete), 132);
         assert_action!(Action::AutoMod(AutoModAction::RuleCreate), 140);
         assert_action!(Action::AutoMod(AutoModAction::RuleUpdate), 141);
         assert_action!(Action::AutoMod(AutoModAction::RuleDelete), 142);
@@ -487,6 +561,13 @@ mod tests {
         assert_action!(Action::AutoMod(AutoModAction::QuarantineUser), 146);
         assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::RequestCreated), 150);
         assert_action!(Action::CreatorMonetization(CreatorMonetizationAction::TermsAccepted), 151);
+        assert_action!(Action::OnboardingPrompt(OnboardingPromptAction::Create), 163);
+        assert_action!(Action::OnboardingPrompt(OnboardingPromptAction::Update), 164);
+        assert_action!(Action::OnboardingPrompt(OnboardingPromptAction::Delete), 165);
+        assert_action!(Action::Onboarding(OnboardingAction::Create), 166);
+        assert_action!(Action::Onboarding(OnboardingAction::Update), 167);
+        assert_action!(Action::ServerGuide(ServerGuideAction::Create), 190);
+        assert_action!(Action::ServerGuide(ServerGuideAction::Update), 191);
         assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusCreate), 192);
         assert_action!(Action::VoiceChannelStatus(VoiceChannelStatusAction::StatusDelete), 193);
         assert_action!(Action::Unknown(234), 234);

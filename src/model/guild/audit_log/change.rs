@@ -32,7 +32,7 @@ macro_rules! generate_change {
         $key:literal => $name:ident ($type:ty),
     )* ) => {
         #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-        #[derive(Debug, PartialEq, Eq, Serialize, Deserialize, Clone)]
+        #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
         #[non_exhaustive]
         #[serde(tag = "key")]
         #[serde(rename_all = "snake_case")]
@@ -61,9 +61,9 @@ macro_rules! generate_change {
                 #[serde(rename = "new_value")]
                 new: Option<FixedArray<AffectedRole>>,
             },
-            /// Role was removed to a member.
+            /// Role was removed from a member.
             #[serde(rename = "$remove")]
-            RolesRemove {
+            RolesRemoved {
                 #[serde(skip_serializing_if = "Option::is_none")]
                 #[serde(rename = "old_value")]
                 old: Option<FixedArray<AffectedRole>>,
@@ -72,9 +72,21 @@ macro_rules! generate_change {
                 new: Option<FixedArray<AffectedRole>>,
             },
 
+            /// Permissions were updated for a command.
+            #[serde(untagged)]
+            CommandPermissions {
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[serde(rename = "old_value")]
+                old_value: Option<CommandPermission>,
+                #[serde(skip_serializing_if = "Option::is_none")]
+                #[serde(rename = "new_value")]
+                new_value: Option<CommandPermission>,
+            },
+
             /// Unknown key was changed.
+            #[serde(untagged)]
             Other {
-                name: FixedString,
+                key: FixedString,
                 #[serde(skip_serializing_if = "Option::is_none")]
                 #[serde(rename = "old_value")]
                 old_value: Option<Value>,
@@ -82,21 +94,25 @@ macro_rules! generate_change {
                 #[serde(rename = "new_value")]
                 new_value: Option<Value>,
             },
-
-            /// Unknown key was changed and was invalid
-            #[serde(other)]
-            Unknown
         }
 
         impl Change {
             #[must_use]
-            pub fn key(&self) -> &str {
+            pub fn key(&self) -> FixedString {
                 match self {
-                    $( Self::$name { .. } => $key, )*
-                    Self::RolesAdded { .. } => "$add",
-                    Self::RolesRemove { .. } => "$remove",
-                    Self::Other { name, .. } => name,
-                    Self::Unknown => "unknown",
+                    $( Self::$name { .. } => FixedString::from_static_trunc($key), )*
+                    Self::RolesAdded { .. } => FixedString::from_static_trunc("$add"),
+                    Self::RolesRemoved { .. } => FixedString::from_static_trunc("$remove"),
+                    Self::CommandPermissions { old_value, new_value } => {
+                        if let Some(old_value) = old_value {
+                            FixedString::from_string_trunc(old_value.id.to_string())
+                        } else if let Some (new_value) = new_value {
+                            FixedString::from_string_trunc(new_value.id.to_string())
+                        } else {
+                            FixedString::from_static_trunc("unknown")
+                        }
+                    }
+                    Self::Other { key, .. } => key.clone(),
                 }
             }
         }
@@ -120,7 +136,7 @@ generate_change! {
     "auto_archive_duration" => AutoArchiveDuration(u16),
     /// Availability of a sticker was changed.
     "available" => Available(bool),
-    /// User avatar was changed.
+    /// User or webhook avatar was changed.
     "avatar_hash" => AvatarHash(ImageHash),
     /// Guild banner was changed.
     "banner_hash" => BannerHash(ImageHash),
@@ -132,12 +148,16 @@ generate_change! {
     "code" => Code(FixedString),
     /// Role color was changed.
     "color" => Color(u32),
+    /// Role colors were changed.
+    "colors" => Colors(RoleColours),
     /// Member timeout state was changed.
     "communication_disabled_until" => CommunicationDisabledUntil(Timestamp),
     /// User was server deafened/undeafened.
     "deaf" => Deaf(bool),
     /// Default auto archive duration for newly created threads was changed.
     "default_auto_archive_duration" => DefaultAutoArchiveDuration(u16),
+    /// Default channels for onboarding were changed.
+    "default_channel_ids" => DefaultChannelIds(FixedArray<ChannelId>),
     /// Default message notification level for a server was changed.
     "default_message_notifications" => DefaultMessageNotifications(DefaultMessageNotificationLevel),
     /// Permission on a text or voice channel was denied for a role.
@@ -146,6 +166,10 @@ generate_change! {
     "description" => Description(FixedString),
     /// Guild's discovery splash was changed.
     "discovery_splash_hash" => DiscoverySplashHash(ImageHash),
+    /// Id of the emoji for a soundboard sound was changed.
+    "emoji_id" => EmojiId(EmojiId),
+    /// Unicode character of the emoji for a soundboard sound was changed.
+    "emoji_name" => EmojiName(FixedString),
     "enabled" => Enabled(bool),
     /// Integration emoticons was enabled/disabled.
     "enable_emoticons" => EnableEmoticons(bool),
@@ -218,8 +242,18 @@ generate_change! {
     "rate_limit_per_user" => RateLimitPerUser(u16),
     /// Region of a guild was changed.
     "region" => Region(FixedString),
+    /// Whether an onboarding prompt is required was changed.
+    "required" => Required(bool),
     /// ID of the rules channel was changed.
     "rules_channel_id" => RulesChannelId(ChannelId),
+    /// End time of a scheduled event was changed.
+    "scheduled_end_time" => ScheduledEndTime(Timestamp),
+    /// Start time of a scheduled event was changed.
+    "scheduled_start_time" => ScheduledStartTime(Timestamp),
+    /// Whether only one option can be selected for an onboarding prompt was changed.
+    "single_select" => SingleSelect(bool),
+    /// ID of a soundboard sound was changed.
+    "sound_id" => SoundId(SoundId),
     /// Invite splash page artwork was changed.
     "splash_hash" => SplashHash(ImageHash),
     /// Status of guild scheduled event was changed.
@@ -240,6 +274,8 @@ generate_change! {
     "type" => Type(EntityType),
     /// Unicode emoji of a role icon was changed.
     "unicode_emoji" => UnicodeEmoji(FixedString),
+    /// ID of the user associated with an entity was changed.
+    "user_id" => UserId(UserId),
     /// Maximum number of users in a voice channel was changed.
     "user_limit" => UserLimit(NonMaxU16),
     /// Number of uses of an invite was changed.
@@ -248,6 +284,8 @@ generate_change! {
     "vanity_url_code" => VanityUrlCode(FixedString),
     /// Required verification level for new members was changed.
     "verification_level" => VerificationLevel(VerificationLevel),
+    /// Volume of a soundboard sound was changed.
+    "volume" => Volume(f64),
     /// Channel of the server widget was changed.
     "widget_channel_id" => WidgetChannelId(ChannelId),
     /// Whether a widget is enabled or not was changed.
