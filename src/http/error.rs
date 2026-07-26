@@ -123,6 +123,7 @@ enum_number! {
         RequestEntityTooLarge = 40005,
         FeatureTemporarilyDisabled = 40006,
         UserBannedFromGuild = 40007,
+        OnlyOneChannelParentIdPerRequest = 40009,
         ConnectionRevoked = 40012,
         OnlyConsumableSkusCanBeConsumed = 40018,
         CanOnlyDeleteSandboxEntitlements = 40019,
@@ -253,6 +254,8 @@ enum_number! {
         AccessToJoiningNewServersLimited = 340015,
         OnboardingRequirementsNotMet = 350000,
         BelowOnboardingRequirements = 350001,
+
+        AccessToFileUploadsLimitedForGuild = 400001,
 
         FailedToBanUsers = 500000,
         PollVotingBlocked = 520000,
