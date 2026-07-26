@@ -1221,7 +1221,9 @@ impl GuildId {
     /// Although not required, you should specify all channels' positions, regardless of whether
     /// they were updated. Otherwise, positioning can sometimes get weird.
     ///
-    /// **Note**: Requires the [Manage Channels] permission.
+    /// **Note**: Requires the [Manage Channels] permission at the guild level (or on the
+    /// channel’s current parent category). It does not require access to the individual channel,
+    /// so a full reordering may include channels the current user cannot view.
     ///
     /// # Errors
     ///
