@@ -449,7 +449,7 @@ impl GuildId {
     ///
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
-    /// [Manage Events]: Permissions::CREATE_EVENTS
+    /// [Create Events]: Permissions::CREATE_EVENTS
     pub async fn create_scheduled_event(
         self,
         http: &Http,
