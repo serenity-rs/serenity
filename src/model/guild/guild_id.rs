@@ -1680,6 +1680,46 @@ impl GuildId {
     ) -> Result<IncidentsData> {
         builder.execute(http, guild_id).await
     }
+
+    /// Adds a [`Role`] to the guild user.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, or if a role with the given
+    /// Id does not exist.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[inline]
+    pub async fn add_user_role(
+        self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        role_id: impl Into<RoleId>,
+    ) -> Result<()> {
+        http.as_ref().add_member_role(self, user_id.into(), role_id.into(), None).await
+    }
+
+    /// Removes a [`Role`] from the guild user.
+    ///
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a role with the given Id does not exist, or if the current user
+    /// lacks permission.
+    ///
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    #[inline]
+    pub async fn remove_user_role(
+        self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        role_id: impl Into<RoleId>,
+    ) -> Result<()> {
+        http.as_ref().remove_member_role(self, user_id.into(), role_id.into(), None).await
+    }
 }
 
 impl From<PartialGuild> for GuildId {
