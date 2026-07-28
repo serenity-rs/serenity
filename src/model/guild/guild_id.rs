@@ -1153,9 +1153,15 @@ impl GuildId {
 
     /// Gets a user's voice state in this guild.
     ///
+    /// **Note**: If the specified user is connected to a voice channel, the current user must
+    /// have the [Connect] permission for that channel.
+    ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the user is not in a voice channel in this guild.
+    /// Returns [`Error::Http`] if the current user lacks permission, or if the user is not in a
+    /// voice channel in this guild.
+    ///
+    /// [Connect]: Permissions::CONNECT
     pub async fn get_user_voice_state(self, http: &Http, user_id: UserId) -> Result<VoiceState> {
         http.get_user_voice_state(self, user_id).await
     }
