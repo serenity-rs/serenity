@@ -16,7 +16,7 @@ pub struct EditStageInstance<'a> {
     privacy_level: Option<StageInstancePrivacyLevel>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditStageInstance<'a> {
@@ -38,9 +38,22 @@ impl<'a> EditStageInstance<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditStageInstance<'static> {
+        let Self {
+            topic,
+            privacy_level,
+            audit_log_reason,
+        } = self;
+        EditStageInstance {
+            topic: topic.map(|t| t.into_owned().into()),
+            privacy_level,
+            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+        }
     }
 
     /// Edits the stage instance
@@ -51,6 +64,6 @@ impl<'a> EditStageInstance<'a> {
     /// instance currently.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<StageInstance> {
-        http.edit_stage_instance(channel_id, &self, self.audit_log_reason).await
+        http.edit_stage_instance(channel_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

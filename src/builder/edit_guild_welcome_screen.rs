@@ -18,7 +18,7 @@ pub struct EditGuildWelcomeScreen<'a> {
     description: Option<Cow<'a, str>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditGuildWelcomeScreen<'a> {
@@ -54,9 +54,26 @@ impl<'a> EditGuildWelcomeScreen<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditGuildWelcomeScreen<'static> {
+        let Self {
+            enabled,
+            welcome_channels,
+            description,
+            audit_log_reason,
+        } = self;
+        EditGuildWelcomeScreen {
+            enabled,
+            welcome_channels: Cow::Owned(
+                welcome_channels.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+            ),
+            description: description.map(|d| d.into_owned().into()),
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Edits the guild's welcome screen.
@@ -70,7 +87,7 @@ impl<'a> EditGuildWelcomeScreen<'a> {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<GuildWelcomeScreen> {
-        http.edit_guild_welcome_screen(guild_id, &self, self.audit_log_reason).await
+        http.edit_guild_welcome_screen(guild_id, &self, self.audit_log_reason.as_deref()).await
     }
 }
 
@@ -125,5 +142,20 @@ impl<'a> CreateGuildWelcomeChannel<'a> {
         }
 
         self
+    }
+
+    pub fn into_owned(self) -> CreateGuildWelcomeChannel<'static> {
+        let Self {
+            channel_id,
+            emoji_name,
+            emoji_id,
+            description,
+        } = self;
+        CreateGuildWelcomeChannel {
+            channel_id,
+            emoji_name: emoji_name.map(|e| e.into_owned().into()),
+            emoji_id,
+            description: description.into_owned().into(),
+        }
     }
 }

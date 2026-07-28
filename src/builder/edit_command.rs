@@ -176,4 +176,40 @@ impl<'a> EditCommand<'a> {
             None => http.edit_global_command(command_id, &self).await,
         }
     }
+
+    pub fn into_owned(self) -> EditCommand<'static> {
+        let Self {
+            name,
+            name_localizations,
+            description,
+            description_localizations,
+            options,
+            default_member_permissions,
+            #[cfg(not(feature = "unstable"))]
+            dm_permission,
+            integration_types,
+            contexts,
+            nsfw,
+        } = self;
+
+        EditCommand {
+            name: name.map(|n| n.into_owned().into()),
+            name_localizations: name_localizations
+                .into_iter()
+                .map(|(k, v)| (k.into_owned().into(), v.into_owned().into()))
+                .collect(),
+            description: description.map(|d| d.into_owned().into()),
+            description_localizations: description_localizations
+                .into_iter()
+                .map(|(k, v)| (k.into_owned().into(), v.into_owned().into()))
+                .collect(),
+            options: Cow::Owned(options.into_owned().into_iter().map(|o| o.into_owned()).collect()),
+            default_member_permissions,
+            #[cfg(not(feature = "unstable"))]
+            dm_permission,
+            integration_types: integration_types.map(|v| v.into_owned().into()),
+            contexts: contexts.map(|v| v.into_owned().into()),
+            nsfw,
+        }
+    }
 }

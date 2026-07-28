@@ -30,7 +30,7 @@ pub struct EditAutoModRule<'a> {
     exempt_channels: Option<Cow<'a, [ChannelId]>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditAutoModRule<'a> {
@@ -88,9 +88,32 @@ impl<'a> EditAutoModRule<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditAutoModRule<'static> {
+        let Self {
+            name,
+            event_type,
+            trigger,
+            actions,
+            enabled,
+            exempt_roles,
+            exempt_channels,
+            audit_log_reason,
+        } = self;
+        EditAutoModRule {
+            name: name.map(|n| n.into_owned().into()),
+            event_type,
+            trigger,
+            actions: actions.map(|a| Cow::Owned(a.into_owned())),
+            enabled,
+            exempt_roles: exempt_roles.map(|r| Cow::Owned(r.into_owned())),
+            exempt_channels: exempt_channels.map(|c| Cow::Owned(c.into_owned())),
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Creates or edits an [`AutoModRule`] in a guild.
@@ -113,10 +136,14 @@ impl<'a> EditAutoModRule<'a> {
         rule_id: Option<RuleId>,
     ) -> Result<AutoModRule> {
         match rule_id {
-            Some(id) => http.edit_automod_rule(guild_id, id, &self, self.audit_log_reason).await,
+            Some(id) => {
+                http.edit_automod_rule(guild_id, id, &self, self.audit_log_reason.as_deref()).await
+            },
             // Automod Rule creation has required fields, whereas modifying a rule does not.
             // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
-            None => http.create_automod_rule(guild_id, &self, self.audit_log_reason).await,
+            None => {
+                http.create_automod_rule(guild_id, &self, self.audit_log_reason.as_deref()).await
+            },
         }
     }
 }

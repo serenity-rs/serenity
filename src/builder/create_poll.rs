@@ -30,6 +30,14 @@ struct CreatePollMedia<'a> {
     text: Cow<'a, str>,
 }
 
+impl CreatePollMedia<'_> {
+    pub fn into_owned(self) -> CreatePollMedia<'static> {
+        CreatePollMedia {
+            text: self.text.into_owned().into(),
+        }
+    }
+}
+
 #[derive(serde::Serialize, Clone, Debug)]
 #[must_use = "Builders do nothing unless built"]
 pub struct CreatePoll<'a, Stage: Sealed> {
@@ -151,12 +159,40 @@ impl<Stage: Sealed> CreatePoll<'_, Stage> {
         self.allow_multiselect = true;
         self
     }
+
+    pub fn into_owned(self) -> CreatePoll<'static, Stage> {
+        let Self {
+            question,
+            answers,
+            duration,
+            allow_multiselect,
+            layout_type,
+            _stage,
+        } = self;
+        CreatePoll {
+            question: question.into_owned(),
+            answers: Cow::Owned(answers.into_owned().into_iter().map(|a| a.into_owned()).collect()),
+            duration,
+            allow_multiselect,
+            layout_type,
+            _stage,
+        }
+    }
 }
 
 #[derive(serde::Serialize, Clone, Debug, Default)]
 struct CreatePollAnswerMedia<'a> {
     text: Option<Cow<'a, str>>,
     emoji: Option<PollMediaEmoji>,
+}
+
+impl<'a> CreatePollAnswerMedia<'a> {
+    pub fn into_owned(self) -> CreatePollAnswerMedia<'static> {
+        CreatePollAnswerMedia {
+            text: self.text.map(|t| t.into_owned().into()),
+            emoji: self.emoji,
+        }
+    }
 }
 
 #[derive(serde::Serialize, Clone, Debug, Default)]
@@ -181,5 +217,11 @@ impl<'a> CreatePollAnswer<'a> {
     pub fn emoji(mut self, emoji: impl Into<PollMediaEmoji>) -> Self {
         self.poll_media.emoji = Some(emoji.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreatePollAnswer<'static> {
+        CreatePollAnswer {
+            poll_media: self.poll_media.into_owned(),
+        }
     }
 }

@@ -31,7 +31,7 @@ pub struct EditScheduledEvent<'a> {
     image: Option<DataUri<'a>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditScheduledEvent<'a> {
@@ -156,9 +156,38 @@ impl<'a> EditScheduledEvent<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditScheduledEvent<'static> {
+        let Self {
+            channel_id,
+            entity_metadata,
+            name,
+            privacy_level,
+            scheduled_start_time,
+            scheduled_end_time,
+            description,
+            entity_type,
+            status,
+            image,
+            audit_log_reason,
+        } = self;
+        EditScheduledEvent {
+            channel_id,
+            entity_metadata: entity_metadata.map(|m| m.map(|m| m.into_owned())),
+            name: name.map(|n| n.into_owned().into()),
+            privacy_level,
+            scheduled_start_time,
+            scheduled_end_time,
+            description: description.map(|d| d.into_owned().into()),
+            entity_type,
+            status,
+            image: image.map(|i| i.into_owned()),
+            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+        }
     }
 
     /// Modifies a scheduled event in the guild with the data set, if any.
@@ -179,6 +208,6 @@ impl<'a> EditScheduledEvent<'a> {
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -> Result<ScheduledEvent> {
-        http.edit_scheduled_event(guild_id, event_id, &self, self.audit_log_reason).await
+        http.edit_scheduled_event(guild_id, event_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

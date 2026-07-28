@@ -44,6 +44,15 @@ impl<'a> EditCommandPermissions<'a> {
     ) -> Result<CommandPermissions> {
         http.edit_guild_command_permissions(guild_id, command_id, &self).await
     }
+
+    pub fn into_owned(self) -> EditCommandPermissions<'static> {
+        let Self {
+            permissions,
+        } = self;
+        EditCommandPermissions {
+            permissions: permissions.into_owned().into(),
+        }
+    }
 }
 
 /// A builder for creating an [`CommandPermission`].

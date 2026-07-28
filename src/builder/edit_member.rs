@@ -27,7 +27,7 @@ pub struct EditMember<'a> {
     flags: Option<GuildMemberFlags>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditMember<'a> {
@@ -127,9 +127,32 @@ impl<'a> EditMember<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditMember<'static> {
+        let Self {
+            nick,
+            roles,
+            mute,
+            deaf,
+            channel_id,
+            communication_disabled_until,
+            flags,
+            audit_log_reason,
+        } = self;
+        EditMember {
+            nick: nick.map(|n| n.into_owned().into()),
+            roles: roles.map(|r| Cow::Owned(r.into_owned())),
+            mute,
+            deaf,
+            channel_id,
+            communication_disabled_until,
+            flags,
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Edits the properties of the guild member.
@@ -141,6 +164,6 @@ impl<'a> EditMember<'a> {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId, user_id: UserId) -> Result<Member> {
-        http.edit_member(guild_id, user_id, &self, self.audit_log_reason).await
+        http.edit_member(guild_id, user_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

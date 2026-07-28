@@ -22,6 +22,14 @@ impl<'a> CreateActionRow<'a> {
     pub fn select_menu(select_menu: impl Into<CreateSelectMenu<'a>>) -> Self {
         Self::SelectMenu(select_menu.into())
     }
+    pub fn into_owned(self) -> CreateActionRow<'static> {
+        match self {
+            Self::Buttons(btns) => CreateActionRow::Buttons(Cow::Owned(
+                btns.into_owned().into_iter().map(|b| b.into_owned()).collect(),
+            )),
+            Self::SelectMenu(csm) => CreateActionRow::SelectMenu(csm.into_owned()),
+        }
+    }
 }
 
 impl serde::Serialize for CreateActionRow<'_> {
@@ -95,6 +103,21 @@ pub enum CreateComponent<'a> {
     Label(CreateLabel<'a>),
 }
 
+impl<'a> CreateComponent<'a> {
+    pub fn into_owned(self) -> CreateComponent<'static> {
+        match self {
+            Self::ActionRow(e) => CreateComponent::ActionRow(e.into_owned()),
+            Self::Section(e) => CreateComponent::Section(e.into_owned()),
+            Self::TextDisplay(e) => CreateComponent::TextDisplay(e.into_owned()),
+            Self::MediaGallery(e) => CreateComponent::MediaGallery(e.into_owned()),
+            Self::File(e) => CreateComponent::File(e.into_owned()),
+            Self::Separator(e) => CreateComponent::Separator(e),
+            Self::Container(e) => CreateComponent::Container(e.into_owned()),
+            Self::Label(e) => CreateComponent::Label(e.into_owned()),
+        }
+    }
+}
+
 /// A builder to create a section component, supports up to a max of **3** components with an
 /// accessory.
 #[derive(Clone, Debug, Serialize)]
@@ -147,6 +170,21 @@ impl<'a> CreateSection<'a> {
         self.accessory = accessory;
         self
     }
+
+    pub fn into_owned(self) -> CreateSection<'static> {
+        let Self {
+            kind,
+            components,
+            accessory,
+        } = self;
+        CreateSection {
+            kind,
+            components: Cow::Owned(
+                components.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+            ),
+            accessory: accessory.into_owned(),
+        }
+    }
 }
 
 /// An enum of all valid section components.
@@ -155,6 +193,14 @@ impl<'a> CreateSection<'a> {
 #[serde(untagged)]
 pub enum CreateSectionComponent<'a> {
     TextDisplay(CreateTextDisplay<'a>),
+}
+
+impl<'a> CreateSectionComponent<'a> {
+    pub fn into_owned(self) -> CreateSectionComponent<'static> {
+        match self {
+            Self::TextDisplay(e) => CreateSectionComponent::TextDisplay(e.into_owned()),
+        }
+    }
 }
 
 /// A builder to create a text display component.
@@ -185,6 +231,17 @@ impl<'a> CreateTextDisplay<'a> {
         self.content = content.into();
         self
     }
+
+    pub fn into_owned(self) -> CreateTextDisplay<'static> {
+        let Self {
+            kind,
+            content,
+        } = self;
+        CreateTextDisplay {
+            kind,
+            content: content.into_owned().into(),
+        }
+    }
 }
 
 /// An enum of all valid section accessories.
@@ -194,6 +251,15 @@ impl<'a> CreateTextDisplay<'a> {
 pub enum CreateSectionAccessory<'a> {
     Thumbnail(CreateThumbnail<'a>),
     Button(CreateButton<'a>),
+}
+
+impl<'a> CreateSectionAccessory<'a> {
+    pub fn into_owned(self) -> CreateSectionAccessory<'static> {
+        match self {
+            Self::Thumbnail(e) => CreateSectionAccessory::Thumbnail(e.into_owned()),
+            Self::Button(e) => CreateSectionAccessory::Button(e.into_owned()),
+        }
+    }
 }
 
 /// A builder to create a thumbnail for a section.
@@ -237,6 +303,21 @@ impl<'a> CreateThumbnail<'a> {
         self.spoiler = Some(spoiler);
         self
     }
+
+    pub fn into_owned(self) -> CreateThumbnail<'static> {
+        let Self {
+            kind,
+            media,
+            description,
+            spoiler,
+        } = self;
+        CreateThumbnail {
+            kind,
+            media: media.into_owned(),
+            description: description.map(|d| d.into_owned().into()),
+            spoiler,
+        }
+    }
 }
 
 /// A builder to create a media item.
@@ -258,6 +339,15 @@ impl<'a> CreateUnfurledMediaItem<'a> {
     pub fn url(mut self, url: impl Into<Cow<'a, str>>) -> Self {
         self.url = url.into();
         self
+    }
+
+    pub fn into_owned(self) -> CreateUnfurledMediaItem<'static> {
+        let Self {
+            url,
+        } = self;
+        CreateUnfurledMediaItem {
+            url: url.into_owned().into(),
+        }
     }
 }
 
@@ -296,6 +386,17 @@ impl<'a> CreateMediaGallery<'a> {
     pub fn add_item(mut self, item: CreateMediaGalleryItem<'a>) -> Self {
         self.items.to_mut().push(item);
         self
+    }
+
+    pub fn into_owned(self) -> CreateMediaGallery<'static> {
+        let Self {
+            kind,
+            items,
+        } = self;
+        CreateMediaGallery {
+            kind,
+            items: Cow::Owned(items.into_owned().into_iter().map(|i| i.into_owned()).collect()),
+        }
     }
 }
 
@@ -336,6 +437,19 @@ impl<'a> CreateMediaGalleryItem<'a> {
     pub fn spoiler(mut self, spoiler: bool) -> Self {
         self.spoiler = Some(spoiler);
         self
+    }
+
+    pub fn into_owned(self) -> CreateMediaGalleryItem<'static> {
+        let Self {
+            media,
+            description,
+            spoiler,
+        } = self;
+        CreateMediaGalleryItem {
+            media: media.into_owned(),
+            description: description.map(|d| d.into_owned().into()),
+            spoiler,
+        }
     }
 }
 
@@ -389,6 +503,19 @@ impl<'a> CreateFile<'a> {
     pub fn spoiler(mut self, spoiler: bool) -> Self {
         self.spoiler = Some(spoiler);
         self
+    }
+
+    pub fn into_owned(self) -> CreateFile<'static> {
+        let Self {
+            kind,
+            file,
+            spoiler,
+        } = self;
+        CreateFile {
+            kind,
+            file: file.into_owned(),
+            spoiler,
+        }
     }
 }
 
@@ -495,6 +622,23 @@ impl<'a> CreateContainer<'a> {
         self.components.to_mut().push(component);
         self
     }
+
+    pub fn into_owned(self) -> CreateContainer<'static> {
+        let Self {
+            kind,
+            accent_color,
+            spoiler,
+            components,
+        } = self;
+        CreateContainer {
+            kind,
+            accent_color,
+            spoiler,
+            components: Cow::Owned(
+                components.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+            ),
+        }
+    }
 }
 
 /// An enum of all valid container components.
@@ -508,6 +652,19 @@ pub enum CreateContainerComponent<'a> {
     MediaGallery(CreateMediaGallery<'a>),
     File(CreateFile<'a>),
     Separator(CreateSeparator),
+}
+
+impl<'a> CreateContainerComponent<'a> {
+    pub fn into_owned(self) -> CreateContainerComponent<'static> {
+        match self {
+            Self::ActionRow(e) => CreateContainerComponent::ActionRow(e.into_owned()),
+            Self::Section(e) => CreateContainerComponent::Section(e.into_owned()),
+            Self::TextDisplay(e) => CreateContainerComponent::TextDisplay(e.into_owned()),
+            Self::MediaGallery(e) => CreateContainerComponent::MediaGallery(e.into_owned()),
+            Self::File(e) => CreateContainerComponent::File(e.into_owned()),
+            Self::Separator(e) => CreateContainerComponent::Separator(e),
+        }
+    }
 }
 
 /// A builder for creating a label, a top-level layout component that wraps modal
@@ -594,6 +751,21 @@ impl<'a> CreateLabel<'a> {
         self.description = Some(description.into());
         self
     }
+
+    pub fn into_owned(self) -> CreateLabel<'static> {
+        let Self {
+            kind,
+            label,
+            description,
+            component,
+        } = self;
+        CreateLabel {
+            kind,
+            label: label.into_owned().into(),
+            description: description.map(|d| d.into_owned().into()),
+            component: component.into_owned(),
+        }
+    }
 }
 
 /// An enum of all valid label components.
@@ -607,6 +779,19 @@ enum CreateLabelComponent<'a> {
     RadioGroup(CreateRadioGroup<'a>),
     CheckboxGroup(CreateCheckboxGroup<'a>),
     Checkbox(CreateCheckbox<'a>),
+}
+
+impl<'a> CreateLabelComponent<'a> {
+    pub fn into_owned(self) -> CreateLabelComponent<'static> {
+        match self {
+            Self::SelectMenu(e) => CreateLabelComponent::SelectMenu(e.into_owned()),
+            Self::InputText(e) => CreateLabelComponent::InputText(e.into_owned()),
+            Self::FileUpload(e) => CreateLabelComponent::FileUpload(e.into_owned()),
+            Self::RadioGroup(e) => CreateLabelComponent::RadioGroup(e.into_owned()),
+            Self::CheckboxGroup(e) => CreateLabelComponent::CheckboxGroup(e.into_owned()),
+            Self::Checkbox(e) => CreateLabelComponent::Checkbox(e.into_owned()),
+        }
+    }
 }
 
 /// A builder for creating a file upload in a modal.
@@ -653,6 +838,23 @@ impl<'a> CreateFileUpload<'a> {
         self.required = required;
         self
     }
+
+    pub fn into_owned(self) -> CreateFileUpload<'static> {
+        let Self {
+            kind,
+            custom_id,
+            min_values,
+            max_values,
+            required,
+        } = self;
+        CreateFileUpload {
+            kind,
+            custom_id: custom_id.into_owned().into(),
+            min_values,
+            max_values,
+            required,
+        }
+    }
 }
 
 /// A builder for creating a radio group.
@@ -690,6 +892,21 @@ impl<'a> CreateRadioGroup<'a> {
     pub fn required(mut self, required: bool) -> Self {
         self.required = Some(required);
         self
+    }
+
+    pub fn into_owned(self) -> CreateRadioGroup<'static> {
+        let Self {
+            kind,
+            custom_id,
+            options,
+            required,
+        } = self;
+        CreateRadioGroup {
+            kind,
+            custom_id: custom_id.into_owned().into(),
+            options: Cow::Owned(options.into_owned().into_iter().map(|o| o.into_owned()).collect()),
+            required,
+        }
     }
 }
 
@@ -741,6 +958,21 @@ impl<'a> CreateRadioGroupOption<'a> {
     pub fn default_selection(mut self, default: bool) -> Self {
         self.default = Some(default);
         self
+    }
+
+    pub fn into_owned(self) -> CreateRadioGroupOption<'static> {
+        let Self {
+            label,
+            value,
+            description,
+            default,
+        } = self;
+        CreateRadioGroupOption {
+            label: label.into_owned().into(),
+            value: value.into_owned().into(),
+            description: description.map(|d| d.into_owned().into()),
+            default,
+        }
     }
 }
 
@@ -812,6 +1044,25 @@ impl<'a> CreateCheckboxGroup<'a> {
         self.required = Some(required);
         self
     }
+
+    pub fn into_owned(self) -> CreateCheckboxGroup<'static> {
+        let Self {
+            kind,
+            custom_id,
+            options,
+            min_values,
+            max_values,
+            required,
+        } = self;
+        CreateCheckboxGroup {
+            kind,
+            custom_id: custom_id.into_owned().into(),
+            options: Cow::Owned(options.into_owned().into_iter().map(|o| o.into_owned()).collect()),
+            min_values,
+            max_values,
+            required,
+        }
+    }
 }
 
 /// A builder for creating an option of a checkbox group component in a message.
@@ -863,6 +1114,21 @@ impl<'a> CreateCheckboxGroupOption<'a> {
         self.default = Some(default);
         self
     }
+
+    pub fn into_owned(self) -> CreateCheckboxGroupOption<'static> {
+        let Self {
+            label,
+            value,
+            description,
+            default,
+        } = self;
+        CreateCheckboxGroupOption {
+            label: label.into_owned().into(),
+            value: value.into_owned().into(),
+            description: description.map(|d| d.into_owned().into()),
+            default,
+        }
+    }
 }
 
 /// A builder for creating a checkbox.
@@ -892,6 +1158,19 @@ impl<'a> CreateCheckbox<'a> {
     pub fn default_selected(mut self, default: bool) -> Self {
         self.default = Some(default);
         self
+    }
+
+    pub fn into_owned(self) -> CreateCheckbox<'static> {
+        let Self {
+            kind,
+            custom_id,
+            default,
+        } = self;
+        CreateCheckbox {
+            kind,
+            custom_id: custom_id.into_owned().into(),
+            default,
+        }
     }
 }
 
@@ -1015,6 +1294,29 @@ impl<'a> CreateButton<'a> {
         self.disabled = disabled;
         self
     }
+
+    pub fn into_owned(self) -> CreateButton<'static> {
+        let Self {
+            style,
+            kind,
+            url,
+            custom_id,
+            sku_id,
+            label,
+            emoji,
+            disabled,
+        } = self;
+        CreateButton {
+            style,
+            kind,
+            url: url.map(|u| u.into_owned().into()),
+            custom_id: custom_id.map(|c| c.into_owned().into()),
+            sku_id,
+            label: label.map(|l| l.into_owned().into()),
+            emoji,
+            disabled,
+        }
+    }
 }
 
 impl From<Button> for CreateButton<'_> {
@@ -1091,6 +1393,44 @@ pub enum CreateSelectMenuKind<'a> {
         channel_types: Option<Cow<'a, [ChannelType]>>,
         default_channels: Option<Cow<'a, [GenericChannelId]>>,
     },
+}
+
+impl<'a> CreateSelectMenuKind<'a> {
+    pub fn into_owned(self) -> CreateSelectMenuKind<'static> {
+        match self {
+            CreateSelectMenuKind::String {
+                options,
+            } => CreateSelectMenuKind::String {
+                options: Cow::Owned(
+                    options.into_owned().into_iter().map(|o| o.into_owned()).collect(),
+                ),
+            },
+            CreateSelectMenuKind::User {
+                default_users,
+            } => CreateSelectMenuKind::User {
+                default_users: default_users.map(|d| d.into_owned().into()),
+            },
+            CreateSelectMenuKind::Role {
+                default_roles,
+            } => CreateSelectMenuKind::Role {
+                default_roles: default_roles.map(|d| d.into_owned().into()),
+            },
+            CreateSelectMenuKind::Mentionable {
+                default_users,
+                default_roles,
+            } => CreateSelectMenuKind::Mentionable {
+                default_users: default_users.map(|d| d.into_owned().into()),
+                default_roles: default_roles.map(|d| d.into_owned().into()),
+            },
+            CreateSelectMenuKind::Channel {
+                channel_types,
+                default_channels,
+            } => CreateSelectMenuKind::Channel {
+                channel_types: channel_types.map(|c| c.into_owned().into()),
+                default_channels: default_channels.map(|d| d.into_owned().into()),
+            },
+        }
+    }
 }
 
 impl Serialize for CreateSelectMenuKind<'_> {
@@ -1230,6 +1570,27 @@ impl<'a> CreateSelectMenu<'a> {
         self.disabled = Some(disabled);
         self
     }
+
+    pub fn into_owned(self) -> CreateSelectMenu<'static> {
+        let Self {
+            custom_id,
+            placeholder,
+            min_values,
+            max_values,
+            required,
+            disabled,
+            kind,
+        } = self;
+        CreateSelectMenu {
+            custom_id: custom_id.into_owned().into(),
+            placeholder: placeholder.map(|p| p.into_owned().into()),
+            min_values,
+            max_values,
+            required,
+            disabled,
+            kind: kind.into_owned(),
+        }
+    }
 }
 
 /// A builder for creating an option of a select menu component in a message.
@@ -1289,6 +1650,23 @@ impl<'a> CreateSelectMenuOption<'a> {
     pub fn default_selection(mut self, default: bool) -> Self {
         self.default = Some(default);
         self
+    }
+
+    pub fn into_owned(self) -> CreateSelectMenuOption<'static> {
+        let Self {
+            label,
+            value,
+            description,
+            emoji,
+            default,
+        } = self;
+        CreateSelectMenuOption {
+            label: label.into_owned().into(),
+            value: value.into_owned().into(),
+            description: description.map(|d| d.into_owned().into()),
+            emoji,
+            default,
+        }
     }
 }
 
@@ -1370,6 +1748,29 @@ impl<'a> CreateInputText<'a> {
     pub fn required(mut self, required: bool) -> Self {
         self.required = required;
         self
+    }
+
+    pub fn into_owned(self) -> CreateInputText<'static> {
+        let Self {
+            kind,
+            custom_id,
+            style,
+            min_length,
+            max_length,
+            required,
+            value,
+            placeholder,
+        } = self;
+        CreateInputText {
+            kind,
+            custom_id: custom_id.into_owned().into(),
+            style,
+            min_length,
+            max_length,
+            required,
+            value: value.map(|v| v.into_owned().into()),
+            placeholder: placeholder.map(|p| p.into_owned().into()),
+        }
     }
 }
 

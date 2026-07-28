@@ -127,4 +127,23 @@ impl<'a> CreateBotAuthParameters<'a> {
         self.integration_type = Some(integration_type);
         self
     }
+
+    pub fn into_owned(self) -> CreateBotAuthParameters<'static> {
+        let Self {
+            client_id,
+            scopes,
+            permissions,
+            guild_id,
+            disable_guild_select,
+            integration_type,
+        } = self;
+        CreateBotAuthParameters {
+            client_id,
+            scopes: Cow::Owned(scopes.into_owned()),
+            permissions,
+            guild_id,
+            disable_guild_select,
+            integration_type,
+        }
+    }
 }

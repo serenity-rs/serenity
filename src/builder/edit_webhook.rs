@@ -17,7 +17,7 @@ pub struct EditWebhook<'a> {
     channel_id: Option<ChannelId>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditWebhook<'a> {
@@ -53,9 +53,24 @@ impl<'a> EditWebhook<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditWebhook<'static> {
+        let Self {
+            name,
+            avatar,
+            channel_id,
+            audit_log_reason,
+        } = self;
+        EditWebhook {
+            name: name.map(|n| n.into_owned().into()),
+            avatar: avatar.map(|a| a.map(|a| a.into_owned())),
+            channel_id,
+            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+        }
     }
 
     /// Edits the webhook corresponding to the provided [`WebhookId`] and token, and returns the
@@ -75,9 +90,15 @@ impl<'a> EditWebhook<'a> {
     ) -> Result<Webhook> {
         match webhook_token {
             Some(token) => {
-                http.edit_webhook_with_token(webhook_id, token, &self, self.audit_log_reason).await
+                http.edit_webhook_with_token(
+                    webhook_id,
+                    token,
+                    &self,
+                    self.audit_log_reason.as_deref(),
+                )
+                .await
             },
-            None => http.edit_webhook(webhook_id, &self, self.audit_log_reason).await,
+            None => http.edit_webhook(webhook_id, &self, self.audit_log_reason.as_deref()).await,
         }
     }
 }

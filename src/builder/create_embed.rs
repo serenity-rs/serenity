@@ -242,6 +242,35 @@ impl<'a> CreateEmbed<'a> {
 
         length
     }
+
+    pub fn into_owned(self) -> CreateEmbed<'static> {
+        let Self {
+            title,
+            kind,
+            description,
+            url,
+            timestamp,
+            colour,
+            footer,
+            image,
+            thumbnail,
+            author,
+            fields,
+        } = self;
+        CreateEmbed {
+            title: title.map(|t| t.into_owned().into()),
+            kind,
+            description: description.map(|d| d.into_owned().into()),
+            url: url.map(|u| u.into_owned().into()),
+            timestamp,
+            colour,
+            footer: footer.map(|f| f.into_owned()),
+            image: image.map(|i| i.into_owned()),
+            thumbnail: thumbnail.map(|t| t.into_owned()),
+            author: author.map(|a| a.into_owned()),
+            fields: fields.into_iter().map(|f| f.into_owned()).collect(),
+        }
+    }
 }
 
 impl Default for CreateEmbed<'_> {
@@ -317,6 +346,19 @@ impl<'a> CreateEmbedAuthor<'a> {
         self.url = Some(url.into());
         self
     }
+
+    pub fn into_owned(self) -> CreateEmbedAuthor<'static> {
+        let Self {
+            name,
+            url,
+            icon_url,
+        } = self;
+        CreateEmbedAuthor {
+            name: name.into_owned().into(),
+            url: url.map(|u| u.into_owned().into()),
+            icon_url: icon_url.map(|i| i.into_owned().into()),
+        }
+    }
 }
 
 impl From<EmbedAuthor> for CreateEmbedAuthor<'_> {
@@ -375,6 +417,17 @@ impl<'a> CreateEmbedFooter<'a> {
         self.icon_url = Some(icon_url.into());
         self
     }
+
+    pub fn into_owned(self) -> CreateEmbedFooter<'static> {
+        let Self {
+            text,
+            icon_url,
+        } = self;
+        CreateEmbedFooter {
+            text: text.into_owned().into(),
+            icon_url: icon_url.map(|i| i.into_owned().into()),
+        }
+    }
 }
 
 impl From<EmbedFooter> for CreateEmbedFooter<'_> {
@@ -391,6 +444,21 @@ struct CreateEmbedField<'a> {
     name: Cow<'a, str>,
     value: Cow<'a, str>,
     inline: bool,
+}
+
+impl<'a> CreateEmbedField<'a> {
+    pub fn into_owned(self) -> CreateEmbedField<'static> {
+        let Self {
+            name,
+            value,
+            inline,
+        } = self;
+        CreateEmbedField {
+            name: name.into_owned().into(),
+            value: value.into_owned().into(),
+            inline,
+        }
+    }
 }
 
 impl<'a> From<&'a EmbedField> for CreateEmbedField<'a> {
@@ -417,6 +485,19 @@ impl From<EmbedField> for CreateEmbedField<'_> {
 struct CreateEmbedImage<'a> {
     url: Cow<'a, str>,
     description: Option<Cow<'a, str>>,
+}
+
+impl<'a> CreateEmbedImage<'a> {
+    pub fn into_owned(self) -> CreateEmbedImage<'static> {
+        let Self {
+            url,
+            description,
+        } = self;
+        CreateEmbedImage {
+            url: url.into_owned().into(),
+            description: description.map(|d| d.into_owned().into()),
+        }
+    }
 }
 
 impl From<EmbedImage> for CreateEmbedImage<'_> {

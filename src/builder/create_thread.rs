@@ -24,7 +24,7 @@ pub struct CreateThread<'a> {
     rate_limit_per_user: Option<NonMaxU16>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> CreateThread<'a> {
@@ -88,9 +88,28 @@ impl<'a> CreateThread<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreateThread<'static> {
+        let Self {
+            name,
+            auto_archive_duration,
+            kind,
+            invitable,
+            rate_limit_per_user,
+            audit_log_reason,
+        } = self;
+        CreateThread {
+            name: name.into_owned().into(),
+            auto_archive_duration,
+            kind,
+            invitable,
+            rate_limit_per_user,
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Creates a thread, either private or public. Public threads require a message to connect the
@@ -108,9 +127,15 @@ impl<'a> CreateThread<'a> {
     ) -> Result<GuildThread> {
         match message_id {
             Some(id) => {
-                http.create_thread_from_message(channel_id, id, &self, self.audit_log_reason).await
+                http.create_thread_from_message(
+                    channel_id,
+                    id,
+                    &self,
+                    self.audit_log_reason.as_deref(),
+                )
+                .await
             },
-            None => http.create_thread(channel_id, &self, self.audit_log_reason).await,
+            None => http.create_thread(channel_id, &self, self.audit_log_reason.as_deref()).await,
         }
     }
 }

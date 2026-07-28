@@ -80,6 +80,19 @@ impl<'a> EditProfile<'a> {
         self
     }
 
+    pub fn into_owned(self) -> EditProfile<'static> {
+        let Self {
+            username,
+            avatar,
+            banner,
+        } = self;
+        EditProfile {
+            username: username.map(|u| u.into_owned().into()),
+            avatar: avatar.map(|a| a.map(|a| a.into_owned())),
+            banner: banner.map(|b| b.map(|b| b.into_owned())),
+        }
+    }
+
     /// Edit the current user's profile with the fields set.
     ///
     /// # Errors

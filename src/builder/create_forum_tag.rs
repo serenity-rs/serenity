@@ -44,4 +44,19 @@ impl<'a> CreateForumTag<'a> {
         }
         self
     }
+
+    pub fn into_owned(self) -> CreateForumTag<'static> {
+        let Self {
+            name,
+            moderated,
+            emoji_id,
+            emoji_name,
+        } = self;
+        CreateForumTag {
+            name: name.into_owned().into(),
+            moderated,
+            emoji_id,
+            emoji_name: emoji_name.map(|e| e.into_owned().into()),
+        }
+    }
 }

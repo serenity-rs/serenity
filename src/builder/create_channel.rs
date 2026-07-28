@@ -55,7 +55,7 @@ pub struct CreateChannel<'a> {
     flags: Option<ChannelFlags>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> CreateChannel<'a> {
@@ -287,8 +287,8 @@ impl<'a> CreateChannel<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
     }
 
@@ -308,6 +308,56 @@ impl<'a> CreateChannel<'a> {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<GuildChannel> {
-        http.create_channel(guild_id, &self, self.audit_log_reason).await
+        http.create_channel(guild_id, &self, self.audit_log_reason.as_deref()).await
+    }
+
+    pub fn into_owned(self) -> CreateChannel<'static> {
+        let Self {
+            name,
+            kind,
+            topic,
+            bitrate,
+            user_limit,
+            rate_limit_per_user,
+            position,
+            permission_overwrites,
+            parent_id,
+            nsfw,
+            rtc_region,
+            video_quality_mode,
+            default_auto_archive_duration,
+            default_reaction_emoji,
+            available_tags,
+            default_sort_order,
+            default_forum_layout,
+            default_thread_rate_limit_per_user,
+            flags,
+            audit_log_reason,
+        } = self;
+
+        CreateChannel {
+            name: name.into_owned().into(),
+            kind,
+            topic: topic.map(|t| t.into_owned().into()),
+            bitrate,
+            user_limit,
+            rate_limit_per_user,
+            position,
+            permission_overwrites: permission_overwrites.into_owned().into(),
+            parent_id,
+            nsfw,
+            rtc_region: rtc_region.map(|r| r.into_owned().into()),
+            video_quality_mode,
+            default_auto_archive_duration,
+            default_reaction_emoji,
+            available_tags: Cow::Owned(
+                available_tags.into_owned().into_iter().map(CreateForumTag::into_owned).collect(),
+            ),
+            default_sort_order,
+            default_forum_layout,
+            default_thread_rate_limit_per_user,
+            flags,
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 }

@@ -25,7 +25,7 @@ pub struct CreateScheduledEvent<'a> {
     image: Option<DataUri<'a>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> CreateScheduledEvent<'a> {
@@ -114,9 +114,36 @@ impl<'a> CreateScheduledEvent<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreateScheduledEvent<'static> {
+        let Self {
+            channel_id,
+            entity_metadata,
+            name,
+            privacy_level,
+            scheduled_start_time,
+            scheduled_end_time,
+            description,
+            entity_type,
+            image,
+            audit_log_reason,
+        } = self;
+        CreateScheduledEvent {
+            channel_id,
+            entity_metadata: entity_metadata.map(|m| m.into_owned()),
+            name: name.into_owned().into(),
+            privacy_level,
+            scheduled_start_time,
+            scheduled_end_time,
+            description: description.map(|d| d.into_owned().into()),
+            entity_type,
+            image: image.map(|i| i.into_owned()),
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Creates a new scheduled event in the guild with the data set, if any.
@@ -130,11 +157,19 @@ impl<'a> CreateScheduledEvent<'a> {
     /// [Create Events]: Permissions::CREATE_EVENTS
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<ScheduledEvent> {
-        http.create_scheduled_event(guild_id, &self, self.audit_log_reason).await
+        http.create_scheduled_event(guild_id, &self, self.audit_log_reason.as_deref()).await
     }
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize)]
 pub(crate) struct CreateScheduledEventMetadata<'a> {
     pub(crate) location: Option<Cow<'a, str>>,
+}
+
+impl CreateScheduledEventMetadata<'_> {
+    pub fn into_owned(self) -> CreateScheduledEventMetadata<'static> {
+        CreateScheduledEventMetadata {
+            location: self.location.map(|l| l.into_owned().into()),
+        }
+    }
 }

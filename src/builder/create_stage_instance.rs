@@ -17,7 +17,7 @@ pub struct CreateStageInstance<'a> {
     send_start_notification: Option<bool>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> CreateStageInstance<'a> {
@@ -46,9 +46,26 @@ impl<'a> CreateStageInstance<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreateStageInstance<'static> {
+        let Self {
+            channel_id,
+            topic,
+            privacy_level,
+            send_start_notification,
+            audit_log_reason,
+        } = self;
+        CreateStageInstance {
+            channel_id,
+            topic: topic.into_owned().into(),
+            privacy_level,
+            send_start_notification,
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Creates the stage instance.
@@ -59,6 +76,6 @@ impl<'a> CreateStageInstance<'a> {
     #[cfg(feature = "http")]
     pub async fn execute(mut self, http: &Http, channel_id: ChannelId) -> Result<StageInstance> {
         self.channel_id = Some(channel_id);
-        http.create_stage_instance(&self, self.audit_log_reason).await
+        http.create_stage_instance(&self, self.audit_log_reason.as_deref()).await
     }
 }

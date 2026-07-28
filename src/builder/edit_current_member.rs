@@ -23,7 +23,7 @@ pub struct EditCurrentMember<'a> {
     bio: Option<Option<Cow<'a, str>>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditCurrentMember<'a> {
@@ -65,9 +65,26 @@ impl<'a> EditCurrentMember<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditCurrentMember<'static> {
+        let Self {
+            nick,
+            banner,
+            avatar,
+            bio,
+            audit_log_reason,
+        } = self;
+        EditCurrentMember {
+            nick: nick.map(|n| n.map(|n| n.into_owned().into())),
+            banner: banner.map(|b| b.map(|b| b.into_owned())),
+            avatar: avatar.map(|a| a.map(|a| a.into_owned())),
+            bio: bio.map(|b| b.map(|b| b.into_owned().into())),
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Edits the properties of the application's guild member.
@@ -79,6 +96,6 @@ impl<'a> EditCurrentMember<'a> {
     /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<Member> {
-        http.edit_current_member(guild_id, &self, self.audit_log_reason).await
+        http.edit_current_member(guild_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

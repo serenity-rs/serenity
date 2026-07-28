@@ -45,7 +45,7 @@ pub struct CreateInvite<'a> {
     role_ids: Option<Cow<'a, [RoleId]>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> CreateInvite<'a> {
@@ -123,9 +123,34 @@ impl<'a> CreateInvite<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreateInvite<'static> {
+        let Self {
+            max_age,
+            max_uses,
+            temporary,
+            unique,
+            target_type,
+            target_user_id,
+            target_application_id,
+            role_ids,
+            audit_log_reason,
+        } = self;
+        CreateInvite {
+            max_age,
+            max_uses,
+            temporary,
+            unique,
+            target_type,
+            target_user_id,
+            target_application_id,
+            role_ids: role_ids.map(|r| Cow::Owned(r.into_owned())),
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Creates an invite for the given channel.
@@ -140,6 +165,6 @@ impl<'a> CreateInvite<'a> {
     /// [Create Instant Invite]: Permissions::CREATE_INSTANT_INVITE
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<Invite> {
-        http.create_invite(channel_id, &self, self.audit_log_reason).await
+        http.create_invite(channel_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

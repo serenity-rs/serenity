@@ -76,7 +76,7 @@ pub struct EditChannel<'a> {
     status: Option<Cow<'a, str>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditChannel<'a> {
@@ -248,9 +248,59 @@ impl<'a> EditChannel<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditChannel<'static> {
+        let Self {
+            name,
+            kind,
+            position,
+            topic,
+            nsfw,
+            rate_limit_per_user,
+            bitrate,
+            user_limit,
+            permission_overwrites,
+            parent_id,
+            rtc_region,
+            video_quality_mode,
+            default_auto_archive_duration,
+            flags,
+            available_tags,
+            default_reaction_emoji,
+            default_thread_rate_limit_per_user,
+            default_sort_order,
+            default_forum_layout,
+            status,
+            audit_log_reason,
+        } = self;
+        EditChannel {
+            name: name.map(|n| n.into_owned().into()),
+            kind,
+            position,
+            topic: topic.map(|t| t.into_owned().into()),
+            nsfw,
+            rate_limit_per_user,
+            bitrate,
+            user_limit,
+            permission_overwrites: permission_overwrites.map(|p| Cow::Owned(p.into_owned())),
+            parent_id,
+            rtc_region: rtc_region.map(|r| r.map(|r| r.into_owned().into())),
+            video_quality_mode,
+            default_auto_archive_duration,
+            flags,
+            available_tags: available_tags
+                .map(|t| Cow::Owned(t.into_owned().into_iter().map(|t| t.into_owned()).collect())),
+            default_reaction_emoji,
+            default_thread_rate_limit_per_user,
+            default_sort_order,
+            default_forum_layout,
+            status: status.map(|s| s.into_owned().into()),
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// The type of channel; only conversion between text and announcement is supported and only in
@@ -334,12 +384,12 @@ impl<'a> EditChannel<'a> {
                 &EditVoiceStatusBody {
                     status,
                 },
-                self.audit_log_reason,
+                self.audit_log_reason.as_deref(),
             )
             .await?;
         }
 
-        http.edit_channel(channel_id.widen(), &self, self.audit_log_reason)
+        http.edit_channel(channel_id.widen(), &self, self.audit_log_reason.as_deref())
             .await?
             .guild()
             .ok_or(Error::Model(ModelError::InvalidChannelType))

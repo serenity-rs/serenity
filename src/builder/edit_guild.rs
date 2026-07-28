@@ -52,7 +52,7 @@ pub struct EditGuild<'a> {
     premium_progress_bar_enabled: Option<bool>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditGuild<'a> {
@@ -297,9 +297,58 @@ impl<'a> EditGuild<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditGuild<'static> {
+        let Self {
+            name,
+            verification_level,
+            default_message_notifications,
+            explicit_content_filter,
+            afk_channel_id,
+            afk_timeout,
+            icon,
+            owner_id,
+            splash,
+            discovery_splash,
+            banner,
+            system_channel_id,
+            system_channel_flags,
+            rules_channel_id,
+            public_updates_channel_id,
+            preferred_locale,
+            features,
+            description,
+            premium_progress_bar_enabled,
+            audit_log_reason,
+        } = self;
+        EditGuild {
+            name: name.map(|n| n.into_owned().into()),
+            verification_level,
+            default_message_notifications,
+            explicit_content_filter,
+            afk_channel_id,
+            afk_timeout,
+            icon: icon.map(|i| i.map(|i| i.into_owned())),
+            owner_id,
+            splash: splash.map(|s| s.map(|s| s.into_owned())),
+            discovery_splash: discovery_splash.map(|s| s.map(|s| s.into_owned())),
+            banner: banner.map(|b| b.map(|b| b.into_owned())),
+            system_channel_id,
+            system_channel_flags,
+            rules_channel_id,
+            public_updates_channel_id,
+            preferred_locale: preferred_locale.map(|l| l.map(|l| l.into_owned().into())),
+            features: features.map(|f| {
+                Cow::Owned(f.into_owned().into_iter().map(|f| Cow::Owned(f.into_owned())).collect())
+            }),
+            description: description.map(|d| d.into_owned().into()),
+            premium_progress_bar_enabled,
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Whether the guild's boost progress bar should be enabled
@@ -319,6 +368,6 @@ impl<'a> EditGuild<'a> {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<PartialGuild> {
-        http.edit_guild(guild_id, &self, self.audit_log_reason).await
+        http.edit_guild(guild_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

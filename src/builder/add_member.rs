@@ -98,4 +98,21 @@ impl<'a> AddMember<'a> {
     ) -> Result<Option<Member>> {
         http.add_guild_member(guild_id, user_id, &self).await
     }
+
+    pub fn into_owned(self) -> AddMember<'static> {
+        let Self {
+            access_token,
+            nick,
+            roles,
+            mute,
+            deaf,
+        } = self;
+        AddMember {
+            access_token: access_token.into_owned().into(),
+            nick: nick.map(|n| n.into_owned().into()),
+            roles: roles.into_owned().into(),
+            mute,
+            deaf,
+        }
+    }
 }

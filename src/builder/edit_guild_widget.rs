@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::prelude::*;
@@ -14,7 +16,7 @@ pub struct EditGuildWidget<'a> {
     channel_id: Option<ChannelId>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditGuildWidget<'a> {
@@ -36,9 +38,22 @@ impl<'a> EditGuildWidget<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditGuildWidget<'static> {
+        let Self {
+            enabled,
+            channel_id,
+            audit_log_reason,
+        } = self;
+        EditGuildWidget {
+            enabled,
+            channel_id,
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Edits the guild's widget.
@@ -52,6 +67,6 @@ impl<'a> EditGuildWidget<'a> {
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<GuildWidget> {
-        http.edit_guild_widget(guild_id, &self, self.audit_log_reason).await
+        http.edit_guild_widget(guild_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

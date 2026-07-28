@@ -15,7 +15,7 @@ pub struct CreateWebhook<'a> {
     avatar: Option<DataUri<'a>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> CreateWebhook<'a> {
@@ -43,9 +43,22 @@ impl<'a> CreateWebhook<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreateWebhook<'static> {
+        let Self {
+            name,
+            avatar,
+            audit_log_reason,
+        } = self;
+        CreateWebhook {
+            name: name.into_owned().into(),
+            avatar: avatar.map(|a| a.into_owned()),
+            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+        }
     }
 
     /// Creates the webhook.
@@ -65,6 +78,6 @@ impl<'a> CreateWebhook<'a> {
         crate::model::error::Minimum::WebhookName.check_underflow(self.name.chars().count())?;
         crate::model::error::Maximum::WebhookName.check_overflow(self.name.chars().count())?;
 
-        http.create_webhook(channel_id, &self, self.audit_log_reason).await
+        http.create_webhook(channel_id, &self, self.audit_log_reason.as_deref()).await
     }
 }

@@ -63,7 +63,7 @@ pub struct EditRole<'a> {
     #[serde(skip)]
     position: Option<i16>,
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditRole<'a> {
@@ -148,9 +148,36 @@ impl<'a> EditRole<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditRole<'static> {
+        let Self {
+            name,
+            permissions,
+            colour,
+            colours,
+            hoist,
+            icon,
+            unicode_emoji,
+            mentionable,
+            position,
+            audit_log_reason,
+        } = self;
+        EditRole {
+            name: name.map(|n| n.into_owned().into()),
+            permissions,
+            colour,
+            colours,
+            hoist,
+            icon: icon.map(|i| i.map(|i| i.into_owned())),
+            unicode_emoji: unicode_emoji.map(|e| e.map(|e| e.into_owned().into())),
+            mentionable,
+            position,
+            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+        }
     }
 
     /// Edits the role.
@@ -171,14 +198,14 @@ impl<'a> EditRole<'a> {
     ) -> Result<Role> {
         let role = match role_id {
             Some(role_id) => {
-                http.edit_role(guild_id, role_id, &self, self.audit_log_reason).await?
+                http.edit_role(guild_id, role_id, &self, self.audit_log_reason.as_deref()).await?
             },
-            None => http.create_role(guild_id, &self, self.audit_log_reason).await?,
+            None => http.create_role(guild_id, &self, self.audit_log_reason.as_deref()).await?,
         };
 
         if let Some(position) = self.position {
             guild_id
-                .edit_role_positions(http, [(role.id, position)], self.audit_log_reason)
+                .edit_role_positions(http, [(role.id, position)], self.audit_log_reason.as_deref())
                 .await?;
         }
         Ok(role)

@@ -117,6 +117,27 @@ impl<'a> GetEntitlements<'a> {
         self
     }
 
+    pub fn into_owned(self) -> GetEntitlements<'static> {
+        let Self {
+            user_id,
+            sku_ids,
+            before,
+            after,
+            limit,
+            guild_id,
+            exclude_ended,
+        } = self;
+        GetEntitlements {
+            user_id,
+            sku_ids: sku_ids.map(|s| Cow::Owned(s.into_owned())),
+            before,
+            after,
+            limit,
+            guild_id,
+            exclude_ended,
+        }
+    }
+
     /// Returns all entitlements for the current application, active and expired.
     ///
     /// # Errors

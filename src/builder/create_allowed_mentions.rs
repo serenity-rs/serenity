@@ -170,4 +170,19 @@ impl<'a> CreateAllowedMentions<'a> {
         self.replied_user = Some(mention_user);
         self
     }
+
+    pub fn into_owned(self) -> CreateAllowedMentions<'static> {
+        let Self {
+            parse,
+            users,
+            roles,
+            replied_user,
+        } = self;
+        CreateAllowedMentions {
+            parse,
+            users: users.into_owned().into(),
+            roles: roles.into_owned().into(),
+            replied_user,
+        }
+    }
 }

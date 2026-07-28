@@ -302,6 +302,16 @@ pub enum AutocompleteValue<'a> {
     Float(f64),
 }
 
+impl AutocompleteValue<'_> {
+    pub fn into_owned(self) -> AutocompleteValue<'static> {
+        match self {
+            AutocompleteValue::String(s) => AutocompleteValue::String(s.into_owned().into()),
+            AutocompleteValue::Integer(i) => AutocompleteValue::Integer(i),
+            AutocompleteValue::Float(f) => AutocompleteValue::Float(f),
+        }
+    }
+}
+
 impl<'a> From<Cow<'a, str>> for AutocompleteValue<'a> {
     fn from(value: Cow<'a, str>) -> Self {
         Self::String(value)
@@ -362,6 +372,23 @@ impl<'a> AutocompleteChoice<'a> {
             .insert(locale.into(), localized_name.into());
         self
     }
+
+    pub fn into_owned(self) -> AutocompleteChoice<'static> {
+        let Self {
+            name,
+            name_localizations,
+            value,
+        } = self;
+        AutocompleteChoice {
+            name: name.into_owned().into(),
+            name_localizations: name_localizations.map(|l| {
+                l.into_iter()
+                    .map(|(k, v)| (Cow::Owned(k.into_owned()), Cow::Owned(v.into_owned())))
+                    .collect()
+            }),
+            value: value.into_owned(),
+        }
+    }
 }
 
 impl<'a, S: Into<Cow<'a, str>>> From<S> for AutocompleteChoice<'a> {
@@ -404,6 +431,14 @@ impl<'a> CreateAutocompleteResponse<'a> {
     pub fn add_choice(mut self, value: impl Into<AutocompleteChoice<'a>>) -> Self {
         self.choices.to_mut().push(value.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreateAutocompleteResponse<'static> {
+        CreateAutocompleteResponse {
+            choices: Cow::Owned(
+                self.choices.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+            ),
+        }
     }
 
     /// Creates a response to an autocomplete interaction.
@@ -451,6 +486,21 @@ impl<'a> CreateModal<'a> {
         self.components = components.into();
         self
     }
+
+    pub fn into_owned(self) -> CreateModal<'static> {
+        let Self {
+            components,
+            custom_id,
+            title,
+        } = self;
+        CreateModal {
+            components: Cow::Owned(
+                components.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+            ),
+            custom_id: custom_id.into_owned().into(),
+            title: title.into_owned().into(),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -459,4 +509,15 @@ impl<'a> CreateModal<'a> {
 pub enum CreateModalComponent<'a> {
     TextDisplay(CreateTextDisplay<'a>),
     Label(CreateLabel<'a>),
+}
+
+impl CreateModalComponent<'_> {
+    pub fn into_owned(self) -> CreateModalComponent<'static> {
+        match self {
+            CreateModalComponent::TextDisplay(t) => {
+                CreateModalComponent::TextDisplay(t.into_owned())
+            },
+            CreateModalComponent::Label(l) => CreateModalComponent::Label(l.into_owned()),
+        }
+    }
 }

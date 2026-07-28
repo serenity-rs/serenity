@@ -18,7 +18,7 @@ pub struct EditSoundboard<'a> {
     emoji_name: Option<Cow<'a, str>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditSoundboard<'a> {
@@ -56,9 +56,26 @@ impl<'a> EditSoundboard<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditSoundboard<'static> {
+        let Self {
+            name,
+            volume,
+            emoji_id,
+            emoji_name,
+            audit_log_reason,
+        } = self;
+        EditSoundboard {
+            name: name.map(|n| n.into_owned().into()),
+            volume,
+            emoji_id,
+            emoji_name: emoji_name.map(|e| e.into_owned().into()),
+            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+        }
     }
 
     /// Edits the soundboard sound.
@@ -82,7 +99,7 @@ impl<'a> EditSoundboard<'a> {
     ) -> Result<Soundboard> {
         cache_http
             .http()
-            .edit_guild_soundboard(guild_id, sound_id, &self, self.audit_log_reason)
+            .edit_guild_soundboard(guild_id, sound_id, &self, self.audit_log_reason.as_deref())
             .await
     }
 }

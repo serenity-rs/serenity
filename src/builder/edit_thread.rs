@@ -28,7 +28,7 @@ pub struct EditThread<'a> {
     applied_tags: Option<Cow<'a, [ForumTagId]>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> EditThread<'a> {
@@ -96,9 +96,34 @@ impl<'a> EditThread<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> EditThread<'static> {
+        let Self {
+            name,
+            archived,
+            auto_archive_duration,
+            locked,
+            invitable,
+            rate_limit_per_user,
+            flags,
+            applied_tags,
+            audit_log_reason,
+        } = self;
+        EditThread {
+            name: name.map(|n| n.into_owned().into()),
+            archived,
+            auto_archive_duration,
+            locked,
+            invitable,
+            rate_limit_per_user,
+            flags,
+            applied_tags: applied_tags.map(|t| t.into_owned().into()),
+            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+        }
     }
 
     /// Edits the thread.
@@ -109,7 +134,7 @@ impl<'a> EditThread<'a> {
     /// Returns [`ModelError::InvalidChannelType`] if the `ThreadId` is not identifying a thread.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, thread_id: ThreadId) -> Result<GuildThread> {
-        http.edit_channel(thread_id.widen(), &self, self.audit_log_reason)
+        http.edit_channel(thread_id.widen(), &self, self.audit_log_reason.as_deref())
             .await?
             .thread()
             .ok_or(Error::Model(ModelError::InvalidChannelType))

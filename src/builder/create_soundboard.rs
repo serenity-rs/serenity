@@ -18,7 +18,7 @@ pub struct CreateSoundboard<'a> {
     emoji_name: Option<Cow<'a, str>>,
 
     #[serde(skip)]
-    audit_log_reason: Option<&'a str>,
+    audit_log_reason: Option<Cow<'a, str>>,
 }
 
 impl<'a> CreateSoundboard<'a> {
@@ -72,9 +72,28 @@ impl<'a> CreateSoundboard<'a> {
     }
 
     /// Sets the request's audit log reason.
-    pub fn audit_log_reason(mut self, reason: &'a str) -> Self {
-        self.audit_log_reason = Some(reason);
+    pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
+        self.audit_log_reason = Some(reason.into());
         self
+    }
+
+    pub fn into_owned(self) -> CreateSoundboard<'static> {
+        let Self {
+            name,
+            sound,
+            volume,
+            emoji_id,
+            emoji_name,
+            audit_log_reason,
+        } = self;
+        CreateSoundboard {
+            name: name.into_owned().into(),
+            sound: sound.into_owned(),
+            volume,
+            emoji_id,
+            emoji_name: emoji_name.map(|e| e.into_owned().into()),
+            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+        }
     }
 
     /// Creates a new soundboard in the guild with the data set.
@@ -92,6 +111,9 @@ impl<'a> CreateSoundboard<'a> {
         cache_http: impl CacheHttp,
         guild_id: GuildId,
     ) -> Result<Soundboard> {
-        cache_http.http().create_guild_soundboard(guild_id, &self, self.audit_log_reason).await
+        cache_http
+            .http()
+            .create_guild_soundboard(guild_id, &self, self.audit_log_reason.as_deref())
+            .await
     }
 }
