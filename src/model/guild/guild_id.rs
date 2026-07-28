@@ -1681,7 +1681,7 @@ impl GuildId {
         builder.execute(http, guild_id).await
     }
 
-    /// Adds a [`Role`] to the guild user.
+    /// Adds a [`Role`] to a member of the guild.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -1691,17 +1691,17 @@ impl GuildId {
     /// Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
-    pub async fn add_user_role(
+    pub async fn add_member_role(
         self,
-        http: impl AsRef<Http>,
-        user_id: impl Into<UserId>,
-        role_id: impl Into<RoleId>,
+        http: &Http,
+        user_id: UserId,
+        role_id: RoleId,
+        reason: Option<&str>,
     ) -> Result<()> {
-        http.as_ref().add_member_role(self, user_id.into(), role_id.into(), None).await
+        http.add_member_role(self, user_id, role_id, reason).await
     }
 
-    /// Removes a [`Role`] from the guild user.
+    /// Removes a [`Role`] from a member of the guild.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
@@ -1711,14 +1711,14 @@ impl GuildId {
     /// lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    #[inline]
-    pub async fn remove_user_role(
+    pub async fn remove_member_role(
         self,
-        http: impl AsRef<Http>,
-        user_id: impl Into<UserId>,
-        role_id: impl Into<RoleId>,
+        http: &Http,
+        user_id: UserId,
+        role_id: RoleId,
+        reason: Option<&str>,
     ) -> Result<()> {
-        http.as_ref().remove_member_role(self, user_id.into(), role_id.into(), None).await
+        http.remove_member_role(self, user_id, role_id, reason).await
     }
 }
 
