@@ -293,7 +293,7 @@ impl<'a> EditChannel<'a> {
             default_auto_archive_duration,
             flags,
             available_tags: available_tags
-                .map(|t| Cow::Owned(t.into_owned().into_iter().map(|t| t.into_owned()).collect())),
+                .map(|t| Cow::Owned(t.into_owned().into_iter().map(CreateForumTag::into_owned).collect())),
             default_reaction_emoji,
             default_thread_rate_limit_per_user,
             default_sort_order,

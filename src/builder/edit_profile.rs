@@ -88,8 +88,8 @@ impl<'a> EditProfile<'a> {
         } = self;
         EditProfile {
             username: username.map(|u| u.into_owned().into()),
-            avatar: avatar.map(|a| a.map(|a| a.into_owned())),
-            banner: banner.map(|b| b.map(|b| b.into_owned())),
+            avatar: avatar.map(|a| a.map(DataUri::into_owned)),
+            banner: banner.map(|b| b.map(DataUri::into_owned)),
         }
     }
 

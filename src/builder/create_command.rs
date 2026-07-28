@@ -349,8 +349,8 @@ impl<'a> CreateCommandOption<'a> {
                     .collect()
             }),
             required,
-            choices: Cow::Owned(choices.into_owned().into_iter().map(|c| c.into_owned()).collect()),
-            options: Cow::Owned(options.into_owned().into_iter().map(|o| o.into_owned()).collect()),
+            choices: Cow::Owned(choices.into_owned().into_iter().map(CreateCommandOptionChoice::into_owned).collect()),
+            options: Cow::Owned(options.into_owned().into_iter().map(CreateCommandOption::into_owned).collect()),
             channel_types: channel_types.into_owned().into(),
             min_value,
             max_value,
@@ -561,7 +561,7 @@ struct CreateCommandOptionChoice<'a> {
     pub value: Value,
 }
 
-impl<'a> CreateCommandOptionChoice<'a> {
+impl CreateCommandOptionChoice<'_> {
     pub fn into_owned(self) -> CreateCommandOptionChoice<'static> {
         let Self {
             name,

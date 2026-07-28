@@ -25,7 +25,7 @@ impl<'a> CreateActionRow<'a> {
     pub fn into_owned(self) -> CreateActionRow<'static> {
         match self {
             Self::Buttons(btns) => CreateActionRow::Buttons(Cow::Owned(
-                btns.into_owned().into_iter().map(|b| b.into_owned()).collect(),
+                btns.into_owned().into_iter().map(CreateButton::into_owned).collect(),
             )),
             Self::SelectMenu(csm) => CreateActionRow::SelectMenu(csm.into_owned()),
         }
@@ -103,7 +103,7 @@ pub enum CreateComponent<'a> {
     Label(CreateLabel<'a>),
 }
 
-impl<'a> CreateComponent<'a> {
+impl CreateComponent<'_> {
     pub fn into_owned(self) -> CreateComponent<'static> {
         match self {
             Self::ActionRow(e) => CreateComponent::ActionRow(e.into_owned()),
@@ -180,7 +180,7 @@ impl<'a> CreateSection<'a> {
         CreateSection {
             kind,
             components: Cow::Owned(
-                components.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+                components.into_owned().into_iter().map(CreateSectionComponent::into_owned).collect(),
             ),
             accessory: accessory.into_owned(),
         }
@@ -195,7 +195,7 @@ pub enum CreateSectionComponent<'a> {
     TextDisplay(CreateTextDisplay<'a>),
 }
 
-impl<'a> CreateSectionComponent<'a> {
+impl CreateSectionComponent<'_> {
     pub fn into_owned(self) -> CreateSectionComponent<'static> {
         match self {
             Self::TextDisplay(e) => CreateSectionComponent::TextDisplay(e.into_owned()),
@@ -232,6 +232,7 @@ impl<'a> CreateTextDisplay<'a> {
         self
     }
 
+    #[must_use]
     pub fn into_owned(self) -> CreateTextDisplay<'static> {
         let Self {
             kind,
@@ -253,7 +254,7 @@ pub enum CreateSectionAccessory<'a> {
     Button(CreateButton<'a>),
 }
 
-impl<'a> CreateSectionAccessory<'a> {
+impl CreateSectionAccessory<'_> {
     pub fn into_owned(self) -> CreateSectionAccessory<'static> {
         match self {
             Self::Thumbnail(e) => CreateSectionAccessory::Thumbnail(e.into_owned()),
@@ -395,7 +396,7 @@ impl<'a> CreateMediaGallery<'a> {
         } = self;
         CreateMediaGallery {
             kind,
-            items: Cow::Owned(items.into_owned().into_iter().map(|i| i.into_owned()).collect()),
+            items: Cow::Owned(items.into_owned().into_iter().map(CreateMediaGalleryItem::into_owned).collect()),
         }
     }
 }
@@ -635,7 +636,7 @@ impl<'a> CreateContainer<'a> {
             accent_color,
             spoiler,
             components: Cow::Owned(
-                components.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+                components.into_owned().into_iter().map(CreateContainerComponent::into_owned).collect(),
             ),
         }
     }
@@ -654,7 +655,7 @@ pub enum CreateContainerComponent<'a> {
     Separator(CreateSeparator),
 }
 
-impl<'a> CreateContainerComponent<'a> {
+impl CreateContainerComponent<'_> {
     pub fn into_owned(self) -> CreateContainerComponent<'static> {
         match self {
             Self::ActionRow(e) => CreateContainerComponent::ActionRow(e.into_owned()),
@@ -781,7 +782,7 @@ enum CreateLabelComponent<'a> {
     Checkbox(CreateCheckbox<'a>),
 }
 
-impl<'a> CreateLabelComponent<'a> {
+impl CreateLabelComponent<'_> {
     pub fn into_owned(self) -> CreateLabelComponent<'static> {
         match self {
             Self::SelectMenu(e) => CreateLabelComponent::SelectMenu(e.into_owned()),
@@ -904,7 +905,7 @@ impl<'a> CreateRadioGroup<'a> {
         CreateRadioGroup {
             kind,
             custom_id: custom_id.into_owned().into(),
-            options: Cow::Owned(options.into_owned().into_iter().map(|o| o.into_owned()).collect()),
+            options: Cow::Owned(options.into_owned().into_iter().map(CreateRadioGroupOption::into_owned).collect()),
             required,
         }
     }
@@ -1057,7 +1058,7 @@ impl<'a> CreateCheckboxGroup<'a> {
         CreateCheckboxGroup {
             kind,
             custom_id: custom_id.into_owned().into(),
-            options: Cow::Owned(options.into_owned().into_iter().map(|o| o.into_owned()).collect()),
+            options: Cow::Owned(options.into_owned().into_iter().map(CreateCheckboxGroupOption::into_owned).collect()),
             min_values,
             max_values,
             required,
@@ -1395,14 +1396,15 @@ pub enum CreateSelectMenuKind<'a> {
     },
 }
 
-impl<'a> CreateSelectMenuKind<'a> {
+impl CreateSelectMenuKind<'_> {
+    #[must_use]
     pub fn into_owned(self) -> CreateSelectMenuKind<'static> {
         match self {
             CreateSelectMenuKind::String {
                 options,
             } => CreateSelectMenuKind::String {
                 options: Cow::Owned(
-                    options.into_owned().into_iter().map(|o| o.into_owned()).collect(),
+                    options.into_owned().into_iter().map(CreateSelectMenuOption::into_owned).collect(),
                 ),
             },
             CreateSelectMenuKind::User {

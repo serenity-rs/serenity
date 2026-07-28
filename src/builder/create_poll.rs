@@ -167,15 +167,15 @@ impl<Stage: Sealed> CreatePoll<'_, Stage> {
             duration,
             allow_multiselect,
             layout_type,
-            _stage,
+            _stage: stage,
         } = self;
         CreatePoll {
             question: question.into_owned(),
-            answers: Cow::Owned(answers.into_owned().into_iter().map(|a| a.into_owned()).collect()),
+            answers: Cow::Owned(answers.into_owned().into_iter().map(CreatePollAnswer::into_owned).collect()),
             duration,
             allow_multiselect,
             layout_type,
-            _stage,
+            _stage: stage,
         }
     }
 }
@@ -186,7 +186,7 @@ struct CreatePollAnswerMedia<'a> {
     emoji: Option<PollMediaEmoji>,
 }
 
-impl<'a> CreatePollAnswerMedia<'a> {
+impl CreatePollAnswerMedia<'_> {
     pub fn into_owned(self) -> CreatePollAnswerMedia<'static> {
         CreatePollAnswerMedia {
             text: self.text.map(|t| t.into_owned().into()),

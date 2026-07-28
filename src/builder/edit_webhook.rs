@@ -67,7 +67,7 @@ impl<'a> EditWebhook<'a> {
         } = self;
         EditWebhook {
             name: name.map(|n| n.into_owned().into()),
-            avatar: avatar.map(|a| a.map(|a| a.into_owned())),
+            avatar: avatar.map(|a| a.map(DataUri::into_owned)),
             channel_id,
             audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
         }

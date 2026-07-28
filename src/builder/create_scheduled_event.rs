@@ -134,14 +134,14 @@ impl<'a> CreateScheduledEvent<'a> {
         } = self;
         CreateScheduledEvent {
             channel_id,
-            entity_metadata: entity_metadata.map(|m| m.into_owned()),
+            entity_metadata: entity_metadata.map(CreateScheduledEventMetadata::into_owned),
             name: name.into_owned().into(),
             privacy_level,
             scheduled_start_time,
             scheduled_end_time,
             description: description.map(|d| d.into_owned().into()),
             entity_type,
-            image: image.map(|i| i.into_owned()),
+            image: image.map(DataUri::into_owned),
             audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
         }
     }

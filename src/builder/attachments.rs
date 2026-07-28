@@ -202,6 +202,7 @@ impl<'a> DataUri<'a> {
         }
     }
 
+    #[must_use]
     pub fn into_owned(self) -> DataUri<'static> {
         DataUri(self.0.into_owned().into())
     }

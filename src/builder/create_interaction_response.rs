@@ -436,7 +436,7 @@ impl<'a> CreateAutocompleteResponse<'a> {
     pub fn into_owned(self) -> CreateAutocompleteResponse<'static> {
         CreateAutocompleteResponse {
             choices: Cow::Owned(
-                self.choices.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+                self.choices.into_owned().into_iter().map(AutocompleteChoice::into_owned).collect(),
             ),
         }
     }
@@ -495,7 +495,7 @@ impl<'a> CreateModal<'a> {
         } = self;
         CreateModal {
             components: Cow::Owned(
-                components.into_owned().into_iter().map(|c| c.into_owned()).collect(),
+                components.into_owned().into_iter().map(CreateModalComponent::into_owned).collect(),
             ),
             custom_id: custom_id.into_owned().into(),
             title: title.into_owned().into(),

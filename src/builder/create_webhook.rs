@@ -56,7 +56,7 @@ impl<'a> CreateWebhook<'a> {
         } = self;
         CreateWebhook {
             name: name.into_owned().into(),
-            avatar: avatar.map(|a| a.into_owned()),
+            avatar: avatar.map(DataUri::into_owned),
             audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
         }
     }

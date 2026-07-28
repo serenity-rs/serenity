@@ -80,8 +80,8 @@ impl<'a> EditCurrentMember<'a> {
         } = self;
         EditCurrentMember {
             nick: nick.map(|n| n.map(|n| n.into_owned().into())),
-            banner: banner.map(|b| b.map(|b| b.into_owned())),
-            avatar: avatar.map(|a| a.map(|a| a.into_owned())),
+            banner: banner.map(|b| b.map(DataUri::into_owned)),
+            avatar: avatar.map(|a| a.map(DataUri::into_owned)),
             bio: bio.map(|b| b.map(|b| b.into_owned().into())),
             audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
         }

@@ -177,7 +177,7 @@ impl<'a> EditScheduledEvent<'a> {
         } = self;
         EditScheduledEvent {
             channel_id,
-            entity_metadata: entity_metadata.map(|m| m.map(|m| m.into_owned())),
+            entity_metadata: entity_metadata.map(|m| m.map(CreateScheduledEventMetadata::into_owned)),
             name: name.map(|n| n.into_owned().into()),
             privacy_level,
             scheduled_start_time,
@@ -185,7 +185,7 @@ impl<'a> EditScheduledEvent<'a> {
             description: description.map(|d| d.into_owned().into()),
             entity_type,
             status,
-            image: image.map(|i| i.into_owned()),
+            image: image.map(DataUri::into_owned),
             audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
         }
     }

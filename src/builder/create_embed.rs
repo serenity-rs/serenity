@@ -264,11 +264,11 @@ impl<'a> CreateEmbed<'a> {
             url: url.map(|u| u.into_owned().into()),
             timestamp,
             colour,
-            footer: footer.map(|f| f.into_owned()),
-            image: image.map(|i| i.into_owned()),
-            thumbnail: thumbnail.map(|t| t.into_owned()),
-            author: author.map(|a| a.into_owned()),
-            fields: fields.into_iter().map(|f| f.into_owned()).collect(),
+            footer: footer.map(CreateEmbedFooter::into_owned),
+            image: image.map(CreateEmbedImage::into_owned),
+            thumbnail: thumbnail.map(CreateEmbedImage::into_owned),
+            author: author.map(CreateEmbedAuthor::into_owned),
+            fields: fields.into_iter().map(CreateEmbedField::into_owned).collect(),
         }
     }
 }
@@ -446,7 +446,7 @@ struct CreateEmbedField<'a> {
     inline: bool,
 }
 
-impl<'a> CreateEmbedField<'a> {
+impl CreateEmbedField<'_> {
     pub fn into_owned(self) -> CreateEmbedField<'static> {
         let Self {
             name,
@@ -487,7 +487,7 @@ struct CreateEmbedImage<'a> {
     description: Option<Cow<'a, str>>,
 }
 
-impl<'a> CreateEmbedImage<'a> {
+impl CreateEmbedImage<'_> {
     pub fn into_owned(self) -> CreateEmbedImage<'static> {
         let Self {
             url,

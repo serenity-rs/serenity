@@ -172,7 +172,7 @@ impl<'a> EditRole<'a> {
             colour,
             colours,
             hoist,
-            icon: icon.map(|i| i.map(|i| i.into_owned())),
+            icon: icon.map(|i| i.map(DataUri::into_owned)),
             unicode_emoji: unicode_emoji.map(|e| e.map(|e| e.into_owned().into())),
             mentionable,
             position,
