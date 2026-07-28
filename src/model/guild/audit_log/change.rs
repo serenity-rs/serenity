@@ -229,6 +229,8 @@ generate_change! {
     "mentionable" => Mentionable(bool),
     /// Multi-factor authentication requirement was changed.
     "mfa_level" => MfaLevel(MfaLevel),
+    /// Mode of onboarding was changed.
+    "mode" => Mode(OnboardingMode),
     /// Whether a user is server muted was changed.
     "mute" => Mute(bool),
     /// Name of an entity was changed.
@@ -241,6 +243,8 @@ generate_change! {
     "nsfw" => Nsfw(bool),
     /// Owner of a guild was changed.
     "owner_id" => OwnerId(UserId),
+    /// Onboarding prompt options were changed.
+    "options" => Options(FixedArray<OnboardingPromptOption>),
     /// Permissions on a channel were changed.
     "permission_overwrites" => PermissionOverwrites(FixedArray<PermissionOverwrite>),
     /// Permissions for an entity were changed.
@@ -253,6 +257,8 @@ generate_change! {
     "premium_progress_bar_enabled" => PremiumProgressBarEnabled(bool),
     /// Privacy level of a stage instance was changed.
     "privacy_level" => PrivacyLevel(u64),
+    /// Prompts shown during onboarding and in customize community were changed.
+    "prompts" => Prompts(FixedArray<OnboardingPrompt>),
     /// Number of days after which inactive and role-unassigned members are kicked was changed.
     "prune_delete_days" => PruneDeleteDays(u64),
     /// Id of a public updates channel was changed.
