@@ -195,28 +195,32 @@
 <a href=#195 id=195 data-nosnippet>195</a>            <span class="self">Self</span>::TooSmall {
 <a href=#196 id=196 data-nosnippet>196</a>                minimum,
 <a href=#197 id=197 data-nosnippet>197</a>                value,
-<a href=#198 id=198 data-nosnippet>198</a>            } =&gt; <span class="macro">write!</span>(f, <span class="string">"The {minimum} minimum has been missed by {value}"</span>),
-<a href=#199 id=199 data-nosnippet>199</a>            <span class="self">Self</span>::TooLarge {
-<a href=#200 id=200 data-nosnippet>200</a>                maximum,
-<a href=#201 id=201 data-nosnippet>201</a>                value,
-<a href=#202 id=202 data-nosnippet>202</a>            } =&gt; <span class="macro">write!</span>(f, <span class="string">"The {maximum} maximum has been overflowed by {value}"</span>),
-<a href=#203 id=203 data-nosnippet>203</a>            <span class="self">Self</span>::GuildNotFound =&gt; f.write_str(<span class="string">"Guild not found in the cache."</span>),
-<a href=#204 id=204 data-nosnippet>204</a>            <span class="self">Self</span>::RoleNotFound =&gt; f.write_str(<span class="string">"Role not found in the cache."</span>),
-<a href=#205 id=205 data-nosnippet>205</a>            <span class="self">Self</span>::MemberNotFound =&gt; f.write_str(<span class="string">"Member not found in the cache."</span>),
-<a href=#206 id=206 data-nosnippet>206</a>            <span class="self">Self</span>::ChannelNotFound =&gt; f.write_str(<span class="string">"Channel not found in the cache."</span>),
-<a href=#207 id=207 data-nosnippet>207</a>            <span class="self">Self</span>::Hierarchy =&gt; f.write_str(<span class="string">"Role hierarchy prevents this action."</span>),
-<a href=#208 id=208 data-nosnippet>208</a>            <span class="self">Self</span>::InvalidChannelType =&gt; f.write_str(<span class="string">"The channel cannot perform the action."</span>),
-<a href=#209 id=209 data-nosnippet>209</a>            <span class="self">Self</span>::InvalidUser =&gt; f.write_str(<span class="string">"The current user cannot perform the action."</span>),
-<a href=#210 id=210 data-nosnippet>210</a>            <span class="self">Self</span>::ItemMissing =&gt; f.write_str(<span class="string">"The required item is missing from the cache."</span>),
-<a href=#211 id=211 data-nosnippet>211</a>            <span class="self">Self</span>::MessageAlreadyCrossposted =&gt; f.write_str(<span class="string">"Message already crossposted."</span>),
-<a href=#212 id=212 data-nosnippet>212</a>            <span class="self">Self</span>::CannotCrosspostMessage =&gt; f.write_str(<span class="string">"Cannot crosspost this message type."</span>),
-<a href=#213 id=213 data-nosnippet>213</a>            <span class="self">Self</span>::MessagingBot =&gt; f.write_str(<span class="string">"Attempted to message another bot user."</span>),
-<a href=#214 id=214 data-nosnippet>214</a>            <span class="self">Self</span>::NoTokenSet =&gt; f.write_str(<span class="string">"Token is not set."</span>),
-<a href=#215 id=215 data-nosnippet>215</a>            <span class="self">Self</span>::DeleteNitroSticker =&gt; f.write_str(<span class="string">"Cannot delete an official sticker."</span>),
-<a href=#216 id=216 data-nosnippet>216</a>            <span class="self">Self</span>::CannotEditVoiceMessage =&gt; f.write_str(<span class="string">"Cannot edit voice message."</span>),
-<a href=#217 id=217 data-nosnippet>217</a>        }
-<a href=#218 id=218 data-nosnippet>218</a>    }
-<a href=#219 id=219 data-nosnippet>219</a>}
-<a href=#220 id=220 data-nosnippet>220</a>
-<a href=#221 id=221 data-nosnippet>221</a><span class="kw">impl </span>StdError <span class="kw">for </span>Error {}
+<a href=#198 id=198 data-nosnippet>198</a>            } =&gt; {
+<a href=#199 id=199 data-nosnippet>199</a>                <span class="macro">write!</span>(f, <span class="string">"The {minimum} minimum has been missed by {value}"</span>)
+<a href=#200 id=200 data-nosnippet>200</a>            },
+<a href=#201 id=201 data-nosnippet>201</a>            <span class="self">Self</span>::TooLarge {
+<a href=#202 id=202 data-nosnippet>202</a>                maximum,
+<a href=#203 id=203 data-nosnippet>203</a>                value,
+<a href=#204 id=204 data-nosnippet>204</a>            } =&gt; {
+<a href=#205 id=205 data-nosnippet>205</a>                <span class="macro">write!</span>(f, <span class="string">"The {maximum} maximum has been overflowed by {value}"</span>)
+<a href=#206 id=206 data-nosnippet>206</a>            },
+<a href=#207 id=207 data-nosnippet>207</a>            <span class="self">Self</span>::GuildNotFound =&gt; f.write_str(<span class="string">"Guild not found in the cache."</span>),
+<a href=#208 id=208 data-nosnippet>208</a>            <span class="self">Self</span>::RoleNotFound =&gt; f.write_str(<span class="string">"Role not found in the cache."</span>),
+<a href=#209 id=209 data-nosnippet>209</a>            <span class="self">Self</span>::MemberNotFound =&gt; f.write_str(<span class="string">"Member not found in the cache."</span>),
+<a href=#210 id=210 data-nosnippet>210</a>            <span class="self">Self</span>::ChannelNotFound =&gt; f.write_str(<span class="string">"Channel not found in the cache."</span>),
+<a href=#211 id=211 data-nosnippet>211</a>            <span class="self">Self</span>::Hierarchy =&gt; f.write_str(<span class="string">"Role hierarchy prevents this action."</span>),
+<a href=#212 id=212 data-nosnippet>212</a>            <span class="self">Self</span>::InvalidChannelType =&gt; f.write_str(<span class="string">"The channel cannot perform the action."</span>),
+<a href=#213 id=213 data-nosnippet>213</a>            <span class="self">Self</span>::InvalidUser =&gt; f.write_str(<span class="string">"The current user cannot perform the action."</span>),
+<a href=#214 id=214 data-nosnippet>214</a>            <span class="self">Self</span>::ItemMissing =&gt; f.write_str(<span class="string">"The required item is missing from the cache."</span>),
+<a href=#215 id=215 data-nosnippet>215</a>            <span class="self">Self</span>::MessageAlreadyCrossposted =&gt; f.write_str(<span class="string">"Message already crossposted."</span>),
+<a href=#216 id=216 data-nosnippet>216</a>            <span class="self">Self</span>::CannotCrosspostMessage =&gt; f.write_str(<span class="string">"Cannot crosspost this message type."</span>),
+<a href=#217 id=217 data-nosnippet>217</a>            <span class="self">Self</span>::MessagingBot =&gt; f.write_str(<span class="string">"Attempted to message another bot user."</span>),
+<a href=#218 id=218 data-nosnippet>218</a>            <span class="self">Self</span>::NoTokenSet =&gt; f.write_str(<span class="string">"Token is not set."</span>),
+<a href=#219 id=219 data-nosnippet>219</a>            <span class="self">Self</span>::DeleteNitroSticker =&gt; f.write_str(<span class="string">"Cannot delete an official sticker."</span>),
+<a href=#220 id=220 data-nosnippet>220</a>            <span class="self">Self</span>::CannotEditVoiceMessage =&gt; f.write_str(<span class="string">"Cannot edit voice message."</span>),
+<a href=#221 id=221 data-nosnippet>221</a>        }
+<a href=#222 id=222 data-nosnippet>222</a>    }
+<a href=#223 id=223 data-nosnippet>223</a>}
+<a href=#224 id=224 data-nosnippet>224</a>
+<a href=#225 id=225 data-nosnippet>225</a><span class="kw">impl </span>StdError <span class="kw">for </span>Error {}
 </code></pre></div></section></main></body></html>

@@ -30,7 +30,7 @@
 <a href=#30 id=30 data-nosnippet>30</a>    </span>exempt_channels: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, [ChannelId]&gt;&gt;,
 <a href=#31 id=31 data-nosnippet>31</a>
 <a href=#32 id=32 data-nosnippet>32</a>    <span class="attr">#[serde(skip)]
-<a href=#33 id=33 data-nosnippet>33</a>    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+<a href=#33 id=33 data-nosnippet>33</a>    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 <a href=#34 id=34 data-nosnippet>34</a>}
 <a href=#35 id=35 data-nosnippet>35</a>
 <a href=#36 id=36 data-nosnippet>36</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; EditAutoModRule&lt;<span class="lifetime">'a</span>&gt; {
@@ -88,51 +88,78 @@
 <a href=#88 id=88 data-nosnippet>88</a>    </span>}
 <a href=#89 id=89 data-nosnippet>89</a>
 <a href=#90 id=90 data-nosnippet>90</a>    <span class="doccomment">/// Sets the request's audit log reason.
-<a href=#91 id=91 data-nosnippet>91</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
-<a href=#92 id=92 data-nosnippet>92</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+<a href=#91 id=91 data-nosnippet>91</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#92 id=92 data-nosnippet>92</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason.into());
 <a href=#93 id=93 data-nosnippet>93</a>        <span class="self">self
 <a href=#94 id=94 data-nosnippet>94</a>    </span>}
 <a href=#95 id=95 data-nosnippet>95</a>
-<a href=#96 id=96 data-nosnippet>96</a>    <span class="doccomment">/// Creates or edits an [`AutoModRule`] in a guild.
-<a href=#97 id=97 data-nosnippet>97</a>    ///
-<a href=#98 id=98 data-nosnippet>98</a>    /// Providing a [`RuleId`] will edit that corresponding rule, otherwise a new rule will be
-<a href=#99 id=99 data-nosnippet>99</a>    /// created.
-<a href=#100 id=100 data-nosnippet>100</a>    ///
-<a href=#101 id=101 data-nosnippet>101</a>    /// **Note**: Requires the [Manage Guild] permission.
-<a href=#102 id=102 data-nosnippet>102</a>    ///
-<a href=#103 id=103 data-nosnippet>103</a>    /// # Errors
-<a href=#104 id=104 data-nosnippet>104</a>    ///
-<a href=#105 id=105 data-nosnippet>105</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-<a href=#106 id=106 data-nosnippet>106</a>    ///
-<a href=#107 id=107 data-nosnippet>107</a>    /// [Manage Guild]: Permissions::MANAGE_GUILD
-<a href=#108 id=108 data-nosnippet>108</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-<a href=#109 id=109 data-nosnippet>109</a>    </span><span class="kw">pub async fn </span>execute(
-<a href=#110 id=110 data-nosnippet>110</a>        <span class="self">self</span>,
-<a href=#111 id=111 data-nosnippet>111</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#112 id=112 data-nosnippet>112</a>        guild_id: GuildId,
-<a href=#113 id=113 data-nosnippet>113</a>        rule_id: <span class="prelude-ty">Option</span>&lt;RuleId&gt;,
-<a href=#114 id=114 data-nosnippet>114</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;AutoModRule&gt; {
-<a href=#115 id=115 data-nosnippet>115</a>        <span class="kw">match </span>rule_id {
-<a href=#116 id=116 data-nosnippet>116</a>            <span class="prelude-val">Some</span>(id) =&gt; http.edit_automod_rule(guild_id, id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span>,
-<a href=#117 id=117 data-nosnippet>117</a>            <span class="comment">// Automod Rule creation has required fields, whereas modifying a rule does not.
-<a href=#118 id=118 data-nosnippet>118</a>            // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
-<a href=#119 id=119 data-nosnippet>119</a>            </span><span class="prelude-val">None </span>=&gt; http.create_automod_rule(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await</span>,
-<a href=#120 id=120 data-nosnippet>120</a>        }
-<a href=#121 id=121 data-nosnippet>121</a>    }
-<a href=#122 id=122 data-nosnippet>122</a>}
-<a href=#123 id=123 data-nosnippet>123</a>
-<a href=#124 id=124 data-nosnippet>124</a><span class="kw">impl </span>Default <span class="kw">for </span>EditAutoModRule&lt;<span class="lifetime">'_</span>&gt; {
-<a href=#125 id=125 data-nosnippet>125</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-<a href=#126 id=126 data-nosnippet>126</a>        <span class="self">Self </span>{
-<a href=#127 id=127 data-nosnippet>127</a>            name: <span class="prelude-val">None</span>,
-<a href=#128 id=128 data-nosnippet>128</a>            trigger: <span class="prelude-val">None</span>,
-<a href=#129 id=129 data-nosnippet>129</a>            actions: <span class="prelude-val">None</span>,
-<a href=#130 id=130 data-nosnippet>130</a>            enabled: <span class="prelude-val">None</span>,
-<a href=#131 id=131 data-nosnippet>131</a>            exempt_roles: <span class="prelude-val">None</span>,
-<a href=#132 id=132 data-nosnippet>132</a>            exempt_channels: <span class="prelude-val">None</span>,
-<a href=#133 id=133 data-nosnippet>133</a>            event_type: EventType::MessageSend,
-<a href=#134 id=134 data-nosnippet>134</a>            audit_log_reason: <span class="prelude-val">None</span>,
-<a href=#135 id=135 data-nosnippet>135</a>        }
-<a href=#136 id=136 data-nosnippet>136</a>    }
-<a href=#137 id=137 data-nosnippet>137</a>}
+<a href=#96 id=96 data-nosnippet>96</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; EditAutoModRule&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#97 id=97 data-nosnippet>97</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#98 id=98 data-nosnippet>98</a>            name,
+<a href=#99 id=99 data-nosnippet>99</a>            event_type,
+<a href=#100 id=100 data-nosnippet>100</a>            trigger,
+<a href=#101 id=101 data-nosnippet>101</a>            actions,
+<a href=#102 id=102 data-nosnippet>102</a>            enabled,
+<a href=#103 id=103 data-nosnippet>103</a>            exempt_roles,
+<a href=#104 id=104 data-nosnippet>104</a>            exempt_channels,
+<a href=#105 id=105 data-nosnippet>105</a>            audit_log_reason,
+<a href=#106 id=106 data-nosnippet>106</a>        } = <span class="self">self</span>;
+<a href=#107 id=107 data-nosnippet>107</a>        EditAutoModRule {
+<a href=#108 id=108 data-nosnippet>108</a>            name: name.map(|n| n.into_owned().into()),
+<a href=#109 id=109 data-nosnippet>109</a>            event_type,
+<a href=#110 id=110 data-nosnippet>110</a>            trigger,
+<a href=#111 id=111 data-nosnippet>111</a>            actions: actions.map(|a| Cow::Owned(a.into_owned())),
+<a href=#112 id=112 data-nosnippet>112</a>            enabled,
+<a href=#113 id=113 data-nosnippet>113</a>            exempt_roles: exempt_roles.map(|r| Cow::Owned(r.into_owned())),
+<a href=#114 id=114 data-nosnippet>114</a>            exempt_channels: exempt_channels.map(|c| Cow::Owned(c.into_owned())),
+<a href=#115 id=115 data-nosnippet>115</a>            audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),
+<a href=#116 id=116 data-nosnippet>116</a>        }
+<a href=#117 id=117 data-nosnippet>117</a>    }
+<a href=#118 id=118 data-nosnippet>118</a>
+<a href=#119 id=119 data-nosnippet>119</a>    <span class="doccomment">/// Creates or edits an [`AutoModRule`] in a guild.
+<a href=#120 id=120 data-nosnippet>120</a>    ///
+<a href=#121 id=121 data-nosnippet>121</a>    /// Providing a [`RuleId`] will edit that corresponding rule, otherwise a new rule will be
+<a href=#122 id=122 data-nosnippet>122</a>    /// created.
+<a href=#123 id=123 data-nosnippet>123</a>    ///
+<a href=#124 id=124 data-nosnippet>124</a>    /// **Note**: Requires the [Manage Guild] permission.
+<a href=#125 id=125 data-nosnippet>125</a>    ///
+<a href=#126 id=126 data-nosnippet>126</a>    /// # Errors
+<a href=#127 id=127 data-nosnippet>127</a>    ///
+<a href=#128 id=128 data-nosnippet>128</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+<a href=#129 id=129 data-nosnippet>129</a>    ///
+<a href=#130 id=130 data-nosnippet>130</a>    /// [Manage Guild]: Permissions::MANAGE_GUILD
+<a href=#131 id=131 data-nosnippet>131</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href=#132 id=132 data-nosnippet>132</a>    </span><span class="kw">pub async fn </span>execute(
+<a href=#133 id=133 data-nosnippet>133</a>        <span class="self">self</span>,
+<a href=#134 id=134 data-nosnippet>134</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#135 id=135 data-nosnippet>135</a>        guild_id: GuildId,
+<a href=#136 id=136 data-nosnippet>136</a>        rule_id: <span class="prelude-ty">Option</span>&lt;RuleId&gt;,
+<a href=#137 id=137 data-nosnippet>137</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;AutoModRule&gt; {
+<a href=#138 id=138 data-nosnippet>138</a>        <span class="kw">match </span>rule_id {
+<a href=#139 id=139 data-nosnippet>139</a>            <span class="prelude-val">Some</span>(id) =&gt; {
+<a href=#140 id=140 data-nosnippet>140</a>                http.edit_automod_rule(guild_id, id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason.as_deref()).<span class="kw">await
+<a href=#141 id=141 data-nosnippet>141</a>            </span>},
+<a href=#142 id=142 data-nosnippet>142</a>            <span class="comment">// Automod Rule creation has required fields, whereas modifying a rule does not.
+<a href=#143 id=143 data-nosnippet>143</a>            // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
+<a href=#144 id=144 data-nosnippet>144</a>            </span><span class="prelude-val">None </span>=&gt; {
+<a href=#145 id=145 data-nosnippet>145</a>                http.create_automod_rule(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason.as_deref()).<span class="kw">await
+<a href=#146 id=146 data-nosnippet>146</a>            </span>},
+<a href=#147 id=147 data-nosnippet>147</a>        }
+<a href=#148 id=148 data-nosnippet>148</a>    }
+<a href=#149 id=149 data-nosnippet>149</a>}
+<a href=#150 id=150 data-nosnippet>150</a>
+<a href=#151 id=151 data-nosnippet>151</a><span class="kw">impl </span>Default <span class="kw">for </span>EditAutoModRule&lt;<span class="lifetime">'_</span>&gt; {
+<a href=#152 id=152 data-nosnippet>152</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+<a href=#153 id=153 data-nosnippet>153</a>        <span class="self">Self </span>{
+<a href=#154 id=154 data-nosnippet>154</a>            name: <span class="prelude-val">None</span>,
+<a href=#155 id=155 data-nosnippet>155</a>            trigger: <span class="prelude-val">None</span>,
+<a href=#156 id=156 data-nosnippet>156</a>            actions: <span class="prelude-val">None</span>,
+<a href=#157 id=157 data-nosnippet>157</a>            enabled: <span class="prelude-val">None</span>,
+<a href=#158 id=158 data-nosnippet>158</a>            exempt_roles: <span class="prelude-val">None</span>,
+<a href=#159 id=159 data-nosnippet>159</a>            exempt_channels: <span class="prelude-val">None</span>,
+<a href=#160 id=160 data-nosnippet>160</a>            event_type: EventType::MessageSend,
+<a href=#161 id=161 data-nosnippet>161</a>            audit_log_reason: <span class="prelude-val">None</span>,
+<a href=#162 id=162 data-nosnippet>162</a>        }
+<a href=#163 id=163 data-nosnippet>163</a>    }
+<a href=#164 id=164 data-nosnippet>164</a>}
 </code></pre></div></section></main></body></html>

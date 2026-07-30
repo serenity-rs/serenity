@@ -316,192 +316,274 @@
 <a href=#316 id=316 data-nosnippet>316</a>
 <a href=#317 id=317 data-nosnippet>317</a>        <span class="self">self
 <a href=#318 id=318 data-nosnippet>318</a>    </span>}
-<a href=#319 id=319 data-nosnippet>319</a>}
-<a href=#320 id=320 data-nosnippet>320</a>
-<a href=#321 id=321 data-nosnippet>321</a><span class="doccomment">/// A builder for creating a new [`Command`].
-<a href=#322 id=322 data-nosnippet>322</a>///
-<a href=#323 id=323 data-nosnippet>323</a>/// [`Command`]: crate::model::application::Command
-<a href=#324 id=324 data-nosnippet>324</a>///
-<a href=#325 id=325 data-nosnippet>325</a>/// Discord docs:
-<a href=#326 id=326 data-nosnippet>326</a>/// - [global command](https://docs.discord.com/developers/interactions/application-commands#create-global-application-command)
-<a href=#327 id=327 data-nosnippet>327</a>/// - [guild command](https://docs.discord.com/developers/interactions/application-commands#create-guild-application-command)
-<a href=#328 id=328 data-nosnippet>328</a></span><span class="attr">#[derive(Clone, Debug, Serialize)]
-<a href=#329 id=329 data-nosnippet>329</a>#[must_use]
-<a href=#330 id=330 data-nosnippet>330</a></span><span class="kw">pub struct </span>CreateCommand&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#331 id=331 data-nosnippet>331</a>    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#332 id=332 data-nosnippet>332</a>    #[serde(rename = <span class="string">"type"</span>)]
-<a href=#333 id=333 data-nosnippet>333</a>    </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
-<a href=#334 id=334 data-nosnippet>334</a>    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#335 id=335 data-nosnippet>335</a>    </span>handler: <span class="prelude-ty">Option</span>&lt;EntryPointHandlerType&gt;,
-<a href=#336 id=336 data-nosnippet>336</a>
-<a href=#337 id=337 data-nosnippet>337</a>    <span class="attr">#[serde(flatten)]
-<a href=#338 id=338 data-nosnippet>338</a>    </span>fields: EditCommand&lt;<span class="lifetime">'a</span>&gt;,
-<a href=#339 id=339 data-nosnippet>339</a>}
-<a href=#340 id=340 data-nosnippet>340</a>
-<a href=#341 id=341 data-nosnippet>341</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateCommand&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#342 id=342 data-nosnippet>342</a>    <span class="doccomment">/// Creates a new builder with the given name, leaving all other fields empty.
-<a href=#343 id=343 data-nosnippet>343</a>    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-<a href=#344 id=344 data-nosnippet>344</a>        <span class="self">Self </span>{
-<a href=#345 id=345 data-nosnippet>345</a>            kind: <span class="prelude-val">None</span>,
-<a href=#346 id=346 data-nosnippet>346</a>            handler: <span class="prelude-val">None</span>,
-<a href=#347 id=347 data-nosnippet>347</a>
-<a href=#348 id=348 data-nosnippet>348</a>            fields: EditCommand::new().name(name),
-<a href=#349 id=349 data-nosnippet>349</a>        }
-<a href=#350 id=350 data-nosnippet>350</a>    }
-<a href=#351 id=351 data-nosnippet>351</a>
-<a href=#352 id=352 data-nosnippet>352</a>    <span class="doccomment">/// Specifies the name of the application command, replacing the current value as set in
-<a href=#353 id=353 data-nosnippet>353</a>    /// [`Self::new`].
-<a href=#354 id=354 data-nosnippet>354</a>    ///
-<a href=#355 id=355 data-nosnippet>355</a>    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two
-<a href=#356 id=356 data-nosnippet>356</a>    /// global commands of the same app cannot have the same name. Two guild-specific commands of
-<a href=#357 id=357 data-nosnippet>357</a>    /// the same app cannot have the same name.
-<a href=#358 id=358 data-nosnippet>358</a>    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-<a href=#359 id=359 data-nosnippet>359</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.name(name);
-<a href=#360 id=360 data-nosnippet>360</a>        <span class="self">self
-<a href=#361 id=361 data-nosnippet>361</a>    </span>}
-<a href=#362 id=362 data-nosnippet>362</a>
-<a href=#363 id=363 data-nosnippet>363</a>    <span class="doccomment">/// Specifies a localized name of the application command.
-<a href=#364 id=364 data-nosnippet>364</a>    ///
-<a href=#365 id=365 data-nosnippet>365</a>    /// ```rust
-<a href=#366 id=366 data-nosnippet>366</a>    /// # serenity::builder::CreateCommand::new("birthday")
-<a href=#367 id=367 data-nosnippet>367</a>    /// .name_localized("zh-CN", "生日")
-<a href=#368 id=368 data-nosnippet>368</a>    /// .name_localized("el", "γενέθλια")
-<a href=#369 id=369 data-nosnippet>369</a>    /// # ;
-<a href=#370 id=370 data-nosnippet>370</a>    /// ```
-<a href=#371 id=371 data-nosnippet>371</a>    </span><span class="kw">pub fn </span>name_localized(
-<a href=#372 id=372 data-nosnippet>372</a>        <span class="kw-2">mut </span><span class="self">self</span>,
-<a href=#373 id=373 data-nosnippet>373</a>        locale: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
-<a href=#374 id=374 data-nosnippet>374</a>        name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
-<a href=#375 id=375 data-nosnippet>375</a>    ) -&gt; <span class="self">Self </span>{
-<a href=#376 id=376 data-nosnippet>376</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.name_localized(locale, name);
-<a href=#377 id=377 data-nosnippet>377</a>        <span class="self">self
-<a href=#378 id=378 data-nosnippet>378</a>    </span>}
-<a href=#379 id=379 data-nosnippet>379</a>
-<a href=#380 id=380 data-nosnippet>380</a>    <span class="doccomment">/// Specifies the type of the application command.
-<a href=#381 id=381 data-nosnippet>381</a>    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandType) -&gt; <span class="self">Self </span>{
-<a href=#382 id=382 data-nosnippet>382</a>        <span class="self">self</span>.kind = <span class="prelude-val">Some</span>(kind);
-<a href=#383 id=383 data-nosnippet>383</a>        <span class="self">self
-<a href=#384 id=384 data-nosnippet>384</a>    </span>}
-<a href=#385 id=385 data-nosnippet>385</a>
-<a href=#386 id=386 data-nosnippet>386</a>    <span class="doccomment">/// Specifies the default permissions required to execute the command.
-<a href=#387 id=387 data-nosnippet>387</a>    </span><span class="kw">pub fn </span>default_member_permissions(<span class="kw-2">mut </span><span class="self">self</span>, permissions: Permissions) -&gt; <span class="self">Self </span>{
-<a href=#388 id=388 data-nosnippet>388</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.default_member_permissions(permissions);
-<a href=#389 id=389 data-nosnippet>389</a>        <span class="self">self
-<a href=#390 id=390 data-nosnippet>390</a>    </span>}
+<a href=#319 id=319 data-nosnippet>319</a>
+<a href=#320 id=320 data-nosnippet>320</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; CreateCommandOption&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#321 id=321 data-nosnippet>321</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#322 id=322 data-nosnippet>322</a>            kind,
+<a href=#323 id=323 data-nosnippet>323</a>            name,
+<a href=#324 id=324 data-nosnippet>324</a>            name_localizations,
+<a href=#325 id=325 data-nosnippet>325</a>            description,
+<a href=#326 id=326 data-nosnippet>326</a>            description_localizations,
+<a href=#327 id=327 data-nosnippet>327</a>            required,
+<a href=#328 id=328 data-nosnippet>328</a>            choices,
+<a href=#329 id=329 data-nosnippet>329</a>            options,
+<a href=#330 id=330 data-nosnippet>330</a>            channel_types,
+<a href=#331 id=331 data-nosnippet>331</a>            min_value,
+<a href=#332 id=332 data-nosnippet>332</a>            max_value,
+<a href=#333 id=333 data-nosnippet>333</a>            min_length,
+<a href=#334 id=334 data-nosnippet>334</a>            max_length,
+<a href=#335 id=335 data-nosnippet>335</a>            autocomplete,
+<a href=#336 id=336 data-nosnippet>336</a>        } = <span class="self">self</span>;
+<a href=#337 id=337 data-nosnippet>337</a>        CreateCommandOption {
+<a href=#338 id=338 data-nosnippet>338</a>            kind,
+<a href=#339 id=339 data-nosnippet>339</a>            name: name.into_owned().into(),
+<a href=#340 id=340 data-nosnippet>340</a>            name_localizations: name_localizations.map(|map| {
+<a href=#341 id=341 data-nosnippet>341</a>                map.into_iter()
+<a href=#342 id=342 data-nosnippet>342</a>                    .map(|(k, v)| (k.into_owned().into(), v.into_owned().into()))
+<a href=#343 id=343 data-nosnippet>343</a>                    .collect()
+<a href=#344 id=344 data-nosnippet>344</a>            }),
+<a href=#345 id=345 data-nosnippet>345</a>            description: description.into_owned().into(),
+<a href=#346 id=346 data-nosnippet>346</a>            description_localizations: description_localizations.map(|map| {
+<a href=#347 id=347 data-nosnippet>347</a>                map.into_iter()
+<a href=#348 id=348 data-nosnippet>348</a>                    .map(|(k, v)| (k.into_owned().into(), v.into_owned().into()))
+<a href=#349 id=349 data-nosnippet>349</a>                    .collect()
+<a href=#350 id=350 data-nosnippet>350</a>            }),
+<a href=#351 id=351 data-nosnippet>351</a>            required,
+<a href=#352 id=352 data-nosnippet>352</a>            choices: Cow::Owned(
+<a href=#353 id=353 data-nosnippet>353</a>                choices
+<a href=#354 id=354 data-nosnippet>354</a>                    .into_owned()
+<a href=#355 id=355 data-nosnippet>355</a>                    .into_iter()
+<a href=#356 id=356 data-nosnippet>356</a>                    .map(CreateCommandOptionChoice::into_owned)
+<a href=#357 id=357 data-nosnippet>357</a>                    .collect(),
+<a href=#358 id=358 data-nosnippet>358</a>            ),
+<a href=#359 id=359 data-nosnippet>359</a>            options: Cow::Owned(
+<a href=#360 id=360 data-nosnippet>360</a>                options.into_owned().into_iter().map(CreateCommandOption::into_owned).collect(),
+<a href=#361 id=361 data-nosnippet>361</a>            ),
+<a href=#362 id=362 data-nosnippet>362</a>            channel_types: channel_types.into_owned().into(),
+<a href=#363 id=363 data-nosnippet>363</a>            min_value,
+<a href=#364 id=364 data-nosnippet>364</a>            max_value,
+<a href=#365 id=365 data-nosnippet>365</a>            min_length,
+<a href=#366 id=366 data-nosnippet>366</a>            max_length,
+<a href=#367 id=367 data-nosnippet>367</a>            autocomplete,
+<a href=#368 id=368 data-nosnippet>368</a>        }
+<a href=#369 id=369 data-nosnippet>369</a>    }
+<a href=#370 id=370 data-nosnippet>370</a>}
+<a href=#371 id=371 data-nosnippet>371</a>
+<a href=#372 id=372 data-nosnippet>372</a><span class="doccomment">/// A builder for creating a new [`Command`].
+<a href=#373 id=373 data-nosnippet>373</a>///
+<a href=#374 id=374 data-nosnippet>374</a>/// [`Command`]: crate::model::application::Command
+<a href=#375 id=375 data-nosnippet>375</a>///
+<a href=#376 id=376 data-nosnippet>376</a>/// Discord docs:
+<a href=#377 id=377 data-nosnippet>377</a>/// - [global command](https://docs.discord.com/developers/interactions/application-commands#create-global-application-command)
+<a href=#378 id=378 data-nosnippet>378</a>/// - [guild command](https://docs.discord.com/developers/interactions/application-commands#create-guild-application-command)
+<a href=#379 id=379 data-nosnippet>379</a></span><span class="attr">#[derive(Clone, Debug, Serialize)]
+<a href=#380 id=380 data-nosnippet>380</a>#[must_use]
+<a href=#381 id=381 data-nosnippet>381</a></span><span class="kw">pub struct </span>CreateCommand&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#382 id=382 data-nosnippet>382</a>    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#383 id=383 data-nosnippet>383</a>    #[serde(rename = <span class="string">"type"</span>)]
+<a href=#384 id=384 data-nosnippet>384</a>    </span>kind: <span class="prelude-ty">Option</span>&lt;CommandType&gt;,
+<a href=#385 id=385 data-nosnippet>385</a>    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#386 id=386 data-nosnippet>386</a>    </span>handler: <span class="prelude-ty">Option</span>&lt;EntryPointHandlerType&gt;,
+<a href=#387 id=387 data-nosnippet>387</a>
+<a href=#388 id=388 data-nosnippet>388</a>    <span class="attr">#[serde(flatten)]
+<a href=#389 id=389 data-nosnippet>389</a>    </span>fields: EditCommand&lt;<span class="lifetime">'a</span>&gt;,
+<a href=#390 id=390 data-nosnippet>390</a>}
 <a href=#391 id=391 data-nosnippet>391</a>
-<a href=#392 id=392 data-nosnippet>392</a>    <span class="doccomment">/// Specifies if the command is available in DMs.
-<a href=#393 id=393 data-nosnippet>393</a>    </span><span class="attr">#[cfg(not(feature = <span class="string">"unstable"</span>))]
-<a href=#394 id=394 data-nosnippet>394</a>    </span><span class="kw">pub fn </span>dm_permission(<span class="kw-2">mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
-<a href=#395 id=395 data-nosnippet>395</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.dm_permission(enabled);
-<a href=#396 id=396 data-nosnippet>396</a>        <span class="self">self
-<a href=#397 id=397 data-nosnippet>397</a>    </span>}
-<a href=#398 id=398 data-nosnippet>398</a>
-<a href=#399 id=399 data-nosnippet>399</a>    <span class="doccomment">/// Specifies the description of the application command.
-<a href=#400 id=400 data-nosnippet>400</a>    ///
-<a href=#401 id=401 data-nosnippet>401</a>    /// **Note**: Must be between 1 and 100 characters long.
-<a href=#402 id=402 data-nosnippet>402</a>    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
-<a href=#403 id=403 data-nosnippet>403</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.description(description);
-<a href=#404 id=404 data-nosnippet>404</a>        <span class="self">self
-<a href=#405 id=405 data-nosnippet>405</a>    </span>}
-<a href=#406 id=406 data-nosnippet>406</a>
-<a href=#407 id=407 data-nosnippet>407</a>    <span class="doccomment">/// Specifies a localized description of the application command.
-<a href=#408 id=408 data-nosnippet>408</a>    ///
-<a href=#409 id=409 data-nosnippet>409</a>    /// ```rust
-<a href=#410 id=410 data-nosnippet>410</a>    /// # serenity::builder::CreateCommand::new("birthday")
-<a href=#411 id=411 data-nosnippet>411</a>    /// .description("Wish a friend a happy birthday")
-<a href=#412 id=412 data-nosnippet>412</a>    /// .description_localized("zh-CN", "祝你朋友生日快乐")
-<a href=#413 id=413 data-nosnippet>413</a>    /// # ;
-<a href=#414 id=414 data-nosnippet>414</a>    /// ```
-<a href=#415 id=415 data-nosnippet>415</a>    </span><span class="kw">pub fn </span>description_localized(
-<a href=#416 id=416 data-nosnippet>416</a>        <span class="kw-2">mut </span><span class="self">self</span>,
-<a href=#417 id=417 data-nosnippet>417</a>        locale: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
-<a href=#418 id=418 data-nosnippet>418</a>        description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
-<a href=#419 id=419 data-nosnippet>419</a>    ) -&gt; <span class="self">Self </span>{
-<a href=#420 id=420 data-nosnippet>420</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.description_localized(locale, description);
-<a href=#421 id=421 data-nosnippet>421</a>        <span class="self">self
-<a href=#422 id=422 data-nosnippet>422</a>    </span>}
-<a href=#423 id=423 data-nosnippet>423</a>
-<a href=#424 id=424 data-nosnippet>424</a>    <span class="doccomment">/// Adds an application command option for the application command.
-<a href=#425 id=425 data-nosnippet>425</a>    ///
-<a href=#426 id=426 data-nosnippet>426</a>    /// **Note**: Application commands can have up to 25 options.
-<a href=#427 id=427 data-nosnippet>427</a>    </span><span class="kw">pub fn </span>add_option(<span class="kw-2">mut </span><span class="self">self</span>, option: CreateCommandOption&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
-<a href=#428 id=428 data-nosnippet>428</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.add_option(option);
-<a href=#429 id=429 data-nosnippet>429</a>        <span class="self">self
-<a href=#430 id=430 data-nosnippet>430</a>    </span>}
-<a href=#431 id=431 data-nosnippet>431</a>
-<a href=#432 id=432 data-nosnippet>432</a>    <span class="doccomment">/// Sets all the application command options for the application command.
-<a href=#433 id=433 data-nosnippet>433</a>    ///
-<a href=#434 id=434 data-nosnippet>434</a>    /// **Note**: Application commands can have up to 25 options.
-<a href=#435 id=435 data-nosnippet>435</a>    </span><span class="kw">pub fn </span>set_options(<span class="kw-2">mut </span><span class="self">self</span>, options: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateCommandOption&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
-<a href=#436 id=436 data-nosnippet>436</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.set_options(options);
-<a href=#437 id=437 data-nosnippet>437</a>        <span class="self">self
-<a href=#438 id=438 data-nosnippet>438</a>    </span>}
-<a href=#439 id=439 data-nosnippet>439</a>
-<a href=#440 id=440 data-nosnippet>440</a>    <span class="doccomment">/// Adds an installation context that this application command can be used in.
-<a href=#441 id=441 data-nosnippet>441</a>    </span><span class="kw">pub fn </span>add_integration_type(<span class="kw-2">mut </span><span class="self">self</span>, integration_type: InstallationContext) -&gt; <span class="self">Self </span>{
-<a href=#442 id=442 data-nosnippet>442</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.add_integration_type(integration_type);
-<a href=#443 id=443 data-nosnippet>443</a>        <span class="self">self
-<a href=#444 id=444 data-nosnippet>444</a>    </span>}
-<a href=#445 id=445 data-nosnippet>445</a>
-<a href=#446 id=446 data-nosnippet>446</a>    <span class="doccomment">/// Sets the installation contexts that this application command can be used in.
-<a href=#447 id=447 data-nosnippet>447</a>    </span><span class="kw">pub fn </span>integration_types(<span class="kw-2">mut </span><span class="self">self</span>, integration_types: Cow&lt;<span class="lifetime">'a</span>, [InstallationContext]&gt;) -&gt; <span class="self">Self </span>{
-<a href=#448 id=448 data-nosnippet>448</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.integration_types(integration_types);
-<a href=#449 id=449 data-nosnippet>449</a>        <span class="self">self
-<a href=#450 id=450 data-nosnippet>450</a>    </span>}
-<a href=#451 id=451 data-nosnippet>451</a>
-<a href=#452 id=452 data-nosnippet>452</a>    <span class="doccomment">/// Adds an interaction context that this application command can be used in.
-<a href=#453 id=453 data-nosnippet>453</a>    </span><span class="kw">pub fn </span>add_context(<span class="kw-2">mut </span><span class="self">self</span>, context: InteractionContext) -&gt; <span class="self">Self </span>{
-<a href=#454 id=454 data-nosnippet>454</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.add_context(context);
-<a href=#455 id=455 data-nosnippet>455</a>        <span class="self">self
-<a href=#456 id=456 data-nosnippet>456</a>    </span>}
-<a href=#457 id=457 data-nosnippet>457</a>
-<a href=#458 id=458 data-nosnippet>458</a>    <span class="doccomment">/// Sets the interaction contexts that this application command can be used in.
-<a href=#459 id=459 data-nosnippet>459</a>    </span><span class="kw">pub fn </span>contexts(<span class="kw-2">mut </span><span class="self">self</span>, contexts: Cow&lt;<span class="lifetime">'a</span>, [InteractionContext]&gt;) -&gt; <span class="self">Self </span>{
-<a href=#460 id=460 data-nosnippet>460</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.contexts(contexts);
-<a href=#461 id=461 data-nosnippet>461</a>        <span class="self">self
-<a href=#462 id=462 data-nosnippet>462</a>    </span>}
-<a href=#463 id=463 data-nosnippet>463</a>
-<a href=#464 id=464 data-nosnippet>464</a>    <span class="doccomment">/// Whether this command is marked NSFW (age-restricted)
-<a href=#465 id=465 data-nosnippet>465</a>    </span><span class="kw">pub fn </span>nsfw(<span class="kw-2">mut </span><span class="self">self</span>, nsfw: bool) -&gt; <span class="self">Self </span>{
-<a href=#466 id=466 data-nosnippet>466</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.nsfw(nsfw);
-<a href=#467 id=467 data-nosnippet>467</a>        <span class="self">self
-<a href=#468 id=468 data-nosnippet>468</a>    </span>}
-<a href=#469 id=469 data-nosnippet>469</a>
-<a href=#470 id=470 data-nosnippet>470</a>    <span class="doccomment">/// Sets the command's entry point handler type. Only valid for commands of type
-<a href=#471 id=471 data-nosnippet>471</a>    /// [`PrimaryEntryPoint`].
-<a href=#472 id=472 data-nosnippet>472</a>    ///
-<a href=#473 id=473 data-nosnippet>473</a>    /// [`PrimaryEntryPoint`]: CommandType::PrimaryEntryPoint
-<a href=#474 id=474 data-nosnippet>474</a>    </span><span class="kw">pub fn </span>handler(<span class="kw-2">mut </span><span class="self">self</span>, handler: EntryPointHandlerType) -&gt; <span class="self">Self </span>{
-<a href=#475 id=475 data-nosnippet>475</a>        <span class="self">self</span>.handler = <span class="prelude-val">Some</span>(handler);
-<a href=#476 id=476 data-nosnippet>476</a>        <span class="self">self
-<a href=#477 id=477 data-nosnippet>477</a>    </span>}
-<a href=#478 id=478 data-nosnippet>478</a>
-<a href=#479 id=479 data-nosnippet>479</a>    <span class="doccomment">/// Create a [`Command`], overwriting an existing one with the same name if it exists.
-<a href=#480 id=480 data-nosnippet>480</a>    ///
-<a href=#481 id=481 data-nosnippet>481</a>    /// Providing a [`GuildId`] will create a command in the corresponding [`Guild`]. Otherwise, a
-<a href=#482 id=482 data-nosnippet>482</a>    /// global command will be created.
+<a href=#392 id=392 data-nosnippet>392</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateCommand&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#393 id=393 data-nosnippet>393</a>    <span class="doccomment">/// Creates a new builder with the given name, leaving all other fields empty.
+<a href=#394 id=394 data-nosnippet>394</a>    </span><span class="kw">pub fn </span>new(name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#395 id=395 data-nosnippet>395</a>        <span class="self">Self </span>{
+<a href=#396 id=396 data-nosnippet>396</a>            kind: <span class="prelude-val">None</span>,
+<a href=#397 id=397 data-nosnippet>397</a>            handler: <span class="prelude-val">None</span>,
+<a href=#398 id=398 data-nosnippet>398</a>            fields: EditCommand::new().name(name),
+<a href=#399 id=399 data-nosnippet>399</a>        }
+<a href=#400 id=400 data-nosnippet>400</a>    }
+<a href=#401 id=401 data-nosnippet>401</a>
+<a href=#402 id=402 data-nosnippet>402</a>    <span class="doccomment">/// Specifies the name of the application command, replacing the current value as set in
+<a href=#403 id=403 data-nosnippet>403</a>    /// [`Self::new`].
+<a href=#404 id=404 data-nosnippet>404</a>    ///
+<a href=#405 id=405 data-nosnippet>405</a>    /// **Note**: Must be between 1 and 32 lowercase characters, matching `r"^[\w-]{1,32}$"`. Two
+<a href=#406 id=406 data-nosnippet>406</a>    /// global commands of the same app cannot have the same name. Two guild-specific commands of
+<a href=#407 id=407 data-nosnippet>407</a>    /// the same app cannot have the same name.
+<a href=#408 id=408 data-nosnippet>408</a>    </span><span class="kw">pub fn </span>name(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#409 id=409 data-nosnippet>409</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.name(name);
+<a href=#410 id=410 data-nosnippet>410</a>        <span class="self">self
+<a href=#411 id=411 data-nosnippet>411</a>    </span>}
+<a href=#412 id=412 data-nosnippet>412</a>
+<a href=#413 id=413 data-nosnippet>413</a>    <span class="doccomment">/// Specifies a localized name of the application command.
+<a href=#414 id=414 data-nosnippet>414</a>    ///
+<a href=#415 id=415 data-nosnippet>415</a>    /// ```rust
+<a href=#416 id=416 data-nosnippet>416</a>    /// # serenity::builder::CreateCommand::new("birthday")
+<a href=#417 id=417 data-nosnippet>417</a>    /// .name_localized("zh-CN", "生日")
+<a href=#418 id=418 data-nosnippet>418</a>    /// .name_localized("el", "γενέθλια")
+<a href=#419 id=419 data-nosnippet>419</a>    /// # ;
+<a href=#420 id=420 data-nosnippet>420</a>    /// ```
+<a href=#421 id=421 data-nosnippet>421</a>    </span><span class="kw">pub fn </span>name_localized(
+<a href=#422 id=422 data-nosnippet>422</a>        <span class="kw-2">mut </span><span class="self">self</span>,
+<a href=#423 id=423 data-nosnippet>423</a>        locale: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+<a href=#424 id=424 data-nosnippet>424</a>        name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+<a href=#425 id=425 data-nosnippet>425</a>    ) -&gt; <span class="self">Self </span>{
+<a href=#426 id=426 data-nosnippet>426</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.name_localized(locale, name);
+<a href=#427 id=427 data-nosnippet>427</a>        <span class="self">self
+<a href=#428 id=428 data-nosnippet>428</a>    </span>}
+<a href=#429 id=429 data-nosnippet>429</a>
+<a href=#430 id=430 data-nosnippet>430</a>    <span class="doccomment">/// Specifies the type of the application command.
+<a href=#431 id=431 data-nosnippet>431</a>    </span><span class="kw">pub fn </span>kind(<span class="kw-2">mut </span><span class="self">self</span>, kind: CommandType) -&gt; <span class="self">Self </span>{
+<a href=#432 id=432 data-nosnippet>432</a>        <span class="self">self</span>.kind = <span class="prelude-val">Some</span>(kind);
+<a href=#433 id=433 data-nosnippet>433</a>        <span class="self">self
+<a href=#434 id=434 data-nosnippet>434</a>    </span>}
+<a href=#435 id=435 data-nosnippet>435</a>
+<a href=#436 id=436 data-nosnippet>436</a>    <span class="doccomment">/// Specifies the default permissions required to execute the command.
+<a href=#437 id=437 data-nosnippet>437</a>    </span><span class="kw">pub fn </span>default_member_permissions(<span class="kw-2">mut </span><span class="self">self</span>, permissions: Permissions) -&gt; <span class="self">Self </span>{
+<a href=#438 id=438 data-nosnippet>438</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.default_member_permissions(permissions);
+<a href=#439 id=439 data-nosnippet>439</a>        <span class="self">self
+<a href=#440 id=440 data-nosnippet>440</a>    </span>}
+<a href=#441 id=441 data-nosnippet>441</a>
+<a href=#442 id=442 data-nosnippet>442</a>    <span class="doccomment">/// Specifies if the command is available in DMs.
+<a href=#443 id=443 data-nosnippet>443</a>    </span><span class="attr">#[cfg(not(feature = <span class="string">"unstable"</span>))]
+<a href=#444 id=444 data-nosnippet>444</a>    </span><span class="kw">pub fn </span>dm_permission(<span class="kw-2">mut </span><span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+<a href=#445 id=445 data-nosnippet>445</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.dm_permission(enabled);
+<a href=#446 id=446 data-nosnippet>446</a>        <span class="self">self
+<a href=#447 id=447 data-nosnippet>447</a>    </span>}
+<a href=#448 id=448 data-nosnippet>448</a>
+<a href=#449 id=449 data-nosnippet>449</a>    <span class="doccomment">/// Specifies the description of the application command.
+<a href=#450 id=450 data-nosnippet>450</a>    ///
+<a href=#451 id=451 data-nosnippet>451</a>    /// **Note**: Must be between 1 and 100 characters long.
+<a href=#452 id=452 data-nosnippet>452</a>    </span><span class="kw">pub fn </span>description(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#453 id=453 data-nosnippet>453</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.description(description);
+<a href=#454 id=454 data-nosnippet>454</a>        <span class="self">self
+<a href=#455 id=455 data-nosnippet>455</a>    </span>}
+<a href=#456 id=456 data-nosnippet>456</a>
+<a href=#457 id=457 data-nosnippet>457</a>    <span class="doccomment">/// Specifies a localized description of the application command.
+<a href=#458 id=458 data-nosnippet>458</a>    ///
+<a href=#459 id=459 data-nosnippet>459</a>    /// ```rust
+<a href=#460 id=460 data-nosnippet>460</a>    /// # serenity::builder::CreateCommand::new("birthday")
+<a href=#461 id=461 data-nosnippet>461</a>    /// .description("Wish a friend a happy birthday")
+<a href=#462 id=462 data-nosnippet>462</a>    /// .description_localized("zh-CN", "祝你朋友生日快乐")
+<a href=#463 id=463 data-nosnippet>463</a>    /// # ;
+<a href=#464 id=464 data-nosnippet>464</a>    /// ```
+<a href=#465 id=465 data-nosnippet>465</a>    </span><span class="kw">pub fn </span>description_localized(
+<a href=#466 id=466 data-nosnippet>466</a>        <span class="kw-2">mut </span><span class="self">self</span>,
+<a href=#467 id=467 data-nosnippet>467</a>        locale: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+<a href=#468 id=468 data-nosnippet>468</a>        description: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
+<a href=#469 id=469 data-nosnippet>469</a>    ) -&gt; <span class="self">Self </span>{
+<a href=#470 id=470 data-nosnippet>470</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.description_localized(locale, description);
+<a href=#471 id=471 data-nosnippet>471</a>        <span class="self">self
+<a href=#472 id=472 data-nosnippet>472</a>    </span>}
+<a href=#473 id=473 data-nosnippet>473</a>
+<a href=#474 id=474 data-nosnippet>474</a>    <span class="doccomment">/// Adds an application command option for the application command.
+<a href=#475 id=475 data-nosnippet>475</a>    ///
+<a href=#476 id=476 data-nosnippet>476</a>    /// **Note**: Application commands can have up to 25 options.
+<a href=#477 id=477 data-nosnippet>477</a>    </span><span class="kw">pub fn </span>add_option(<span class="kw-2">mut </span><span class="self">self</span>, option: CreateCommandOption&lt;<span class="lifetime">'a</span>&gt;) -&gt; <span class="self">Self </span>{
+<a href=#478 id=478 data-nosnippet>478</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.add_option(option);
+<a href=#479 id=479 data-nosnippet>479</a>        <span class="self">self
+<a href=#480 id=480 data-nosnippet>480</a>    </span>}
+<a href=#481 id=481 data-nosnippet>481</a>
+<a href=#482 id=482 data-nosnippet>482</a>    <span class="doccomment">/// Sets all the application command options for the application command.
 <a href=#483 id=483 data-nosnippet>483</a>    ///
-<a href=#484 id=484 data-nosnippet>484</a>    /// # Errors
-<a href=#485 id=485 data-nosnippet>485</a>    ///
-<a href=#486 id=486 data-nosnippet>486</a>    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
-<a href=#487 id=487 data-nosnippet>487</a>    ///
-<a href=#488 id=488 data-nosnippet>488</a>    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
-<a href=#489 id=489 data-nosnippet>489</a>    ///
-<a href=#490 id=490 data-nosnippet>490</a>    /// [Discord's docs]: https://docs.discord.com/developers/interactions/application-commands#slash-commands
-<a href=#491 id=491 data-nosnippet>491</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-<a href=#492 id=492 data-nosnippet>492</a>    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
-<a href=#493 id=493 data-nosnippet>493</a>        <span class="kw">match </span>guild_id {
-<a href=#494 id=494 data-nosnippet>494</a>            <span class="prelude-val">Some</span>(guild_id) =&gt; http.create_guild_command(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
-<a href=#495 id=495 data-nosnippet>495</a>            <span class="prelude-val">None </span>=&gt; http.create_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
-<a href=#496 id=496 data-nosnippet>496</a>        }
-<a href=#497 id=497 data-nosnippet>497</a>    }
-<a href=#498 id=498 data-nosnippet>498</a>}
-<a href=#499 id=499 data-nosnippet>499</a>
-<a href=#500 id=500 data-nosnippet>500</a><span class="attr">#[derive(Clone, Debug, Serialize)]
-<a href=#501 id=501 data-nosnippet>501</a></span><span class="kw">struct </span>CreateCommandOptionChoice&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#502 id=502 data-nosnippet>502</a>    <span class="kw">pub </span>name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
-<a href=#503 id=503 data-nosnippet>503</a>    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
-<a href=#504 id=504 data-nosnippet>504</a>    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;, Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
-<a href=#505 id=505 data-nosnippet>505</a>    <span class="kw">pub </span>value: Value,
-<a href=#506 id=506 data-nosnippet>506</a>}
+<a href=#484 id=484 data-nosnippet>484</a>    /// **Note**: Application commands can have up to 25 options.
+<a href=#485 id=485 data-nosnippet>485</a>    </span><span class="kw">pub fn </span>set_options(<span class="kw-2">mut </span><span class="self">self</span>, options: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [CreateCommandOption&lt;<span class="lifetime">'a</span>&gt;]&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#486 id=486 data-nosnippet>486</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.set_options(options);
+<a href=#487 id=487 data-nosnippet>487</a>        <span class="self">self
+<a href=#488 id=488 data-nosnippet>488</a>    </span>}
+<a href=#489 id=489 data-nosnippet>489</a>
+<a href=#490 id=490 data-nosnippet>490</a>    <span class="doccomment">/// Adds an installation context that this application command can be used in.
+<a href=#491 id=491 data-nosnippet>491</a>    </span><span class="kw">pub fn </span>add_integration_type(<span class="kw-2">mut </span><span class="self">self</span>, integration_type: InstallationContext) -&gt; <span class="self">Self </span>{
+<a href=#492 id=492 data-nosnippet>492</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.add_integration_type(integration_type);
+<a href=#493 id=493 data-nosnippet>493</a>        <span class="self">self
+<a href=#494 id=494 data-nosnippet>494</a>    </span>}
+<a href=#495 id=495 data-nosnippet>495</a>
+<a href=#496 id=496 data-nosnippet>496</a>    <span class="doccomment">/// Sets the installation contexts that this application command can be used in.
+<a href=#497 id=497 data-nosnippet>497</a>    </span><span class="kw">pub fn </span>integration_types(<span class="kw-2">mut </span><span class="self">self</span>, integration_types: Cow&lt;<span class="lifetime">'a</span>, [InstallationContext]&gt;) -&gt; <span class="self">Self </span>{
+<a href=#498 id=498 data-nosnippet>498</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.integration_types(integration_types);
+<a href=#499 id=499 data-nosnippet>499</a>        <span class="self">self
+<a href=#500 id=500 data-nosnippet>500</a>    </span>}
+<a href=#501 id=501 data-nosnippet>501</a>
+<a href=#502 id=502 data-nosnippet>502</a>    <span class="doccomment">/// Adds an interaction context that this application command can be used in.
+<a href=#503 id=503 data-nosnippet>503</a>    </span><span class="kw">pub fn </span>add_context(<span class="kw-2">mut </span><span class="self">self</span>, context: InteractionContext) -&gt; <span class="self">Self </span>{
+<a href=#504 id=504 data-nosnippet>504</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.add_context(context);
+<a href=#505 id=505 data-nosnippet>505</a>        <span class="self">self
+<a href=#506 id=506 data-nosnippet>506</a>    </span>}
+<a href=#507 id=507 data-nosnippet>507</a>
+<a href=#508 id=508 data-nosnippet>508</a>    <span class="doccomment">/// Sets the interaction contexts that this application command can be used in.
+<a href=#509 id=509 data-nosnippet>509</a>    </span><span class="kw">pub fn </span>contexts(<span class="kw-2">mut </span><span class="self">self</span>, contexts: Cow&lt;<span class="lifetime">'a</span>, [InteractionContext]&gt;) -&gt; <span class="self">Self </span>{
+<a href=#510 id=510 data-nosnippet>510</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.contexts(contexts);
+<a href=#511 id=511 data-nosnippet>511</a>        <span class="self">self
+<a href=#512 id=512 data-nosnippet>512</a>    </span>}
+<a href=#513 id=513 data-nosnippet>513</a>
+<a href=#514 id=514 data-nosnippet>514</a>    <span class="doccomment">/// Whether this command is marked NSFW (age-restricted)
+<a href=#515 id=515 data-nosnippet>515</a>    </span><span class="kw">pub fn </span>nsfw(<span class="kw-2">mut </span><span class="self">self</span>, nsfw: bool) -&gt; <span class="self">Self </span>{
+<a href=#516 id=516 data-nosnippet>516</a>        <span class="self">self</span>.fields = <span class="self">self</span>.fields.nsfw(nsfw);
+<a href=#517 id=517 data-nosnippet>517</a>        <span class="self">self
+<a href=#518 id=518 data-nosnippet>518</a>    </span>}
+<a href=#519 id=519 data-nosnippet>519</a>
+<a href=#520 id=520 data-nosnippet>520</a>    <span class="doccomment">/// Sets the command's entry point handler type. Only valid for commands of type
+<a href=#521 id=521 data-nosnippet>521</a>    /// [`PrimaryEntryPoint`].
+<a href=#522 id=522 data-nosnippet>522</a>    ///
+<a href=#523 id=523 data-nosnippet>523</a>    /// [`PrimaryEntryPoint`]: CommandType::PrimaryEntryPoint
+<a href=#524 id=524 data-nosnippet>524</a>    </span><span class="kw">pub fn </span>handler(<span class="kw-2">mut </span><span class="self">self</span>, handler: EntryPointHandlerType) -&gt; <span class="self">Self </span>{
+<a href=#525 id=525 data-nosnippet>525</a>        <span class="self">self</span>.handler = <span class="prelude-val">Some</span>(handler);
+<a href=#526 id=526 data-nosnippet>526</a>        <span class="self">self
+<a href=#527 id=527 data-nosnippet>527</a>    </span>}
+<a href=#528 id=528 data-nosnippet>528</a>
+<a href=#529 id=529 data-nosnippet>529</a>    <span class="doccomment">/// Create a [`Command`], overwriting an existing one with the same name if it exists.
+<a href=#530 id=530 data-nosnippet>530</a>    ///
+<a href=#531 id=531 data-nosnippet>531</a>    /// Providing a [`GuildId`] will create a command in the corresponding [`Guild`]. Otherwise, a
+<a href=#532 id=532 data-nosnippet>532</a>    /// global command will be created.
+<a href=#533 id=533 data-nosnippet>533</a>    ///
+<a href=#534 id=534 data-nosnippet>534</a>    /// # Errors
+<a href=#535 id=535 data-nosnippet>535</a>    ///
+<a href=#536 id=536 data-nosnippet>536</a>    /// Returns [`Error::Http`] if invalid data is given. See [Discord's docs] for more details.
+<a href=#537 id=537 data-nosnippet>537</a>    ///
+<a href=#538 id=538 data-nosnippet>538</a>    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+<a href=#539 id=539 data-nosnippet>539</a>    ///
+<a href=#540 id=540 data-nosnippet>540</a>    /// [Discord's docs]: https://docs.discord.com/developers/interactions/application-commands#slash-commands
+<a href=#541 id=541 data-nosnippet>541</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href=#542 id=542 data-nosnippet>542</a>    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+<a href=#543 id=543 data-nosnippet>543</a>        <span class="kw">match </span>guild_id {
+<a href=#544 id=544 data-nosnippet>544</a>            <span class="prelude-val">Some</span>(guild_id) =&gt; http.create_guild_command(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+<a href=#545 id=545 data-nosnippet>545</a>            <span class="prelude-val">None </span>=&gt; http.create_global_command(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await</span>,
+<a href=#546 id=546 data-nosnippet>546</a>        }
+<a href=#547 id=547 data-nosnippet>547</a>    }
+<a href=#548 id=548 data-nosnippet>548</a>
+<a href=#549 id=549 data-nosnippet>549</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; CreateCommand&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#550 id=550 data-nosnippet>550</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#551 id=551 data-nosnippet>551</a>            kind,
+<a href=#552 id=552 data-nosnippet>552</a>            handler,
+<a href=#553 id=553 data-nosnippet>553</a>            fields,
+<a href=#554 id=554 data-nosnippet>554</a>        } = <span class="self">self</span>;
+<a href=#555 id=555 data-nosnippet>555</a>        CreateCommand {
+<a href=#556 id=556 data-nosnippet>556</a>            kind,
+<a href=#557 id=557 data-nosnippet>557</a>            handler,
+<a href=#558 id=558 data-nosnippet>558</a>            fields: fields.into_owned(),
+<a href=#559 id=559 data-nosnippet>559</a>        }
+<a href=#560 id=560 data-nosnippet>560</a>    }
+<a href=#561 id=561 data-nosnippet>561</a>}
+<a href=#562 id=562 data-nosnippet>562</a>
+<a href=#563 id=563 data-nosnippet>563</a><span class="attr">#[derive(Clone, Debug, Serialize)]
+<a href=#564 id=564 data-nosnippet>564</a></span><span class="kw">struct </span>CreateCommandOptionChoice&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#565 id=565 data-nosnippet>565</a>    <span class="kw">pub </span>name: Cow&lt;<span class="lifetime">'a</span>, str&gt;,
+<a href=#566 id=566 data-nosnippet>566</a>    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
+<a href=#567 id=567 data-nosnippet>567</a>    </span><span class="kw">pub </span>name_localizations: <span class="prelude-ty">Option</span>&lt;HashMap&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;, Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;&gt;,
+<a href=#568 id=568 data-nosnippet>568</a>    <span class="kw">pub </span>value: Value,
+<a href=#569 id=569 data-nosnippet>569</a>}
+<a href=#570 id=570 data-nosnippet>570</a>
+<a href=#571 id=571 data-nosnippet>571</a><span class="kw">impl </span>CreateCommandOptionChoice&lt;<span class="lifetime">'_</span>&gt; {
+<a href=#572 id=572 data-nosnippet>572</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; CreateCommandOptionChoice&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#573 id=573 data-nosnippet>573</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#574 id=574 data-nosnippet>574</a>            name,
+<a href=#575 id=575 data-nosnippet>575</a>            name_localizations,
+<a href=#576 id=576 data-nosnippet>576</a>            value,
+<a href=#577 id=577 data-nosnippet>577</a>        } = <span class="self">self</span>;
+<a href=#578 id=578 data-nosnippet>578</a>        CreateCommandOptionChoice {
+<a href=#579 id=579 data-nosnippet>579</a>            name: name.into_owned().into(),
+<a href=#580 id=580 data-nosnippet>580</a>            name_localizations: name_localizations.map(|map| {
+<a href=#581 id=581 data-nosnippet>581</a>                map.into_iter()
+<a href=#582 id=582 data-nosnippet>582</a>                    .map(|(k, v)| (k.into_owned().into(), v.into_owned().into()))
+<a href=#583 id=583 data-nosnippet>583</a>                    .collect()
+<a href=#584 id=584 data-nosnippet>584</a>            }),
+<a href=#585 id=585 data-nosnippet>585</a>            value,
+<a href=#586 id=586 data-nosnippet>586</a>        }
+<a href=#587 id=587 data-nosnippet>587</a>    }
+<a href=#588 id=588 data-nosnippet>588</a>}
 </code></pre></div></section></main></body></html>

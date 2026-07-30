@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_soundboard.rs`."><title>create_soundboard.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-650bd49d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.99.0-nightly (1a833e165 2026-07-29)" data-channel="nightly" data-search-js="search-cf4fc35e.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-d4bd101e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/builder/</div>create_soundboard.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-2"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::borrow::Cow;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/builder/create_soundboard.rs`."><title>create_soundboard.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-650bd49d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.99.0-nightly (1a833e165 2026-07-29)" data-channel="nightly" data-search-js="search-cf4fc35e.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-d4bd101e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/builder/</div>create_soundboard.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::borrow::Cow;
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a><span class="kw">use </span><span class="kw">super</span>::DataUri;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
@@ -18,7 +18,7 @@
 <a href=#18 id=18 data-nosnippet>18</a>    </span>emoji_name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 <a href=#19 id=19 data-nosnippet>19</a>
 <a href=#20 id=20 data-nosnippet>20</a>    <span class="attr">#[serde(skip)]
-<a href=#21 id=21 data-nosnippet>21</a>    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+<a href=#21 id=21 data-nosnippet>21</a>    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 <a href=#22 id=22 data-nosnippet>22</a>}
 <a href=#23 id=23 data-nosnippet>23</a>
 <a href=#24 id=24 data-nosnippet>24</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; CreateSoundboard&lt;<span class="lifetime">'a</span>&gt; {
@@ -72,27 +72,49 @@
 <a href=#72 id=72 data-nosnippet>72</a>    </span>}
 <a href=#73 id=73 data-nosnippet>73</a>
 <a href=#74 id=74 data-nosnippet>74</a>    <span class="doccomment">/// Sets the request's audit log reason.
-<a href=#75 id=75 data-nosnippet>75</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
-<a href=#76 id=76 data-nosnippet>76</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+<a href=#75 id=75 data-nosnippet>75</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#76 id=76 data-nosnippet>76</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason.into());
 <a href=#77 id=77 data-nosnippet>77</a>        <span class="self">self
 <a href=#78 id=78 data-nosnippet>78</a>    </span>}
 <a href=#79 id=79 data-nosnippet>79</a>
-<a href=#80 id=80 data-nosnippet>80</a>    <span class="doccomment">/// Creates a new soundboard in the guild with the data set.
-<a href=#81 id=81 data-nosnippet>81</a>    ///
-<a href=#82 id=82 data-nosnippet>82</a>    /// **Note**: Requires the [Create Guild Expressions] permission.
-<a href=#83 id=83 data-nosnippet>83</a>    ///
-<a href=#84 id=84 data-nosnippet>84</a>    /// # Errors
-<a href=#85 id=85 data-nosnippet>85</a>    ///
-<a href=#86 id=86 data-nosnippet>86</a>    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
-<a href=#87 id=87 data-nosnippet>87</a>    ///
-<a href=#88 id=88 data-nosnippet>88</a>    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
-<a href=#89 id=89 data-nosnippet>89</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-<a href=#90 id=90 data-nosnippet>90</a>    </span><span class="kw">pub async fn </span>execute(
-<a href=#91 id=91 data-nosnippet>91</a>        <span class="self">self</span>,
-<a href=#92 id=92 data-nosnippet>92</a>        cache_http: <span class="kw">impl </span>CacheHttp,
-<a href=#93 id=93 data-nosnippet>93</a>        guild_id: GuildId,
-<a href=#94 id=94 data-nosnippet>94</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Soundboard&gt; {
-<a href=#95 id=95 data-nosnippet>95</a>        cache_http.http().create_guild_soundboard(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
-<a href=#96 id=96 data-nosnippet>96</a>    </span>}
-<a href=#97 id=97 data-nosnippet>97</a>}
+<a href=#80 id=80 data-nosnippet>80</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; CreateSoundboard&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#81 id=81 data-nosnippet>81</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#82 id=82 data-nosnippet>82</a>            name,
+<a href=#83 id=83 data-nosnippet>83</a>            sound,
+<a href=#84 id=84 data-nosnippet>84</a>            volume,
+<a href=#85 id=85 data-nosnippet>85</a>            emoji_id,
+<a href=#86 id=86 data-nosnippet>86</a>            emoji_name,
+<a href=#87 id=87 data-nosnippet>87</a>            audit_log_reason,
+<a href=#88 id=88 data-nosnippet>88</a>        } = <span class="self">self</span>;
+<a href=#89 id=89 data-nosnippet>89</a>        CreateSoundboard {
+<a href=#90 id=90 data-nosnippet>90</a>            name: name.into_owned().into(),
+<a href=#91 id=91 data-nosnippet>91</a>            sound: sound.into_owned(),
+<a href=#92 id=92 data-nosnippet>92</a>            volume,
+<a href=#93 id=93 data-nosnippet>93</a>            emoji_id,
+<a href=#94 id=94 data-nosnippet>94</a>            emoji_name: emoji_name.map(|e| e.into_owned().into()),
+<a href=#95 id=95 data-nosnippet>95</a>            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+<a href=#96 id=96 data-nosnippet>96</a>        }
+<a href=#97 id=97 data-nosnippet>97</a>    }
+<a href=#98 id=98 data-nosnippet>98</a>
+<a href=#99 id=99 data-nosnippet>99</a>    <span class="doccomment">/// Creates a new soundboard in the guild with the data set.
+<a href=#100 id=100 data-nosnippet>100</a>    ///
+<a href=#101 id=101 data-nosnippet>101</a>    /// **Note**: Requires the [Create Guild Expressions] permission.
+<a href=#102 id=102 data-nosnippet>102</a>    ///
+<a href=#103 id=103 data-nosnippet>103</a>    /// # Errors
+<a href=#104 id=104 data-nosnippet>104</a>    ///
+<a href=#105 id=105 data-nosnippet>105</a>    /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
+<a href=#106 id=106 data-nosnippet>106</a>    ///
+<a href=#107 id=107 data-nosnippet>107</a>    /// [Create Guild Expressions]: Permissions::CREATE_GUILD_EXPRESSIONS
+<a href=#108 id=108 data-nosnippet>108</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href=#109 id=109 data-nosnippet>109</a>    </span><span class="kw">pub async fn </span>execute(
+<a href=#110 id=110 data-nosnippet>110</a>        <span class="self">self</span>,
+<a href=#111 id=111 data-nosnippet>111</a>        cache_http: <span class="kw">impl </span>CacheHttp,
+<a href=#112 id=112 data-nosnippet>112</a>        guild_id: GuildId,
+<a href=#113 id=113 data-nosnippet>113</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Soundboard&gt; {
+<a href=#114 id=114 data-nosnippet>114</a>        cache_http
+<a href=#115 id=115 data-nosnippet>115</a>            .http()
+<a href=#116 id=116 data-nosnippet>116</a>            .create_guild_soundboard(guild_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason.as_deref())
+<a href=#117 id=117 data-nosnippet>117</a>            .<span class="kw">await
+<a href=#118 id=118 data-nosnippet>118</a>    </span>}
+<a href=#119 id=119 data-nosnippet>119</a>}
 </code></pre></div></section></main></body></html>

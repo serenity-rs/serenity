@@ -98,5 +98,22 @@
 <a href=#98 id=98 data-nosnippet>98</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Member&gt;&gt; {
 <a href=#99 id=99 data-nosnippet>99</a>        http.add_guild_member(guild_id, user_id, <span class="kw-2">&amp;</span><span class="self">self</span>).<span class="kw">await
 <a href=#100 id=100 data-nosnippet>100</a>    </span>}
-<a href=#101 id=101 data-nosnippet>101</a>}
+<a href=#101 id=101 data-nosnippet>101</a>
+<a href=#102 id=102 data-nosnippet>102</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; AddMember&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#103 id=103 data-nosnippet>103</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#104 id=104 data-nosnippet>104</a>            access_token,
+<a href=#105 id=105 data-nosnippet>105</a>            nick,
+<a href=#106 id=106 data-nosnippet>106</a>            roles,
+<a href=#107 id=107 data-nosnippet>107</a>            mute,
+<a href=#108 id=108 data-nosnippet>108</a>            deaf,
+<a href=#109 id=109 data-nosnippet>109</a>        } = <span class="self">self</span>;
+<a href=#110 id=110 data-nosnippet>110</a>        AddMember {
+<a href=#111 id=111 data-nosnippet>111</a>            access_token: access_token.into_owned().into(),
+<a href=#112 id=112 data-nosnippet>112</a>            nick: nick.map(|n| n.into_owned().into()),
+<a href=#113 id=113 data-nosnippet>113</a>            roles: roles.into_owned().into(),
+<a href=#114 id=114 data-nosnippet>114</a>            mute,
+<a href=#115 id=115 data-nosnippet>115</a>            deaf,
+<a href=#116 id=116 data-nosnippet>116</a>        }
+<a href=#117 id=117 data-nosnippet>117</a>    }
+<a href=#118 id=118 data-nosnippet>118</a>}
 </code></pre></div></section></main></body></html>

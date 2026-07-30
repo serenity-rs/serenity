@@ -127,5 +127,24 @@
 <a href=#127 id=127 data-nosnippet>127</a>        <span class="self">self</span>.integration_type = <span class="prelude-val">Some</span>(integration_type);
 <a href=#128 id=128 data-nosnippet>128</a>        <span class="self">self
 <a href=#129 id=129 data-nosnippet>129</a>    </span>}
-<a href=#130 id=130 data-nosnippet>130</a>}
+<a href=#130 id=130 data-nosnippet>130</a>
+<a href=#131 id=131 data-nosnippet>131</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; CreateBotAuthParameters&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#132 id=132 data-nosnippet>132</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#133 id=133 data-nosnippet>133</a>            client_id,
+<a href=#134 id=134 data-nosnippet>134</a>            scopes,
+<a href=#135 id=135 data-nosnippet>135</a>            permissions,
+<a href=#136 id=136 data-nosnippet>136</a>            guild_id,
+<a href=#137 id=137 data-nosnippet>137</a>            disable_guild_select,
+<a href=#138 id=138 data-nosnippet>138</a>            integration_type,
+<a href=#139 id=139 data-nosnippet>139</a>        } = <span class="self">self</span>;
+<a href=#140 id=140 data-nosnippet>140</a>        CreateBotAuthParameters {
+<a href=#141 id=141 data-nosnippet>141</a>            client_id,
+<a href=#142 id=142 data-nosnippet>142</a>            scopes: Cow::Owned(scopes.into_owned()),
+<a href=#143 id=143 data-nosnippet>143</a>            permissions,
+<a href=#144 id=144 data-nosnippet>144</a>            guild_id,
+<a href=#145 id=145 data-nosnippet>145</a>            disable_guild_select,
+<a href=#146 id=146 data-nosnippet>146</a>            integration_type,
+<a href=#147 id=147 data-nosnippet>147</a>        }
+<a href=#148 id=148 data-nosnippet>148</a>    }
+<a href=#149 id=149 data-nosnippet>149</a>}
 </code></pre></div></section></main></body></html>

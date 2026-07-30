@@ -31,7 +31,7 @@
 <a href=#31 id=31 data-nosnippet>31</a>    </span>image: <span class="prelude-ty">Option</span>&lt;DataUri&lt;<span class="lifetime">'a</span>&gt;&gt;,
 <a href=#32 id=32 data-nosnippet>32</a>
 <a href=#33 id=33 data-nosnippet>33</a>    <span class="attr">#[serde(skip)]
-<a href=#34 id=34 data-nosnippet>34</a>    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>str&gt;,
+<a href=#34 id=34 data-nosnippet>34</a>    </span>audit_log_reason: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
 <a href=#35 id=35 data-nosnippet>35</a>}
 <a href=#36 id=36 data-nosnippet>36</a>
 <a href=#37 id=37 data-nosnippet>37</a><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; EditScheduledEvent&lt;<span class="lifetime">'a</span>&gt; {
@@ -156,30 +156,60 @@
 <a href=#156 id=156 data-nosnippet>156</a>    </span>}
 <a href=#157 id=157 data-nosnippet>157</a>
 <a href=#158 id=158 data-nosnippet>158</a>    <span class="doccomment">/// Sets the request's audit log reason.
-<a href=#159 id=159 data-nosnippet>159</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
-<a href=#160 id=160 data-nosnippet>160</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+<a href=#159 id=159 data-nosnippet>159</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#160 id=160 data-nosnippet>160</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason.into());
 <a href=#161 id=161 data-nosnippet>161</a>        <span class="self">self
 <a href=#162 id=162 data-nosnippet>162</a>    </span>}
 <a href=#163 id=163 data-nosnippet>163</a>
-<a href=#164 id=164 data-nosnippet>164</a>    <span class="doccomment">/// Modifies a scheduled event in the guild with the data set, if any.
-<a href=#165 id=165 data-nosnippet>165</a>    ///
-<a href=#166 id=166 data-nosnippet>166</a>    /// **Note**: If the event was created by the current user, requires either [Create Events] or
-<a href=#167 id=167 data-nosnippet>167</a>    /// the [Manage Events] permission. Otherwise, the [Manage Events] permission is required.
-<a href=#168 id=168 data-nosnippet>168</a>    ///
-<a href=#169 id=169 data-nosnippet>169</a>    /// # Errors
-<a href=#170 id=170 data-nosnippet>170</a>    ///
-<a href=#171 id=171 data-nosnippet>171</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-<a href=#172 id=172 data-nosnippet>172</a>    ///
-<a href=#173 id=173 data-nosnippet>173</a>    /// [Create Events]: Permissions::CREATE_EVENTS
-<a href=#174 id=174 data-nosnippet>174</a>    /// [Manage Events]: Permissions::MANAGE_EVENTS
-<a href=#175 id=175 data-nosnippet>175</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-<a href=#176 id=176 data-nosnippet>176</a>    </span><span class="kw">pub async fn </span>execute(
-<a href=#177 id=177 data-nosnippet>177</a>        <span class="self">self</span>,
-<a href=#178 id=178 data-nosnippet>178</a>        http: <span class="kw-2">&amp;</span>Http,
-<a href=#179 id=179 data-nosnippet>179</a>        guild_id: GuildId,
-<a href=#180 id=180 data-nosnippet>180</a>        event_id: ScheduledEventId,
-<a href=#181 id=181 data-nosnippet>181</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
-<a href=#182 id=182 data-nosnippet>182</a>        http.edit_scheduled_event(guild_id, event_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason).<span class="kw">await
-<a href=#183 id=183 data-nosnippet>183</a>    </span>}
-<a href=#184 id=184 data-nosnippet>184</a>}
+<a href=#164 id=164 data-nosnippet>164</a>    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; EditScheduledEvent&lt;<span class="lifetime">'static</span>&gt; {
+<a href=#165 id=165 data-nosnippet>165</a>        <span class="kw">let </span><span class="self">Self </span>{
+<a href=#166 id=166 data-nosnippet>166</a>            channel_id,
+<a href=#167 id=167 data-nosnippet>167</a>            entity_metadata,
+<a href=#168 id=168 data-nosnippet>168</a>            name,
+<a href=#169 id=169 data-nosnippet>169</a>            privacy_level,
+<a href=#170 id=170 data-nosnippet>170</a>            scheduled_start_time,
+<a href=#171 id=171 data-nosnippet>171</a>            scheduled_end_time,
+<a href=#172 id=172 data-nosnippet>172</a>            description,
+<a href=#173 id=173 data-nosnippet>173</a>            entity_type,
+<a href=#174 id=174 data-nosnippet>174</a>            status,
+<a href=#175 id=175 data-nosnippet>175</a>            image,
+<a href=#176 id=176 data-nosnippet>176</a>            audit_log_reason,
+<a href=#177 id=177 data-nosnippet>177</a>        } = <span class="self">self</span>;
+<a href=#178 id=178 data-nosnippet>178</a>        EditScheduledEvent {
+<a href=#179 id=179 data-nosnippet>179</a>            channel_id,
+<a href=#180 id=180 data-nosnippet>180</a>            entity_metadata: entity_metadata
+<a href=#181 id=181 data-nosnippet>181</a>                .map(|m| m.map(CreateScheduledEventMetadata::into_owned)),
+<a href=#182 id=182 data-nosnippet>182</a>            name: name.map(|n| n.into_owned().into()),
+<a href=#183 id=183 data-nosnippet>183</a>            privacy_level,
+<a href=#184 id=184 data-nosnippet>184</a>            scheduled_start_time,
+<a href=#185 id=185 data-nosnippet>185</a>            scheduled_end_time,
+<a href=#186 id=186 data-nosnippet>186</a>            description: description.map(|d| d.into_owned().into()),
+<a href=#187 id=187 data-nosnippet>187</a>            entity_type,
+<a href=#188 id=188 data-nosnippet>188</a>            status,
+<a href=#189 id=189 data-nosnippet>189</a>            image: image.map(DataUri::into_owned),
+<a href=#190 id=190 data-nosnippet>190</a>            audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
+<a href=#191 id=191 data-nosnippet>191</a>        }
+<a href=#192 id=192 data-nosnippet>192</a>    }
+<a href=#193 id=193 data-nosnippet>193</a>
+<a href=#194 id=194 data-nosnippet>194</a>    <span class="doccomment">/// Modifies a scheduled event in the guild with the data set, if any.
+<a href=#195 id=195 data-nosnippet>195</a>    ///
+<a href=#196 id=196 data-nosnippet>196</a>    /// **Note**: If the event was created by the current user, requires either [Create Events] or
+<a href=#197 id=197 data-nosnippet>197</a>    /// the [Manage Events] permission. Otherwise, the [Manage Events] permission is required.
+<a href=#198 id=198 data-nosnippet>198</a>    ///
+<a href=#199 id=199 data-nosnippet>199</a>    /// # Errors
+<a href=#200 id=200 data-nosnippet>200</a>    ///
+<a href=#201 id=201 data-nosnippet>201</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+<a href=#202 id=202 data-nosnippet>202</a>    ///
+<a href=#203 id=203 data-nosnippet>203</a>    /// [Create Events]: Permissions::CREATE_EVENTS
+<a href=#204 id=204 data-nosnippet>204</a>    /// [Manage Events]: Permissions::MANAGE_EVENTS
+<a href=#205 id=205 data-nosnippet>205</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href=#206 id=206 data-nosnippet>206</a>    </span><span class="kw">pub async fn </span>execute(
+<a href=#207 id=207 data-nosnippet>207</a>        <span class="self">self</span>,
+<a href=#208 id=208 data-nosnippet>208</a>        http: <span class="kw-2">&amp;</span>Http,
+<a href=#209 id=209 data-nosnippet>209</a>        guild_id: GuildId,
+<a href=#210 id=210 data-nosnippet>210</a>        event_id: ScheduledEventId,
+<a href=#211 id=211 data-nosnippet>211</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;ScheduledEvent&gt; {
+<a href=#212 id=212 data-nosnippet>212</a>        http.edit_scheduled_event(guild_id, event_id, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="self">self</span>.audit_log_reason.as_deref()).<span class="kw">await
+<a href=#213 id=213 data-nosnippet>213</a>    </span>}
+<a href=#214 id=214 data-nosnippet>214</a>}
 </code></pre></div></section></main></body></html>
