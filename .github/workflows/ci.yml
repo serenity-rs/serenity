@@ -88,6 +88,7 @@ jobs:
       matrix:
         name:
           - builder without model
+          - http without model
           - unstable + typesize
           - unstable (no default features)
           - temp cache
@@ -96,6 +97,8 @@ jobs:
         include:
           - name: builder without model
             features: builder
+          - name: http without model
+            features: http rustls_backend
           - name: unstable + typesize
             features: default unstable typesize
           - name: unstable (no default features)

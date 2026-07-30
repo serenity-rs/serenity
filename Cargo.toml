@@ -100,7 +100,8 @@ framework = ["gateway"]
 # Enables gateway support, which allows bots to listen for Discord events.
 gateway = ["model", "flate2", "dashmap"]
 # Enables HTTP, which enables bots to execute actions on Discord.
-http = ["dashmap", "mime", "mime_guess", "percent-encoding"]
+# Requires "builder" for request body types such as CreateAttachment.
+http = ["builder", "dashmap", "mime", "mime_guess", "percent-encoding"]
 # Enables wrapper methods around HTTP requests on model types.
 # Requires "builder" to configure the requests and "http" to execute them.
 # Note: the model type definitions themselves are always active, regardless of this feature.

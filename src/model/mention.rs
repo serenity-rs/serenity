@@ -184,7 +184,6 @@ macro_rules! mentionable {
     };
 }
 
-#[cfg(feature = "model")]
 mentionable!(value: Channel, value.id());
 
 mentionable!(value: GuildChannel, value.id.widen());
