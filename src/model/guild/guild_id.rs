@@ -20,6 +20,7 @@ use crate::builder::{
     EditCurrentMember,
     EditGuild,
     EditGuildIncidentActions,
+    EditGuildOnboarding,
     EditGuildWelcomeScreen,
     EditGuildWidget,
     EditMember,
@@ -891,6 +892,24 @@ impl GuildId {
         http: &Http,
         builder: EditGuildWelcomeScreen<'_>,
     ) -> Result<GuildWelcomeScreen> {
+        builder.execute(http, self).await
+    }
+
+    /// Edits the guild's onboarding configuration.
+    ///
+    /// **Note**: Requires the [Manage Guild] and [Manage Roles] permissions.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
+    pub async fn edit_onboarding(
+        self,
+        http: &Http,
+        builder: EditGuildOnboarding<'_>,
+    ) -> Result<Onboarding> {
         builder.execute(http, self).await
     }
 
