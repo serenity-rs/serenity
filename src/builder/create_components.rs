@@ -180,7 +180,11 @@ impl<'a> CreateSection<'a> {
         CreateSection {
             kind,
             components: Cow::Owned(
-                components.into_owned().into_iter().map(CreateSectionComponent::into_owned).collect(),
+                components
+                    .into_owned()
+                    .into_iter()
+                    .map(CreateSectionComponent::into_owned)
+                    .collect(),
             ),
             accessory: accessory.into_owned(),
         }
@@ -396,7 +400,9 @@ impl<'a> CreateMediaGallery<'a> {
         } = self;
         CreateMediaGallery {
             kind,
-            items: Cow::Owned(items.into_owned().into_iter().map(CreateMediaGalleryItem::into_owned).collect()),
+            items: Cow::Owned(
+                items.into_owned().into_iter().map(CreateMediaGalleryItem::into_owned).collect(),
+            ),
         }
     }
 }
@@ -636,7 +642,11 @@ impl<'a> CreateContainer<'a> {
             accent_color,
             spoiler,
             components: Cow::Owned(
-                components.into_owned().into_iter().map(CreateContainerComponent::into_owned).collect(),
+                components
+                    .into_owned()
+                    .into_iter()
+                    .map(CreateContainerComponent::into_owned)
+                    .collect(),
             ),
         }
     }
@@ -905,7 +915,9 @@ impl<'a> CreateRadioGroup<'a> {
         CreateRadioGroup {
             kind,
             custom_id: custom_id.into_owned().into(),
-            options: Cow::Owned(options.into_owned().into_iter().map(CreateRadioGroupOption::into_owned).collect()),
+            options: Cow::Owned(
+                options.into_owned().into_iter().map(CreateRadioGroupOption::into_owned).collect(),
+            ),
             required,
         }
     }
@@ -1058,7 +1070,13 @@ impl<'a> CreateCheckboxGroup<'a> {
         CreateCheckboxGroup {
             kind,
             custom_id: custom_id.into_owned().into(),
-            options: Cow::Owned(options.into_owned().into_iter().map(CreateCheckboxGroupOption::into_owned).collect()),
+            options: Cow::Owned(
+                options
+                    .into_owned()
+                    .into_iter()
+                    .map(CreateCheckboxGroupOption::into_owned)
+                    .collect(),
+            ),
             min_values,
             max_values,
             required,
@@ -1404,7 +1422,11 @@ impl CreateSelectMenuKind<'_> {
                 options,
             } => CreateSelectMenuKind::String {
                 options: Cow::Owned(
-                    options.into_owned().into_iter().map(CreateSelectMenuOption::into_owned).collect(),
+                    options
+                        .into_owned()
+                        .into_iter()
+                        .map(CreateSelectMenuOption::into_owned)
+                        .collect(),
                 ),
             },
             CreateSelectMenuKind::User {

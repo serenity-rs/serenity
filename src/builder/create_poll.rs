@@ -171,7 +171,9 @@ impl<Stage: Sealed> CreatePoll<'_, Stage> {
         } = self;
         CreatePoll {
             question: question.into_owned(),
-            answers: Cow::Owned(answers.into_owned().into_iter().map(CreatePollAnswer::into_owned).collect()),
+            answers: Cow::Owned(
+                answers.into_owned().into_iter().map(CreatePollAnswer::into_owned).collect(),
+            ),
             duration,
             allow_multiselect,
             layout_type,

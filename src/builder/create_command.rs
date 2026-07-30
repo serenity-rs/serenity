@@ -349,8 +349,16 @@ impl<'a> CreateCommandOption<'a> {
                     .collect()
             }),
             required,
-            choices: Cow::Owned(choices.into_owned().into_iter().map(CreateCommandOptionChoice::into_owned).collect()),
-            options: Cow::Owned(options.into_owned().into_iter().map(CreateCommandOption::into_owned).collect()),
+            choices: Cow::Owned(
+                choices
+                    .into_owned()
+                    .into_iter()
+                    .map(CreateCommandOptionChoice::into_owned)
+                    .collect(),
+            ),
+            options: Cow::Owned(
+                options.into_owned().into_iter().map(CreateCommandOption::into_owned).collect(),
+            ),
             channel_types: channel_types.into_owned().into(),
             min_value,
             max_value,
@@ -387,7 +395,6 @@ impl<'a> CreateCommand<'a> {
         Self {
             kind: None,
             handler: None,
-
             fields: EditCommand::new().name(name),
         }
     }

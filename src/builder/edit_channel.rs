@@ -292,8 +292,9 @@ impl<'a> EditChannel<'a> {
             video_quality_mode,
             default_auto_archive_duration,
             flags,
-            available_tags: available_tags
-                .map(|t| Cow::Owned(t.into_owned().into_iter().map(CreateForumTag::into_owned).collect())),
+            available_tags: available_tags.map(|t| {
+                Cow::Owned(t.into_owned().into_iter().map(CreateForumTag::into_owned).collect())
+            }),
             default_reaction_emoji,
             default_thread_rate_limit_per_user,
             default_sort_order,

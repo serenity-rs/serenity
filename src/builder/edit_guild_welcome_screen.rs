@@ -69,7 +69,11 @@ impl<'a> EditGuildWelcomeScreen<'a> {
         EditGuildWelcomeScreen {
             enabled,
             welcome_channels: Cow::Owned(
-                welcome_channels.into_owned().into_iter().map(CreateGuildWelcomeChannel::into_owned).collect(),
+                welcome_channels
+                    .into_owned()
+                    .into_iter()
+                    .map(CreateGuildWelcomeChannel::into_owned)
+                    .collect(),
             ),
             description: description.map(|d| d.into_owned().into()),
             audit_log_reason: audit_log_reason.map(|r| Cow::Owned(r.into_owned())),

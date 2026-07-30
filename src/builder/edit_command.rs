@@ -203,7 +203,9 @@ impl<'a> EditCommand<'a> {
                 .into_iter()
                 .map(|(k, v)| (k.into_owned().into(), v.into_owned().into()))
                 .collect(),
-            options: Cow::Owned(options.into_owned().into_iter().map(CreateCommandOption::into_owned).collect()),
+            options: Cow::Owned(
+                options.into_owned().into_iter().map(CreateCommandOption::into_owned).collect(),
+            ),
             default_member_permissions,
             #[cfg(not(feature = "unstable"))]
             dm_permission,
