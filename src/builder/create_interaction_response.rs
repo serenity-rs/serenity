@@ -144,7 +144,7 @@ impl CreateInteractionResponse<'_> {
             msg.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        http.create_interaction_response(interaction_id, interaction_token, &self, files).await
+        http.create_interaction_response(interaction_id.0, interaction_token, &self, files).await
     }
 }
 
@@ -418,7 +418,8 @@ impl<'a> CreateAutocompleteResponse<'a> {
         interaction_id: InteractionId,
         interaction_token: &str,
     ) -> Result<()> {
-        http.create_interaction_response(interaction_id, interaction_token, &self, Vec::new()).await
+        http.create_interaction_response(interaction_id.0, interaction_token, &self, Vec::new())
+            .await
     }
 }
 

@@ -82,7 +82,7 @@ impl<'a> EditSoundboard<'a> {
     ) -> Result<Soundboard> {
         cache_http
             .http()
-            .edit_guild_soundboard(guild_id, sound_id, &self, self.audit_log_reason)
+            .edit_guild_soundboard(guild_id.0, sound_id.0, &self, self.audit_log_reason)
             .await
     }
 }

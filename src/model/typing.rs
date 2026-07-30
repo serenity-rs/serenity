@@ -76,7 +76,7 @@ impl Typing {
                     _ => (),
                 }
 
-                http.broadcast_typing(channel_id).await?;
+                http.broadcast_typing(channel_id.0).await?;
 
                 // It is unclear for how long typing persists after this method is called.
                 // It is generally assumed to be 7 or 10 seconds, so we use 7 to be safe.

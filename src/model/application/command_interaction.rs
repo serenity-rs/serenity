@@ -165,7 +165,7 @@ impl CommandInteraction {
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was already
     /// deleted.
     pub async fn delete_followup(&self, http: &Http, message_id: MessageId) -> Result<()> {
-        http.delete_followup_message(&self.token, message_id).await
+        http.delete_followup_message(&self.token, message_id.0).await
     }
 
     /// Gets a followup message.
@@ -175,7 +175,7 @@ impl CommandInteraction {
     /// May return [`Error::Http`] if the API returns an error. Such as if the response was
     /// deleted.
     pub async fn get_followup(&self, http: &Http, message_id: MessageId) -> Result<Message> {
-        http.get_followup_message(&self.token, message_id).await
+        http.get_followup_message(&self.token, message_id.0).await
     }
 
     /// Helper function to defer an interaction.

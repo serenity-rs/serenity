@@ -67,29 +67,19 @@ impl LightMethod {
     }
 }
 
-/// Representation of the method of a query to send for the [`Http::get_guilds`] function.
+/// Representation of the method of a query to send for the [`Http::get_guilds`],
+/// [`Http::get_bans`], and [`Http::get_scheduled_event_users`], functions.
 #[non_exhaustive]
-pub enum GuildPagination {
-    /// The Id to get the guilds after.
-    After(GuildId),
-    /// The Id to get the guilds before.
-    Before(GuildId),
+pub enum Pagination {
+    After(Snowflake),
+    Before(Snowflake),
 }
 
-/// Representation of the method of a query to send for the [`Http::get_scheduled_event_users`] and
-/// [`Http::get_bans`] functions.
-#[non_exhaustive]
-pub enum UserPagination {
-    /// The Id to get the users after.
-    After(UserId),
-    /// The Id to get the users before.
-    Before(UserId),
-}
-
+/// Representation of the method of a query to send for the [`Http::get_messages`] function.
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum MessagePagination {
-    After(MessageId),
-    Around(MessageId),
-    Before(MessageId),
+    After(Snowflake),
+    Around(Snowflake),
+    Before(Snowflake),
 }

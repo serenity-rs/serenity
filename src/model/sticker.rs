@@ -14,7 +14,7 @@ impl StickerPackId {
     /// Returns [`Error::Http`] if a [`StickerPack`] with that [`StickerPackId`] does not exist, or
     /// is otherwise unavailable.
     pub async fn to_sticker_pack(self, http: &Http) -> Result<StickerPack> {
-        http.get_sticker_pack(self).await
+        http.get_sticker_pack(self.0).await
     }
 }
 
@@ -27,7 +27,7 @@ impl StickerId {
     /// Returns [`Error::Http`] if a [`Sticker`] with that [`StickerId`] does not exist, or is
     /// otherwise unavailable.
     pub async fn to_sticker(self, http: &Http) -> Result<Sticker> {
-        http.get_sticker(self).await
+        http.get_sticker(self.0).await
     }
 }
 

@@ -113,10 +113,12 @@ impl<'a> EditAutoModRule<'a> {
         rule_id: Option<RuleId>,
     ) -> Result<AutoModRule> {
         match rule_id {
-            Some(id) => http.edit_automod_rule(guild_id, id, &self, self.audit_log_reason).await,
+            Some(id) => {
+                http.edit_automod_rule(guild_id.0, id.0, &self, self.audit_log_reason).await
+            },
             // Automod Rule creation has required fields, whereas modifying a rule does not.
             // TODO: Enforce these fields (maybe with a separate CreateAutoModRule builder).
-            None => http.create_automod_rule(guild_id, &self, self.audit_log_reason).await,
+            None => http.create_automod_rule(guild_id.0, &self, self.audit_log_reason).await,
         }
     }
 }

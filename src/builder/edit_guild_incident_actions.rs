@@ -40,6 +40,6 @@ impl EditGuildIncidentActions {
     /// May also return [`Error::Json`] if there is an error in deserializing the API response.
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: GuildId) -> Result<IncidentsData> {
-        http.edit_guild_incident_actions(guild_id, &self).await
+        http.edit_guild_incident_actions(guild_id.0, &self).await
     }
 }

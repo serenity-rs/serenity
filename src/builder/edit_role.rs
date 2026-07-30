@@ -169,11 +169,11 @@ impl<'a> EditRole<'a> {
         guild_id: GuildId,
         role_id: Option<RoleId>,
     ) -> Result<Role> {
-        let role = match role_id {
+        let role: Role = match role_id {
             Some(role_id) => {
-                http.edit_role(guild_id, role_id, &self, self.audit_log_reason).await?
+                http.edit_role(guild_id.0, role_id.0, &self, self.audit_log_reason).await?
             },
-            None => http.create_role(guild_id, &self, self.audit_log_reason).await?,
+            None => http.create_role(guild_id.0, &self, self.audit_log_reason).await?,
         };
 
         if let Some(position) = self.position {

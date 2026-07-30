@@ -80,9 +80,9 @@ impl EditVoiceState {
     ) -> Result<()> {
         self.channel_id = Some(channel_id);
         if let Some(user_id) = user_id {
-            http.edit_voice_state(guild_id, user_id, &self).await
+            http.edit_voice_state(guild_id.0, user_id.0, &self).await
         } else {
-            http.edit_voice_state_me(guild_id, &self).await
+            http.edit_voice_state_me(guild_id.0, &self).await
         }
     }
 }

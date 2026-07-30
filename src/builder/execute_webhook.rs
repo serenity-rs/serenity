@@ -365,8 +365,8 @@ impl<'a> ExecuteWebhook<'a> {
 
         if self.with_components.unwrap_or_default() {
             http.execute_webhook_with_components(
-                webhook_id,
-                self.thread_id,
+                webhook_id.0,
+                self.thread_id.map(|id| id.0),
                 webhook_token,
                 wait,
                 files,
@@ -374,8 +374,15 @@ impl<'a> ExecuteWebhook<'a> {
             )
             .await
         } else {
-            http.execute_webhook(webhook_id, self.thread_id, webhook_token, wait, files, &self)
-                .await
+            http.execute_webhook(
+                webhook_id.0,
+                self.thread_id.map(|id| id.0),
+                webhook_token,
+                wait,
+                files,
+                &self,
+            )
+            .await
         }
     }
 }

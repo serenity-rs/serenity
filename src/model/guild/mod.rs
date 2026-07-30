@@ -37,7 +37,7 @@ use crate::builder::EditGuild;
 #[cfg(doc)]
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
-use crate::http::Http;
+use crate::http::{Http, Pagination};
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::*;
@@ -75,6 +75,25 @@ pub struct AfkMetadata {
     /// The amount of seconds a user can not show any activity in a voice channel before being
     /// moved to an AFK channel -- if one exists.
     pub afk_timeout: AfkTimeout,
+}
+
+/// Representation of the method of a query to send for the [`Http::get_guilds`] function.
+#[non_exhaustive]
+pub enum GuildPagination {
+    /// The Id to get the guilds after.
+    After(GuildId),
+    /// The Id to get the guilds before.
+    Before(GuildId),
+}
+
+#[cfg(feature = "model")]
+impl From<GuildPagination> for Pagination {
+    fn from(pagination: GuildPagination) -> Self {
+        match pagination {
+            GuildPagination::After(id) => Pagination::After(id.0),
+            GuildPagination::Before(id) => Pagination::Before(id.0),
+        }
+    }
 }
 
 // A type to standarize the maximum integer size for member counts.
@@ -546,7 +565,7 @@ impl Guild {
         if let Some(member) = self.members.get(&user_id) {
             Ok(Cow::Borrowed(member))
         } else {
-            http.get_member(self.id, user_id).await.map(Cow::Owned)
+            http.get_member(self.id.0, user_id.0).await.map(Cow::Owned)
         }
     }
 

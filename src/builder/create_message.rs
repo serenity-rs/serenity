@@ -284,6 +284,6 @@ impl<'a> CreateMessage<'a> {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        http.send_message(channel_id, files, &self).await
+        http.send_message(channel_id.0, files, &self).await
     }
 }

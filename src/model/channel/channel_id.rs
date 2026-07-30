@@ -75,7 +75,7 @@ impl ChannelId {
             }
         }
 
-        let channel = cache_http.http().get_channel(self.widen()).await?;
+        let channel: Channel = cache_http.http().get_channel(self.0).await?;
         let guild_channel = channel.guild().ok_or(ModelError::InvalidChannelType)?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
@@ -123,7 +123,7 @@ impl ChannelId {
         reason: Option<&str>,
     ) -> Result<()> {
         let data: PermissionOverwriteData = target.into();
-        http.create_permission(self, data.id, &data, reason).await
+        http.create_permission(self.0, data.id.0, &data, reason).await
     }
 
     /// Deletes all permission overrides in the channel from a member or role.
@@ -142,10 +142,10 @@ impl ChannelId {
         reason: Option<&str>,
     ) -> Result<()> {
         let id = match permission_type {
-            PermissionOverwriteType::Member(id) => id.into(),
-            PermissionOverwriteType::Role(id) => id.get().into(),
+            PermissionOverwriteType::Member(id) => id.0,
+            PermissionOverwriteType::Role(id) => id.0,
         };
-        http.delete_permission(self, id, reason).await
+        http.delete_permission(self.0, id, reason).await
     }
 
     /// Edits a channel's settings.
@@ -205,7 +205,7 @@ impl ChannelId {
             webhook_channel_id: target_channel_id,
         };
 
-        http.follow_news_channel(self, &map).await
+        http.follow_news_channel(self.0, &map).await
     }
 
     /// Gets all of the channel's invites.
@@ -218,7 +218,7 @@ impl ChannelId {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn invites(self, http: &Http) -> Result<Vec<Invite>> {
-        http.get_channel_invites(self).await
+        http.get_channel_invites(self.0).await
     }
 
     /// Crossposts a [`Message`].
@@ -235,7 +235,7 @@ impl ChannelId {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn crosspost(self, http: &Http, message_id: MessageId) -> Result<Message> {
-        http.crosspost_message(self, message_id).await
+        http.crosspost_message(self.0, message_id.0).await
     }
 
     /// Retrieves the channel's webhooks.
@@ -248,7 +248,7 @@ impl ChannelId {
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     pub async fn webhooks(self, http: &Http) -> Result<Vec<Webhook>> {
-        http.get_channel_webhooks(self).await
+        http.get_channel_webhooks(self.0).await
     }
 
     /// Creates a webhook in the channel.
@@ -267,7 +267,7 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
     pub async fn get_stage_instance(self, http: &Http) -> Result<StageInstance> {
-        http.get_stage_instance(self).await
+        http.get_stage_instance(self.0).await
     }
 
     /// Creates a stage instance.
@@ -306,7 +306,7 @@ impl ChannelId {
     /// Returns [`Error::Http`] if the channel is not a stage channel, or if there is no stage
     /// instance currently.
     pub async fn delete_stage_instance(self, http: &Http, reason: Option<&str>) -> Result<()> {
-        http.delete_stage_instance(self, reason).await
+        http.delete_stage_instance(self.0, reason).await
     }
 
     /// Creates a public thread that is connected to a message.
@@ -362,7 +362,7 @@ impl ChannelId {
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
-        http.get_channel_archived_private_threads(self, before, limit).await
+        http.get_channel_archived_private_threads(self.0, before, limit).await
     }
 
     /// Gets public archived threads of a channel.
@@ -376,7 +376,7 @@ impl ChannelId {
         before: Option<Timestamp>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
-        http.get_channel_archived_public_threads(self, before, limit).await
+        http.get_channel_archived_public_threads(self.0, before, limit).await
     }
 
     /// Gets private archived threads joined by the current user of a channel.
@@ -390,7 +390,7 @@ impl ChannelId {
         before: Option<ChannelId>,
         limit: Option<u64>,
     ) -> Result<ThreadsData> {
-        http.get_channel_joined_archived_private_threads(self, before, limit).await
+        http.get_channel_joined_archived_private_threads(self.0, before.map(|id| id.0), limit).await
     }
 
     /// Sends a soundboard sound to this voice channel.
@@ -421,7 +421,7 @@ impl ChannelId {
             source_guild_id: guild_id,
         };
 
-        http.as_ref().send_soundboard_sound(self, &map).await
+        http.as_ref().send_soundboard_sound(self.0, &map).await
     }
 }
 
@@ -455,7 +455,7 @@ impl GenericChannelId {
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     pub async fn broadcast_typing(self, http: &Http) -> Result<()> {
-        http.broadcast_typing(self).await
+        http.broadcast_typing(self.0).await
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -476,7 +476,7 @@ impl GenericChannelId {
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.create_reaction(self, message_id, &reaction_type.into().as_data()).await
+        http.create_reaction(self.0, message_id.0, &reaction_type.into().as_data()).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -489,7 +489,7 @@ impl GenericChannelId {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn delete(self, http: &Http, reason: Option<&str>) -> Result<Channel> {
-        http.delete_channel(self, reason).await
+        http.delete_channel(self.0, reason).await
     }
 
     /// Deletes a [`Message`] given its Id.
@@ -510,7 +510,7 @@ impl GenericChannelId {
         message_id: MessageId,
         reason: Option<&str>,
     ) -> Result<()> {
-        http.delete_message(self, message_id, reason).await
+        http.delete_message(self.0, message_id.0, reason).await
     }
 
     /// Deletes messages by Ids from the given vector in the given channel.
@@ -553,7 +553,7 @@ impl GenericChannelId {
                 messages: message_ids,
             };
 
-            http.delete_messages(self, &req, reason).await
+            http.delete_messages(self.0, &req, reason).await
         }
     }
 
@@ -578,9 +578,10 @@ impl GenericChannelId {
         let reaction_type = reaction_type.into();
         match user_id {
             Some(user_id) => {
-                http.delete_reaction(self, message_id, user_id, &reaction_type.as_data()).await
+                http.delete_reaction(self.0, message_id.0, user_id.0, &reaction_type.as_data())
+                    .await
             },
-            None => http.delete_reaction_me(self, message_id, &reaction_type.as_data()).await,
+            None => http.delete_reaction_me(self.0, message_id.0, &reaction_type.as_data()).await,
         }
     }
     /// Deletes all of the [`Reaction`]s associated with the provided message id.
@@ -595,7 +596,7 @@ impl GenericChannelId {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reactions(self, http: &Http, message_id: MessageId) -> Result<()> {
-        http.delete_message_reactions(self, message_id).await
+        http.delete_message_reactions(self.0, message_id.0).await
     }
 
     /// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
@@ -613,7 +614,8 @@ impl GenericChannelId {
         message_id: MessageId,
         reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.delete_message_reaction_emoji(self, message_id, &reaction_type.into().as_data()).await
+        http.delete_message_reaction_emoji(self.0, message_id.0, &reaction_type.into().as_data())
+            .await
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -677,7 +679,7 @@ impl GenericChannelId {
             }
         }
 
-        let channel = cache_http.http().get_channel(self).await?;
+        let channel = cache_http.http().get_channel(self.0).await?;
 
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         if let Some(cache) = cache_http.cache() {
@@ -722,7 +724,7 @@ impl GenericChannelId {
             return Ok(message.clone());
         }
 
-        let message = cache_http.http().get_message(self, message_id).await?;
+        let message: Message = cache_http.http().get_message(self.0, message_id.0).await?;
 
         #[cfg(feature = "temp_cache")]
         if let Some(cache) = cache_http.cache() {
@@ -799,7 +801,7 @@ impl GenericChannelId {
     ///
     /// [Pin Messages]: Permissions::PIN_MESSAGES
     pub async fn pin(self, http: &Http, message_id: MessageId, reason: Option<&str>) -> Result<()> {
-        http.pin_message(self, message_id, reason).await
+        http.pin_message(self.0, message_id.0, reason).await
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -821,7 +823,7 @@ impl GenericChannelId {
         before: Option<Timestamp>,
         limit: Option<u8>,
     ) -> Result<MessagePinsPage> {
-        let page = cache_http.http().get_pins(self, before, limit).await?;
+        let page: MessagePinsPage = cache_http.http().get_pins(self.0, before, limit).await?;
 
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
@@ -864,12 +866,12 @@ impl GenericChannelId {
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
         http.get_reaction_users(
-            self,
-            message_id,
+            self.0,
+            message_id.0,
             &emoji.into().as_data(),
             reaction_type,
             limit,
-            after,
+            after.map(|id| id.0),
         )
         .await
     }
@@ -1032,7 +1034,7 @@ impl GenericChannelId {
         message_id: MessageId,
         reason: Option<&str>,
     ) -> Result<()> {
-        http.unpin_message(self, message_id, reason).await
+        http.unpin_message(self.0, message_id.0, reason).await
     }
 
     /// Get a list of users that voted for this specific answer.
@@ -1048,7 +1050,14 @@ impl GenericChannelId {
         after: Option<UserId>,
         limit: Option<u8>,
     ) -> Result<Vec<User>> {
-        http.get_poll_answer_voters(self, message_id, answer_id, after, limit).await
+        http.get_poll_answer_voters(
+            self.0,
+            message_id.0,
+            answer_id.get(),
+            after.map(|id| id.0),
+            limit,
+        )
+        .await
     }
 
     /// Ends the [`Poll`] on a given [`MessageId`], if there is one.
@@ -1057,7 +1066,7 @@ impl GenericChannelId {
     ///
     /// If the message does not have a poll, or if the poll was not created by the current user.
     pub async fn end_poll(self, http: &Http, message_id: MessageId) -> Result<Message> {
-        http.expire_poll(self, message_id).await
+        http.expire_poll(self.0, message_id.0).await
     }
 }
 

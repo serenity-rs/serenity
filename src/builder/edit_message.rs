@@ -249,6 +249,6 @@ impl<'a> EditMessage<'a> {
             self.allowed_mentions.clone_from(&http.default_allowed_mentions);
         }
 
-        http.edit_message(channel_id, message_id, &self, files).await
+        http.edit_message(channel_id.0, message_id.0, &self, files).await
     }
 }

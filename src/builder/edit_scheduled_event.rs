@@ -179,6 +179,6 @@ impl<'a> EditScheduledEvent<'a> {
         guild_id: GuildId,
         event_id: ScheduledEventId,
     ) -> Result<ScheduledEvent> {
-        http.edit_scheduled_event(guild_id, event_id, &self, self.audit_log_reason).await
+        http.edit_scheduled_event(guild_id.0, event_id.0, &self, self.audit_log_reason).await
     }
 }

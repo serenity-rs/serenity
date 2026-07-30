@@ -197,7 +197,7 @@ impl Command {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn get_global_command(http: &Http, command_id: CommandId) -> Result<Command> {
-        http.get_global_command(command_id).await
+        http.get_global_command(command_id.0).await
     }
 
     /// Deletes a global command by its Id.
@@ -206,7 +206,7 @@ impl Command {
     ///
     /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
     pub async fn delete_global_command(http: &Http, command_id: CommandId) -> Result<()> {
-        http.delete_global_command(command_id).await
+        http.delete_global_command(command_id.0).await
     }
 }
 

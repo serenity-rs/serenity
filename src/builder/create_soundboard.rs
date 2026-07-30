@@ -92,6 +92,6 @@ impl<'a> CreateSoundboard<'a> {
         cache_http: impl CacheHttp,
         guild_id: GuildId,
     ) -> Result<Soundboard> {
-        cache_http.http().create_guild_soundboard(guild_id, &self, self.audit_log_reason).await
+        cache_http.http().create_guild_soundboard(guild_id.0, &self, self.audit_log_reason).await
     }
 }

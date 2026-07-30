@@ -491,7 +491,7 @@ impl<'a> CreateCommand<'a> {
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, guild_id: Option<GuildId>) -> Result<Command> {
         match guild_id {
-            Some(guild_id) => http.create_guild_command(guild_id, &self).await,
+            Some(guild_id) => http.create_guild_command(guild_id.0, &self).await,
             None => http.create_global_command(&self).await,
         }
     }

@@ -108,7 +108,7 @@ impl GetMessages {
     ) -> Result<Vec<Message>> {
         let http = cache_http.http();
         let search_filter = self.search_filter.map(Into::into);
-        let messages = http.get_messages(channel_id, search_filter, self.limit).await?;
+        let messages = http.get_messages(channel_id.0, search_filter, self.limit).await?;
 
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
@@ -131,9 +131,9 @@ enum SearchFilter {
 impl From<SearchFilter> for MessagePagination {
     fn from(filter: SearchFilter) -> Self {
         match filter {
-            SearchFilter::After(id) => MessagePagination::After(id),
-            SearchFilter::Around(id) => MessagePagination::Around(id),
-            SearchFilter::Before(id) => MessagePagination::Before(id),
+            SearchFilter::After(id) => MessagePagination::After(id.0),
+            SearchFilter::Around(id) => MessagePagination::Around(id.0),
+            SearchFilter::Before(id) => MessagePagination::Before(id.0),
         }
     }
 }

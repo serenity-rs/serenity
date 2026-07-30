@@ -126,7 +126,7 @@ impl Entitlement {
     /// [`consumed`]: Entitlement::consumed
     #[cfg(feature = "model")]
     pub async fn consume(&mut self, http: &Http) -> Result<()> {
-        http.consume_entitlement(self.id).await?;
+        http.consume_entitlement(self.id.0).await?;
         self.consumed = Some(true);
         Ok(())
     }

@@ -12,7 +12,7 @@ use super::prelude::*;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
-use crate::http::Http;
+use crate::http::{Http, Pagination};
 #[cfg(feature = "model")]
 use crate::model::CacheHttp;
 use crate::model::utils::deserialize_null_as_default;
@@ -212,6 +212,23 @@ impl OnlineStatus {
             OnlineStatus::Invisible => "invisible",
             OnlineStatus::Offline => "offline",
             OnlineStatus::Online => "online",
+        }
+    }
+}
+
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum UserPagination {
+    After(UserId),
+    Before(UserId),
+}
+
+#[cfg(feature = "model")]
+impl From<UserPagination> for Pagination {
+    fn from(pagination: UserPagination) -> Self {
+        match pagination {
+            UserPagination::After(id) => Pagination::After(id.0),
+            UserPagination::Before(id) => Pagination::Before(id.0),
         }
     }
 }
@@ -672,7 +689,7 @@ impl UserId {
             recipient_id: self,
         };
 
-        let channel = cache_http.http().create_private_channel(&body).await?;
+        let channel: PrivateChannel = cache_http.http().create_private_channel(&body).await?;
 
         #[cfg(feature = "temp_cache")]
         if let Some(cache) = cache_http.cache() {
@@ -758,7 +775,7 @@ impl UserId {
             }
         }
 
-        let user = cache_http.http().get_user(self).await?;
+        let user: User = cache_http.http().get_user(self.0).await?;
 
         #[cfg(feature = "temp_cache")]
         {

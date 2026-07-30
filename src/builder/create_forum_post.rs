@@ -98,6 +98,6 @@ impl<'a> CreateForumPost<'a> {
     #[cfg(feature = "http")]
     pub async fn execute(self, http: &Http, channel_id: ChannelId) -> Result<GuildThread> {
         let files = self.message.attachments.new_attachment_data();
-        http.create_forum_post(channel_id, &self, files, self.audit_log_reason).await
+        http.create_forum_post(channel_id.0, &self, files, self.audit_log_reason).await
     }
 }
