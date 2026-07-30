@@ -61,44 +61,42 @@
 <a href=#61 id=61 data-nosnippet>61</a>
 <a href=#62 id=62 data-nosnippet>62</a>    <span class="doccomment">/// How many seconds must a user wait before sending another message.
 <a href=#63 id=63 data-nosnippet>63</a>    ///
-<a href=#64 id=64 data-nosnippet>64</a>    /// Bots, or users with the [`MANAGE_MESSAGES`] and/or [`MANAGE_CHANNELS`] permissions are
-<a href=#65 id=65 data-nosnippet>65</a>    /// exempt from this restriction.
-<a href=#66 id=66 data-nosnippet>66</a>    ///
-<a href=#67 id=67 data-nosnippet>67</a>    /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
-<a href=#68 id=68 data-nosnippet>68</a>    ///
-<a href=#69 id=69 data-nosnippet>69</a>    /// [`MANAGE_MESSAGES`]: crate::model::permissions::Permissions::MANAGE_MESSAGES
-<a href=#70 id=70 data-nosnippet>70</a>    /// [`MANAGE_CHANNELS`]: crate::model::permissions::Permissions::MANAGE_CHANNELS
-<a href=#71 id=71 data-nosnippet>71</a>    </span><span class="attr">#[doc(alias = <span class="string">"slowmode"</span>)]
-<a href=#72 id=72 data-nosnippet>72</a>    </span><span class="kw">pub fn </span>rate_limit_per_user(<span class="kw-2">mut </span><span class="self">self</span>, seconds: NonMaxU16) -&gt; <span class="self">Self </span>{
-<a href=#73 id=73 data-nosnippet>73</a>        <span class="self">self</span>.rate_limit_per_user = <span class="prelude-val">Some</span>(seconds);
-<a href=#74 id=74 data-nosnippet>74</a>        <span class="self">self
-<a href=#75 id=75 data-nosnippet>75</a>    </span>}
-<a href=#76 id=76 data-nosnippet>76</a>
-<a href=#77 id=77 data-nosnippet>77</a>    <span class="kw">pub fn </span>add_applied_tag(<span class="kw-2">mut </span><span class="self">self</span>, applied_tag: ForumTagId) -&gt; <span class="self">Self </span>{
-<a href=#78 id=78 data-nosnippet>78</a>        <span class="self">self</span>.applied_tags.to_mut().push(applied_tag);
-<a href=#79 id=79 data-nosnippet>79</a>        <span class="self">self
-<a href=#80 id=80 data-nosnippet>80</a>    </span>}
-<a href=#81 id=81 data-nosnippet>81</a>
-<a href=#82 id=82 data-nosnippet>82</a>    <span class="kw">pub fn </span>set_applied_tags(<span class="kw-2">mut </span><span class="self">self</span>, applied_tags: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [ForumTagId]&gt;&gt;) -&gt; <span class="self">Self </span>{
-<a href=#83 id=83 data-nosnippet>83</a>        <span class="self">self</span>.applied_tags = applied_tags.into();
-<a href=#84 id=84 data-nosnippet>84</a>        <span class="self">self
-<a href=#85 id=85 data-nosnippet>85</a>    </span>}
-<a href=#86 id=86 data-nosnippet>86</a>
-<a href=#87 id=87 data-nosnippet>87</a>    <span class="doccomment">/// Sets the request's audit log reason.
-<a href=#88 id=88 data-nosnippet>88</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
-<a href=#89 id=89 data-nosnippet>89</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
-<a href=#90 id=90 data-nosnippet>90</a>        <span class="self">self
-<a href=#91 id=91 data-nosnippet>91</a>    </span>}
-<a href=#92 id=92 data-nosnippet>92</a>
-<a href=#93 id=93 data-nosnippet>93</a>    <span class="doccomment">/// Creates a forum post in the given channel.
+<a href=#64 id=64 data-nosnippet>64</a>    /// Bots, or users with the [`BYPASS_SLOWMODE`] permission, are exempt from this restriction.
+<a href=#65 id=65 data-nosnippet>65</a>    ///
+<a href=#66 id=66 data-nosnippet>66</a>    /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
+<a href=#67 id=67 data-nosnippet>67</a>    ///
+<a href=#68 id=68 data-nosnippet>68</a>    /// [`BYPASS_SLOWMODE`]: crate::model::permissions::Permissions::BYPASS_SLOWMODE
+<a href=#69 id=69 data-nosnippet>69</a>    </span><span class="attr">#[doc(alias = <span class="string">"slowmode"</span>)]
+<a href=#70 id=70 data-nosnippet>70</a>    </span><span class="kw">pub fn </span>rate_limit_per_user(<span class="kw-2">mut </span><span class="self">self</span>, seconds: NonMaxU16) -&gt; <span class="self">Self </span>{
+<a href=#71 id=71 data-nosnippet>71</a>        <span class="self">self</span>.rate_limit_per_user = <span class="prelude-val">Some</span>(seconds);
+<a href=#72 id=72 data-nosnippet>72</a>        <span class="self">self
+<a href=#73 id=73 data-nosnippet>73</a>    </span>}
+<a href=#74 id=74 data-nosnippet>74</a>
+<a href=#75 id=75 data-nosnippet>75</a>    <span class="kw">pub fn </span>add_applied_tag(<span class="kw-2">mut </span><span class="self">self</span>, applied_tag: ForumTagId) -&gt; <span class="self">Self </span>{
+<a href=#76 id=76 data-nosnippet>76</a>        <span class="self">self</span>.applied_tags.to_mut().push(applied_tag);
+<a href=#77 id=77 data-nosnippet>77</a>        <span class="self">self
+<a href=#78 id=78 data-nosnippet>78</a>    </span>}
+<a href=#79 id=79 data-nosnippet>79</a>
+<a href=#80 id=80 data-nosnippet>80</a>    <span class="kw">pub fn </span>set_applied_tags(<span class="kw-2">mut </span><span class="self">self</span>, applied_tags: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">'a</span>, [ForumTagId]&gt;&gt;) -&gt; <span class="self">Self </span>{
+<a href=#81 id=81 data-nosnippet>81</a>        <span class="self">self</span>.applied_tags = applied_tags.into();
+<a href=#82 id=82 data-nosnippet>82</a>        <span class="self">self
+<a href=#83 id=83 data-nosnippet>83</a>    </span>}
+<a href=#84 id=84 data-nosnippet>84</a>
+<a href=#85 id=85 data-nosnippet>85</a>    <span class="doccomment">/// Sets the request's audit log reason.
+<a href=#86 id=86 data-nosnippet>86</a>    </span><span class="kw">pub fn </span>audit_log_reason(<span class="kw-2">mut </span><span class="self">self</span>, reason: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="self">Self </span>{
+<a href=#87 id=87 data-nosnippet>87</a>        <span class="self">self</span>.audit_log_reason = <span class="prelude-val">Some</span>(reason);
+<a href=#88 id=88 data-nosnippet>88</a>        <span class="self">self
+<a href=#89 id=89 data-nosnippet>89</a>    </span>}
+<a href=#90 id=90 data-nosnippet>90</a>
+<a href=#91 id=91 data-nosnippet>91</a>    <span class="doccomment">/// Creates a forum post in the given channel.
+<a href=#92 id=92 data-nosnippet>92</a>    ///
+<a href=#93 id=93 data-nosnippet>93</a>    /// # Errors
 <a href=#94 id=94 data-nosnippet>94</a>    ///
-<a href=#95 id=95 data-nosnippet>95</a>    /// # Errors
-<a href=#96 id=96 data-nosnippet>96</a>    ///
-<a href=#97 id=97 data-nosnippet>97</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
-<a href=#98 id=98 data-nosnippet>98</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
-<a href=#99 id=99 data-nosnippet>99</a>    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildThread&gt; {
-<a href=#100 id=100 data-nosnippet>100</a>        <span class="kw">let </span>files = <span class="self">self</span>.message.attachments.new_attachment_data();
-<a href=#101 id=101 data-nosnippet>101</a>        http.create_forum_post(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, files, <span class="self">self</span>.audit_log_reason).<span class="kw">await
-<a href=#102 id=102 data-nosnippet>102</a>    </span>}
-<a href=#103 id=103 data-nosnippet>103</a>}
+<a href=#95 id=95 data-nosnippet>95</a>    /// Returns [`Error::Http`] if the current user lacks permission, or if invalid data is given.
+<a href=#96 id=96 data-nosnippet>96</a>    </span><span class="attr">#[cfg(feature = <span class="string">"http"</span>)]
+<a href=#97 id=97 data-nosnippet>97</a>    </span><span class="kw">pub async fn </span>execute(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, channel_id: ChannelId) -&gt; <span class="prelude-ty">Result</span>&lt;GuildThread&gt; {
+<a href=#98 id=98 data-nosnippet>98</a>        <span class="kw">let </span>files = <span class="self">self</span>.message.attachments.new_attachment_data();
+<a href=#99 id=99 data-nosnippet>99</a>        http.create_forum_post(channel_id, <span class="kw-2">&amp;</span><span class="self">self</span>, files, <span class="self">self</span>.audit_log_reason).<span class="kw">await
+<a href=#100 id=100 data-nosnippet>100</a>    </span>}
+<a href=#101 id=101 data-nosnippet>101</a>}
 </code></pre></div></section></main></body></html>
