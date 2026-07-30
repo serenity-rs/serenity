@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/voice.rs`."><title>voice.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ddecd707.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.99.0-nightly (09ee43b2d 2026-07-27)" data-channel="nightly" data-search-js="search-cf4fc35e.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-f7c3ffd8.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/</div>voice.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-2"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Representations of voice information.
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/voice.rs`."><title>voice.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-650bd49d.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.99.0-nightly (1a833e165 2026-07-29)" data-channel="nightly" data-search-js="search-cf4fc35e.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-170eb4bf.js" ><script src="../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../static.files/src-script-813739b1.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-417ebf0a.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-d4bd101e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/</div>voice.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="doccomment">//! Representations of voice information.
 <a href=#2 id=2 data-nosnippet>2</a>
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span>serde::Serialize;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>serde::de::{Deserialize, Deserializer};
@@ -75,4 +75,42 @@
 <a href=#75 id=75 data-nosnippet>75</a>        </span><span class="self">Self</span>::serialize(<span class="self">self</span>, serializer)
 <a href=#76 id=76 data-nosnippet>76</a>    }
 <a href=#77 id=77 data-nosnippet>77</a>}
+<a href=#78 id=78 data-nosnippet>78</a>
+<a href=#79 id=79 data-nosnippet>79</a><span class="doccomment">/// Information about an effect, such as an emoji reaction or a soundboard sound, sent in a voice
+<a href=#80 id=80 data-nosnippet>80</a>/// channel.
+<a href=#81 id=81 data-nosnippet>81</a>///
+<a href=#82 id=82 data-nosnippet>82</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-effect-send).
+<a href=#83 id=83 data-nosnippet>83</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#84 id=84 data-nosnippet>84</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+<a href=#85 id=85 data-nosnippet>85</a>#[non_exhaustive]
+<a href=#86 id=86 data-nosnippet>86</a></span><span class="kw">pub struct </span>VoiceChannelEffect {
+<a href=#87 id=87 data-nosnippet>87</a>    <span class="doccomment">/// The Id of the channel the effect was sent in.
+<a href=#88 id=88 data-nosnippet>88</a>    </span><span class="kw">pub </span>channel_id: ChannelId,
+<a href=#89 id=89 data-nosnippet>89</a>    <span class="doccomment">/// The Id of the guild the effect was sent in.
+<a href=#90 id=90 data-nosnippet>90</a>    </span><span class="kw">pub </span>guild_id: GuildId,
+<a href=#91 id=91 data-nosnippet>91</a>    <span class="doccomment">/// The Id of the user who sent the effect.
+<a href=#92 id=92 data-nosnippet>92</a>    </span><span class="kw">pub </span>user_id: UserId,
+<a href=#93 id=93 data-nosnippet>93</a>    <span class="doccomment">/// The emoji sent, for emoji reaction and soundboard effects.
+<a href=#94 id=94 data-nosnippet>94</a>    </span><span class="kw">pub </span>emoji: <span class="prelude-ty">Option</span>&lt;ReactionType&gt;,
+<a href=#95 id=95 data-nosnippet>95</a>    <span class="doccomment">/// The type of emoji animation, for emoji reaction and soundboard effects.
+<a href=#96 id=96 data-nosnippet>96</a>    </span><span class="kw">pub </span>animation_type: <span class="prelude-ty">Option</span>&lt;AnimationType&gt;,
+<a href=#97 id=97 data-nosnippet>97</a>    <span class="doccomment">/// The Id of the emoji animation, for emoji reaction and soundboard effects.
+<a href=#98 id=98 data-nosnippet>98</a>    </span><span class="kw">pub </span>animation_id: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+<a href=#99 id=99 data-nosnippet>99</a>    <span class="doccomment">/// The Id of the soundboard sound, for soundboard effects.
+<a href=#100 id=100 data-nosnippet>100</a>    </span><span class="kw">pub </span>sound_id: <span class="prelude-ty">Option</span>&lt;SoundId&gt;,
+<a href=#101 id=101 data-nosnippet>101</a>    <span class="doccomment">/// The volume of the soundboard sound, from 0 to 1, for soundboard effects.
+<a href=#102 id=102 data-nosnippet>102</a>    </span><span class="kw">pub </span>sound_volume: <span class="prelude-ty">Option</span>&lt;f64&gt;,
+<a href=#103 id=103 data-nosnippet>103</a>}
+<a href=#104 id=104 data-nosnippet>104</a>
+<a href=#105 id=105 data-nosnippet>105</a><span class="macro">enum_number!</span> {
+<a href=#106 id=106 data-nosnippet>106</a>    <span class="doccomment">/// The type of emoji animation, for emoji reaction and soundboard effects.
+<a href=#107 id=107 data-nosnippet>107</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<a href=#108 id=108 data-nosnippet>108</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#109 id=109 data-nosnippet>109</a>    #[non_exhaustive]
+<a href=#110 id=110 data-nosnippet>110</a>    </span><span class="kw">pub enum </span>AnimationType {
+<a href=#111 id=111 data-nosnippet>111</a>        Premium = <span class="number">0</span>,
+<a href=#112 id=112 data-nosnippet>112</a>        Basic = <span class="number">1</span>,
+<a href=#113 id=113 data-nosnippet>113</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
+<a href=#114 id=114 data-nosnippet>114</a>    }
+<a href=#115 id=115 data-nosnippet>115</a>}
 </code></pre></div></section></main></body></html>

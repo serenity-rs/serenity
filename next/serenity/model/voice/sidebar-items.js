@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["VoiceRegion","VoiceRegionGeneratedOriginal","VoiceState","VoiceStateGeneratedOriginal"]};
+window.SIDEBAR_ITEMS = {"struct":["AnimationType","VoiceChannelEffect","VoiceRegion","VoiceRegionGeneratedOriginal","VoiceState","VoiceStateGeneratedOriginal"]};
