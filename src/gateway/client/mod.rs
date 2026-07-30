@@ -60,9 +60,11 @@ use crate::framework::Framework;
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::GatewayIntents;
+use crate::model::gateway::{BotGateway, GatewayIntents};
 #[cfg(feature = "voice")]
 use crate::model::id::UserId;
+#[cfg(feature = "voice")]
+use crate::model::user::CurrentUser;
 use crate::model::user::OnlineStatus;
 
 /// A builder implementing [`IntoFuture`] building a [`Client`] to interact with Discord.
@@ -305,17 +307,18 @@ impl IntoFuture for ClientBuilder {
         let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
-            let (ws_url, shard_total, max_concurrency) = match http.get_bot_gateway().await {
-                Ok(response) => (
-                    Arc::from(response.url),
-                    response.shards,
-                    response.session_start_limit.max_concurrency,
-                ),
-                Err(err) => {
-                    tracing::warn!("HTTP request to get gateway URL failed: {err}");
-                    (Arc::from("wss://gateway.discord.gg"), NonZeroU16::MIN, NonZeroU16::MIN)
-                },
-            };
+            let (ws_url, shard_total, max_concurrency) =
+                match http.get_bot_gateway::<BotGateway>().await {
+                    Ok(response) => (
+                        Arc::from(response.url),
+                        response.shards,
+                        response.session_start_limit.max_concurrency,
+                    ),
+                    Err(err) => {
+                        tracing::warn!("HTTP request to get gateway URL failed: {err}");
+                        (Arc::from("wss://gateway.discord.gg"), NonZeroU16::MIN, NonZeroU16::MIN)
+                    },
+                };
 
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceLock::new());
@@ -507,7 +510,7 @@ impl Client {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn start_autosharded(&mut self) -> Result<()> {
         let (end, total) = {
-            let res = self.http.get_bot_gateway().await?;
+            let res: BotGateway = self.http.get_bot_gateway().await?;
             (res.shards.get() - 1, res.shards)
         };
 
@@ -681,7 +684,7 @@ impl Client {
 
             let user_id = match cache_user_id {
                 Some(u) => u,
-                None => self.http.get_current_user().await?.id,
+                None => self.http.get_current_user::<CurrentUser>().await?.id,
             };
 
             voice_manager.initialise(total_shards, user_id).await;
