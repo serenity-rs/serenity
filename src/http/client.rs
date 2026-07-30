@@ -1677,6 +1677,26 @@ impl Http {
         .await
     }
 
+    /// Edits a guild onboarding configuration.
+    pub async fn edit_guild_onboarding(
+        &self,
+        guild_id: GuildId,
+        map: &impl serde::Serialize,
+        audit_log_reason: Option<&str>,
+    ) -> Result<Onboarding> {
+        self.fire(Request {
+            body: Some(to_vec(map)?),
+            multipart: None,
+            headers: audit_log_reason.map(reason_into_header),
+            method: LightMethod::Put,
+            route: Route::GuildOnboarding {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
     /// Does specific actions to a member.
     pub async fn edit_member(
         &self,
@@ -3303,6 +3323,21 @@ impl Http {
             headers: None,
             method: LightMethod::Get,
             route: Route::GuildWelcomeScreen {
+                guild_id,
+            },
+            params: None,
+        })
+        .await
+    }
+
+    /// Gets a guild onboarding configuration.
+    pub async fn get_guild_onboarding(&self, guild_id: GuildId) -> Result<Onboarding> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildOnboarding {
                 guild_id,
             },
             params: None,

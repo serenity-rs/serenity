@@ -361,6 +361,10 @@ routes! ('a, {
     api!("/guilds/{}/welcome-screen", guild_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
 
+    GuildOnboarding { guild_id: GuildId },
+    api!("/guilds/{}/onboarding", guild_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+
     GuildThreadsActive { guild_id: GuildId },
     api!("/guilds/{}/threads/active", guild_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));

@@ -1572,6 +1572,15 @@ impl GuildId {
         http.get_guild_welcome_screen(self).await
     }
 
+    /// Get the guild onboarding configuration.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the guild does not have an onboarding flow.
+    pub async fn get_onboarding(self, http: &Http) -> Result<Onboarding> {
+        http.get_guild_onboarding(self).await
+    }
+
     /// Get the guild preview.
     ///
     /// **Note**: The bot need either to be part of the guild or the guild needs to have the
