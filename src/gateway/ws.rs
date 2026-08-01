@@ -1,3 +1,4 @@
+use std::io::ErrorKind;
 use std::env::consts;
 #[cfg(feature = "client")]
 use std::io::Read;
@@ -17,7 +18,7 @@ use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 #[cfg(feature = "client")]
 use tokio_tungstenite::tungstenite::Error as WsError;
 use tokio_tungstenite::tungstenite::Message;
-use tokio_tungstenite::{connect_async_with_config, MaybeTlsStream, WebSocketStream};
+use tokio_tungstenite::{client_async_tls_with_config, MaybeTlsStream, WebSocketStream};
 #[cfg(feature = "client")]
 use tracing::warn;
 use tracing::{debug, instrument, trace};
@@ -104,13 +105,87 @@ const TIMEOUT: Duration = Duration::from_millis(500);
 const DECOMPRESSION_MULTIPLIER: usize = 3;
 
 impl WsClient {
+    async fn create_stream_without_proxy(target_url: &Url) -> TcpStream {
+        TcpStream::connect(format!(
+            "{}:{}",
+            target_url.domain().unwrap(),
+            target_url.port_or_known_default().unwrap()
+        ))
+        .await
+        .unwrap()
+    }
+
+    async fn create_proxy_stream(target_url: &Url) -> TcpStream {
+        let proxy = std::env::var("ALL_PROXY");
+        if proxy.is_err() {
+            return Self::create_stream_without_proxy(target_url).await;
+        };
+
+        let proxy_url = Url::parse(proxy.unwrap().as_str());
+        if proxy_url.is_err() {
+            return Self::create_stream_without_proxy(target_url).await;
+        }
+
+        let proxy_url = proxy_url.unwrap();
+        let proxy_addr = &proxy_url[url::Position::BeforeHost..url::Position::AfterPort];
+        if proxy_url.scheme() != "http" && proxy_url.scheme() != "https" {
+            return Self::create_stream_without_proxy(target_url).await;
+        };
+
+        let host = target_url.host_str().unwrap();
+        let port = target_url
+            .port()
+            .or_else(|| match target_url.scheme() {
+                "wss" => Some(443),
+                "ws" => Some(80),
+                _ => None,
+            })
+            .unwrap();
+
+        let mut tcp_stream = TcpStream::connect(proxy_addr).await.map_err(
+            |e| std::io::Error::new(ErrorKind::AddrNotAvailable, format!("cannot connect proxy: {e}")),
+        ).unwrap();
+
+        let (username, password) = if let Some(pass) = proxy_url.password() {
+            let user = proxy_url.username();
+            (user, pass)
+        } else {
+            ("", "")
+        };
+
+        if username.is_empty() {
+            _ = async_http_proxy::http_connect_tokio(&mut tcp_stream, host, port).await.map_err(
+                |e| std::io::Error::new(ErrorKind::Other, format!("proxy connect failed: {e}")),
+            );
+        } else {
+            _ = async_http_proxy::http_connect_tokio_with_basic_auth(
+                &mut tcp_stream,
+                host,
+                port,
+                username,
+                password,
+            )
+            .await
+            .map_err(|e| {
+                std::io::Error::new(
+                    ErrorKind::Other,
+                    format!("proxy connect with auth failed: {e}"),
+                )
+            });
+        }
+
+        tcp_stream
+    }
+
     pub(crate) async fn connect(url: Url) -> Result<Self> {
         let config = WebSocketConfig {
             max_message_size: None,
             max_frame_size: None,
             ..Default::default()
         };
-        let (stream, _) = connect_async_with_config(url, Some(config), false).await?;
+
+        let proxy_stream = Self::create_proxy_stream(&url).await;
+        let (stream, _) = client_async_tls_with_config(url, proxy_stream, Some(config), None).await?;
 
         Ok(Self(stream))
     }
