@@ -233,8 +233,9 @@ impl ClientBuilder {
         self.intents
     }
 
-    /// Sets the [gateway capabilities]. Capabilities are a bitflag; you can combine them by
-    /// performing the `|`-operator.
+    /// Sets the [gateway capabilities].
+    ///
+    /// Capabilities are a bitflag; you can combine them performing the `|`-operator.
     ///
     /// [gateway capabilities]: https://docs.discord.com/developers/events/gateway-events#identify-gateway-capabilities
     pub fn capabilities(mut self, capabilities: GatewayCapabilities) -> Self {
