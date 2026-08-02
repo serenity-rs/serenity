@@ -231,7 +231,6 @@ pub struct Guild {
     /// All channels with [obfuscated metadata] contained within a guild.
     ///
     /// Channel metadata is obfuscated when the bot does not have permission to view that channel.
-    /// Only the `id`, `type`, `position`, and `parent_id` fields are guaranteed to be available.
     ///
     /// [obfuscated metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
     pub obfuscated_channels: ExtractMap<ChannelId, ObfuscatedChannel>,
@@ -1050,8 +1049,7 @@ impl<'de> Deserialize<'de> for Guild {
             threads: ExtractMap<ThreadId, GuildThread>,
             presences: ExtractMap<UserId, Presence>,
             stage_instances: FixedArray<StageInstance>,
-            #[serde(rename = "guild_scheduled_events")]
-            scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
+            guild_scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
             safety_alerts_channel_id: Option<ChannelId>,
             incidents_data: Option<Box<IncidentsData>>,
         }
@@ -1108,7 +1106,7 @@ impl<'de> Deserialize<'de> for Guild {
             threads: raw.threads,
             presences: raw.presences,
             stage_instances: raw.stage_instances,
-            scheduled_events: raw.scheduled_events,
+            scheduled_events: raw.guild_scheduled_events,
             safety_alerts_channel_id: raw.safety_alerts_channel_id,
             incidents_data: raw.incidents_data,
             __generated_flags: GuildGeneratedFlags::empty(),

@@ -302,7 +302,10 @@ impl CacheUpdate for GuildRoleUpdateEvent {
         if let Some(old_role) = &old_role
             && let Some(member) = guild.members.get(&cache.current_user().id)
             && member.roles.contains(&self.role.id)
+            // Check for permissions that affect channel visibility to avoid rescanning
+            // channels for non-consequential role updates.
             && (old_role.permissions.view_channel() && !self.role.permissions.view_channel()
+                // Also check administrator since it can be toggled separately from view channel.
                 || old_role.permissions.administrator() && !self.role.permissions.administrator())
         {
             let mut to_obfuscate: Vec<ChannelId> = Vec::new();
@@ -637,6 +640,8 @@ impl CacheUpdate for VoiceStateUpdateEvent {
             guild.voice_states.insert(self.voice_state.clone());
         }
 
+        // Obfuscate the voice channel if the bot never had view channel access, e.g.,
+        // the bot was moved into the channel by someone with Permissions::MOVE_MEMBERS.
         if self.voice_state.user_id == cache.current_user().id
             && let Some(old_state) = &old_state
             && let Some(channel_id) = &old_state.channel_id
