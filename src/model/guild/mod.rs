@@ -227,10 +227,11 @@ pub struct Guild {
     /// with [obfuscated metadata], see the `obfuscated_channels` field.
     ///
     /// [obfuscated metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
-    pub channels: ExtractMap<ChannelId, GuildChannel>,
+    pub viewable_channels: ExtractMap<ChannelId, GuildChannel>,
     /// All channels with [obfuscated metadata] contained within a guild.
     ///
     /// Channel metadata is obfuscated when the bot does not have permission to view that channel.
+    /// For channels with full metadata, see the `viewable_channels` field.
     ///
     /// [obfuscated metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
     pub obfuscated_channels: ExtractMap<ChannelId, ObfuscatedChannel>,
@@ -256,41 +257,83 @@ pub struct Guild {
 
 #[cfg(feature = "model")]
 impl Guild {
-    /// Returns the "default" channel of the guild for the passed user id. (This returns the first
-    /// channel that can be read by the user, if there isn't one, returns [`None`])
+    /// Returns the "default" channel of the guild for the passed user Id.
+    ///
+    /// This returns the first text-only channel that the user can view, or [`None`] if there
+    /// isn't one or if the user's member object is not in the cache.
+    ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results will be
+    /// inaccurate if the member's default channel is an obfuscated channel with access granted
+    /// via permission overwrites on that channel.
     #[must_use]
-    pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
+    pub fn default_channel(&self, uid: UserId) -> Option<GuildChannelRef<'_>> {
         let member = self.members.get(&uid)?;
-        self.channels.iter().find(|&channel| {
-            channel.base.kind != ChannelType::Category
-                && self.user_permissions_in(channel, member).view_channel()
-        })
+        let mut sorted = self
+            .channels()
+            .filter(|&channel| {
+                channel.kind() != ChannelType::Category
+                    && channel.kind() != ChannelType::Voice
+                    && channel.kind() != ChannelType::Stage
+                    && self.user_permissions_in(channel, member).view_channel()
+            })
+            .collect::<Vec<_>>();
+        sorted.sort_by_key(|channel| channel.position());
+        sorted.first().copied()
     }
 
-    /// Returns either the [`GuildChannel`] or the [`GuildThread`] that this ID corresponds to.
+    /// Returns the [`GuildChannel`], [`ObfuscatedChannel`], or [`GuildThread`] that this Id
+    /// corresponds to.
     #[must_use]
     pub fn channel(&self, channel_id: GenericChannelId) -> Option<GenericGuildChannelRef<'_>> {
         let (channel_id, thread_id) = channel_id.split();
-        let channel = self.channels.get(&channel_id).map(GenericGuildChannelRef::Channel);
+        let viewable = self
+            .viewable_channels
+            .get(&channel_id)
+            .map(|gc| GenericGuildChannelRef::Channel(GuildChannelRef::Viewable(gc)));
+        let obfuscated = || {
+            self.obfuscated_channels
+                .get(&channel_id)
+                .map(|oc| GenericGuildChannelRef::Channel(GuildChannelRef::Obfuscated(oc)))
+        };
         let thread = || self.threads.get(&thread_id).map(GenericGuildChannelRef::Thread);
 
-        channel.or_else(thread)
+        viewable.or_else(obfuscated).or_else(thread)
     }
 
-    /// Returns the guaranteed "default" channel of the guild. (This returns the first channel that
-    /// can be read by everyone, if there isn't one, returns [`None`])
+    /// Returns an `impl Iterator` over all non-thread channels within the guild.
+    ///
+    /// This includes both [`GuildChannel`]s and [`ObfuscatedChannel`]s.
+    pub fn channels(&self) -> impl Iterator<Item = GuildChannelRef<'_>> {
+        self.viewable_channels
+            .iter()
+            .map(GuildChannelRef::Viewable)
+            .chain(self.obfuscated_channels.iter().map(GuildChannelRef::Obfuscated))
+    }
+
+    /// Returns the guaranteed "default" channel of the guild.
+    ///
+    /// This returns the first text-only channel that everyone can view, or [`None`] if there
+    /// isn't one.
     ///
     /// **Note**: This is very costly if used in a server with lots of channels, members, or both.
     #[must_use]
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
-        self.channels.iter().find(|&channel| {
-            channel.base.kind != ChannelType::Category
-                && self
-                    .members
-                    .iter()
-                    .map(|member| self.user_permissions_in(channel, member))
-                    .all(Permissions::view_channel)
-        })
+        let mut sorted = self
+            .viewable_channels
+            .iter()
+            .filter(|&channel| {
+                channel.base.kind != ChannelType::Category
+                    && channel.base.kind != ChannelType::Voice
+                    && channel.base.kind != ChannelType::Stage
+                    && self
+                        .members
+                        .iter()
+                        .map(|member| self.user_permissions_in(channel, member))
+                        .all(Permissions::view_channel)
+            })
+            .collect::<Vec<_>>();
+        sorted.sort_by_key(|channel| channel.position);
+        sorted.first().copied()
     }
 
     /// Returns the formatted URL of the guild's banner image, if one exists.
@@ -846,10 +889,18 @@ impl Guild {
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
+    ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+    /// the member.
     #[must_use]
-    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
+    pub fn user_permissions_in<'a>(
+        &self,
+        channel: impl Into<GuildChannelRef<'a>>,
+        member: &Member,
+    ) -> Permissions {
         Self::user_permissions_in_(
-            Some(channel),
+            Some(channel.into()),
             member.user.id,
             &member.roles,
             self.id,
@@ -860,13 +911,17 @@ impl Guild {
 
     /// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
     ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+    /// the member.
+    ///
     /// # Panics
     ///
     /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
     #[must_use]
-    pub fn partial_member_permissions_in(
+    pub fn partial_member_permissions_in<'a>(
         &self,
-        channel: &GuildChannel,
+        channel: impl Into<GuildChannelRef<'a>>,
         member_id: UserId,
         member: &PartialMember,
     ) -> Permissions {
@@ -875,7 +930,7 @@ impl Guild {
         }
 
         Self::user_permissions_in_(
-            Some(channel),
+            Some(channel.into()),
             member_id,
             &member.roles,
             self.id,
@@ -886,7 +941,7 @@ impl Guild {
 
     /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn user_permissions_in_(
-        channel: Option<&GuildChannel>,
+        channel: Option<GuildChannelRef>,
         member_user_id: UserId,
         member_roles: &[RoleId],
         guild_id: GuildId,
@@ -901,24 +956,31 @@ impl Guild {
         let mut member_deny_overwrites = Permissions::empty();
 
         if let Some(channel) = channel {
-            for overwrite in &channel.permission_overwrites {
-                match overwrite.kind {
-                    PermissionOverwriteType::Member(user_id) => {
-                        if member_user_id == user_id {
-                            member_allow_overwrites = overwrite.allow;
-                            member_deny_overwrites = overwrite.deny;
+            match channel {
+                GuildChannelRef::Viewable(guild_channel) => {
+                    for overwrite in &guild_channel.permission_overwrites {
+                        match overwrite.kind {
+                            PermissionOverwriteType::Member(user_id) => {
+                                if member_user_id == user_id {
+                                    member_allow_overwrites = overwrite.allow;
+                                    member_deny_overwrites = overwrite.deny;
+                                }
+                            },
+                            PermissionOverwriteType::Role(role_id) => {
+                                if role_id.get() == guild_id.get() {
+                                    everyone_allow_overwrites = overwrite.allow;
+                                    everyone_deny_overwrites = overwrite.deny;
+                                } else if member_roles.contains(&role_id) {
+                                    roles_allow_overwrites.push(overwrite.allow);
+                                    roles_deny_overwrites.push(overwrite.deny);
+                                }
+                            },
                         }
-                    },
-                    PermissionOverwriteType::Role(role_id) => {
-                        if role_id.get() == guild_id.get() {
-                            everyone_allow_overwrites = overwrite.allow;
-                            everyone_deny_overwrites = overwrite.deny;
-                        } else if member_roles.contains(&role_id) {
-                            roles_allow_overwrites.push(overwrite.allow);
-                            roles_deny_overwrites.push(overwrite.deny);
-                        }
-                    },
-                }
+                    }
+                },
+                GuildChannelRef::Obfuscated(_) => {
+                    everyone_deny_overwrites = Permissions::VIEW_CHANNEL;
+                },
             }
         }
 
@@ -1101,7 +1163,7 @@ impl<'de> Deserialize<'de> for Guild {
             member_count: raw.member_count,
             voice_states: raw.voice_states,
             members: raw.members,
-            channels: ExtractMap::new(),
+            viewable_channels: ExtractMap::new(),
             obfuscated_channels: ExtractMap::new(),
             threads: raw.threads,
             presences: raw.presences,
@@ -1121,7 +1183,7 @@ impl<'de> Deserialize<'de> for Guild {
             if channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
                 guild.obfuscated_channels.insert(channel.into());
             } else {
-                guild.channels.insert(channel);
+                guild.viewable_channels.insert(channel);
             }
         }
 

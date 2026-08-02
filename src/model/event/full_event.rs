@@ -68,19 +68,19 @@ full_event! {
     /// Dispatched when a channel is created.
     ///
     /// Provides said channel's data.
-    ChannelCreate { channel: GuildChannel };
+    ChannelCreate { channel: MaybeObfuscated };
     /// Dispatched when a category is created.
     ///
     /// Provides said category's data.
-    CategoryCreate { category: GuildChannel };
+    CategoryCreate { category: MaybeObfuscated };
     /// Dispatched when a category is deleted.
     ///
     /// Provides said category's data.
-    CategoryDelete { category: GuildChannel };
+    CategoryDelete { category: MaybeObfuscated };
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
-    ChannelDelete { channel: GuildChannel, messages: Option<VecDeque<Message>> };
+    ChannelDelete { channel: MaybeObfuscated, messages: Option<VecDeque<Message>> };
     /// Dispatched when channel info is requested for a guild.
     ///
     /// Provides said channel info.
@@ -92,7 +92,7 @@ full_event! {
     /// Dispatched when a channel is updated.
     ///
     /// The old channel data is only provided when the cache feature is enabled.
-    ChannelUpdate { old: Option<GuildChannel>, new: GuildChannel };
+    ChannelUpdate { old: Option<MaybeObfuscated>, new: MaybeObfuscated };
     /// Dispatched when a new audit log entry is created.
     ///
     /// Provides said entry's data and the id of the guild where it was created.
@@ -448,11 +448,11 @@ impl FullEvent {
                 let channel = event.channel;
                 if channel.base.kind == ChannelType::Category {
                     Self::CategoryCreate {
-                        category: channel,
+                        category: channel.into(),
                     }
                 } else {
                     Self::ChannelCreate {
-                        channel,
+                        channel: channel.into(),
                     }
                 }
             },
@@ -465,11 +465,11 @@ impl FullEvent {
                 let channel = event.channel;
                 if channel.base.kind == ChannelType::Category {
                     Self::CategoryDelete {
-                        category: channel,
+                        category: channel.into(),
                     }
                 } else {
                     Self::ChannelDelete {
-                        channel,
+                        channel: channel.into(),
                         messages: cached_messages,
                     }
                 }
@@ -497,7 +497,7 @@ impl FullEvent {
 
                 Self::ChannelUpdate {
                     old: old_channel,
-                    new: event.channel,
+                    new: event.channel.into(),
                 }
             },
             Event::GuildAuditLogEntryCreate(event) => Self::GuildAuditLogEntryCreate {
@@ -1062,7 +1062,7 @@ mod tests {
                 nsfw_level: NsfwLevel::Default,
                 stickers: ExtractMap::new(),
                 joined_at: Timestamp::now(),
-                channels: ExtractMap::new(),
+                viewable_channels: ExtractMap::new(),
                 obfuscated_channels: ExtractMap::new(),
                 member_count: MemberCount::ZERO,
                 members: ExtractMap::new(),
@@ -1133,7 +1133,7 @@ mod tests {
                 nsfw_level: NsfwLevel::Default,
                 stickers: ExtractMap::new(),
                 joined_at: Timestamp::now(),
-                channels: ExtractMap::new(),
+                viewable_channels: ExtractMap::new(),
                 obfuscated_channels: ExtractMap::new(),
                 member_count: MemberCount::ZERO,
                 members: ExtractMap::new(),

@@ -11,6 +11,7 @@ mod private_channel;
 mod reaction;
 mod thread;
 
+use std::borrow::Cow;
 use std::fmt;
 
 use serde::de::Error as DeError;
@@ -82,7 +83,7 @@ impl GenericChannelId {
 // purposefully missing non-exhaustive, as discord considers new channel types like threads to be
 // breaking (see the difference between API v8/v9).
 pub enum GenericGuildChannelRef<'a> {
-    Channel(&'a GuildChannel),
+    Channel(GuildChannelRef<'a>),
     Thread(&'a GuildThread),
 }
 
@@ -91,18 +92,104 @@ impl<'a> GenericGuildChannelRef<'a> {
     #[must_use]
     pub fn id(self) -> GenericChannelId {
         match self {
-            Self::Channel(ch) => ch.id.widen(),
+            Self::Channel(ch) => match ch {
+                GuildChannelRef::Viewable(gc) => gc.id.widen(),
+                GuildChannelRef::Obfuscated(oc) => oc.id.widen(),
+            },
             Self::Thread(th) => th.id.widen(),
         }
     }
 
-    /// Returns the shared fields between a [`GuildChannel`] and a [`GuildThread`].
+    /// Returns the shared fields between a [`GuildChannel`] and a [`GuildThread`],
+    /// or an obfuscated version if [`GenericGuildChannelRef`] is an [`ObfuscatedChannel`].
     #[must_use]
-    pub fn base(self) -> &'a BaseGuildChannel {
+    pub fn base(self) -> Cow<'a, BaseGuildChannel> {
         match self {
-            Self::Channel(ch) => &ch.base,
-            Self::Thread(th) => &th.base,
+            Self::Channel(ch) => match ch {
+                GuildChannelRef::Viewable(gc) => Cow::Borrowed(&gc.base),
+                GuildChannelRef::Obfuscated(oc) => Cow::Owned(oc.into()),
+            },
+            Self::Thread(th) => Cow::Borrowed(&th.base),
         }
+    }
+}
+
+/// A container for a reference to a non-thread guild channel.
+#[derive(Clone, Copy, Debug)]
+pub enum GuildChannelRef<'a> {
+    Viewable(&'a GuildChannel),
+    Obfuscated(&'a ObfuscatedChannel),
+}
+
+impl<'a> GuildChannelRef<'a> {
+    /// Returns the [`GenericChannelId`] of the [`GuildChannelRef`].
+    #[must_use]
+    pub fn id(self) -> GenericChannelId {
+        match self {
+            GuildChannelRef::Viewable(gc) => gc.id.widen(),
+            GuildChannelRef::Obfuscated(oc) => oc.id.widen(),
+        }
+    }
+
+    /// Returns the [`ChannelType`] of the [`GuildChannelRef`].
+    #[must_use]
+    pub fn kind(self) -> ChannelType {
+        match self {
+            GuildChannelRef::Viewable(gc) => gc.base.kind,
+            GuildChannelRef::Obfuscated(oc) => oc.kind,
+        }
+    }
+
+    /// Returns the name of the [`GuildChannelRef`].
+    ///
+    /// **Note**: If the channel is obfuscated, this will return `___hidden___`.
+    #[must_use]
+    pub fn name(self) -> &'a str {
+        match self {
+            GuildChannelRef::Viewable(gc) => gc.base.name.as_str(),
+            GuildChannelRef::Obfuscated(_) => "___hidden___",
+        }
+    }
+
+    /// Returns the [`ChannelId`] of the parent category [`GuildChannelRef`] belongs to.
+    ///
+    /// **Note**: If the channel does not belong to a category, this will return `None`.
+    #[must_use]
+    pub fn parent_id(self) -> Option<ChannelId> {
+        match self {
+            GuildChannelRef::Viewable(gc) => gc.parent_id,
+            GuildChannelRef::Obfuscated(oc) => oc.parent_id,
+        }
+    }
+
+    /// Returns the position of the [`GuildChannelRef`].
+    #[must_use]
+    pub fn position(self) -> u16 {
+        match self {
+            GuildChannelRef::Viewable(gc) => gc.position,
+            GuildChannelRef::Obfuscated(oc) => oc.position,
+        }
+    }
+
+    /// Returns the [`GuildId`] of the [`GuildChannelRef`].
+    #[must_use]
+    pub fn guild_id(self) -> GuildId {
+        match self {
+            GuildChannelRef::Viewable(gc) => gc.base.guild_id,
+            GuildChannelRef::Obfuscated(oc) => oc.guild_id,
+        }
+    }
+}
+
+impl<'a> From<&'a GuildChannel> for GuildChannelRef<'a> {
+    fn from(guild_channel: &'a GuildChannel) -> Self {
+        Self::Viewable(guild_channel)
+    }
+}
+
+impl<'a> From<&'a ObfuscatedChannel> for GuildChannelRef<'a> {
+    fn from(obfuscated_channel: &'a ObfuscatedChannel) -> Self {
+        Self::Obfuscated(obfuscated_channel)
     }
 }
 
@@ -112,8 +199,10 @@ impl<'a> GenericGuildChannelRef<'a> {
 #[serde(untagged)]
 #[non_exhaustive]
 pub enum Channel {
-    /// A channel within a [`Guild`].
-    Guild(GuildChannel),
+    /// A viewable channel within a [`Guild`].
+    GuildViewable(GuildChannel),
+    /// An obfuscated channel within a [`Guild`].
+    GuildObfuscated(ObfuscatedChannel),
     /// A thread inside a [`Guild`].
     GuildThread(GuildThread),
     /// A private channel to another [`User`] (Direct Message). No other users may access the
@@ -123,11 +212,19 @@ pub enum Channel {
 
 #[cfg(feature = "model")]
 impl Channel {
-    /// If this is a guild channel, returns it.
+    /// If this is a viewable guild channel, returns it.
     #[must_use]
     pub fn guild(self) -> Option<GuildChannel> {
         match self {
-            Self::Guild(channel) => Some(channel),
+            Self::GuildViewable(channel) => Some(channel),
+            _ => None,
+        }
+    }
+    /// If this is an obfuscated guild channel, returns it.
+    #[must_use]
+    pub fn obfuscated(self) -> Option<ObfuscatedChannel> {
+        match self {
+            Self::GuildObfuscated(channel) => Some(channel),
             _ => None,
         }
     }
@@ -152,9 +249,14 @@ impl Channel {
 
     /// If this is a category channel, returns it.
     #[must_use]
-    pub fn category(self) -> Option<GuildChannel> {
+    pub fn category(self) -> Option<MaybeObfuscated> {
         match self {
-            Self::Guild(c) if c.base.kind == ChannelType::Category => Some(c),
+            Self::GuildViewable(gc) if gc.base.kind == ChannelType::Category => {
+                Some(MaybeObfuscated::Viewable(gc))
+            },
+            Self::GuildObfuscated(oc) if oc.kind == ChannelType::Category => {
+                Some(MaybeObfuscated::Obfuscated(oc))
+            },
             _ => None,
         }
     }
@@ -163,11 +265,15 @@ impl Channel {
     ///
     /// # Errors
     ///
-    /// Returns [`Error::Http`] if the current user lacks permission.
+    /// Returns [`Error::Http`] if the current user lacks permission, or
+    /// [`ModelError::InvalidChannelType`] if the channel is obfuscated.
     pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<()> {
         match self {
-            Self::Guild(public_channel) => {
+            Self::GuildViewable(public_channel) => {
                 public_channel.delete(http, reason).await?;
+            },
+            Self::GuildObfuscated(_) => {
+                return Err(Error::Model(ModelError::InvalidChannelType));
             },
             Self::GuildThread(thread) => {
                 thread.delete(http, reason).await?;
@@ -184,7 +290,8 @@ impl Channel {
     #[must_use]
     pub fn id(&self) -> GenericChannelId {
         match self {
-            Self::Guild(ch) => ch.id.widen(),
+            Self::GuildViewable(ch) => ch.id.widen(),
+            Self::GuildObfuscated(ch) => ch.id.widen(),
             Self::GuildThread(ch) => ch.id.widen(),
             Self::Private(ch) => ch.id.widen(),
         }
@@ -195,13 +302,14 @@ impl Channel {
     pub fn guild_id(&self) -> Option<GuildId> {
         match self {
             Channel::GuildThread(thread) => Some(thread.base.guild_id),
-            Channel::Guild(channel) => Some(channel.base.guild_id),
+            Channel::GuildViewable(channel) => Some(channel.base.guild_id),
+            Channel::GuildObfuscated(channel) => Some(channel.guild_id),
             Channel::Private(_) => None,
         }
     }
 }
 
-fn extract_type<'de, D>(deserializer: D) -> StdResult<(u64, &'de RawValue), D::Error>
+fn extract_type<'de, D>(deserializer: D) -> StdResult<(u64, bool, &'de RawValue), D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -209,21 +317,31 @@ where
     struct ChannelRaw {
         #[serde(rename = "type")]
         kind: u64,
+        #[serde(default)]
+        flags: Option<ChannelFlags>,
     }
 
     let raw_data = <&RawValue>::deserialize(deserializer)?;
     let raw = ChannelRaw::deserialize(raw_data).map_err(DeError::custom)?;
+    let is_obfuscated =
+        raw.flags.is_some_and(|flags| flags.contains(ChannelFlags::CHANNEL_OBFUSCATED));
 
-    Ok((raw.kind, raw_data))
+    Ok((raw.kind, is_obfuscated, raw_data))
 }
 
 // Manual impl needed to emulate integer enum tags
 impl<'de> Deserialize<'de> for Channel {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let (kind, raw_data) = extract_type(deserializer)?;
+        let (kind, is_obfuscated, raw_data) = extract_type(deserializer)?;
 
         match kind {
-            0 | 2 | 4 | 5 | 13 | 14 | 15 => Deserialize::deserialize(raw_data).map(Channel::Guild),
+            0 | 2 | 4 | 5 | 13 | 14 | 15 => {
+                if is_obfuscated {
+                    Deserialize::deserialize(raw_data).map(Channel::GuildObfuscated)
+                } else {
+                    Deserialize::deserialize(raw_data).map(Channel::GuildViewable)
+                }
+            },
             10..=12 => Deserialize::deserialize(raw_data).map(Channel::GuildThread),
             1 => Deserialize::deserialize(raw_data).map(Channel::Private),
             _ => return Err(DeError::custom("Unknown channel type")),
@@ -241,7 +359,8 @@ impl fmt::Display for Channel {
     ///   click on.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Guild(ch) => fmt::Display::fmt(&ch.id.widen().mention(), f),
+            Self::GuildViewable(ch) => fmt::Display::fmt(&ch.id.widen().mention(), f),
+            Self::GuildObfuscated(ch) => fmt::Display::fmt(&ch.id.widen().mention(), f),
             Self::GuildThread(ch) => fmt::Display::fmt(&ch.id.widen().mention(), f),
             Self::Private(ch) => fmt::Display::fmt(&ch.recipient.name, f),
         }

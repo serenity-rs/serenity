@@ -190,6 +190,7 @@ mentionable!(value: Channel, value.id());
 mentionable!(value: GuildChannel, value.id.widen());
 mentionable!(value: GuildThread, value.id.widen());
 mentionable!(value: ObfuscatedChannel, value.id.widen());
+mentionable!(value: MaybeObfuscated, value.id().widen());
 mentionable!(value: PrivateChannel, value.id.widen());
 mentionable!(value: Member, value.user.id);
 mentionable!(value: CurrentUser, value.id);
@@ -206,7 +207,7 @@ mod test {
     #[test]
     fn test_mention() {
         let role = Role::default();
-        let channel = Channel::Guild(GuildChannel {
+        let channel = Channel::GuildViewable(GuildChannel {
             id: ChannelId::new(4),
             ..Default::default()
         });

@@ -239,6 +239,7 @@ pub fn print_ranking() {
         ("InviteAction", std::mem::size_of::<InviteAction>()),
         ("InviteTargetType", std::mem::size_of::<InviteTargetType>()),
         ("KeywordPresetType", std::mem::size_of::<KeywordPresetType>()),
+        ("MaybeObfuscated", std::mem::size_of::<MaybeObfuscated>()),
         ("MemberAction", std::mem::size_of::<MemberAction>()),
         ("MembershipState", std::mem::size_of::<MembershipState>()),
         ("Mention", std::mem::size_of::<Mention>()),
