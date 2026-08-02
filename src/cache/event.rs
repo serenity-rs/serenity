@@ -7,16 +7,15 @@ use super::{Cache, CacheUpdate};
 use crate::model::prelude::*;
 
 impl CacheUpdate for ChannelCreateEvent {
-    type Output = GuildChannel;
+    type Output = MaybeObfuscated;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
-        cache.guilds.get_mut(&self.channel.base.guild_id).and_then(|mut g| {
-            if self.channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
-                g.obfuscated_channels.insert((&self.channel).into()).map(Into::into)
-            } else {
-                g.channels.insert(self.channel.clone())
-            }
-        })
+        let mut guild = cache.guilds.get_mut(&self.channel.base.guild_id)?;
+        if self.channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+            guild.obfuscated_channels.insert((&self.channel).into()).map(Into::into)
+        } else {
+            guild.viewable_channels.insert(self.channel.clone()).map(Into::into)
+        }
     }
 }
 
@@ -27,7 +26,7 @@ impl CacheUpdate for ChannelDeleteEvent {
         let (channel_id, guild_id) = (self.channel.id, self.channel.base.guild_id);
 
         if let Some(mut guild) = cache.guilds.get_mut(&guild_id)
-            && guild.channels.remove(&channel_id).is_none()
+            && guild.viewable_channels.remove(&channel_id).is_none()
         {
             guild.obfuscated_channels.remove(&channel_id);
         }
@@ -38,21 +37,23 @@ impl CacheUpdate for ChannelDeleteEvent {
 }
 
 impl CacheUpdate for ChannelUpdateEvent {
-    type Output = GuildChannel;
+    type Output = MaybeObfuscated;
 
-    fn update(&self, cache: &Cache) -> Option<GuildChannel> {
-        cache.guilds.get_mut(&self.channel.base.guild_id).and_then(|mut g| {
-            if self.channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
-                g.obfuscated_channels
-                    .insert((&self.channel).into())
-                    .map(Into::into)
-                    .or_else(|| g.channels.remove(&self.channel.id))
-            } else {
-                g.channels
-                    .insert(self.channel.clone())
-                    .or_else(|| g.obfuscated_channels.remove(&self.channel.id).map(Into::into))
+    fn update(&self, cache: &Cache) -> Option<Self::Output> {
+        let mut guild = cache.guilds.get_mut(&self.channel.base.guild_id)?;
+        let updated_channel = &self.channel;
+
+        if updated_channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+            match guild.obfuscated_channels.insert(updated_channel.into()) {
+                Some(obfuscated_channel) => Some(obfuscated_channel.into()),
+                None => guild.viewable_channels.remove(&updated_channel.id).map(Into::into),
             }
-        })
+        } else {
+            match guild.viewable_channels.insert(updated_channel.clone()) {
+                Some(viewable_channel) => Some(viewable_channel.into()),
+                None => guild.obfuscated_channels.remove(&updated_channel.id).map(Into::into),
+            }
+        }
     }
 }
 
@@ -64,7 +65,7 @@ impl CacheUpdate for ChannelInfoEvent {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;
 
         for channel_info_channel in &self.channels {
-            let mut channel = guild.channels.get_mut(&channel_info_channel.id)?;
+            let mut channel = guild.viewable_channels.get_mut(&channel_info_channel.id)?;
             let old_status = std::mem::take(&mut channel.status);
             let old_voice_start_time = channel.voice_start_time;
             channel.status.clone_from(&channel_info_channel.status);
@@ -88,7 +89,7 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
             && let Some(mut guild) = cache.guilds.get_mut(&guild_id)
         {
             let (channel_id, thread_id) = self.channel_id.split();
-            if let Some(mut channel) = guild.channels.get_mut(&channel_id) {
+            if let Some(mut channel) = guild.viewable_channels.get_mut(&channel_id) {
                 channel.base.last_pin_timestamp = self.last_pin_timestamp;
                 return None;
             }
@@ -133,7 +134,7 @@ impl CacheUpdate for GuildDeleteEvent {
 
         match cache.guilds.remove(&self.guild.id) {
             Some(guild) => {
-                for channel in &guild.1.channels {
+                for channel in &guild.1.viewable_channels {
                     // Remove the channel's cached messages.
                     cache.messages.remove(&channel.id.widen());
                 }
@@ -190,73 +191,65 @@ impl CacheUpdate for GuildMemberUpdateEvent {
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;
-        let old_member = guild.members.get_mut(&self.user.id).and_then(|mut member| {
-            let old_member = Some(member.clone());
-
-            member.joined_at.clone_from(&self.joined_at);
-            member.nick.clone_from(&self.nick);
-            member.roles.clone_from(&self.roles);
-            member.user.clone_from(&self.user);
-            member.premium_since.clone_from(&self.premium_since);
-            member.avatar.clone_from(&self.avatar);
-            member.banner.clone_from(&self.banner);
-            member.communication_disabled_until.clone_from(&self.communication_disabled_until);
-            member.unusual_dm_activity_until.clone_from(&self.unusual_dm_activity_until);
-            member.collectibles.clone_from(&self.collectibles);
-            member.set_pending(self.pending());
-            member.set_deaf(self.deaf());
-            member.set_mute(self.mute());
-
-            old_member
-        });
+        let old_member = guild.members.get(&self.user.id).cloned();
+        let mut new_member = Member {
+            __generated_flags: MemberGeneratedFlags::empty(),
+            guild_id: self.guild_id,
+            joined_at: self.joined_at,
+            nick: self.nick.clone(),
+            roles: self.roles.clone(),
+            user: self.user.clone(),
+            premium_since: self.premium_since,
+            permissions: None,
+            avatar: self.avatar,
+            banner: self.banner,
+            communication_disabled_until: self.communication_disabled_until,
+            flags: self.flags.unwrap_or_else(|| {
+                old_member.as_ref().map_or_else(GuildMemberFlags::default, |m| m.flags)
+            }),
+            unusual_dm_activity_until: self.unusual_dm_activity_until,
+            avatar_decoration_data: self.avatar_decoration_data,
+            collectibles: self.collectibles.clone(),
+        };
+        let pending =
+            self.pending().unwrap_or_else(|| old_member.as_ref().is_some_and(Member::pending));
+        let deaf = self.deaf().unwrap_or_else(|| old_member.as_ref().is_some_and(Member::deaf));
+        let mute = self.mute().unwrap_or_else(|| old_member.as_ref().is_some_and(Member::mute));
+        new_member.set_pending(pending);
+        new_member.set_deaf(deaf);
+        new_member.set_mute(mute);
 
         if self.user.id == cache.current_user().id
             && let Some(old_member) = &old_member
+            && old_member.roles.iter().any(|role| !new_member.roles.contains(role))
+            && let Some(channels) = no_longer_viewable_channels(&guild, &new_member)
         {
-            let mut to_obfuscate: Vec<ChannelId> = Vec::new();
-            if let Some(new_member) = guild.members.get(&self.user.id)
-                && old_member.roles.iter().any(|role| !new_member.roles.contains(role))
-            {
-                for channel in &guild.channels {
-                    if !guild.user_permissions_in(channel, new_member).view_channel() {
-                        to_obfuscate.push(channel.id);
-                    }
-                }
-            }
-            for id in to_obfuscate {
-                if let Some(channel) = guild.channels.remove(&id) {
-                    guild.obfuscated_channels.insert(channel.into());
-                }
-            }
+            obfuscate_no_longer_viewable_channels(&mut guild, channels);
         }
 
-        if old_member.is_none() {
-            let mut new_member = Member {
-                __generated_flags: MemberGeneratedFlags::empty(),
-                guild_id: self.guild_id,
-                joined_at: self.joined_at,
-                nick: self.nick.clone(),
-                roles: self.roles.clone(),
-                user: self.user.clone(),
-                premium_since: self.premium_since,
-                permissions: None,
-                avatar: self.avatar,
-                banner: self.banner,
-                communication_disabled_until: self.communication_disabled_until,
-                flags: self.flags.unwrap_or_default(),
-                unusual_dm_activity_until: self.unusual_dm_activity_until,
-                avatar_decoration_data: self.avatar_decoration_data,
-                collectibles: self.collectibles.clone(),
-            };
-
-            new_member.set_pending(self.pending());
-            new_member.set_deaf(self.deaf());
-            new_member.set_mute(self.mute());
-
-            guild.members.insert(new_member);
-        }
-
+        guild.members.insert(new_member);
         old_member
+    }
+}
+
+fn no_longer_viewable_channels(guild: &Guild, member: &Member) -> Option<Vec<ChannelId>> {
+    let no_longer_viewable: Vec<_> = guild
+        .viewable_channels
+        .iter()
+        .filter(|&channel| !guild.user_permissions_in(channel, member).view_channel())
+        .map(|channel| channel.id)
+        .collect();
+    (!no_longer_viewable.is_empty()).then_some(no_longer_viewable)
+}
+
+fn obfuscate_no_longer_viewable_channels(
+    guild: &mut dashmap::mapref::one::RefMut<'_, GuildId, Guild>,
+    channels: Vec<ChannelId>,
+) {
+    for id in channels {
+        if let Some(channel) = guild.viewable_channels.remove(&id) {
+            guild.obfuscated_channels.insert(channel.into());
+        }
     }
 }
 
@@ -307,18 +300,9 @@ impl CacheUpdate for GuildRoleUpdateEvent {
             && (old_role.permissions.view_channel() && !self.role.permissions.view_channel()
                 // Also check administrator since it can be toggled separately from view channel.
                 || old_role.permissions.administrator() && !self.role.permissions.administrator())
+            && let Some(channels) = no_longer_viewable_channels(&guild, member)
         {
-            let mut to_obfuscate: Vec<ChannelId> = Vec::new();
-            for channel in &guild.channels {
-                if !guild.user_permissions_in(channel, member).view_channel() {
-                    to_obfuscate.push(channel.id);
-                }
-            }
-            for id in to_obfuscate {
-                if let Some(channel) = guild.channels.remove(&id) {
-                    guild.obfuscated_channels.insert(channel.into());
-                }
-            }
+            obfuscate_no_longer_viewable_channels(&mut guild, channels);
         }
 
         old_role
@@ -396,7 +380,7 @@ impl CacheUpdate for MessageCreateEvent {
         if let Some(mut guild) = guild {
             let shared_id = self.message.channel_id;
             let (channel_id, thread_id) = shared_id.split();
-            if let Some(mut channel) = guild.channels.get_mut(&channel_id) {
+            if let Some(mut channel) = guild.viewable_channels.get_mut(&channel_id) {
                 update_channel_last_message_id(&self.message, &mut channel.base, shared_id, cache);
             }
 
@@ -645,10 +629,10 @@ impl CacheUpdate for VoiceStateUpdateEvent {
         if self.voice_state.user_id == cache.current_user().id
             && let Some(old_state) = &old_state
             && let Some(channel_id) = &old_state.channel_id
-            && let Some(channel) = guild.channels.get(channel_id)
+            && let Some(channel) = guild.viewable_channels.get(channel_id)
             && let Some(member) = guild.members.get(&self.voice_state.user_id)
             && !guild.user_permissions_in(channel, member).view_channel()
-            && let Some(removed_channel) = guild.channels.remove(channel_id)
+            && let Some(removed_channel) = guild.viewable_channels.remove(channel_id)
         {
             guild.obfuscated_channels.insert(removed_channel.into());
         }
@@ -662,7 +646,7 @@ impl CacheUpdate for VoiceChannelStartTimeUpdateEvent {
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;
-        let mut channel = guild.channels.get_mut(&self.id)?;
+        let mut channel = guild.viewable_channels.get_mut(&self.id)?;
 
         let old = channel.voice_start_time;
         channel.voice_start_time.clone_from(&self.voice_start_time);
@@ -675,7 +659,7 @@ impl CacheUpdate for VoiceChannelStatusUpdateEvent {
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;
-        let mut channel = guild.channels.get_mut(&self.id)?;
+        let mut channel = guild.viewable_channels.get_mut(&self.id)?;
 
         let old = if channel.status.as_ref().is_some_and(FixedString::is_empty) {
             None

@@ -41,7 +41,7 @@ impl Default for Settings {
     fn default() -> Self {
         Self {
             #[cfg(feature = "temp_cache")]
-            time_to_live: std::time::Duration::from_secs(60 * 60),
+            time_to_live: std::time::Duration::from_hours(1),
             max_messages: 0,
             cache_guilds: true,
             cache_channels: true,
