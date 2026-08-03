@@ -269,7 +269,7 @@ impl GuildChannel {
     ///
     /// let channel = {
     ///     let guild = cache.guild(guild_id).ok_or(ModelError::ItemMissing)?;
-    ///     guild.channels.get(&channel_id).ok_or(ModelError::ItemMissing)?.clone()
+    ///     guild.viewable_channels.get(&channel_id).ok_or(ModelError::ItemMissing)?.clone()
     /// };
     ///
     /// let builder = EditVoiceState::new().suppress(false);
@@ -322,7 +322,7 @@ impl GuildChannel {
     ///
     /// let channel = {
     ///     let guild = cache.guild(guild_id).ok_or(ModelError::ItemMissing)?;
-    ///     guild.channels.get(&channel_id).ok_or(ModelError::ItemMissing)?.clone()
+    ///     guild.viewable_channels.get(&channel_id).ok_or(ModelError::ItemMissing)?.clone()
     /// };
     ///
     /// // Send a request to speak
