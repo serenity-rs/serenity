@@ -315,21 +315,33 @@ impl Guild {
     /// This returns the first text-only channel that everyone can view, or [`None`] if there
     /// isn't one.
     ///
-    /// **Note**: This is very costly if used in a server with lots of channels, members, or both.
+    /// **Note**: This is very costly if used in a server with lots of channels and/or a complex
+    /// channel permissions setup.
     #[must_use]
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
+        let everyone = RoleId::new(self.id.get());
+        let everyone_role_has_view =
+            self.roles.get(&everyone).is_some_and(|everyone| everyone.permissions.view_channel());
         let mut sorted = self
             .viewable_channels
             .iter()
             .filter(|&channel| {
+                // The channel is text-only.
                 channel.base.kind != ChannelType::Category
                     && channel.base.kind != ChannelType::Voice
                     && channel.base.kind != ChannelType::Stage
-                    && self
-                        .members
+                    // No overwrites deny Permissions::VIEW_CHANNEL.
+                    && channel
+                        .permission_overwrites
                         .iter()
-                        .map(|member| self.user_permissions_in(channel, member))
-                        .all(Permissions::view_channel)
+                        .all(|overwrite| !overwrite.deny.view_channel())
+                    // The @everyone role has Permissions::VIEW_CHANNEL.
+                    && everyone_role_has_view
+                    // Or an overwrite allows Permissions::VIEW_CHANNEL for @everyone.
+                    || channel.permission_overwrites.iter().any(|overwrite| {
+                        overwrite.kind == PermissionOverwriteType::Role(everyone)
+                            && overwrite.allow.view_channel()
+                    })
             })
             .collect::<Vec<_>>();
         sorted.sort_by_key(|channel| channel.position);
