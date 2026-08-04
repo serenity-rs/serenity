@@ -318,7 +318,7 @@ impl<'a> From<Cow<'a, str>> for AutocompleteValue<'a> {
     }
 }
 
-impl From<String> for AutocompleteValue<'static> {
+impl From<String> for AutocompleteValue<'_> {
     fn from(value: String) -> Self {
         Self::String(Cow::Owned(value))
     }
@@ -330,13 +330,13 @@ impl<'a> From<&'a str> for AutocompleteValue<'a> {
     }
 }
 
-impl From<u64> for AutocompleteValue<'static> {
+impl From<u64> for AutocompleteValue<'_> {
     fn from(value: u64) -> Self {
         Self::Integer(value)
     }
 }
 
-impl From<f64> for AutocompleteValue<'static> {
+impl From<f64> for AutocompleteValue<'_> {
     fn from(value: f64) -> Self {
         Self::Float(value)
     }
