@@ -228,6 +228,7 @@ pub struct ClientStatus {
     pub desktop: Option<OnlineStatus>,
     pub mobile: Option<OnlineStatus>,
     pub web: Option<OnlineStatus>,
+    pub vr: Option<OnlineStatus>,
 }
 
 /// Information about the user of a [`Presence`] event.
