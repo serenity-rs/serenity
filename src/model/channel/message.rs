@@ -798,6 +798,7 @@ enum_number! {
         Spectate = 2,
         Listen = 3,
         JoinRequest = 5,
+        StreamRequest = 6,
         _ => Unknown(u8),
     }
 }
