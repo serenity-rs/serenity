@@ -130,6 +130,8 @@ generate_change! {
     "allow" => Allow(Permissions),
     /// Id of the application associated with an entity was changed.
     "application_id" => ApplicationId(ApplicationId),
+    /// Ids of the set of tags applied to a thread in a forum channel was changed.
+    "applied_tags" => AppliedTags(FixedArray<ForumTagId>),
     /// Whether a thread is archived was changed.
     "archived" => Archived(bool),
     /// Entity asset was changed.
@@ -138,12 +140,16 @@ generate_change! {
     "auto_archive_duration" => AutoArchiveDuration(u16),
     /// Availability status was changed.
     "available" => Available(bool),
+    /// Set of tags that can be used in a forum channel was changed.
+    "available_tags" => AvailableTags(FixedArray<ForumTag>),
     /// User or webhook avatar was changed.
     "avatar_hash" => AvatarHash(ImageHash),
     /// Banner image was changed.
     "banner_hash" => BannerHash(ImageHash),
     /// Voice channel bitrate was changed.
     "bitrate" => Bitrate(u32),
+    /// Primary color of a server profile banner was changed.
+    "brand_color_primary" => BrandColorPrimary(FixedString),
     /// Id of the channel associated with an entity was changed.
     "channel_id" => ChannelId(ChannelId),
     /// Invite code was changed.
@@ -162,6 +168,10 @@ generate_change! {
     "default_channel_ids" => DefaultChannelIds(FixedArray<ChannelId>),
     /// Default message notification level for a server was changed.
     "default_message_notifications" => DefaultMessageNotifications(DefaultMessageNotificationLevel),
+    /// Emoji to show in the add reaction button on a thread in a forum channel was changed.
+    "default_reaction_emoji" => DefaultReactionEmoji(ForumEmoji),
+    /// Initial rate limit per user to set on newly created threads in a channel was changed.
+    "default_thread_rate_limit_per_user" => DefaultThreadRateLimitPerUser(u16),
     /// Deny field of a permission overwrite was changed.
     "deny" => Deny(Permissions),
     /// Description of an entity was changed.
@@ -194,6 +204,8 @@ generate_change! {
     "flags" => Flags(u64),
     /// Format type of a sticker was changed.
     "format_type" => FormatType(StickerFormatType),
+    /// Ids of games included in a server profile were changed.
+    "game_application_ids" => GameApplicationIds(FixedArray<ApplicationId>),
     /// Id of the guild associated with an entity was changed.
     "guild_id" => GuildId(GuildId),
     /// Whether a role is pinned in the user listing was changed.
@@ -204,6 +216,8 @@ generate_change! {
     "id" => Id(GenericId),
     /// Cover image of a scheduled event was changed.
     "image_hash" => ImageHash(ImageHash),
+    /// Whether a prompt is present in an onboarding flow was changed.
+    "in_onboarding" => InOnboarding(bool),
     /// Private thread's invitable state was changed.
     "invitable" => Invitable(bool),
     /// Id of the user who created an invite was changed.
@@ -212,6 +226,8 @@ generate_change! {
     "location" => Location(FixedString),
     /// Locked status of a thread was changed.
     "locked" => Locked(bool),
+    /// Whether users must apply to join a guild was changed.
+    "manual_approval_enabled" => ManualApprovalEnabled(bool),
     /// How long an invite code lasts was changed.
     "max_age" => MaxAge(u32),
     /// Maximum uses of an invite was changed.
@@ -224,6 +240,8 @@ generate_change! {
     "mute" => Mute(bool),
     /// Name of an entity was changed.
     "name" => Name(FixedString),
+    // Undocumented type: server guide new member to-do's
+    // "new_member_actions" => NewMemberActions(FixedArray<>),
     /// Nickname of a member was changed.
     "nick" => Nick(FixedString),
     /// Whether a channel is age-restricted was changed.
@@ -238,20 +256,26 @@ generate_change! {
     "position" => Position(u32),
     /// Preferred locale of a guild was changed.
     "preferred_locale" => PreferredLocale(FixedString),
+    /// Whether a guild has the boost progress bar enabled was changed.
+    "premium_progress_bar_enabled" => PremiumProgressBarEnabled(bool),
     /// Privacy level of a stage instance was changed.
     "privacy_level" => PrivacyLevel(u64),
     /// Number of days after which inactive and role-unassigned members are kicked was changed.
     "prune_delete_days" => PruneDeleteDays(u64),
     /// Id of a public updates channel was changed.
     "public_updates_channel_id" => PublicUpdatesChannelId(ChannelId),
-    /// Ratelimit per user in a text channel was changed.
+    /// Rate limit per user in a text channel was changed.
     "rate_limit_per_user" => RateLimitPerUser(u16),
     /// Region of a guild was changed.
     "region" => Region(FixedString),
     /// Whether an onboarding prompt is required was changed.
     "required" => Required(bool),
+    // Undocumented type: server guide resource channels
+    // "resource_channels" => ResourceChannels(FixedArray<>),
     /// Roles assigned to a user upon accepting an invite were changed.
     "role_ids" => RoleIds(FixedArray<RoleId>),
+    /// Voice region Id for a voice or stage channel was changed.
+    "rtc_region" => RtcRegion(FixedString),
     /// Id of a rules channel was changed.
     "rules_channel_id" => RulesChannelId(ChannelId),
     /// End time of a scheduled event was changed.
@@ -278,6 +302,8 @@ generate_change! {
     "title" => Title(FixedString),
     /// Topic of a text channel or stage instance was changed.
     "topic" => Topic(FixedString),
+    // Undocumented type: server profile traits
+    // "traits" => Traits(FixedArray<>),
     /// Trigger metadata of an auto moderation rule was changed.
     "trigger_metadata" => TriggerMetadata(TriggerMetadata),
     /// Trigger type of an auto moderation rule was changed.
@@ -294,10 +320,18 @@ generate_change! {
     "uses" => Uses(u64),
     /// Guild invite vanity url was changed.
     "vanity_url_code" => VanityUrlCode(FixedString),
+    /// Whether server rules are enabled was changed.
+    "verification_enabled" => VerificationEnabled(bool),
     /// Required verification level for new members was changed.
     "verification_level" => VerificationLevel(VerificationLevel),
+    /// Video quality mode for a voice channel was changed.
+    "video_quality_mode" => VideoQualityMode(VideoQualityMode),
+    // Undocumented type: server profile visibility
+    // "visibility" => Visibility(),
     /// Volume of a soundboard sound was changed.
     "volume" => Volume(f64),
+    // Undocumented type: server guide welcome message
+    // "welcome_message" => WelcomeMessage(),
     /// Channel of a server widget was changed.
     "widget_channel_id" => WidgetChannelId(ChannelId),
     /// Whether a server widget is enabled was changed.

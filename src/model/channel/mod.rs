@@ -488,7 +488,7 @@ pub struct ThreadsData {
 /// See [Discord](https://docs.discord.com/developers/resources/channel#default-reaction-object)
 /// [docs]()
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[non_exhaustive]
 pub enum ForumEmoji {
     /// The id of a guild's custom emoji.
@@ -541,7 +541,7 @@ impl<'de> serde::Deserialize<'de> for ForumEmoji {
 ///
 /// See [Discord docs](https://docs.discord.com/developers/resources/channel#forum-tag-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[non_exhaustive]
 pub struct ForumTag {
     /// The id of the tag.
