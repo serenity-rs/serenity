@@ -40,6 +40,8 @@ pub struct CreateCommandOption<'a> {
     min_length: Option<u16>,
     #[serde(default)]
     max_length: Option<u16>,
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    file_types: Cow<'a, [Cow<'a, str>]>,
     #[serde(default)]
     autocomplete: bool,
 }
@@ -68,6 +70,7 @@ impl<'a> CreateCommandOption<'a> {
             channel_types: Cow::default(),
             choices: Cow::default(),
             options: Cow::default(),
+            file_types: Cow::default(),
         }
     }
 
@@ -317,6 +320,19 @@ impl<'a> CreateCommandOption<'a> {
         self
     }
 
+    /// If the option is an [`Attachment`], file types to filter for; can be `image`, `video`,
+    /// `audio`, or any dot-prefixed extension such as `.pdf`; max 10.
+    ///
+    /// **Note**: This only matches against the file extension. See [File Type Filtering] for
+    /// details.
+    ///
+    /// [`Attachment`]: crate::model::application::CommandOptionType::Attachment
+    /// [File Type Filtering]: https://docs.discord.com/developers/reference#file-type-filtering
+    pub fn file_types(mut self, file_types: impl Into<Cow<'a, [Cow<'a, str>]>>) -> Self {
+        self.file_types = file_types.into();
+        self
+    }
+
     pub fn into_owned(self) -> CreateCommandOption<'static> {
         let Self {
             kind,
@@ -332,6 +348,7 @@ impl<'a> CreateCommandOption<'a> {
             max_value,
             min_length,
             max_length,
+            file_types,
             autocomplete,
         } = self;
         CreateCommandOption {
@@ -364,6 +381,9 @@ impl<'a> CreateCommandOption<'a> {
             max_value,
             min_length,
             max_length,
+            file_types: Cow::Owned(
+                file_types.into_owned().into_iter().map(|f| f.into_owned().into()).collect(),
+            ),
             autocomplete,
         }
     }

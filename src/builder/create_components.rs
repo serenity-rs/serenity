@@ -817,6 +817,8 @@ pub struct CreateFileUpload<'a> {
     min_values: u8,
     max_values: u8,
     required: bool,
+    #[serde(skip_serializing_if = "<[_]>::is_empty")]
+    file_types: Cow<'a, [Cow<'a, str>]>,
 }
 
 impl<'a> CreateFileUpload<'a> {
@@ -828,6 +830,7 @@ impl<'a> CreateFileUpload<'a> {
             min_values: 1,
             max_values: 1,
             required: true,
+            file_types: Cow::default(),
         }
     }
 
@@ -850,6 +853,18 @@ impl<'a> CreateFileUpload<'a> {
         self
     }
 
+    /// File types to filter for; can be `image`, `video`, `audio`, or any dot-prefixed extension
+    /// such as `.pdf`; max 10. Defaults to empty, which permits any file type.
+    ///
+    /// **Note**: This only matches against the file extension. See [File Type Filtering] for
+    /// details.
+    ///
+    /// [File Type Filtering]: https://docs.discord.com/developers/reference#file-type-filtering
+    pub fn file_types(mut self, file_types: impl Into<Cow<'a, [Cow<'a, str>]>>) -> Self {
+        self.file_types = file_types.into();
+        self
+    }
+
     pub fn into_owned(self) -> CreateFileUpload<'static> {
         let Self {
             kind,
@@ -857,6 +872,7 @@ impl<'a> CreateFileUpload<'a> {
             min_values,
             max_values,
             required,
+            file_types,
         } = self;
         CreateFileUpload {
             kind,
@@ -864,6 +880,9 @@ impl<'a> CreateFileUpload<'a> {
             min_values,
             max_values,
             required,
+            file_types: Cow::Owned(
+                file_types.into_owned().into_iter().map(|f| f.into_owned().into()).collect(),
+            ),
         }
     }
 }

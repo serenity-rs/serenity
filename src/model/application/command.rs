@@ -298,6 +298,16 @@ pub struct CommandOption {
     /// Maximum permitted length for String options
     #[serde(default)]
     pub max_length: Option<u16>,
+    /// If the option is an [`Attachment`], file types to filter for; can be `image`, `video`,
+    /// `audio`, or any dot-prefixed extension such as `.pdf`; max 10.
+    ///
+    /// **Note**: This only matches against the file extension. See [File Type Filtering] for
+    /// details.
+    ///
+    /// [`Attachment`]: CommandOptionType::Attachment
+    /// [File Type Filtering]: https://docs.discord.com/developers/reference#file-type-filtering
+    #[serde(default)]
+    pub file_types: FixedArray<FixedString>,
     #[serde(default)]
     pub autocomplete: bool,
 }
