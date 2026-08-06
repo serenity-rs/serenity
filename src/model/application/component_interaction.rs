@@ -38,7 +38,7 @@ pub struct ComponentInteraction {
     ///
     /// **Note**: It is only present if the interaction is triggered in a guild.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub member: Option<Member>,
+    pub member: Option<Box<Member>>,
     /// The `user` object for the invoking user.
     #[serde(default)]
     pub user: User,
