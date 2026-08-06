@@ -1149,7 +1149,6 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 /// Event received over a websocket connection
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#receive-events).
-#[expect(clippy::large_enum_variant)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, EnumCount, VariantNames, IntoStaticStr)]
 #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
