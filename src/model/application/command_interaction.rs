@@ -34,7 +34,7 @@ pub struct CommandInteraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<GuildId>,
     /// Channel that the interaction was sent from.
-    pub channel: Option<GenericInteractionChannel>,
+    pub channel: GenericInteractionChannel,
     /// The channel Id this interaction was sent from.
     pub channel_id: GenericChannelId,
     /// The `member` data for the invoking user.
