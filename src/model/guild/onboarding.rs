@@ -106,9 +106,9 @@ enum_number! {
     #[non_exhaustive]
     pub enum OnboardingMode {
         /// Counts only default channels towards constraints.
-        OnboardingDefault = 0,
+        Default = 0,
         /// Counts both default channels and questions towards constraints.
-        OnboardingAdvanced = 1,
+        Advanced = 1,
         _ => Unknown(u8),
     }
 }
