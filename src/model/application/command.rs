@@ -298,8 +298,10 @@ pub struct CommandOption {
     /// Maximum permitted length for String options
     #[serde(default)]
     pub max_length: Option<u16>,
-    /// If the option is an [`Attachment`], file types to filter for; can be `image`, `video`,
-    /// `audio`, or any dot-prefixed extension such as `.pdf`; max 10.
+    /// If the option is an [`Attachment`], the file types to filter for.
+    ///
+    /// Can be `image`, `video`, `audio`, or any dot-prefixed extension such as `.pdf`. Maximum
+    /// of 10 types.
     ///
     /// **Note**: This only matches against the file extension. See [File Type Filtering] for
     /// details.
