@@ -320,8 +320,10 @@ impl<'a> CreateCommandOption<'a> {
         self
     }
 
-    /// If the option is an [`Attachment`], file types to filter for; can be `image`, `video`,
-    /// `audio`, or any dot-prefixed extension such as `.pdf`; max 10.
+    /// If the option is an [`Attachment`], sets the file types to filter for.
+    ///
+    /// Can be `image`, `video`, `audio`, or any dot-prefixed extension such as `.pdf`. Maximum of
+    /// 10 types.
     ///
     /// **Note**: This only matches against the file extension. See [File Type Filtering] for
     /// details.
