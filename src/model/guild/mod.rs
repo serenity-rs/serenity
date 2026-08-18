@@ -417,11 +417,11 @@ impl Guild {
     /// Returns None if the member has no roles or the member from this guild.
     #[must_use]
     pub fn member_highest_role(&self, member: &Member) -> Option<&Role> {
-        Self::_member_highest_role_in(&self.roles, member)
+        Self::member_highest_role_in_(&self.roles, member)
     }
 
     /// Helper function that can also be used from [`PartialGuild`].
-    pub(crate) fn _member_highest_role_in<'a>(
+    pub(crate) fn member_highest_role_in_<'a>(
         roles: &'a ExtractMap<RoleId, Role>,
         member: &Member,
     ) -> Option<&'a Role> {
@@ -465,7 +465,7 @@ impl Guild {
         let lhs_highest_role = self.member_highest_role(lhs);
         let rhs_highest_role = self.member_highest_role(rhs);
 
-        Self::_greater_member_hierarchy_in(
+        Self::greater_member_hierarchy_in_(
             lhs_highest_role,
             rhs_highest_role,
             self.owner_id,
@@ -476,7 +476,7 @@ impl Guild {
 
     /// Helper function that can also be used from [`PartialGuild`].
     #[must_use]
-    pub(crate) fn _greater_member_hierarchy_in(
+    pub(crate) fn greater_member_hierarchy_in_(
         lhs_highest_role: Option<&Role>,
         rhs_highest_role: Option<&Role>,
         owner_id: UserId,

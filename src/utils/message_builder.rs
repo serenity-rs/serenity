@@ -1204,7 +1204,7 @@ mod test {
     #[test]
     fn push() {
         assert_eq!(MessageBuilder::new().push("a").0, "a");
-        assert!(MessageBuilder::new().push("").0.is_empty());
+        assert_eq!(MessageBuilder::new().push("").0, "");
     }
 
     #[test]

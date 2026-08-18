@@ -440,6 +440,7 @@ fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
     use std::error::Error as StdError;
     use std::result::Result as StdResult;
 
@@ -476,13 +477,18 @@ mod tests {
     }
 
     #[test]
-    #[expect(clippy::float_cmp)]
     fn test_parse_header_good() -> Result<()> {
         let headers = headers();
 
         assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-limit")?.unwrap(), 5);
-        assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-remaining")?.unwrap(), 4,);
-        assert_eq!(parse_header::<f64>(&headers, "x-ratelimit-reset")?.unwrap(), 1_560_704_880.423);
+        assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-remaining")?.unwrap(), 4);
+
+        // Float patterns behave the same as `==`. Workaround for clippy::float_cmp regression:
+        // https://github.com/rust-lang/rust-clippy/issues/17570
+        assert_matches!(
+            parse_header::<f64>(&headers, "x-ratelimit-reset")?.unwrap(),
+            1_560_704_880.423
+        );
 
         Ok(())
     }
