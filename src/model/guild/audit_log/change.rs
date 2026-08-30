@@ -29,6 +29,7 @@ impl<'de> serde::Deserialize<'de> for EntityType {
 macro_rules! generate_change {
     ( $(
         $( #[doc = $doc:literal] )?
+        $( #[serde(rename = $rename:literal)] )?
         $key:literal => $name:ident ($type:ty),
     )* ) => {
         #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
@@ -39,6 +40,7 @@ macro_rules! generate_change {
         pub enum Change {
             $(
                 $( #[doc = $doc] )?
+                $( #[serde(rename = $rename)] )?
                 $name {
                     #[serde(skip_serializing_if = "Option::is_none")]
                     #[serde(rename = "old_value")]
@@ -49,28 +51,7 @@ macro_rules! generate_change {
                 },
             )*
 
-            /* These changes are special because their variant names do not match their keys. */
-
-            /// Role was added to a member.
-            #[serde(rename = "$add")]
-            RolesAdded {
-                #[serde(skip_serializing_if = "Option::is_none")]
-                #[serde(rename = "old_value")]
-                old: Option<FixedArray<AffectedRole>>,
-                #[serde(skip_serializing_if = "Option::is_none")]
-                #[serde(rename = "new_value")]
-                new: Option<FixedArray<AffectedRole>>,
-            },
-            /// Role was removed from a member.
-            #[serde(rename = "$remove")]
-            RolesRemoved {
-                #[serde(skip_serializing_if = "Option::is_none")]
-                #[serde(rename = "old_value")]
-                old: Option<FixedArray<AffectedRole>>,
-                #[serde(skip_serializing_if = "Option::is_none")]
-                #[serde(rename = "new_value")]
-                new: Option<FixedArray<AffectedRole>>,
-            },
+            /* These changes are special because their keys are variable or unknown. */
 
             /// Permissions were updated for a command.
             #[serde(untagged)]
@@ -100,9 +81,10 @@ macro_rules! generate_change {
             #[must_use]
             pub fn key(&self) -> FixedString {
                 match self {
-                    $( Self::$name { .. } => FixedString::from_static_trunc($key), )*
-                    Self::RolesAdded { .. } => FixedString::from_static_trunc("$add"),
-                    Self::RolesRemoved { .. } => FixedString::from_static_trunc("$remove"),
+                    $( Self::$name { .. } => {
+                        let key = $( $rename; let _ = )? $key;
+                        FixedString::from_static_trunc(key)
+                    } )*
                     Self::CommandPermissions { old_value, new_value } => {
                         if let Some(old_value) = old_value {
                             FixedString::from_string_trunc(old_value.id.to_string())
@@ -122,6 +104,15 @@ macro_rules! generate_change {
 generate_change! {
     /// Actions that execute when an auto moderation rule is triggered were changed.
     "actions" => Actions(FixedArray<Action>),
+    /// Allowed words or phrases were added to an auto moderation rule.
+    #[serde(rename = "$add_allow_list")]
+    "add_allow_list" => AddAllowList(FixedArray<FixedString>),
+    /// Words or phrases were added to the keyword filter list of an auto moderation rule.
+    #[serde(rename = "$add_keyword_filter")]
+    "add_keyword_filter" => AddKeywordFilter(FixedArray<FixedString>),
+    /// Regex patterns were added to an auto moderation rule.
+    #[serde(rename = "$add_regex_patterns")]
+    "add_regex_patterns" => AddRegexPatterns(FixedArray<FixedString>),
     /// AFK channel was changed.
     "afk_channel_id" => AfkChannelId(ChannelId),
     /// AFK timeout duration was changed.
@@ -150,6 +141,8 @@ generate_change! {
     "bitrate" => Bitrate(u32),
     /// Primary color of a server profile banner was changed.
     "brand_color_primary" => BrandColorPrimary(FixedString),
+    /// Whether a user bypasses verification was changed.
+    "bypasses_verification" => BypassesVerification(bool),
     /// Id of the channel associated with an entity was changed.
     "channel_id" => ChannelId(ChannelId),
     /// Invite code was changed.
@@ -160,7 +153,7 @@ generate_change! {
     "colors" => Colors(RoleColours),
     /// Member timeout state was changed.
     "communication_disabled_until" => CommunicationDisabledUntil(Timestamp),
-    /// whether a user is deafened in voice channels was changed.
+    /// Whether a user is deafened in voice channels was changed.
     "deaf" => Deaf(bool),
     /// Default auto archive duration for newly created threads was changed.
     "default_auto_archive_duration" => DefaultAutoArchiveDuration(u16),
@@ -268,12 +261,27 @@ generate_change! {
     "rate_limit_per_user" => RateLimitPerUser(u16),
     /// Region of a guild was changed.
     "region" => Region(FixedString),
+    /// Allowed words or phrases were removed from an auto moderation rule.
+    #[serde(rename = "$remove_allow_list")]
+    "remove_allow_list" => RemoveAllowList(FixedArray<FixedString>),
+    /// Words or phrases were removed from the keyword filter list of an auto moderation rule.
+    #[serde(rename = "$remove_keyword_filter")]
+    "remove_keyword_filter" => RemoveKeywordFilter(FixedArray<FixedString>),
+    /// Regex patterns were removed from an auto moderation rule.
+    #[serde(rename = "$remove_regex_patterns")]
+    "remove_regex_patterns" => RemoveRegexPatterns(FixedArray<FixedString>),
     /// Whether an onboarding prompt is required was changed.
     "required" => Required(bool),
     // Undocumented type: server guide resource channels
     // "resource_channels" => ResourceChannels(FixedArray<>),
     /// Roles assigned to a user upon accepting an invite were changed.
     "role_ids" => RoleIds(FixedArray<RoleId>),
+    /// Role was added to a member.
+    #[serde(rename = "$add")]
+    "roles_added" => RolesAdded(FixedArray<AffectedRole>),
+    /// Role was removed from a member.
+    #[serde(rename = "$remove")]
+    "roles_removed" => RolesRemoved(FixedArray<AffectedRole>),
     /// Voice region Id for a voice or stage channel was changed.
     "rtc_region" => RtcRegion(FixedString),
     /// Id of a rules channel was changed.
@@ -282,6 +290,8 @@ generate_change! {
     "scheduled_end_time" => ScheduledEndTime(Timestamp),
     /// Start time of a scheduled event was changed.
     "scheduled_start_time" => ScheduledStartTime(Timestamp),
+    /// Guild tag was changed.
+    "server_tag" => ServerTag(FixedString),
     /// Whether only one option can be selected for an onboarding prompt was changed.
     "single_select" => SingleSelect(bool),
     /// Id of a soundboard sound was changed.
