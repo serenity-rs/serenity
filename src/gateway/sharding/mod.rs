@@ -434,7 +434,7 @@ impl Shard {
             },
             Ok(GatewayEvent::Reconnect) => Ok(Some(ShardAction::Reconnect)),
             Err(Error::Gateway(GatewayError::Closed(data))) => {
-                self.handle_gateway_closed(data.as_ref())?;
+                self.handle_gateway_closed(data.as_deref())?;
                 Ok(Some(ShardAction::Reconnect))
             },
             Err(Error::Tungstenite(why)) => {

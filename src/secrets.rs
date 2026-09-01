@@ -61,7 +61,7 @@ impl Token {
     /// details). May also return [`TokenError::InvalidToken`] if the token is in an invalid
     /// format (see [`Token::from_str`]).
     pub fn from_env<K: AsRef<OsStr>>(key: K) -> Result<Self, TokenError> {
-        env::var(key).map_err(TokenError::Env).and_then(|token| token.parse())
+        env::var(key).map_err(|e| TokenError::Env(Box::new(e))).and_then(|token| token.parse())
     }
 
     #[must_use]
@@ -146,7 +146,7 @@ impl TryFrom<String> for Token {
 /// Error that can be returned by [`Token::from_str`], [`Token::try_from`], or [`Token::from_env`].
 #[derive(Debug)]
 pub enum TokenError {
-    Env(VarError),
+    Env(Box<VarError>),
     InvalidToken,
 }
 

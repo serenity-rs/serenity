@@ -13,7 +13,7 @@ pub enum Error {
     /// There was an error building a URL.
     BuildingUrl,
     /// The connection closed, potentially uncleanly.
-    Closed(Option<CloseFrame>),
+    Closed(Option<Box<CloseFrame>>),
     /// Expected a Hello during a handshake
     ExpectedHello,
     /// When there was an error sending a heartbeat.
@@ -54,7 +54,7 @@ pub enum Error {
     DisallowedGatewayIntents,
     #[cfg(feature = "transport_compression_zlib")]
     /// A decompression error from the `flate2` crate.
-    DecompressZlib(flate2::DecompressError),
+    DecompressZlib(Box<flate2::DecompressError>),
     #[cfg(feature = "transport_compression_zstd")]
     /// A decompression error from zstd.
     DecompressZstd(usize),
@@ -62,7 +62,7 @@ pub enum Error {
     #[cfg(feature = "transport_compression_zstd")]
     DecompressZstdCorrupted,
     /// When decompressed gateway data is not valid UTF-8.
-    DecompressUtf8(std::string::FromUtf8Error),
+    DecompressUtf8(Box<std::string::FromUtf8Error>),
 }
 
 impl fmt::Display for Error {

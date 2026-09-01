@@ -240,7 +240,7 @@ impl WsClient {
                 None => return Ok(None),
             },
             Message::Close(Some(frame)) => {
-                return Err(Error::Gateway(GatewayError::Closed(Some(frame))));
+                return Err(Error::Gateway(GatewayError::Closed(Some(Box::new(frame)))));
             },
             _ => return Ok(None),
         };

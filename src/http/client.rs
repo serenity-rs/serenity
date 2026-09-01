@@ -4602,9 +4602,9 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::Http(HttpError::UnsuccessfulRequest(
+            Err(Error::Http(HttpError::UnsuccessfulRequest(Box::new(
                 ErrorResponse::from_response(response, method).await,
-            )))
+            ))))
         }
     }
 
@@ -4630,9 +4630,9 @@ impl Http {
         }
 
         debug!("Unsuccessful response: {response:?}");
-        Err(Error::Http(HttpError::UnsuccessfulRequest(
+        Err(Error::Http(HttpError::UnsuccessfulRequest(Box::new(
             ErrorResponse::from_response(response, method).await,
-        )))
+        ))))
     }
 }
 
