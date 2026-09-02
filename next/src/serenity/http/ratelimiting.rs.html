@@ -440,65 +440,71 @@
 <a href=#440 id=440 data-nosnippet>440</a>
 <a href=#441 id=441 data-nosnippet>441</a><span class="attr">#[cfg(test)]
 <a href=#442 id=442 data-nosnippet>442</a></span><span class="kw">mod </span>tests {
-<a href=#443 id=443 data-nosnippet>443</a>    <span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
-<a href=#444 id=444 data-nosnippet>444</a>    <span class="kw">use </span>std::result::Result <span class="kw">as </span>StdResult;
-<a href=#445 id=445 data-nosnippet>445</a>
-<a href=#446 id=446 data-nosnippet>446</a>    <span class="kw">use </span>reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-<a href=#447 id=447 data-nosnippet>447</a>
-<a href=#448 id=448 data-nosnippet>448</a>    <span class="kw">use </span><span class="kw">super</span>::parse_header;
-<a href=#449 id=449 data-nosnippet>449</a>    <span class="kw">use </span><span class="kw">crate</span>::error::Error;
-<a href=#450 id=450 data-nosnippet>450</a>    <span class="kw">use </span><span class="kw">crate</span>::http::HttpError;
-<a href=#451 id=451 data-nosnippet>451</a>
-<a href=#452 id=452 data-nosnippet>452</a>    <span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T&gt; = StdResult&lt;T, Box&lt;<span class="kw">dyn </span>StdError&gt;&gt;;
-<a href=#453 id=453 data-nosnippet>453</a>
-<a href=#454 id=454 data-nosnippet>454</a>    <span class="kw">fn </span>headers() -&gt; HeaderMap {
-<a href=#455 id=455 data-nosnippet>455</a>        <span class="kw">let </span>pairs = <span class="kw-2">&amp;</span>[
-<a href=#456 id=456 data-nosnippet>456</a>            (HeaderName::from_static(<span class="string">"x-ratelimit-limit"</span>), HeaderValue::from_static(<span class="string">"5"</span>)),
-<a href=#457 id=457 data-nosnippet>457</a>            (HeaderName::from_static(<span class="string">"x-ratelimit-remaining"</span>), HeaderValue::from_static(<span class="string">"4"</span>)),
-<a href=#458 id=458 data-nosnippet>458</a>            (
-<a href=#459 id=459 data-nosnippet>459</a>                HeaderName::from_static(<span class="string">"x-ratelimit-reset"</span>),
-<a href=#460 id=460 data-nosnippet>460</a>                HeaderValue::from_static(<span class="string">"1560704880.423"</span>),
-<a href=#461 id=461 data-nosnippet>461</a>            ),
-<a href=#462 id=462 data-nosnippet>462</a>            (HeaderName::from_static(<span class="string">"x-bad-num"</span>), HeaderValue::from_static(<span class="string">"abc"</span>)),
-<a href=#463 id=463 data-nosnippet>463</a>            (
-<a href=#464 id=464 data-nosnippet>464</a>                HeaderName::from_static(<span class="string">"x-bad-unicode"</span>),
-<a href=#465 id=465 data-nosnippet>465</a>                HeaderValue::from_bytes(<span class="kw-2">&amp;</span>[<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>]).unwrap(),
-<a href=#466 id=466 data-nosnippet>466</a>            ),
-<a href=#467 id=467 data-nosnippet>467</a>        ];
-<a href=#468 id=468 data-nosnippet>468</a>
-<a href=#469 id=469 data-nosnippet>469</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HeaderMap::with_capacity(pairs.len());
-<a href=#470 id=470 data-nosnippet>470</a>
-<a href=#471 id=471 data-nosnippet>471</a>        <span class="kw">for </span>(name, val) <span class="kw">in </span>pairs {
-<a href=#472 id=472 data-nosnippet>472</a>            map.insert(name, val.clone());
-<a href=#473 id=473 data-nosnippet>473</a>        }
-<a href=#474 id=474 data-nosnippet>474</a>
-<a href=#475 id=475 data-nosnippet>475</a>        map
-<a href=#476 id=476 data-nosnippet>476</a>    }
-<a href=#477 id=477 data-nosnippet>477</a>
-<a href=#478 id=478 data-nosnippet>478</a>    <span class="attr">#[test]
-<a href=#479 id=479 data-nosnippet>479</a>    #[expect(clippy::float_cmp)]
+<a href=#443 id=443 data-nosnippet>443</a>    <span class="kw">use </span>std::assert_matches;
+<a href=#444 id=444 data-nosnippet>444</a>    <span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<a href=#445 id=445 data-nosnippet>445</a>    <span class="kw">use </span>std::result::Result <span class="kw">as </span>StdResult;
+<a href=#446 id=446 data-nosnippet>446</a>
+<a href=#447 id=447 data-nosnippet>447</a>    <span class="kw">use </span>reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+<a href=#448 id=448 data-nosnippet>448</a>
+<a href=#449 id=449 data-nosnippet>449</a>    <span class="kw">use </span><span class="kw">super</span>::parse_header;
+<a href=#450 id=450 data-nosnippet>450</a>    <span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<a href=#451 id=451 data-nosnippet>451</a>    <span class="kw">use </span><span class="kw">crate</span>::http::HttpError;
+<a href=#452 id=452 data-nosnippet>452</a>
+<a href=#453 id=453 data-nosnippet>453</a>    <span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T&gt; = StdResult&lt;T, Box&lt;<span class="kw">dyn </span>StdError&gt;&gt;;
+<a href=#454 id=454 data-nosnippet>454</a>
+<a href=#455 id=455 data-nosnippet>455</a>    <span class="kw">fn </span>headers() -&gt; HeaderMap {
+<a href=#456 id=456 data-nosnippet>456</a>        <span class="kw">let </span>pairs = <span class="kw-2">&amp;</span>[
+<a href=#457 id=457 data-nosnippet>457</a>            (HeaderName::from_static(<span class="string">"x-ratelimit-limit"</span>), HeaderValue::from_static(<span class="string">"5"</span>)),
+<a href=#458 id=458 data-nosnippet>458</a>            (HeaderName::from_static(<span class="string">"x-ratelimit-remaining"</span>), HeaderValue::from_static(<span class="string">"4"</span>)),
+<a href=#459 id=459 data-nosnippet>459</a>            (
+<a href=#460 id=460 data-nosnippet>460</a>                HeaderName::from_static(<span class="string">"x-ratelimit-reset"</span>),
+<a href=#461 id=461 data-nosnippet>461</a>                HeaderValue::from_static(<span class="string">"1560704880.423"</span>),
+<a href=#462 id=462 data-nosnippet>462</a>            ),
+<a href=#463 id=463 data-nosnippet>463</a>            (HeaderName::from_static(<span class="string">"x-bad-num"</span>), HeaderValue::from_static(<span class="string">"abc"</span>)),
+<a href=#464 id=464 data-nosnippet>464</a>            (
+<a href=#465 id=465 data-nosnippet>465</a>                HeaderName::from_static(<span class="string">"x-bad-unicode"</span>),
+<a href=#466 id=466 data-nosnippet>466</a>                HeaderValue::from_bytes(<span class="kw-2">&amp;</span>[<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>]).unwrap(),
+<a href=#467 id=467 data-nosnippet>467</a>            ),
+<a href=#468 id=468 data-nosnippet>468</a>        ];
+<a href=#469 id=469 data-nosnippet>469</a>
+<a href=#470 id=470 data-nosnippet>470</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = HeaderMap::with_capacity(pairs.len());
+<a href=#471 id=471 data-nosnippet>471</a>
+<a href=#472 id=472 data-nosnippet>472</a>        <span class="kw">for </span>(name, val) <span class="kw">in </span>pairs {
+<a href=#473 id=473 data-nosnippet>473</a>            map.insert(name, val.clone());
+<a href=#474 id=474 data-nosnippet>474</a>        }
+<a href=#475 id=475 data-nosnippet>475</a>
+<a href=#476 id=476 data-nosnippet>476</a>        map
+<a href=#477 id=477 data-nosnippet>477</a>    }
+<a href=#478 id=478 data-nosnippet>478</a>
+<a href=#479 id=479 data-nosnippet>479</a>    <span class="attr">#[test]
 <a href=#480 id=480 data-nosnippet>480</a>    </span><span class="kw">fn </span>test_parse_header_good() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
 <a href=#481 id=481 data-nosnippet>481</a>        <span class="kw">let </span>headers = headers();
 <a href=#482 id=482 data-nosnippet>482</a>
 <a href=#483 id=483 data-nosnippet>483</a>        <span class="macro">assert_eq!</span>(parse_header::&lt;i64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-ratelimit-limit"</span>)<span class="question-mark">?</span>.unwrap(), <span class="number">5</span>);
-<a href=#484 id=484 data-nosnippet>484</a>        <span class="macro">assert_eq!</span>(parse_header::&lt;i64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-ratelimit-remaining"</span>)<span class="question-mark">?</span>.unwrap(), <span class="number">4</span>,);
-<a href=#485 id=485 data-nosnippet>485</a>        <span class="macro">assert_eq!</span>(parse_header::&lt;f64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-ratelimit-reset"</span>)<span class="question-mark">?</span>.unwrap(), <span class="number">1_560_704_880.423</span>);
-<a href=#486 id=486 data-nosnippet>486</a>
-<a href=#487 id=487 data-nosnippet>487</a>        <span class="prelude-val">Ok</span>(())
-<a href=#488 id=488 data-nosnippet>488</a>    }
-<a href=#489 id=489 data-nosnippet>489</a>
-<a href=#490 id=490 data-nosnippet>490</a>    <span class="attr">#[test]
-<a href=#491 id=491 data-nosnippet>491</a>    </span><span class="kw">fn </span>test_parse_header_errors() {
-<a href=#492 id=492 data-nosnippet>492</a>        <span class="kw">let </span>headers = headers();
-<a href=#493 id=493 data-nosnippet>493</a>
-<a href=#494 id=494 data-nosnippet>494</a>        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-<a href=#495 id=495 data-nosnippet>495</a>            parse_header::&lt;i64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-bad-num"</span>).unwrap_err(),
-<a href=#496 id=496 data-nosnippet>496</a>            Error::Http(HttpError::RateLimitI64F64)
-<a href=#497 id=497 data-nosnippet>497</a>        ));
-<a href=#498 id=498 data-nosnippet>498</a>        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-<a href=#499 id=499 data-nosnippet>499</a>            parse_header::&lt;i64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-bad-unicode"</span>).unwrap_err(),
-<a href=#500 id=500 data-nosnippet>500</a>            Error::Http(HttpError::RateLimitUtf8)
-<a href=#501 id=501 data-nosnippet>501</a>        ));
-<a href=#502 id=502 data-nosnippet>502</a>    }
-<a href=#503 id=503 data-nosnippet>503</a>}
+<a href=#484 id=484 data-nosnippet>484</a>        <span class="macro">assert_eq!</span>(parse_header::&lt;i64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-ratelimit-remaining"</span>)<span class="question-mark">?</span>.unwrap(), <span class="number">4</span>);
+<a href=#485 id=485 data-nosnippet>485</a>
+<a href=#486 id=486 data-nosnippet>486</a>        <span class="comment">// Float patterns behave the same as `==`. Workaround for clippy::float_cmp regression:
+<a href=#487 id=487 data-nosnippet>487</a>        // https://github.com/rust-lang/rust-clippy/issues/17570
+<a href=#488 id=488 data-nosnippet>488</a>        </span><span class="macro">assert_matches!</span>(
+<a href=#489 id=489 data-nosnippet>489</a>            parse_header::&lt;f64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-ratelimit-reset"</span>)<span class="question-mark">?</span>.unwrap(),
+<a href=#490 id=490 data-nosnippet>490</a>            <span class="number">1_560_704_880.423
+<a href=#491 id=491 data-nosnippet>491</a>        </span>);
+<a href=#492 id=492 data-nosnippet>492</a>
+<a href=#493 id=493 data-nosnippet>493</a>        <span class="prelude-val">Ok</span>(())
+<a href=#494 id=494 data-nosnippet>494</a>    }
+<a href=#495 id=495 data-nosnippet>495</a>
+<a href=#496 id=496 data-nosnippet>496</a>    <span class="attr">#[test]
+<a href=#497 id=497 data-nosnippet>497</a>    </span><span class="kw">fn </span>test_parse_header_errors() {
+<a href=#498 id=498 data-nosnippet>498</a>        <span class="kw">let </span>headers = headers();
+<a href=#499 id=499 data-nosnippet>499</a>
+<a href=#500 id=500 data-nosnippet>500</a>        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
+<a href=#501 id=501 data-nosnippet>501</a>            parse_header::&lt;i64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-bad-num"</span>).unwrap_err(),
+<a href=#502 id=502 data-nosnippet>502</a>            Error::Http(HttpError::RateLimitI64F64)
+<a href=#503 id=503 data-nosnippet>503</a>        ));
+<a href=#504 id=504 data-nosnippet>504</a>        <span class="macro">assert!</span>(<span class="macro">matches!</span>(
+<a href=#505 id=505 data-nosnippet>505</a>            parse_header::&lt;i64&gt;(<span class="kw-2">&amp;</span>headers, <span class="string">"x-bad-unicode"</span>).unwrap_err(),
+<a href=#506 id=506 data-nosnippet>506</a>            Error::Http(HttpError::RateLimitUtf8)
+<a href=#507 id=507 data-nosnippet>507</a>        ));
+<a href=#508 id=508 data-nosnippet>508</a>    }
+<a href=#509 id=509 data-nosnippet>509</a>}
 </code></pre></div></section></main></body></html>

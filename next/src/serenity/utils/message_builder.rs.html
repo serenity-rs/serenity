@@ -1204,7 +1204,7 @@
 <a href=#1204 id=1204 data-nosnippet>1204</a>    <span class="attr">#[test]
 <a href=#1205 id=1205 data-nosnippet>1205</a>    </span><span class="kw">fn </span>push() {
 <a href=#1206 id=1206 data-nosnippet>1206</a>        <span class="macro">assert_eq!</span>(MessageBuilder::new().push(<span class="string">"a"</span>).<span class="number">0</span>, <span class="string">"a"</span>);
-<a href=#1207 id=1207 data-nosnippet>1207</a>        <span class="macro">assert!</span>(MessageBuilder::new().push(<span class="string">""</span>).<span class="number">0</span>.is_empty());
+<a href=#1207 id=1207 data-nosnippet>1207</a>        <span class="macro">assert_eq!</span>(MessageBuilder::new().push(<span class="string">""</span>).<span class="number">0</span>, <span class="string">""</span>);
 <a href=#1208 id=1208 data-nosnippet>1208</a>    }
 <a href=#1209 id=1209 data-nosnippet>1209</a>
 <a href=#1210 id=1210 data-nosnippet>1210</a>    <span class="attr">#[test]

@@ -417,11 +417,11 @@
 <a href=#417 id=417 data-nosnippet>417</a>    /// Returns None if the member has no roles or the member from this guild.
 <a href=#418 id=418 data-nosnippet>418</a>    </span><span class="attr">#[must_use]
 <a href=#419 id=419 data-nosnippet>419</a>    </span><span class="kw">pub fn </span>member_highest_role(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
-<a href=#420 id=420 data-nosnippet>420</a>        <span class="self">Self</span>::_member_highest_role_in(<span class="kw-2">&amp;</span><span class="self">self</span>.roles, member)
+<a href=#420 id=420 data-nosnippet>420</a>        <span class="self">Self</span>::member_highest_role_in_(<span class="kw-2">&amp;</span><span class="self">self</span>.roles, member)
 <a href=#421 id=421 data-nosnippet>421</a>    }
 <a href=#422 id=422 data-nosnippet>422</a>
 <a href=#423 id=423 data-nosnippet>423</a>    <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].
-<a href=#424 id=424 data-nosnippet>424</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>_member_highest_role_in&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#424 id=424 data-nosnippet>424</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>member_highest_role_in_&lt;<span class="lifetime">'a</span>&gt;(
 <a href=#425 id=425 data-nosnippet>425</a>        roles: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>ExtractMap&lt;RoleId, Role&gt;,
 <a href=#426 id=426 data-nosnippet>426</a>        member: <span class="kw-2">&amp;</span>Member,
 <a href=#427 id=427 data-nosnippet>427</a>    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Role&gt; {
@@ -465,7 +465,7 @@
 <a href=#465 id=465 data-nosnippet>465</a>        <span class="kw">let </span>lhs_highest_role = <span class="self">self</span>.member_highest_role(lhs);
 <a href=#466 id=466 data-nosnippet>466</a>        <span class="kw">let </span>rhs_highest_role = <span class="self">self</span>.member_highest_role(rhs);
 <a href=#467 id=467 data-nosnippet>467</a>
-<a href=#468 id=468 data-nosnippet>468</a>        <span class="self">Self</span>::_greater_member_hierarchy_in(
+<a href=#468 id=468 data-nosnippet>468</a>        <span class="self">Self</span>::greater_member_hierarchy_in_(
 <a href=#469 id=469 data-nosnippet>469</a>            lhs_highest_role,
 <a href=#470 id=470 data-nosnippet>470</a>            rhs_highest_role,
 <a href=#471 id=471 data-nosnippet>471</a>            <span class="self">self</span>.owner_id,
@@ -476,7 +476,7 @@
 <a href=#476 id=476 data-nosnippet>476</a>
 <a href=#477 id=477 data-nosnippet>477</a>    <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].
 <a href=#478 id=478 data-nosnippet>478</a>    </span><span class="attr">#[must_use]
-<a href=#479 id=479 data-nosnippet>479</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>_greater_member_hierarchy_in(
+<a href=#479 id=479 data-nosnippet>479</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>greater_member_hierarchy_in_(
 <a href=#480 id=480 data-nosnippet>480</a>        lhs_highest_role: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt;,
 <a href=#481 id=481 data-nosnippet>481</a>        rhs_highest_role: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt;,
 <a href=#482 id=482 data-nosnippet>482</a>        owner_id: UserId,
