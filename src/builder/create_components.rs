@@ -48,6 +48,28 @@ impl serde::Serialize for CreateActionRow<'_> {
     }
 }
 
+impl TryFrom<ActionRow> for CreateActionRow<'_> {
+    type Error = ComponentConversionError;
+
+    /// Attempts to convert to this type from an [`ActionRow`].
+    ///
+    /// # Errors
+    /// Returns [`ComponentConversionError::LossyComponent`] if the [`ActionRow`] contains a
+    /// non-string [`SelectMenu`], as lossless conversion is not possible.
+    fn try_from(action_row: ActionRow) -> StdResult<Self, Self::Error> {
+        let mut buttons: Vec<CreateButton> = Vec::with_capacity(5);
+        for component in action_row.components {
+            match component {
+                ActionRowComponent::Button(button) => buttons.push(button.into()),
+                ActionRowComponent::SelectMenu(select_menu) => {
+                    return Ok(Self::SelectMenu(select_menu.try_into()?));
+                },
+            }
+        }
+        Ok(Self::Buttons(buttons.into()))
+    }
+}
+
 /// A builder for creating components in a structured way.
 ///
 /// This enum supports both V1 and V2 components, with the exception of `ActionRow`, which is a V1
@@ -114,6 +136,44 @@ impl CreateComponent<'_> {
             Self::Separator(e) => CreateComponent::Separator(e),
             Self::Container(e) => CreateComponent::Container(e.into_owned()),
             Self::Label(e) => CreateComponent::Label(e.into_owned()),
+        }
+    }
+}
+
+impl TryFrom<Component> for CreateComponent<'_> {
+    type Error = ComponentConversionError;
+
+    /// Attempts to convert to this type from a [`Component`].
+    ///
+    /// # Errors
+    /// Returns [`ComponentConversionError::LossyComponent`] if the [`Component`] is a [`Label`]
+    /// or an [`ActionRow`] with a non-string [`SelectMenu`], as lossless conversion is not
+    /// possible.
+    ///
+    /// May also return [`ComponentConversionError::InvalidFilename`] if the [`Component`] is a
+    /// [`FileComponent`] that fails to convert. See the `TryFrom` impl of [`CreateFile`] for
+    /// details.
+    fn try_from(component: Component) -> StdResult<Self, Self::Error> {
+        match component {
+            Component::ActionRow(action_row) => {
+                Ok(CreateComponent::ActionRow(action_row.try_into()?))
+            },
+            Component::Section(section) => Ok(CreateComponent::Section(section.into())),
+            Component::TextDisplay(text_display) => {
+                Ok(CreateComponent::TextDisplay(text_display.into()))
+            },
+            Component::MediaGallery(media_gallery) => {
+                Ok(CreateComponent::MediaGallery(media_gallery.into()))
+            },
+            Component::File(file_component) => {
+                Ok(CreateComponent::File(file_component.try_into()?))
+            },
+            Component::Separator(separator) => Ok(CreateComponent::Separator(separator.into())),
+            Component::Container(container) => {
+                Ok(CreateComponent::Container(container.try_into()?))
+            },
+            Component::Label(_) => Err(ComponentConversionError::LossyComponent),
+            Component::Unknown(_) => Err(ComponentConversionError::UnknownType),
         }
     }
 }
@@ -191,6 +251,21 @@ impl<'a> CreateSection<'a> {
     }
 }
 
+impl From<Section> for CreateSection<'_> {
+    fn from(section: Section) -> Self {
+        let mut components = Vec::with_capacity(section.components.len() as usize);
+        for component in section.components {
+            components.push(component.into());
+        }
+
+        Self {
+            kind: ComponentType::Section,
+            components: components.into(),
+            accessory: CreateSectionAccessory::from(*section.accessory),
+        }
+    }
+}
+
 /// An enum of all valid section components.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -203,6 +278,14 @@ impl CreateSectionComponent<'_> {
     pub fn into_owned(self) -> CreateSectionComponent<'static> {
         match self {
             Self::TextDisplay(e) => CreateSectionComponent::TextDisplay(e.into_owned()),
+        }
+    }
+}
+
+impl From<SectionComponent> for CreateSectionComponent<'_> {
+    fn from(section_component: SectionComponent) -> Self {
+        match section_component {
+            SectionComponent::TextDisplay(text_display) => Self::TextDisplay(text_display.into()),
         }
     }
 }
@@ -249,6 +332,15 @@ impl<'a> CreateTextDisplay<'a> {
     }
 }
 
+impl From<TextDisplay> for CreateTextDisplay<'_> {
+    fn from(text_display: TextDisplay) -> Self {
+        Self {
+            kind: ComponentType::TextDisplay,
+            content: text_display.content.into(),
+        }
+    }
+}
+
 /// An enum of all valid section accessories.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -263,6 +355,15 @@ impl CreateSectionAccessory<'_> {
         match self {
             Self::Thumbnail(e) => CreateSectionAccessory::Thumbnail(e.into_owned()),
             Self::Button(e) => CreateSectionAccessory::Button(e.into_owned()),
+        }
+    }
+}
+
+impl From<SectionAccessory> for CreateSectionAccessory<'_> {
+    fn from(section_accessory: SectionAccessory) -> Self {
+        match section_accessory {
+            SectionAccessory::Button(button) => Self::Button(button.into()),
+            SectionAccessory::Thumbnail(thumbnail) => Self::Thumbnail(thumbnail.into()),
         }
     }
 }
@@ -325,6 +426,17 @@ impl<'a> CreateThumbnail<'a> {
     }
 }
 
+impl From<Thumbnail> for CreateThumbnail<'_> {
+    fn from(thumbnail: Thumbnail) -> Self {
+        Self {
+            kind: ComponentType::Thumbnail,
+            media: thumbnail.media.into(),
+            description: thumbnail.description.map(Into::into),
+            spoiler: thumbnail.spoiler,
+        }
+    }
+}
+
 /// A builder to create a media item.
 #[derive(Clone, Debug, Serialize, Default)]
 #[must_use]
@@ -352,6 +464,14 @@ impl<'a> CreateUnfurledMediaItem<'a> {
         } = self;
         CreateUnfurledMediaItem {
             url: url.into_owned().into(),
+        }
+    }
+}
+
+impl From<UnfurledMediaItem> for CreateUnfurledMediaItem<'_> {
+    fn from(item: UnfurledMediaItem) -> Self {
+        Self {
+            url: item.url.into(),
         }
     }
 }
@@ -407,6 +527,17 @@ impl<'a> CreateMediaGallery<'a> {
     }
 }
 
+impl From<MediaGallery> for CreateMediaGallery<'_> {
+    fn from(gallery: MediaGallery) -> Self {
+        let items: Vec<_> = gallery.items.into_iter().map(CreateMediaGalleryItem::from).collect();
+
+        Self {
+            kind: ComponentType::MediaGallery,
+            items: items.into(),
+        }
+    }
+}
+
 /// Builder to create individual media gallery items.
 #[derive(Clone, Debug, Serialize, Default)]
 #[must_use]
@@ -456,6 +587,16 @@ impl<'a> CreateMediaGalleryItem<'a> {
             media: media.into_owned(),
             description: description.map(|d| d.into_owned().into()),
             spoiler,
+        }
+    }
+}
+
+impl From<MediaGalleryItem> for CreateMediaGalleryItem<'_> {
+    fn from(item: MediaGalleryItem) -> Self {
+        Self {
+            media: item.media.into(),
+            description: item.description.map(Into::into),
+            spoiler: item.spoiler,
         }
     }
 }
@@ -526,6 +667,46 @@ impl<'a> CreateFile<'a> {
     }
 }
 
+impl TryFrom<FileComponent> for CreateFile<'_> {
+    type Error = ComponentConversionError;
+
+    /// Attempts to convert to this type from a [`FileComponent`].
+    ///
+    /// Because the [`CreateFile`] builder only supports the `attachment://` protocol, a file with
+    /// the original filename must be attached to the message for the converted [`FileComponent`]
+    /// to display properly. When editing a message with attachments kept intact, this requirement
+    /// will be satisfied. For a new message, you must upload a file with the same filename and
+    /// attach it to the message.
+    ///
+    /// # Errors
+    /// Returns [`ComponentConversionError::InvalidFilename`] if a valid filename cannot be
+    /// determined from the URL of the existing [`UnfurledMediaItem`].
+    ///
+    /// Note that due to the above requirement, successful conversion does not guarantee the file
+    /// will display properly.
+    fn try_from(file: FileComponent) -> StdResult<Self, Self::Error> {
+        let filename = file
+            .file
+            .url
+            .split('/')
+            .next_back()
+            .ok_or(ComponentConversionError::InvalidFilename)?
+            .split('?')
+            .next()
+            .ok_or(ComponentConversionError::InvalidFilename)?;
+        if !filename.contains('.') {
+            return Err(ComponentConversionError::InvalidFilename);
+        }
+        let url = format!("attachment://{filename}");
+
+        Ok(Self {
+            kind: ComponentType::File,
+            file: CreateUnfurledMediaItem::new(url),
+            spoiler: file.spoiler,
+        })
+    }
+}
+
 /// A builder for creating a separator.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -564,6 +745,16 @@ impl CreateSeparator {
 impl Default for CreateSeparator {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+impl From<Separator> for CreateSeparator {
+    fn from(separator: Separator) -> Self {
+        Self {
+            kind: ComponentType::Separator,
+            divider: Some(separator.divider),
+            spacing: separator.spacing,
+        }
     }
 }
 
@@ -652,6 +843,36 @@ impl<'a> CreateContainer<'a> {
     }
 }
 
+impl TryFrom<Container> for CreateContainer<'_> {
+    type Error = ComponentConversionError;
+
+    /// Attempts to convert to this type from a [`Container`].
+    ///
+    /// # Errors
+    /// Returns [`ComponentConversionError::LossyComponent`] if the [`Container`] contains
+    /// an [`ActionRow`] with a non-string [`SelectMenu`], as lossless conversion is not possible.
+    ///
+    /// May also return [`ComponentConversionError::InvalidFilename`] if the [`Container`]
+    /// contains a [`FileComponent`] that fails to convert. See the `TryFrom` impl of
+    /// [`CreateFile`] for details.
+    fn try_from(container: Container) -> StdResult<Self, Self::Error> {
+        let components = {
+            let mut components = Vec::with_capacity(container.components.len() as usize);
+            for component in container.components {
+                components.push(component.try_into()?);
+            }
+            components
+        };
+
+        Ok(Self {
+            kind: ComponentType::Container,
+            accent_color: container.accent_color,
+            spoiler: container.spoiler,
+            components: components.into(),
+        })
+    }
+}
+
 /// An enum of all valid container components.
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
@@ -674,6 +895,36 @@ impl CreateContainerComponent<'_> {
             Self::MediaGallery(e) => CreateContainerComponent::MediaGallery(e.into_owned()),
             Self::File(e) => CreateContainerComponent::File(e.into_owned()),
             Self::Separator(e) => CreateContainerComponent::Separator(e),
+        }
+    }
+}
+
+impl TryFrom<ContainerComponent> for CreateContainerComponent<'_> {
+    type Error = ComponentConversionError;
+
+    /// Attempts to convert to this type from a [`ContainerComponent`].
+    ///
+    /// # Errors
+    /// Returns [`ComponentConversionError::LossyComponent`] if the [`ContainerComponent`] is an
+    /// [`ActionRow`] with a non-string [`SelectMenu`], as lossless conversion is not possible.
+    ///
+    /// May also return [`ComponentConversionError::InvalidFilename`] if the [`ContainerComponent`]
+    /// is a [`FileComponent`] that fails to convert. See the `TryFrom` impl of [`CreateFile`] for
+    /// details.
+    fn try_from(component: ContainerComponent) -> StdResult<Self, Self::Error> {
+        match component {
+            ContainerComponent::ActionRow(action_row) => {
+                Ok(Self::ActionRow(action_row.try_into()?))
+            },
+            ContainerComponent::Section(section) => Ok(Self::Section(section.into())),
+            ContainerComponent::TextDisplay(text_display) => {
+                Ok(Self::TextDisplay(text_display.into()))
+            },
+            ContainerComponent::MediaGallery(media_gallery) => {
+                Ok(Self::MediaGallery(media_gallery.into()))
+            },
+            ContainerComponent::File(file_component) => Ok(Self::File(file_component.try_into()?)),
+            ContainerComponent::Separator(separator) => Ok(Self::Separator(separator.into())),
         }
     }
 }
@@ -1542,6 +1793,31 @@ impl Serialize for CreateSelectMenuKind<'_> {
     }
 }
 
+impl TryFrom<SelectMenuKind> for CreateSelectMenuKind<'_> {
+    type Error = ComponentConversionError;
+
+    /// Attempts to convert to this type from a [`SelectMenuKind`].
+    ///
+    /// # Errors
+    /// Returns [`ComponentConversionError::LossyComponent`] for variants other than
+    /// [`SelectMenuKind::String`], as lossless conversion is not possible.
+    fn try_from(select_menu_kind: SelectMenuKind) -> StdResult<Self, Self::Error> {
+        match select_menu_kind {
+            SelectMenuKind::String {
+                options,
+            } => Ok(Self::String {
+                options: options.into_iter().map(Into::into).collect(),
+            }),
+            SelectMenuKind::User {}
+            | SelectMenuKind::Role {}
+            | SelectMenuKind::Mentionable {}
+            | SelectMenuKind::Channel {
+                ..
+            } => Err(ComponentConversionError::LossyComponent),
+        }
+    }
+}
+
 /// A builder for creating a select menu component in a message
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#component-object-component-types).
@@ -1638,6 +1914,27 @@ impl<'a> CreateSelectMenu<'a> {
     }
 }
 
+impl TryFrom<SelectMenu> for CreateSelectMenu<'_> {
+    type Error = ComponentConversionError;
+
+    /// Attempts to convert to this type from a [`SelectMenu`].
+    ///
+    /// # Errors
+    /// Returns [`ComponentConversionError::LossyComponent`] for any select menu kind other than
+    /// [`SelectMenuKind::String`], as lossless conversion is not possible.
+    fn try_from(select_menu: SelectMenu) -> StdResult<Self, Self::Error> {
+        Ok(Self {
+            custom_id: select_menu.custom_id.into(),
+            placeholder: select_menu.placeholder.map(Into::into),
+            min_values: select_menu.min_values,
+            max_values: select_menu.max_values,
+            required: Some(select_menu.required),
+            disabled: Some(select_menu.disabled),
+            kind: select_menu.kind.try_into()?,
+        })
+    }
+}
+
 /// A builder for creating an option of a select menu component in a message.
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#string-select-select-option-structure)
@@ -1715,6 +2012,18 @@ impl<'a> CreateSelectMenuOption<'a> {
     }
 }
 
+impl From<SelectMenuOption> for CreateSelectMenuOption<'_> {
+    fn from(select_menu_option: SelectMenuOption) -> Self {
+        Self {
+            label: select_menu_option.label.into(),
+            value: select_menu_option.value.into(),
+            description: select_menu_option.description.map(Into::into),
+            emoji: select_menu_option.emoji,
+            default: Some(select_menu_option.default),
+        }
+    }
+}
+
 /// A builder for creating an input text component in a modal
 ///
 /// [Discord docs](https://docs.discord.com/developers/components/reference#text-input).
@@ -1735,7 +2044,7 @@ pub struct CreateInputText<'a> {
 }
 
 impl<'a> CreateInputText<'a> {
-    /// Creates a text input with the given style, label, and custom id (a developer-defined
+    /// Creates a text input with the given style and custom id (a developer-defined
     /// identifier), leaving all other fields empty.
     pub fn new(style: InputTextStyle, custom_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
@@ -1815,6 +2124,27 @@ impl<'a> CreateInputText<'a> {
             required,
             value: value.map(|v| v.into_owned().into()),
             placeholder: placeholder.map(|p| p.into_owned().into()),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum ComponentConversionError {
+    InvalidFilename,
+    LossyComponent,
+    UnknownType,
+}
+
+impl std::error::Error for ComponentConversionError {}
+
+impl std::fmt::Display for ComponentConversionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::InvalidFilename => f.write_str("unable to determine valid filename"),
+            Self::LossyComponent => f.write_str(
+                "lossless conversion not possible for modal or non-string select components",
+            ),
+            Self::UnknownType => f.write_str("unknown component type"),
         }
     }
 }
