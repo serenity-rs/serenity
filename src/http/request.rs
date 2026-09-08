@@ -1,5 +1,3 @@
-use std::fmt::Write;
-
 use reqwest::header::{
     AUTHORIZATION,
     CONTENT_LENGTH,
@@ -8,7 +6,7 @@ use reqwest::header::{
     HeaderValue,
     USER_AGENT,
 };
-use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
+use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 
@@ -97,14 +95,13 @@ impl<'a> Request<'a> {
             path = path.replace("https://discord.com", proxy.trim_end_matches('/'));
         }
 
+        let mut url = Url::parse(&path)?;
+
         if let Some(params) = self.params {
-            path += "?";
-            for (param, value) in params {
-                write!(path, "&{param}={value}").expect("writing to a string should never fail");
-            }
+            url.query_pairs_mut().extend_pairs(params);
         }
 
-        let mut builder = client.request(self.method.reqwest_method(), path);
+        let mut builder = client.request(self.method.reqwest_method(), url);
 
         let mut headers = self.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(SERENITY_USER_AGENT));
