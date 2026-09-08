@@ -1,5 +1,3 @@
-use std::fmt::Write;
-
 use reqwest::header::{
     AUTHORIZATION,
     CONTENT_LENGTH,
@@ -8,7 +6,7 @@ use reqwest::header::{
     HeaderValue,
     USER_AGENT,
 };
-use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
+use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder, Url};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 
@@ -97,14 +95,13 @@ impl<'a> Request<'a> {
             path = path.replace("https://discord.com", proxy.trim_end_matches('/'));
         }
 
+        let mut url = Url::parse(&path)?;
+
         if let Some(params) = self.params {
-            path += "?";
-            for (param, value) in params {
-                write!(path, "&{param}={value}").expect("writing to a string should never fail");
-            }
+            url.query_pairs_mut().extend_pairs(params);
         }
 
-        let mut builder = client.request(self.method.reqwest_method(), path);
+        let mut builder = client.request(self.method.reqwest_method(), url);
 
         let mut headers = self.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(SERENITY_USER_AGENT));
@@ -162,5 +159,47 @@ impl<'a> Request<'a> {
     #[must_use]
     pub fn params_ref(&self) -> Option<&'a [(&'a str, &'a str)]> {
         self.params
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::borrow::Cow;
+    use std::vec::Vec;
+
+    use super::*;
+    use crate::http::client::HttpBuilder;
+    use crate::model::id::GuildId;
+
+    // This test has to be async because Request::build is async, even though we don't use its async
+    // functionality here.
+    #[tokio::test]
+    async fn test_query_params_are_correctly_encoded() {
+        // Http::search_guild_members passes the query string unmodified into the Request struct
+        // expression. Let's see if it's handled correctly.
+        let guild_id = GuildId::default();
+        // This is actually a valid nickname on Discord. But since the & is also used to separate
+        // query arguments, it must be urlencoded before it can be sent.
+        let query = "foo&bar";
+        let limit = "50";
+
+        let sample_request = Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildMembersSearch {
+                guild_id,
+            },
+            params: Some(&[("query", query), ("limit", limit)]),
+        };
+
+        let client = HttpBuilder::without_token().build();
+        let request_builder = sample_request.build(&client.client, None, None).await.unwrap();
+        let built = request_builder.build().unwrap();
+        let expected =
+            vec![(Cow::from("query"), Cow::from(query)), (Cow::from("limit"), Cow::from(limit))];
+        let actual = Vec::from_iter(built.url().query_pairs());
+        assert_eq!(actual, expected);
     }
 }
