@@ -1,5 +1,3 @@
-use std::fmt::Write;
-
 use reqwest::header::{
     AUTHORIZATION,
     CONTENT_LENGTH,
@@ -97,14 +95,11 @@ impl<'a> Request<'a> {
             path = path.replace("https://discord.com", proxy.trim_end_matches('/'));
         }
 
-        if let Some(params) = self.params {
-            path += "?";
-            for (param, value) in params {
-                write!(path, "&{param}={value}").expect("writing to a string should never fail");
-            }
-        }
-
         let mut builder = client.request(self.method.reqwest_method(), path);
+
+        if let Some(params) = self.params {
+            builder = builder.query(params);
+        }
 
         let mut headers = self.headers.unwrap_or_default();
         headers.insert(USER_AGENT, HeaderValue::from_static(SERENITY_USER_AGENT));
