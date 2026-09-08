@@ -55,7 +55,7 @@ foldhash = { version = "0.2.0", optional = true }
 chrono = { version = "0.4.42", default-features = false, features = ["clock", "serde"], optional = true }
 flate2 = { version = "1.1.9", features = ["zlib-rs"], optional = true }
 zstd = { version = "0.13", default-features = false, optional = true }
-reqwest = { version = ">=0.13", default-features = false, features = ["multipart", "stream", "json"], optional = true }
+reqwest = { version = ">=0.13", default-features = false, features = ["multipart", "stream", "json", "query"], optional = true }
 tokio-tungstenite = { version = "0.28.0", features = ["url"], optional = true }
 percent-encoding = { version = "2.3.2", optional = true }
 mini-moka = { version = "0.10.3", optional = true }
