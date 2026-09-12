@@ -1,26 +1,37 @@
+use crate::model::prelude::*;
+use serde::{Serialize, ser::SerializeSeq};
 use std::borrow::Cow;
 
-use arrayvec::ArrayVec;
-use serde::{Deserialize, Serialize};
-
-use crate::model::prelude::*;
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-enum ParseValue {
-    Everyone,
-    Users,
-    Roles,
+#[derive(Clone, Debug, Default, PartialEq)]
+struct Parse {
+    everyone: bool,
+    users: bool,
+    roles: bool,
 }
 
-enum ParseAction {
-    Remove,
-    Insert,
+impl Parse {
+    const fn new() -> Self {
+        Self { everyone: false, users: false, roles: false }
+    }
 }
 
-impl ParseAction {
-    fn from_allow(allow: bool) -> Self {
-        if allow { Self::Insert } else { Self::Remove }
+impl Serialize for Parse {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let count = self.everyone as usize + self.users as usize + self.roles as usize;
+        let mut seq = serializer.serialize_seq(Some(count))?;
+        if self.everyone {
+            seq.serialize_element("everyone")?;
+        }
+        if self.users {
+            seq.serialize_element("users")?;
+        }
+        if self.roles {
+            seq.serialize_element("roles")?;
+        }
+        seq.end()
     }
 }
 
@@ -74,7 +85,7 @@ impl ParseAction {
 #[derive(Clone, Debug, Default, Serialize)]
 #[must_use]
 pub struct CreateAllowedMentions<'a> {
-    parse: ArrayVec<ParseValue, 3>,
+    parse: Parse,
     users: Cow<'a, [UserId]>,
     roles: Cow<'a, [RoleId]>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -82,35 +93,31 @@ pub struct CreateAllowedMentions<'a> {
 }
 
 impl<'a> CreateAllowedMentions<'a> {
-    /// Equivalent to [`Self::default`].
-    pub fn new() -> Self {
-        Self::default()
+    pub const fn new() -> Self {
+        Self {
+            parse: Parse::new(),
+            users: Cow::Borrowed(&[]),
+            roles: Cow::Borrowed(&[]),
+            replied_user: None,
+        }
     }
 
-    fn handle_parse_unique(mut self, value: ParseValue, action: ParseAction) -> Self {
-        let existing_pos = self.parse.iter().position(|p| *p == value);
-        match (existing_pos, action) {
-            (Some(pos), ParseAction::Remove) => drop(self.parse.swap_remove(pos)),
-            (None, ParseAction::Insert) => self.parse.push(value),
-            _ => {},
-        }
-
+    /// Toggles mentions for all users.
+    pub const fn all_users(mut self, allow: bool) -> Self {
+        self.parse.users = allow;
         self
     }
 
-    /// Toggles mentions for all users. Overrides [`Self::users`] if it was previously set.
-    pub fn all_users(self, allow: bool) -> Self {
-        self.handle_parse_unique(ParseValue::Users, ParseAction::from_allow(allow))
-    }
-
-    /// Toggles mentions for all roles. Overrides [`Self::roles`] if it was previously set.
-    pub fn all_roles(self, allow: bool) -> Self {
-        self.handle_parse_unique(ParseValue::Roles, ParseAction::from_allow(allow))
+    /// Toggles mentions for all roles.
+    pub const fn all_roles(mut self, allow: bool) -> Self {
+        self.parse.roles = allow;
+        self
     }
 
     /// Toggles @everyone and @here mentions.
-    pub fn everyone(self, allow: bool) -> Self {
-        self.handle_parse_unique(ParseValue::Everyone, ParseAction::from_allow(allow))
+    pub const fn everyone(mut self, allow: bool) -> Self {
+        self.parse.everyone = allow;
+        self
     }
 
     /// Sets the *specific* users that will be allowed mentionable.
@@ -166,7 +173,8 @@ impl<'a> CreateAllowedMentions<'a> {
     }
 
     /// Makes the reply mention/ping the user.
-    pub fn replied_user(mut self, mention_user: bool) -> Self {
+    #[inline]
+    pub const fn replied_user(mut self, mention_user: bool) -> Self {
         self.replied_user = Some(mention_user);
         self
     }
