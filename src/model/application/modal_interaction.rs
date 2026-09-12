@@ -236,6 +236,24 @@ pub enum ModalComponent {
     Label(Label),
 }
 
+impl ModalComponent {
+    #[must_use]
+    pub fn into_text_display(self) -> Option<TextDisplay> {
+        match self {
+            ModalComponent::TextDisplay(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_label(self) -> Option<Label> {
+        match self {
+            ModalComponent::Label(component) => Some(component),
+            _ => None,
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for ModalComponent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         #[derive(Deserialize)]
