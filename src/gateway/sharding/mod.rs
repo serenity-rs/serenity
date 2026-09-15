@@ -40,6 +40,7 @@ use aformat::aformat_into;
 use aformat::{ArrayString, CapStr, aformat};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::CloseFrame;
+use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode as TungsteniteCloseCode;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, error, info, trace, warn};
@@ -360,12 +361,17 @@ impl Shard {
                     error!("[{:?}] Disallowed gateway intents have been provided.", self.info);
                     return Err(Error::Gateway(GatewayError::DisallowedGatewayIntents));
                 },
-                _ => warn!(
-                    "[{:?}] Unknown close code {}: {:?}",
-                    self.info,
-                    code,
-                    data.map(|d| &d.reason)
-                ),
+                _ => match code {
+                    TungsteniteCloseCode::Normal => info!("[{:?}] Normal closure.", self.info),
+                    TungsteniteCloseCode::Away => info!("[{:?}] Going away.", self.info),
+                    TungsteniteCloseCode::Restart => info!("[{:?}] Server restarting.", self.info),
+                    _ => warn!(
+                        "[{0:?}] Other close code {1} ({1:?}): {2:?}",
+                        self.info,
+                        code,
+                        data.map(|d| &d.reason)
+                    ),
+                },
             }
         }
         Ok(())
