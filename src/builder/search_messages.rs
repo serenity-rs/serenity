@@ -1,4 +1,6 @@
 use std::borrow::Cow;
+#[cfg(feature = "cache")]
+use std::collections::HashMap;
 use std::ops::Not;
 
 use nonmax::{NonMaxU8, NonMaxU16};
@@ -279,8 +281,10 @@ impl<'a> MessageQuery<'a> {
 
     /// Executes message search in the guild.
     ///
-    /// If the cache is enabled, this method will fill up the message cache for the guild, if the
+    /// If should_cache is `Yes`, this method will fill up the message cache for the guild, if the
     /// messages returned are newer than the existing cached messages or the cache is not full yet.
+    /// Since messages are cached in their respective channels, the returned messages will need to
+    /// be grouped by channel before being added to the cache.
     ///
     /// **Note**: If the user does not have the [Read Message History] permission, returns an empty
     /// [`Vec`].
@@ -295,6 +299,7 @@ impl<'a> MessageQuery<'a> {
         self,
         cache_http: impl CacheHttp,
         guild_id: GuildId,
+        #[cfg_attr(not(feature = "cache"), expect(unused_variables))] should_cache: ShouldCache,
     ) -> Result<Vec<Message>> {
         // There are 24 possible params (as of 2026-09-07), some of which can take arrays.
         // https://docs.discord.com/developers/reference#array-query-strings
@@ -316,12 +321,31 @@ impl<'a> MessageQuery<'a> {
         let http = cache_http.http();
         let messages = http.search_guild_messages(guild_id, Some(borrowed.as_slice())).await?;
 
-        // I would like to populate the cache with these messages, as is done in get_messages.rs.
-        // However this doesn't seem practical with the way fill_message_cache() is currently
-        // implemented. Thoughts?
+        #[cfg(feature = "cache")]
+        if let Some(cache) = cache_http.cache()
+            && matches!(should_cache, ShouldCache::Yes)
+        {
+            let by_channel: HashMap<GenericChannelId, Vec<Message>> =
+                messages.iter().fold(HashMap::new(), |mut map, message| {
+                    map.entry(message.channel_id).or_default().push(message.clone());
+                    map
+                });
+            for (channel_id, channel_messages) in by_channel {
+                cache.fill_message_cache(channel_id, channel_messages.into_iter());
+            }
+        }
 
         Ok(messages)
     }
+}
+
+/// Should the queried messages be cached?
+#[derive(Copy, Clone, Debug, Default)]
+pub enum ShouldCache {
+    #[cfg(feature = "cache")]
+    Yes,
+    #[default]
+    No,
 }
 
 /// Types of authors the result messages should or should not have been sent by.
