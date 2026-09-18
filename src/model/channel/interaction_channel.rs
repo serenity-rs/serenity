@@ -125,7 +125,7 @@ impl ExtractKey<GenericChannelId> for GenericInteractionChannel {
 
 impl<'de> serde::Deserialize<'de> for GenericInteractionChannel {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-        let (kind, data) = super::extract_type(deserializer)?;
+        let (kind, _, data) = super::extract_type(deserializer)?;
 
         match kind {
             10..=12 => Deserialize::deserialize(data).map(Self::Thread),

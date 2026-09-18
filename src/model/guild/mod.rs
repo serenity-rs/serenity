@@ -88,7 +88,7 @@ pub(crate) type MemberCount = NonMaxU32;
 /// [extension](https://docs.discord.com/developers/events/gateway-events#guild-create).
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
+#[derive(Clone, Debug, Default, serde::Serialize)]
 #[non_exhaustive]
 pub struct Guild {
     /// The unique Id identifying the guild.
@@ -118,11 +118,16 @@ pub struct Guild {
     // Omitted `permissions` field because only Http::get_guilds uses it, which returns GuildInfo
     // Omitted `region` field because it is deprecated (see Discord docs)
     /// Information about the voice afk channel.
-    #[serde(flatten)]
     pub afk_metadata: Option<AfkMetadata>,
     /// Whether or not the guild widget is enabled.
+    ///
+    /// **Note:** This field is not present in the `GUILD_CREATE` event. It is included in the
+    /// `GUILD_UPDATE` event and when fetching a guild via the REST API.
     pub widget_enabled: Option<bool>,
-    /// The channel id that the widget will generate an invite to, or null if set to no invite
+    /// The channel id that the widget will generate an invite to, or `None` if set to no invite.
+    ///
+    /// **Note:** This field is not present in the `GUILD_CREATE` event. It is included in the
+    /// `GUILD_UPDATE` event and when fetching a guild via the REST API.
     pub widget_channel_id: Option<ChannelId>,
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
@@ -206,7 +211,6 @@ pub struct Guild {
     /// Indicator of whether the guild is considered "large" by Discord.
     pub large: bool,
     /// Whether this guild is unavailable due to an outage.
-    #[serde(default)]
     pub unavailable: bool,
     /// The number of members in the guild.
     pub member_count: MemberCount,
@@ -217,11 +221,20 @@ pub struct Guild {
     /// Members might not all be available when the [`ReadyEvent`] is received if the
     /// [`Self::member_count`] is greater than the [`LARGE_THRESHOLD`] set by the library.
     pub members: ExtractMap<UserId, Member>,
-    /// All voice and text channels contained within a guild.
+    /// All channels with full metadata contained within a guild.
     ///
-    /// This contains all channels regardless of permissions (i.e. the ability of the bot to read
-    /// from or connect to them).
-    pub channels: ExtractMap<ChannelId, GuildChannel>,
+    /// The bot must have permission to view a channel to receive its full metadata. For channels
+    /// with [obfuscated metadata], see the `obfuscated_channels` field.
+    ///
+    /// [obfuscated metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
+    pub viewable_channels: ExtractMap<ChannelId, GuildChannel>,
+    /// All channels with [obfuscated metadata] contained within a guild.
+    ///
+    /// Channel metadata is obfuscated when the bot does not have permission to view that channel.
+    /// For channels with full metadata, see the `viewable_channels` field.
+    ///
+    /// [obfuscated metadata]: https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels
+    pub obfuscated_channels: ExtractMap<ChannelId, ObfuscatedChannel>,
     /// All active threads in this guild that current user has permission to view.
     ///
     /// A thread is guaranteed (for errors, not for panics) to be cached if a `MESSAGE_CREATE`
@@ -235,7 +248,6 @@ pub struct Guild {
     /// The stage instances in this guild.
     pub stage_instances: FixedArray<StageInstance>,
     /// The scheduled events in this guild.
-    #[serde(rename = "guild_scheduled_events")]
     pub scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
     /// The id of the channel where this guild will recieve safety alerts.
     pub safety_alerts_channel_id: Option<ChannelId>,
@@ -245,41 +257,95 @@ pub struct Guild {
 
 #[cfg(feature = "model")]
 impl Guild {
-    /// Returns the "default" channel of the guild for the passed user id. (This returns the first
-    /// channel that can be read by the user, if there isn't one, returns [`None`])
+    /// Returns the "default" channel of the guild for the passed user Id.
+    ///
+    /// This returns the first text-only channel that the user can view, or [`None`] if there
+    /// isn't one or if the user's member object is not in the cache.
+    ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results will be
+    /// inaccurate if the member's default channel is an obfuscated channel with access granted
+    /// via permission overwrites on that channel.
     #[must_use]
-    pub fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
+    pub fn default_channel(&self, uid: UserId) -> Option<GuildChannelRef<'_>> {
         let member = self.members.get(&uid)?;
-        self.channels.iter().find(|&channel| {
-            channel.base.kind != ChannelType::Category
-                && self.user_permissions_in(channel, member).view_channel()
-        })
+        let mut sorted = self
+            .channels()
+            .filter(|&channel| {
+                channel.kind() != ChannelType::Category
+                    && channel.kind() != ChannelType::Voice
+                    && channel.kind() != ChannelType::Stage
+                    && self.user_permissions_in(channel, member).view_channel()
+            })
+            .collect::<Vec<_>>();
+        sorted.sort_by_key(|channel| channel.position());
+        sorted.first().copied()
     }
 
-    /// Returns either the [`GuildChannel`] or the [`GuildThread`] that this ID corresponds to.
+    /// Returns the [`GuildChannel`], [`ObfuscatedChannel`], or [`GuildThread`] that this Id
+    /// corresponds to.
     #[must_use]
     pub fn channel(&self, channel_id: GenericChannelId) -> Option<GenericGuildChannelRef<'_>> {
         let (channel_id, thread_id) = channel_id.split();
-        let channel = self.channels.get(&channel_id).map(GenericGuildChannelRef::Channel);
+        let viewable = self
+            .viewable_channels
+            .get(&channel_id)
+            .map(|gc| GenericGuildChannelRef::Channel(GuildChannelRef::Viewable(gc)));
+        let obfuscated = || {
+            self.obfuscated_channels
+                .get(&channel_id)
+                .map(|oc| GenericGuildChannelRef::Channel(GuildChannelRef::Obfuscated(oc)))
+        };
         let thread = || self.threads.get(&thread_id).map(GenericGuildChannelRef::Thread);
 
-        channel.or_else(thread)
+        viewable.or_else(obfuscated).or_else(thread)
     }
 
-    /// Returns the guaranteed "default" channel of the guild. (This returns the first channel that
-    /// can be read by everyone, if there isn't one, returns [`None`])
+    /// Returns an `impl Iterator` over all non-thread channels within the guild.
     ///
-    /// **Note**: This is very costly if used in a server with lots of channels, members, or both.
+    /// This includes both [`GuildChannel`]s and [`ObfuscatedChannel`]s.
+    pub fn channels(&self) -> impl Iterator<Item = GuildChannelRef<'_>> {
+        self.viewable_channels
+            .iter()
+            .map(GuildChannelRef::Viewable)
+            .chain(self.obfuscated_channels.iter().map(GuildChannelRef::Obfuscated))
+    }
+
+    /// Returns the guaranteed "default" channel of the guild.
+    ///
+    /// This returns the first text-only channel that everyone can view, or [`None`] if there
+    /// isn't one.
+    ///
+    /// **Note**: This is very costly if used in a server with lots of channels and/or a complex
+    /// channel permissions setup.
     #[must_use]
     pub fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
-        self.channels.iter().find(|&channel| {
-            channel.base.kind != ChannelType::Category
-                && self
-                    .members
-                    .iter()
-                    .map(|member| self.user_permissions_in(channel, member))
-                    .all(Permissions::view_channel)
-        })
+        let everyone = RoleId::new(self.id.get());
+        let everyone_role_has_view =
+            self.roles.get(&everyone).is_some_and(|everyone| everyone.permissions.view_channel());
+        let mut sorted = self
+            .viewable_channels
+            .iter()
+            .filter(|&channel| {
+                // The channel is text-only.
+                channel.base.kind != ChannelType::Category
+                    && channel.base.kind != ChannelType::Voice
+                    && channel.base.kind != ChannelType::Stage
+                    // No overwrites deny Permissions::VIEW_CHANNEL.
+                    && channel
+                        .permission_overwrites
+                        .iter()
+                        .all(|overwrite| !overwrite.deny.view_channel())
+                    // The @everyone role has Permissions::VIEW_CHANNEL.
+                    && everyone_role_has_view
+                    // Or an overwrite allows Permissions::VIEW_CHANNEL for @everyone.
+                    || channel.permission_overwrites.iter().any(|overwrite| {
+                        overwrite.kind == PermissionOverwriteType::Role(everyone)
+                            && overwrite.allow.view_channel()
+                    })
+            })
+            .collect::<Vec<_>>();
+        sorted.sort_by_key(|channel| channel.position);
+        sorted.first().copied()
     }
 
     /// Returns the formatted URL of the guild's banner image, if one exists.
@@ -835,10 +901,18 @@ impl Guild {
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
+    ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+    /// the member.
     #[must_use]
-    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
+    pub fn user_permissions_in<'a>(
+        &self,
+        channel: impl Into<GuildChannelRef<'a>>,
+        member: &Member,
+    ) -> Permissions {
         Self::user_permissions_in_(
-            Some(channel),
+            Some(channel.into()),
             member.user.id,
             &member.roles,
             self.id,
@@ -849,13 +923,17 @@ impl Guild {
 
     /// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
     ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+    /// the member.
+    ///
     /// # Panics
     ///
     /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
     #[must_use]
-    pub fn partial_member_permissions_in(
+    pub fn partial_member_permissions_in<'a>(
         &self,
-        channel: &GuildChannel,
+        channel: impl Into<GuildChannelRef<'a>>,
         member_id: UserId,
         member: &PartialMember,
     ) -> Permissions {
@@ -864,7 +942,7 @@ impl Guild {
         }
 
         Self::user_permissions_in_(
-            Some(channel),
+            Some(channel.into()),
             member_id,
             &member.roles,
             self.id,
@@ -875,7 +953,7 @@ impl Guild {
 
     /// Helper function that can also be used from [`PartialGuild`].
     pub(crate) fn user_permissions_in_(
-        channel: Option<&GuildChannel>,
+        channel: Option<GuildChannelRef>,
         member_user_id: UserId,
         member_roles: &[RoleId],
         guild_id: GuildId,
@@ -890,24 +968,31 @@ impl Guild {
         let mut member_deny_overwrites = Permissions::empty();
 
         if let Some(channel) = channel {
-            for overwrite in &channel.permission_overwrites {
-                match overwrite.kind {
-                    PermissionOverwriteType::Member(user_id) => {
-                        if member_user_id == user_id {
-                            member_allow_overwrites = overwrite.allow;
-                            member_deny_overwrites = overwrite.deny;
+            match channel {
+                GuildChannelRef::Viewable(guild_channel) => {
+                    for overwrite in &guild_channel.permission_overwrites {
+                        match overwrite.kind {
+                            PermissionOverwriteType::Member(user_id) => {
+                                if member_user_id == user_id {
+                                    member_allow_overwrites = overwrite.allow;
+                                    member_deny_overwrites = overwrite.deny;
+                                }
+                            },
+                            PermissionOverwriteType::Role(role_id) => {
+                                if role_id.get() == guild_id.get() {
+                                    everyone_allow_overwrites = overwrite.allow;
+                                    everyone_deny_overwrites = overwrite.deny;
+                                } else if member_roles.contains(&role_id) {
+                                    roles_allow_overwrites.push(overwrite.allow);
+                                    roles_deny_overwrites.push(overwrite.deny);
+                                }
+                            },
                         }
-                    },
-                    PermissionOverwriteType::Role(role_id) => {
-                        if role_id.get() == guild_id.get() {
-                            everyone_allow_overwrites = overwrite.allow;
-                            everyone_deny_overwrites = overwrite.deny;
-                        } else if member_roles.contains(&role_id) {
-                            roles_allow_overwrites.push(overwrite.allow);
-                            roles_deny_overwrites.push(overwrite.deny);
-                        }
-                    },
-                }
+                    }
+                },
+                GuildChannelRef::Obfuscated(_) => {
+                    everyone_deny_overwrites = Permissions::VIEW_CHANNEL;
+                },
             }
         }
 
@@ -980,6 +1065,141 @@ impl Guild {
     #[must_use]
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.iter().find(|role| role_name == &*role.name)
+    }
+}
+
+impl<'de> Deserialize<'de> for Guild {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        #[bool_to_bitflags::bool_to_bitflags]
+        #[derive(serde::Deserialize)]
+        struct GuildRaw {
+            id: GuildId,
+            name: FixedString,
+            icon: Option<ImageHash>,
+            icon_hash: Option<ImageHash>,
+            splash: Option<ImageHash>,
+            discovery_splash: Option<ImageHash>,
+            owner_id: UserId,
+            #[serde(flatten)]
+            afk_metadata: Option<AfkMetadata>,
+            widget_enabled: Option<bool>,
+            widget_channel_id: Option<ChannelId>,
+            verification_level: VerificationLevel,
+            default_message_notifications: DefaultMessageNotificationLevel,
+            explicit_content_filter: ExplicitContentFilter,
+            roles: ExtractMap<RoleId, Role>,
+            emojis: ExtractMap<EmojiId, Emoji>,
+            features: FixedArray<FixedString>,
+            mfa_level: MfaLevel,
+            application_id: Option<ApplicationId>,
+            system_channel_id: Option<ChannelId>,
+            system_channel_flags: SystemChannelFlags,
+            rules_channel_id: Option<ChannelId>,
+            max_presences: Option<MemberCount>,
+            max_members: Option<MemberCount>,
+            vanity_url_code: Option<FixedString<u8>>,
+            description: Option<FixedString>,
+            banner: Option<ImageHash>,
+            premium_tier: PremiumTier,
+            premium_subscription_count: Option<MemberCount>,
+            preferred_locale: FixedString<u8>,
+            public_updates_channel_id: Option<ChannelId>,
+            max_video_channel_users: Option<MemberCount>,
+            max_stage_video_channel_users: Option<MemberCount>,
+            approximate_member_count: Option<MemberCount>,
+            approximate_presence_count: Option<MemberCount>,
+            welcome_screen: Option<GuildWelcomeScreen>,
+            nsfw_level: NsfwLevel,
+            stickers: ExtractMap<StickerId, Sticker>,
+            premium_progress_bar_enabled: bool,
+            joined_at: Timestamp,
+            large: bool,
+            #[serde(default)]
+            unavailable: bool,
+            member_count: MemberCount,
+            voice_states: ExtractMap<UserId, VoiceState>,
+            members: ExtractMap<UserId, Member>,
+            channels: Vec<GuildChannel>,
+            threads: ExtractMap<ThreadId, GuildThread>,
+            presences: ExtractMap<UserId, Presence>,
+            stage_instances: FixedArray<StageInstance>,
+            guild_scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
+            safety_alerts_channel_id: Option<ChannelId>,
+            incidents_data: Option<Box<IncidentsData>>,
+        }
+
+        let raw = GuildRaw::deserialize(deserializer)?;
+        let large = raw.large();
+        let premium_progress_bar_enabled = raw.premium_progress_bar_enabled();
+        let unavailable = raw.unavailable();
+        let widget_enabled = raw.widget_enabled();
+
+        let mut guild = Guild {
+            id: raw.id,
+            name: raw.name,
+            icon: raw.icon,
+            icon_hash: raw.icon_hash,
+            splash: raw.splash,
+            discovery_splash: raw.discovery_splash,
+            owner_id: raw.owner_id,
+            afk_metadata: raw.afk_metadata,
+            widget_channel_id: raw.widget_channel_id,
+            verification_level: raw.verification_level,
+            default_message_notifications: raw.default_message_notifications,
+            explicit_content_filter: raw.explicit_content_filter,
+            roles: raw.roles,
+            emojis: raw.emojis,
+            features: raw.features,
+            mfa_level: raw.mfa_level,
+            application_id: raw.application_id,
+            system_channel_id: raw.system_channel_id,
+            system_channel_flags: raw.system_channel_flags,
+            rules_channel_id: raw.rules_channel_id,
+            max_presences: raw.max_presences,
+            max_members: raw.max_members,
+            vanity_url_code: raw.vanity_url_code,
+            description: raw.description,
+            banner: raw.banner,
+            premium_tier: raw.premium_tier,
+            premium_subscription_count: raw.premium_subscription_count,
+            preferred_locale: raw.preferred_locale,
+            public_updates_channel_id: raw.public_updates_channel_id,
+            max_video_channel_users: raw.max_video_channel_users,
+            max_stage_video_channel_users: raw.max_stage_video_channel_users,
+            approximate_member_count: raw.approximate_member_count,
+            approximate_presence_count: raw.approximate_presence_count,
+            welcome_screen: raw.welcome_screen,
+            nsfw_level: raw.nsfw_level,
+            stickers: raw.stickers,
+            joined_at: raw.joined_at,
+            member_count: raw.member_count,
+            voice_states: raw.voice_states,
+            members: raw.members,
+            viewable_channels: ExtractMap::new(),
+            obfuscated_channels: ExtractMap::new(),
+            threads: raw.threads,
+            presences: raw.presences,
+            stage_instances: raw.stage_instances,
+            scheduled_events: raw.guild_scheduled_events,
+            safety_alerts_channel_id: raw.safety_alerts_channel_id,
+            incidents_data: raw.incidents_data,
+            __generated_flags: GuildGeneratedFlags::empty(),
+        };
+
+        guild.set_large(large);
+        guild.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
+        guild.set_unavailable(unavailable);
+        guild.set_widget_enabled(widget_enabled);
+
+        for channel in raw.channels {
+            if channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+                guild.obfuscated_channels.insert(channel.into());
+            } else {
+                guild.viewable_channels.insert(channel);
+            }
+        }
+
+        Ok(guild)
     }
 }
 
