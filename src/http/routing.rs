@@ -293,6 +293,10 @@ routes! ('a, {
     api!("/guilds/{}/members/@me", guild_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
 
+    GuildMessagesSearch { guild_id: GuildId },
+    api!("/guilds/{}/messages/search", guild_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+
     GuildMfa { guild_id: GuildId },
     api!("/guilds/{}/mfa", guild_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));

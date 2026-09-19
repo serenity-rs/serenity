@@ -4564,6 +4564,25 @@ impl Http {
         .await
     }
 
+    /// Returns a list of [`Message`]s in a [`Guild`] according to various search criteria.
+    pub async fn search_guild_messages(
+        &self,
+        guild_id: GuildId,
+        params: Option<&'_ [(&'_ str, &'_ str)]>,
+    ) -> Result<Vec<Message>> {
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildMessagesSearch {
+                guild_id,
+            },
+            params,
+        })
+        .await
+    }
+
     /// Fires off a request, deserializing the response reader via the given type bound.
     ///
     /// If you don't need to deserialize the response and want the response instance itself, use
