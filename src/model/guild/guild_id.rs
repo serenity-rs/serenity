@@ -27,6 +27,8 @@ use crate::builder::{
     EditScheduledEvent,
     EditSoundboard,
     EditSticker,
+    MessageQuery,
+    ShouldCache,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
@@ -1729,6 +1731,30 @@ impl GuildId {
         reason: Option<&str>,
     ) -> Result<()> {
         http.remove_member_role(self, user_id, role_id, reason).await
+    }
+
+    /// Executes message search in the guild.
+    ///
+    /// If should_cache is `Yes`, this method will fill up the message cache for the guild, if the
+    /// messages returned are newer than the existing cached messages or the cache is not full yet.
+    /// Since messages are cached in their respective channels, the returned messages will need to
+    /// be grouped by channel before being added to the cache.
+    ///
+    /// **Note**: If the user does not have the [Read Message History] permission, returns an
+    /// outcome with an empty [`Vec`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    pub async fn search_messages(
+        self,
+        http: &Http,
+        query: MessageQuery<'_>,
+        should_cache: ShouldCache,
+    ) -> Result<MessageSearchOutcome> {
+        query.execute(http, self, should_cache).await
     }
 }
 
