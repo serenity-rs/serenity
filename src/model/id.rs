@@ -66,6 +66,7 @@ macro_rules! id_u64 {
 
                 #[ref_cast::ref_cast_custom]
                 #[allow(unused, clippy::allow_attributes, reason = "Most IDs don't need casting like this")]
+                #[allow(clippy::let_underscore_must_use, reason = "Internal implementation detail of ref_cast_custom macro")]
                 pub(crate) const fn cast_from(inner: &InnerId) -> &Self;
 
                 /// Retrieves the inner `id` as a [`u64`].
