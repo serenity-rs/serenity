@@ -16,6 +16,7 @@ mod welcome_screen;
 
 #[cfg(feature = "model")]
 use std::borrow::Cow;
+use std::time::Duration;
 
 use nonmax::NonMaxU32;
 #[cfg(feature = "model")]
@@ -1310,6 +1311,83 @@ pub struct IncidentsData {
     pub dm_spam_detected_at: Option<Timestamp>,
     /// The time when raid alerts were triggered.
     pub raid_detected_at: Option<Timestamp>,
+}
+
+/// Outcome of a guild message search.
+///
+/// This is an unusual response type; it can hold either an error-like response or search results.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
+#[derive(Clone, Debug)]
+pub enum MessageSearchOutcome {
+    NotIndexed(MessageSearchNotIndexed),
+    Results(MessageSearchResults),
+}
+
+fn duration_via_secs<'de, D>(deserializer: D) -> Result<Duration, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    // It's actually an i32 in the spec, but that's because JSON doesn't have unsigned types. It
+    // would make no sense for it to ever be negative.
+    u64::deserialize(deserializer).map(Duration::from_secs)
+}
+
+/// Error-like response to a guild message search when indexing is not yet complete.
+///
+/// > You should retry the request after the timeframe specified in the `retry_after` field. If the
+/// > `retry_after` field is 0, you should retry the request after a short delay.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
+#[derive(Clone, Debug, Deserialize)]
+pub struct MessageSearchNotIndexed {
+    // I know this is not great. Probably the best resolution will be to move these types
+    // elsewhere. But where?
+    #[cfg(feature = "http")]
+    pub code: crate::http::JsonErrorCode,
+    #[cfg(not(feature = "http"))]
+    pub code: u32,
+    pub message: FixedString,
+    pub documents_indexed: u32,
+    #[serde(deserialize_with = "duration_via_secs")]
+    pub retry_after: Duration,
+}
+
+/// Unnest a `Vec` of single-element `Vec`s.
+fn de_flatten_vec<'de, T, D>(deserializer: D) -> Result<Vec<T>, D::Error>
+where
+    T: Deserialize<'de>,
+    D: Deserializer<'de>,
+{
+    <Vec<[T; 1]>>::deserialize(deserializer).map(Vec::into_flattened)
+}
+
+/// Successful result of a guild message search.
+///
+/// > Due to speed optimizations, search may return slightly fewer results than the limit specified
+/// > when messages have not been accessed for a long time. Clients should not rely on the length of
+/// > the `messages` array to paginate results.
+/// >
+/// > Additionally, when messages are actively being created or deleted, the `total_results` field
+/// > may not be accurate.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
+#[derive(Clone, Debug, Deserialize)]
+#[non_exhaustive]
+pub struct MessageSearchResults {
+    /// Whether the guild is undergoing a deep historical indexing operation.
+    pub doing_deep_historical_index: bool,
+    /// The number of documents that have been indexed during the current index operation, if any.
+    pub documents_indexed: Option<u32>,
+    /// The total number of results that match the query.
+    pub total_results: u32,
+    /// The messages that match the query.
+    #[serde(deserialize_with = "de_flatten_vec")]
+    pub messages: Vec<Message>,
+    /// The threads that contain returned messages (if any).
+    pub threads: Option<Vec<GuildThread>>,
+    /// A thread member object for each returned thread the current user has joined.
+    pub members: Option<Vec<ThreadMember>>,
 }
 
 #[cfg(test)]

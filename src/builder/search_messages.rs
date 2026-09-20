@@ -274,7 +274,7 @@ impl<'a> MessageQuery<'a> {
         cache_http: impl CacheHttp,
         guild_id: GuildId,
         #[cfg_attr(not(feature = "cache"), expect(unused_variables))] should_cache: ShouldCache,
-    ) -> Result<Vec<Message>> {
+    ) -> Result<MessageSearchOutcome> {
         // There are 24 possible params (as of 2026-09-07), some of which can take arrays.
         // https://docs.discord.com/developers/reference#array-query-strings
         // So, for example, if replied_to_user_ids has the three values [1, 2, 3],
@@ -425,15 +425,16 @@ impl<'a> MessageQuery<'a> {
         }
 
         let http = cache_http.http();
-        let messages = http.search_guild_messages(guild_id, Some(params.as_slice())).await?;
+        let outcome = http.search_guild_messages(guild_id, Some(params.as_slice())).await?;
 
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache()
-            && matches!(should_cache, ShouldCache::Yes)
+            && should_cache == ShouldCache::Yes
+            && let MessageSearchOutcome::Results(ref results) = outcome
         {
             let by_channel: HashMap<GenericChannelId, Vec<Message>> =
-                messages.iter().fold(HashMap::new(), |mut map, message| {
-                    map.entry(message.channel_id).or_default().push(message.clone());
+                results.messages.iter().cloned().fold(HashMap::new(), |mut map, message| {
+                    map.entry(message.channel_id).or_default().push(message);
                     map
                 });
             for (channel_id, channel_messages) in by_channel {
@@ -441,12 +442,12 @@ impl<'a> MessageQuery<'a> {
             }
         }
 
-        Ok(messages)
+        Ok(outcome)
     }
 }
 
 /// Should the queried messages be cached?
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub enum ShouldCache {
     #[cfg(feature = "cache")]
     Yes,
