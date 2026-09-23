@@ -1,12 +1,10 @@
 use std::borrow::Cow;
-#[cfg(feature = "http")]
+#[cfg(all(feature = "http", feature = "cache"))]
 use std::collections::HashMap;
 use std::ops::Not;
 
 use nonmax::{NonMaxU8, NonMaxU16};
-use strum::AsRefStr;
-#[cfg(feature = "http")]
-use to_arraystring::{ArrayString, ToArrayString as _};
+use strum::{AsRefStr, IntoStaticStr};
 
 use crate::model::prelude::*;
 
@@ -253,6 +251,95 @@ impl<'a> MessageQuery<'a> {
         self
     }
 
+    #[cfg(feature = "http")]
+    pub(crate) fn into_param_pairs(self) -> Vec<(&'a str, Cow<'a, str>)> {
+        use std::convert::Into;
+        // There are 24 possible params (as of 2026-09-07), some of which can take arrays.
+        // https://docs.discord.com/developers/reference#array-query-strings
+        // So, for example, if replied_to_user_ids has the three values [1, 2, 3],
+        // it should be encoded as replied_to_user_id=1&replied_to_user_id=2&replied_to_user_id=3.
+        // https://docs.discord.com/developers/reference#boolean-query-strings
+        // Boolean fields can be encoded as "True", "true", or "1" and "False", "false", or "0".
+
+        // We can either manually go through the params and build up a vec of key-value pairs, or
+        // rely on serde. Doing it manually seems tedious and error-prone, but I thought I'd give it
+        // a try. Not sure how to test this in a useful way.
+        let mut params: Vec<(&str, Cow<'a, str>)> = Vec::new();
+        if let Some(limit) = self.limit {
+            params.push(("limit", Cow::from(limit.get().to_string())));
+        }
+        if let Some(offset) = self.offset {
+            params.push(("offset", Cow::from(offset.get().to_string())));
+        }
+        if let Some(max_id) = self.max_id {
+            params.push(("max_id", Cow::from(max_id.to_string())));
+        }
+        if let Some(min_id) = self.min_id {
+            params.push(("min_id", Cow::from(min_id.to_string())));
+        }
+        if let Some(slop) = self.slop {
+            params.push(("slop", Cow::from(slop.to_string())));
+        }
+        if let Some(content) = self.content {
+            params.push(("content", content));
+        }
+        for channel_id in self.channel_ids.iter() {
+            params.push(("channel_id", Cow::from(channel_id.to_string())));
+        }
+        for author_type in self.author_types.iter() {
+            params.push(("author_type", Cow::from(Into::<&'static str>::into(author_type))));
+        }
+        for user_id in self.author_ids.iter() {
+            params.push(("author_id", Cow::from(user_id.to_string())));
+        }
+        for user_id in self.mention_user_ids.iter() {
+            params.push(("mentions", Cow::from(user_id.to_string())));
+        }
+        for role_id in self.mention_role_ids.iter() {
+            params.push(("mentions_role_id", Cow::from(role_id.to_string())));
+        }
+        if let Some(mention_everyone) = self.mention_everyone.map(boolean_value) {
+            params.push(("mention_everyone", Cow::from(mention_everyone)));
+        }
+        for user_id in self.replied_to_user_ids.iter() {
+            params.push(("replied_to_user_id", Cow::from(user_id.to_string())));
+        }
+        for message_id in self.replied_to_message_ids.iter() {
+            params.push(("replied_to_message_id", Cow::from(message_id.to_string())));
+        }
+        if let Some(pinned) = self.pinned.map(boolean_value) {
+            params.push(("pinned", Cow::from(pinned)));
+        }
+        for has in self.has.iter() {
+            params.push(("has", Cow::from(Into::<&'static str>::into(has))));
+        }
+        for embed_type in self.embed_types.iter() {
+            params.push(("embed_type", Cow::from(Into::<&'static str>::into(embed_type))));
+        }
+        for embed_provider in self.embed_providers.iter() {
+            params.push(("embed_provider", Cow::Borrowed(*embed_provider)));
+        }
+        for link_hostname in self.link_hostnames.iter() {
+            params.push(("link_hostname", Cow::Borrowed(*link_hostname)));
+        }
+        for attachment_filename in self.attachment_filenames.iter() {
+            params.push(("attachment_filename", Cow::Borrowed(*attachment_filename)));
+        }
+        for attachment_extension in self.attachment_extensions.iter() {
+            params.push(("attachment_extension", Cow::Borrowed(*attachment_extension)));
+        }
+        if let Some(sort_by) = self.sort_by {
+            params.push(("sort_by", Cow::from(Into::<&'static str>::into(sort_by))));
+        }
+        if let Some(sort_order) = self.sort_order {
+            params.push(("sort_order", Cow::from(Into::<&'static str>::into(sort_order))));
+        }
+        if let Some(include_nsfw) = self.include_nsfw.map(boolean_value) {
+            params.push(("include_nsfw", Cow::from(include_nsfw)));
+        }
+        params
+    }
+
     /// Executes message search in the guild.
     ///
     /// If should_cache is `Yes`, this method will fill up the message cache for the guild, if the
@@ -275,154 +362,10 @@ impl<'a> MessageQuery<'a> {
         guild_id: GuildId,
         #[cfg_attr(not(feature = "cache"), expect(unused_variables))] should_cache: ShouldCache,
     ) -> Result<MessageSearchOutcome> {
-        // There are 24 possible params (as of 2026-09-07), some of which can take arrays.
-        // https://docs.discord.com/developers/reference#array-query-strings
-        // So, for example, if replied_to_user_ids has the three values [1, 2, 3],
-        // it should be encoded as replied_to_user_id=1&replied_to_user_id=2&replied_to_user_id=3.
-        // https://docs.discord.com/developers/reference#boolean-query-strings
-        // Boolean fields can be encoded as "True", "true", or "1" and "False", "false", or "0".
-
-        // We can either manually go through the params and build up a vec of key-value pairs, or
-        // rely on serde. Doing it manually seems tedious and error-prone, but I thought I'd give it
-        // a try. Absolutely no idea how to test this in a useful way.
-
-        // We need to retain ownership of strings built from ints and ids so that we can pass
-        // references to the request. Would be so much easier if we could just use Cows instead.
-        let (limit_str, offset_str, slop_str);
-
-        // Due to borrow rules, we can't borrow an string from the map until after we've fully
-        // populated it. Therefore…
-        let id_strs = {
-            let mut id_strs: HashMap<u64, ArrayString<20>> = HashMap::new();
-
-            if let Some(max_id) = self.max_id {
-                id_strs.entry(max_id.get()).or_insert_with(|| max_id.to_arraystring());
-            }
-            if let Some(min_id) = self.min_id {
-                id_strs.entry(min_id.get()).or_insert_with(|| min_id.to_arraystring());
-            }
-            for channel_id in self.channel_ids.iter() {
-                id_strs.entry(channel_id.get()).or_insert_with(|| channel_id.to_arraystring());
-            }
-            for user_id in self.author_ids.iter() {
-                id_strs.entry(user_id.get()).or_insert_with(|| user_id.to_arraystring());
-            }
-            for user_id in self.mention_user_ids.iter() {
-                id_strs.entry(user_id.get()).or_insert_with(|| user_id.to_arraystring());
-            }
-            for role_id in self.mention_role_ids.iter() {
-                id_strs.entry(role_id.get()).or_insert_with(|| role_id.to_arraystring());
-            }
-            for user_id in self.replied_to_user_ids.iter() {
-                id_strs.entry(user_id.get()).or_insert_with(|| user_id.to_arraystring());
-            }
-            for message_id in self.replied_to_message_ids.iter() {
-                id_strs.entry(message_id.get()).or_insert_with(|| message_id.to_arraystring());
-            }
-
-            id_strs
-        };
-
-        let mut params: Vec<(&str, &str)> = Vec::new();
-        if let Some(limit) = self.limit {
-            limit_str = limit.get().to_arraystring();
-            params.push(("limit", limit_str.as_str()));
-        }
-        if let Some(offset) = self.offset {
-            offset_str = offset.get().to_arraystring();
-            params.push(("offset", offset_str.as_str()));
-        }
-        if let Some(max_id) = self.max_id {
-            params.push((
-                "max_id",
-                id_strs.get(&max_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        if let Some(min_id) = self.min_id {
-            params.push((
-                "min_id",
-                id_strs.get(&min_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        if let Some(slop) = self.slop {
-            slop_str = slop.get().to_arraystring();
-            params.push(("slop", slop_str.as_str()));
-        }
-        if let Some(content) = self.content.as_ref() {
-            params.push(("content", content));
-        }
-        for channel_id in self.channel_ids.iter() {
-            params.push((
-                "channel_id",
-                id_strs.get(&channel_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        for author_type in self.author_types.iter() {
-            params.push(("author_type", author_type.as_ref()));
-        }
-        for user_id in self.author_ids.iter() {
-            params.push((
-                "author_id",
-                id_strs.get(&user_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        for user_id in self.mention_user_ids.iter() {
-            params.push((
-                "mentions",
-                id_strs.get(&user_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        for role_id in self.mention_role_ids.iter() {
-            params.push((
-                "mentions_role_id",
-                id_strs.get(&role_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        if let Some(mention_everyone) = self.mention_everyone {
-            params.push(("mention_everyone", if mention_everyone { "1" } else { "0" }));
-        }
-        for user_id in self.replied_to_user_ids.iter() {
-            params.push((
-                "replied_to_user_id",
-                id_strs.get(&user_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        for message_id in self.replied_to_message_ids.iter() {
-            params.push((
-                "replied_to_message_id",
-                id_strs.get(&message_id.get()).expect("should have been inserted").as_str(),
-            ));
-        }
-        if let Some(pinned) = self.pinned {
-            params.push(("pinned", if pinned { "1" } else { "0" }));
-        }
-        for has in self.has.iter() {
-            params.push(("has", has.as_ref()));
-        }
-        for embed_type in self.embed_types.iter() {
-            params.push(("embed_type", embed_type.as_ref()));
-        }
-        for embed_provider in self.embed_providers.iter() {
-            params.push(("embed_provider", embed_provider));
-        }
-        for link_hostname in self.link_hostnames.iter() {
-            params.push(("link_hostname", link_hostname));
-        }
-        for attachment_filename in self.attachment_filenames.iter() {
-            params.push(("attachment_filename", attachment_filename));
-        }
-        for attachment_extension in self.attachment_extensions.iter() {
-            params.push(("attachment_extension", attachment_extension));
-        }
-        if let Some(sort_by) = self.sort_by.as_ref() {
-            params.push(("sort_by", sort_by.as_ref()));
-        }
-        if let Some(sort_order) = self.sort_order.as_ref() {
-            params.push(("sort_order", sort_order.as_ref()));
-        }
-        if let Some(include_nsfw) = self.include_nsfw {
-            params.push(("include_nsfw", if include_nsfw { "1" } else { "0" }));
-        }
+        // We have to retain ownership of any Cow::Owned variants in the param pairs.
+        let cow_params = self.into_param_pairs();
+        let params: Vec<(&str, &str)> =
+            cow_params.iter().map(|(key, val)| (*key, val.as_ref())).collect();
 
         let http = cache_http.http();
         let outcome = http.search_guild_messages(guild_id, Some(params.as_slice())).await?;
@@ -464,7 +407,7 @@ pub enum ShouldCache {
 /// `!User` returns `NotUser` and `!NotUser` returns `User`, etc.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages-search-has-types)
-#[derive(Copy, Clone, Debug, AsRefStr)]
+#[derive(Copy, Clone, Debug, AsRefStr, IntoStaticStr)]
 pub enum AuthorType {
     /// Return messages sent by user accounts.
     #[strum(serialize = "user")]
@@ -510,7 +453,7 @@ impl Not for AuthorType {
 /// `!Image` returns `NotImage` and `!NotImage` returns `Image`, etc.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages-search-has-types)
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, AsRefStr)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, AsRefStr, IntoStaticStr)]
 pub enum SearchHas {
     /// Return messages that have an image.
     #[strum(serialize = "image")]
@@ -601,7 +544,7 @@ impl Not for SearchHas {
 /// These do not correspond 1:1 to actual embed types and encompass a wider range of actual types.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages-search-embed-types)
-#[derive(Copy, Clone, Debug, AsRefStr)]
+#[derive(Copy, Clone, Debug, AsRefStr, IntoStaticStr)]
 #[strum(serialize_all = "lowercase")]
 pub enum SearchEmbed {
     /// Return messages that have an image embed.
@@ -627,7 +570,7 @@ pub enum MessageQuerySort {
     ByRelevance,
 }
 
-#[derive(Copy, Clone, Debug, Default, AsRefStr)]
+#[derive(Copy, Clone, Debug, Default, AsRefStr, IntoStaticStr)]
 #[strum(serialize_all = "lowercase")]
 enum SearchSortMode {
     #[default]
@@ -635,11 +578,19 @@ enum SearchSortMode {
     Relevance,
 }
 
-#[derive(Copy, Clone, Debug, Default, AsRefStr)]
+#[derive(Copy, Clone, Debug, Default, AsRefStr, IntoStaticStr)]
 enum SearchSortOrder {
     #[strum(serialize = "asc")]
     Ascending,
     #[default]
     #[strum(serialize = "desc")]
     Descending,
+}
+
+/// Converts a boolean to a querystring value for Discord.
+///
+/// https://docs.discord.com/developers/reference#boolean-query-strings
+#[cfg(feature = "http")]
+const fn boolean_value(value: bool) -> &'static str {
+    if value { "1" } else { "0" }
 }
