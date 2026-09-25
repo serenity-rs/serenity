@@ -1740,8 +1740,12 @@ impl GuildId {
     /// Since messages are cached in their respective channels, the returned messages will need to
     /// be grouped by channel before being added to the cache.
     ///
-    /// **Note**: If the user does not have the [Read Message History] permission, returns an
-    /// outcome with an empty [`Vec`].
+    /// If Discord returns a not-ready response, this method will retry the query as needed. If you
+    /// need to impose a timeout on the retry logic, refer to [`tokio::time::timeout`] or a similar
+    /// library.
+    ///
+    /// **Note**: If the user does not have the [Read Message History] permission, returns a result
+    /// with an empty [`Vec`].
     ///
     /// # Errors
     ///
@@ -1753,7 +1757,7 @@ impl GuildId {
         http: &Http,
         query: MessageQuery<'_>,
         should_cache: ShouldCache,
-    ) -> Result<MessageSearchOutcome> {
+    ) -> Result<MessageSearchResults> {
         query.execute(http, self, should_cache).await
     }
 }

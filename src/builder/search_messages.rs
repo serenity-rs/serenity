@@ -2,11 +2,18 @@ use std::borrow::Cow;
 #[cfg(all(feature = "http", feature = "cache"))]
 use std::collections::HashMap;
 use std::ops::Not;
+#[cfg(feature = "http")]
+use std::time::Duration;
 
 use nonmax::{NonMaxU8, NonMaxU16};
 use strum::{AsRefStr, IntoStaticStr};
 
 use crate::model::prelude::*;
+
+// Discord says "If the retry_after field is 0, you should retry the request after a short delay."
+// We'll interpret this as half a second.
+#[cfg(feature = "http")]
+const SHORT_DELAY: Duration = Duration::from_millis(500);
 
 /// Builds a request to the API to search messages in a Guild.
 ///
@@ -347,8 +354,12 @@ impl<'a> MessageQuery<'a> {
     /// Since messages are cached in their respective channels, the returned messages will need to
     /// be grouped by channel before being added to the cache.
     ///
-    /// **Note**: If the user does not have the [Read Message History] permission, returns an
-    /// outcome with an empty [`Vec`].
+    /// If Discord returns a not-ready response, this method will retry the query as needed. If you
+    /// need to impose a timeout on the retry logic, refer to [`tokio::time::timeout`] or a similar
+    /// library.
+    ///
+    /// **Note**: If the user does not have the [Read Message History] permission, returns a result
+    /// with an empty [`Vec`].
     ///
     /// # Errors
     ///
@@ -361,19 +372,27 @@ impl<'a> MessageQuery<'a> {
         cache_http: impl CacheHttp,
         guild_id: GuildId,
         #[cfg_attr(not(feature = "cache"), expect(unused_variables))] should_cache: ShouldCache,
-    ) -> Result<MessageSearchOutcome> {
+    ) -> Result<MessageSearchResults> {
         // We have to retain ownership of any Cow::Owned variants in the param pairs.
         let cow_params = self.into_param_pairs();
         let params: Vec<(&str, &str)> =
             cow_params.iter().map(|(key, val)| (*key, val.as_ref())).collect();
 
         let http = cache_http.http();
-        let outcome = http.search_guild_messages(guild_id, Some(params.as_slice())).await?;
+        let results = loop {
+            match http.search_guild_messages(guild_id, Some(params.as_slice())).await? {
+                MessageSearchOutcome::NotIndexed(not_indexed) => {
+                    tokio::time::sleep(not_indexed.retry_after.max(SHORT_DELAY)).await;
+                },
+                MessageSearchOutcome::Results(results) => {
+                    break results;
+                },
+            }
+        };
 
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache()
             && should_cache == ShouldCache::Yes
-            && let MessageSearchOutcome::Results(ref results) = outcome
         {
             let by_channel: HashMap<GenericChannelId, Vec<Message>> =
                 results.messages.iter().cloned().fold(HashMap::new(), |mut map, message| {
@@ -385,7 +404,7 @@ impl<'a> MessageQuery<'a> {
             }
         }
 
-        Ok(outcome)
+        Ok(results)
     }
 }
 
