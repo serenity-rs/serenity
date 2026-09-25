@@ -358,14 +358,15 @@ impl<'a> MessageQuery<'a> {
     /// need to impose a timeout on the retry logic, refer to [`tokio::time::timeout`] or a similar
     /// library.
     ///
-    /// **Note**: If the user does not have the [Read Message History] permission, returns a result
-    /// with an empty [`Vec`].
+    /// **Note**: The user must have the [Read Message History] permission and the [Message Content]
+    /// privileged intent to perform a search.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    /// [Message Content]: GatewayIntents::MESSAGE_CONTENT
     #[cfg(feature = "http")]
     pub async fn execute(
         self,
