@@ -1749,6 +1749,7 @@ impl GuildId {
     ///
     /// # Errors
     ///
+    /// Returns [`Error::Model`] if one or more query parameters exceed Discord's limits.
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
