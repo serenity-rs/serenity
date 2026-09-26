@@ -53,10 +53,12 @@ macro_rules! sequence_setters {
     ($field: ident, $singular: ident, $plural: ident, $t: ty, $l: lifetime,
         $add_singular: ident, $add_plural: ident,
         $set_singular: ident, $set_plural: ident,
-        $singular_desc: expr, $plural_desc: expr) => {
+        $singular_desc: expr, $plural_desc: expr$(, $max_desc: expr)?) => {
         #[doc = "Add "]
         #[doc = $singular_desc]
-        #[doc = " to the search.\n\n**Note**: This will keep all existing "]
+        #[doc = " to the search.\n\n"]
+        $( #[doc = concat!("Discord allows a maximum of ", $max_desc, " per search.\n\n")] )?
+        #[doc = "**Note**: This will keep all existing "]
         #[doc = concat!($plural_desc, ".")]
         #[doc = "Use "]
         #[doc = concat!("[`Self::", stringify!($set_singular), "()`]")]
@@ -69,7 +71,9 @@ macro_rules! sequence_setters {
 
         #[doc = "Add multiple "]
         #[doc = $plural_desc]
-        #[doc = " to the search.\n\n**Note**: This will keep all existing "]
+        #[doc = " to the search.\n\n"]
+        $( #[doc = concat!("Discord allows a maximum of ", $max_desc, " per search.\n\n")] )?
+        #[doc = "**Note**: This will keep all existing "]
         #[doc = concat!($plural_desc, ".")]
         #[doc = "Use "]
         #[doc = concat!("[`Self::", stringify!($set_plural), "()`]")]
@@ -82,7 +86,9 @@ macro_rules! sequence_setters {
 
         #[doc = "Set "]
         #[doc = $singular_desc]
-        #[doc = " in the search.\n\n**Note**: This will replace all existing "]
+        #[doc = " in the search.\n\n"]
+        $( #[doc = concat!("Discord allows a maximum of ", $max_desc, " per search.\n\n")] )?
+        #[doc = "**Note**: This will replace all existing "]
         #[doc = concat!($plural_desc, ".")]
         #[doc = "Use "]
         #[doc = concat!("[`Self::", stringify!($add_singular), "()`]")]
@@ -94,7 +100,9 @@ macro_rules! sequence_setters {
 
         #[doc = "Set multiple "]
         #[doc = $plural_desc]
-        #[doc = " in the search.\n\n**Note**: This will replace all existing "]
+        #[doc = " in the search.\n\n"]
+        $( #[doc = concat!("Discord allows a maximum of ", $max_desc, " per search.\n\n")] )?
+        #[doc = "**Note**: This will replace all existing "]
         #[doc = concat!($plural_desc, ".")]
         #[doc = "Use "]
         #[doc = concat!("[`Self::", stringify!($add_plural), "()`]")]
@@ -111,6 +119,40 @@ impl<'a> MessageQuery<'a> {
     /// Equivalent to [`Self::default`].
     pub fn new() -> Self {
         Self::default()
+    }
+
+    #[cfg(feature = "http")]
+    fn check_lengths(&self) -> Result<(), ModelError> {
+        use crate::model::error::Maximum;
+        if let Some(content) = self.content.as_ref() {
+            Maximum::MessageSearchContentLength.check_overflow(content.chars().count())?;
+        }
+        Maximum::MessageSearchItemCount.check_overflow(self.author_ids.len())?;
+        Maximum::MessageSearchItemCount.check_overflow(self.mention_user_ids.len())?;
+        Maximum::MessageSearchItemCount.check_overflow(self.mention_role_ids.len())?;
+        Maximum::MessageSearchItemCount.check_overflow(self.replied_to_user_ids.len())?;
+        Maximum::MessageSearchItemCount.check_overflow(self.replied_to_message_ids.len())?;
+        Maximum::MessageSearchItemCount.check_overflow(self.embed_providers.len())?;
+        for embed_provider in self.embed_providers.iter() {
+            Maximum::MessageSearchStringItemLength
+                .check_overflow(embed_provider.chars().count())?;
+        }
+        Maximum::MessageSearchItemCount.check_overflow(self.link_hostnames.len())?;
+        for link_hostname in self.link_hostnames.iter() {
+            Maximum::MessageSearchStringItemLength.check_overflow(link_hostname.chars().count())?;
+        }
+        Maximum::MessageSearchItemCount.check_overflow(self.attachment_filenames.len())?;
+        for attachment_filename in self.attachment_filenames.iter() {
+            Maximum::MessageSearchAttachmentFilenameLength
+                .check_overflow(attachment_filename.chars().count())?;
+        }
+        Maximum::MessageSearchItemCount.check_overflow(self.attachment_extensions.len())?;
+        for attachment_extension in self.attachment_extensions.iter() {
+            Maximum::MessageSearchStringItemLength
+                .check_overflow(attachment_extension.chars().count())?;
+        }
+
+        Ok(())
     }
 
     /// The maximum number of messages to retrieve for the query.
@@ -147,7 +189,7 @@ impl<'a> MessageQuery<'a> {
 
     /// Search message content.
     ///
-    /// **Note**: Message content query must be under 1024 unicode code points.
+    /// **Note**: Message content query must be a maximum of 1024 unicode code points.
     pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
         self.content = Some(content.into());
         self
@@ -166,20 +208,20 @@ impl<'a> MessageQuery<'a> {
 
     sequence_setters!(
         channel_ids, channel_id, channel_ids, GenericChannelId, 'a,
-        add_channel_id, add_channel_ids, channel_id, channel_ids, "a channel/thread", "channels/threads");
+        add_channel_id, add_channel_ids, channel_id, channel_ids, "a channel/thread", "channels/threads", "500 channels/threads");
 
     sequence_setters!(
         author_types, author_type, author_types, AuthorType, 'a,
         add_author_type, add_author_types, author_type, author_types, "an author type", "author types");
     sequence_setters!(
         author_ids, user_id, user_ids, UserId, 'a,
-        add_author_id, add_author_ids, author_id, author_ids, "an author", "authors");
+        add_author_id, add_author_ids, author_id, author_ids, "an author", "authors", "100 authors");
     sequence_setters!(
         mention_user_ids, user_id, user_ids, UserId, 'a,
-        add_user_mention, add_user_mentions, user_mention, user_mentions, "a user mentioned", "users mentioned");
+        add_user_mention, add_user_mentions, user_mention, user_mentions, "a user mentioned", "users mentioned", "100 users mentioned");
     sequence_setters!(
         mention_role_ids, role_id, role_ids, RoleId, 'a,
-        add_role_mention, add_role_mentions, role_mention, role_mentions, "a role mentioned", "roles mentioned");
+        add_role_mention, add_role_mentions, role_mention, role_mentions, "a role mentioned", "roles mentioned", "100 roles mentioned");
 
     /// Filter messages that do or do not mention `@everyone`.
     pub fn mention_everyone(mut self, mention_everyone: bool) -> Self {
@@ -189,11 +231,11 @@ impl<'a> MessageQuery<'a> {
 
     sequence_setters!(
         replied_to_user_ids, user_replied_to, users_replied_to, UserId, 'a,
-        add_user_replied_to, add_users_replied_to, user_replied_to, users_replied_to, "a user replied to", "users replied to");
+        add_user_replied_to, add_users_replied_to, user_replied_to, users_replied_to, "a user replied to", "users replied to", "100 users replied to");
 
     sequence_setters!(
         replied_to_message_ids, message_replied_to, message_replied_to, MessageId, 'a,
-        add_message_replied_to, add_messages_replied_to, message_replied_to, messages_replied_to, "a message replied to", "messages replied to");
+        add_message_replied_to, add_messages_replied_to, message_replied_to, messages_replied_to, "a message replied to", "messages replied to", "100 messages replied to");
 
     /// Filter messages by whether they are or are not pinned.
     pub fn pinned(mut self, pinned: bool) -> Self {
@@ -212,22 +254,26 @@ impl<'a> MessageQuery<'a> {
     sequence_setters!(
         embed_providers, embed_provider, embed_providers, &'a str, 'a,
         add_embed_provider, add_embed_providers, embed_provider, embed_providers,
-        "an embed provider (case-sensitive) the message has", "embed providers (case-sensitive) the message has");
+        "an embed provider (case-sensitive) the message has", "embed providers (case-sensitive) the message has",
+        "100 embed providers (max 256 unicode code points each)");
 
     sequence_setters!(
         link_hostnames, link_hostname, link_hostnames, &'a str, 'a,
         add_link_hostname, add_link_hostnames, link_hostname, link_hostnames,
-        "a hostname of a link in the message", "hostnames of a link in the message");
+        "a hostname of a link in the message", "hostnames of a link in the message",
+        "100 hostnames (max 256 unicode code points each)");
 
     sequence_setters!(
         attachment_filenames, attachment_filename, attachment_filenames, &'a str, 'a,
         add_attachment_filename, add_attachment_filenames, attachment_filename, attachment_filenames,
-        "a file name of an attachment in the message", "file names of an attachment in the message");
+        "a file name of an attachment in the message", "file names of an attachment in the message", 
+        "100 file names (max 1024 unicode code points each)");
 
     sequence_setters!(
         attachment_extensions, attachment_extension, attachment_extensions, &'a str, 'a,
         add_attachment_extension, add_attachment_extensions, attachment_extension, attachment_extensions,
-        "a file extension of an attachment in the message", "file extension of an attachment in the message");
+        "a file extension of an attachment in the message", "file extensions of an attachment in the message", 
+        "100 file extensions (max 256 unicode code points each)");
 
     /// Sort by message creation time or by relevance.
     ///
@@ -363,6 +409,7 @@ impl<'a> MessageQuery<'a> {
     ///
     /// # Errors
     ///
+    /// Returns [`Error::Model`] if one or more query parameters exceed Discord's limits.
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
@@ -374,6 +421,7 @@ impl<'a> MessageQuery<'a> {
         guild_id: GuildId,
         #[cfg_attr(not(feature = "cache"), expect(unused_variables))] should_cache: ShouldCache,
     ) -> Result<MessageSearchResults> {
+        self.check_lengths()?;
         // We have to retain ownership of any Cow::Owned variants in the param pairs.
         let cow_params = self.into_param_pairs();
         let params: Vec<(&str, &str)> =
