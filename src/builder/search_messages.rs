@@ -36,7 +36,7 @@ pub struct MessageQuery<'a> {
     replied_to_user_ids: Cow<'a, [UserId]>,
     replied_to_message_ids: Cow<'a, [MessageId]>,
     pinned: Option<bool>,
-    has: Cow<'a, [SearchHas]>,
+    item_kinds: Cow<'a, [SearchItemKind]>,
     embed_types: Cow<'a, [SearchEmbed]>,
     embed_providers: Cow<'a, [&'a str]>,
     link_hostnames: Cow<'a, [&'a str]>,
@@ -244,35 +244,35 @@ impl<'a> MessageQuery<'a> {
     }
 
     sequence_setters!(
-        has, has_item, has_items, SearchHas, 'a,
-        add_message_has_item, add_message_has_items, message_has_item, message_has_items, "an item the message has", "items the message has");
+        item_kinds, item_kind, item_kinds, SearchItemKind, 'a,
+        add_item_kind, add_item_kinds, item_kind, item_kinds, "an item kind messages should have", "item kinds messages should have");
 
     sequence_setters!(
         embed_types, embed_type, embed_types, SearchEmbed, 'a,
-        add_embed_type, add_embed_types, embed_type, embed_types, "an embed type the message has", "embed types the message has");
+        add_embed_type, add_embed_types, embed_type, embed_types, "an embed type", "embed types");
 
     sequence_setters!(
         embed_providers, embed_provider, embed_providers, &'a str, 'a,
         add_embed_provider, add_embed_providers, embed_provider, embed_providers,
-        "an embed provider (case-sensitive) the message has", "embed providers (case-sensitive) the message has",
+        "an embed provider (case-sensitive)", "embed providers (case-sensitive)",
         "100 embed providers (max 256 unicode code points each)");
 
     sequence_setters!(
         link_hostnames, link_hostname, link_hostnames, &'a str, 'a,
         add_link_hostname, add_link_hostnames, link_hostname, link_hostnames,
-        "a hostname of a link in the message", "hostnames of a link in the message",
+        "a link hostname", "link hostnames",
         "100 hostnames (max 256 unicode code points each)");
 
     sequence_setters!(
         attachment_filenames, attachment_filename, attachment_filenames, &'a str, 'a,
         add_attachment_filename, add_attachment_filenames, attachment_filename, attachment_filenames,
-        "a file name of an attachment in the message", "file names of an attachment in the message", 
+        "an attachemnt file name", "attachment file names",
         "100 file names (max 1024 unicode code points each)");
 
     sequence_setters!(
         attachment_extensions, attachment_extension, attachment_extensions, &'a str, 'a,
         add_attachment_extension, add_attachment_extensions, attachment_extension, attachment_extensions,
-        "a file extension of an attachment in the message", "file extensions of an attachment in the message", 
+        "an attachment file extension", "attachment file extensions",
         "100 file extensions (max 256 unicode code points each)");
 
     /// Sort by message creation time or by relevance.
@@ -363,8 +363,8 @@ impl<'a> MessageQuery<'a> {
         if let Some(pinned) = self.pinned.map(boolean_value) {
             params.push(("pinned", Cow::from(pinned)));
         }
-        for has in self.has.iter() {
-            params.push(("has", Cow::from(Into::<&'static str>::into(has))));
+        for item_kind in self.item_kinds.iter() {
+            params.push(("has", Cow::from(Into::<&'static str>::into(item_kind))));
         }
         for embed_type in self.embed_types.iter() {
             params.push(("embed_type", Cow::from(Into::<&'static str>::into(embed_type))));
@@ -512,7 +512,7 @@ impl Not for AuthorType {
     }
 }
 
-/// Specific things the result messages should or should not have.
+/// Specific kinds of items the result messages should or should not have.
 ///
 /// Discord will allow you to both require a thing and exclude it (for example, `Image` and
 /// `NotImage`). This will probably not produce useful results, but it is possible to do.
@@ -522,7 +522,7 @@ impl Not for AuthorType {
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages-search-has-types)
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, AsRefStr, IntoStaticStr)]
-pub enum SearchHas {
+pub enum SearchItemKind {
     /// Return messages that have an image.
     #[strum(serialize = "image")]
     Image,
@@ -580,7 +580,7 @@ pub enum SearchHas {
     NotSnapshot,
 }
 
-impl Not for SearchHas {
+impl Not for SearchItemKind {
     type Output = Self;
 
     fn not(self) -> Self::Output {
