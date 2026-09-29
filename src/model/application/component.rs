@@ -105,6 +105,8 @@ pub struct Section {
     /// Always [`ComponentType::Section`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the section.
+    pub id: Option<NonMaxU32>,
     /// The components inside of the section. At least one is required, with a maximum limit of 3.
     pub components: FixedArray<SectionComponent>,
     /// The accessory to the side of the section.
@@ -197,6 +199,8 @@ pub struct Thumbnail {
     /// Always [`ComponentType::Thumbnail`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the thumbnail.
+    pub id: Option<NonMaxU32>,
     /// The internal media item this contains.
     pub media: UnfurledMediaItem,
     /// The description of the thumbnail.
@@ -235,6 +239,8 @@ pub struct TextDisplay {
     /// Always [`ComponentType::TextDisplay`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the text display.
+    pub id: Option<NonMaxU32>,
     /// The text content of this component.
     #[serde(default)]
     pub content: FixedString<u16>,
@@ -251,6 +257,8 @@ pub struct MediaGallery {
     /// Always [`ComponentType::MediaGallery`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the media gallery.
+    pub id: Option<NonMaxU32>,
     /// Array of images this media gallery can contain, max of 10.
     pub items: FixedArray<MediaGalleryItem>,
 }
@@ -282,6 +290,8 @@ pub struct Separator {
     /// Always [`ComponentType::Separator`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the separator.
+    pub id: Option<NonMaxU32>,
     /// Whether or not this contains a separating divider.
     #[serde(default = "default_true")]
     pub divider: bool,
@@ -311,6 +321,8 @@ pub struct FileComponent {
     /// Always [`ComponentType::File`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the file component.
+    pub id: Option<NonMaxU32>,
     /// The file this component internally contains.
     pub file: UnfurledMediaItem,
     /// Whether or not this component is spoilered.
@@ -327,6 +339,8 @@ pub struct Container {
     /// Always [`ComponentType::Container`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the container.
+    pub id: Option<NonMaxU32>,
     /// The accent colour, similar to an embeds accent.
     pub accent_color: Option<Colour>,
     /// Whether or not this component is spoilered.
@@ -405,6 +419,8 @@ pub struct Label {
     /// Always [`ComponentType::Label`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the label.
+    pub id: Option<NonMaxU32>,
     /// The component within the label.
     pub component: LabelComponent,
 }
@@ -472,6 +488,8 @@ pub struct FileUpload {
     /// Always [`ComponentType::FileUpload`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the file upload component.
+    pub id: Option<NonMaxU32>,
     /// Developer-defined identifier for the file upload; max 100 characters
     pub custom_id: FixedString,
     /// IDs of the uploaded files found in [`ModalInteractionData::resolved`].
@@ -486,6 +504,8 @@ pub struct RadioGroup {
     /// Always [`ComponentType::RadioGroup`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the radio group.
+    pub id: Option<NonMaxU32>,
     /// Developer-defined identifier for the radio group; max 100 characters
     pub custom_id: FixedString,
     /// Value of the selected [`CreateRadioGroupOption`][crate::builder::CreateRadioGroupOption].
@@ -501,6 +521,8 @@ pub struct CheckboxGroup {
     /// Always [`ComponentType::CheckboxGroup`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the checkbox group.
+    pub id: Option<NonMaxU32>,
     /// Developer-defined identifier for the checkbox group; max 100 characters
     pub custom_id: FixedString,
     /// Values of the selected
@@ -516,6 +538,8 @@ pub struct Checkbox {
     /// Always [`ComponentType::Checkbox`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the checkbox.
+    pub id: Option<NonMaxU32>,
     /// Developer-defined identifier for the checkbox group; max 100 characters
     pub custom_id: FixedString,
     /// The state of the checkbox (`true` if checked, `false` if unchecked).
@@ -532,6 +556,8 @@ pub struct ActionRow {
     /// Always [`ComponentType::ActionRow`]
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the action row.
+    pub id: Option<NonMaxU32>,
     /// The components of this ActionRow.
     #[serde(default)]
     pub components: FixedArray<ActionRowComponent>,
@@ -660,6 +686,8 @@ pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the button.
+    pub id: Option<NonMaxU32>,
     /// The button kind and style.
     #[serde(flatten)]
     pub data: ButtonKind,
@@ -705,6 +733,8 @@ enum_number! {
 pub struct SelectMenu {
     #[serde(flatten)]
     pub kind: SelectMenuKind,
+    /// Optional identifier for the select menu.
+    pub id: Option<NonMaxU32>,
     /// An identifier defined by the developer for the select menu.
     pub custom_id: FixedString,
     /// The placeholder shown when nothing is selected.
@@ -742,6 +772,7 @@ impl<'de> Deserialize<'de> for SelectMenu {
         struct SelectMenuRaw {
             #[serde(rename = "type")]
             kind: ComponentType,
+            id: Option<NonMaxU32>,
             custom_id: FixedString,
             placeholder: Option<FixedString>,
             min_values: Option<u8>,
@@ -791,6 +822,7 @@ impl<'de> Deserialize<'de> for SelectMenu {
 
         Ok(Self {
             kind,
+            id: raw.id,
             custom_id: raw.custom_id,
             placeholder: raw.placeholder,
             min_values: raw.min_values,
@@ -870,6 +902,8 @@ pub struct InputText {
     /// The component type, it will always be [`ComponentType::InputText`].
     #[serde(rename = "type")]
     pub kind: ComponentType,
+    /// Optional identifier for the input text component.
+    pub id: Option<NonMaxU32>,
     /// Developer-defined identifier for the input; max 100 characters
     pub custom_id: FixedString,
     /// The input from the user.
@@ -901,6 +935,7 @@ mod tests {
     fn test_button_serde() {
         let mut button = Button {
             kind: ComponentType::Button,
+            id: None,
             data: ButtonKind::NonLink {
                 custom_id: FixedString::from_static_trunc("hello"),
                 style: ButtonStyle::Danger,

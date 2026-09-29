@@ -1,5 +1,6 @@
 use std::borrow::Cow;
 
+use nonmax::NonMaxU32;
 use serde::Serialize;
 
 use crate::model::prelude::*;
@@ -185,6 +186,8 @@ impl TryFrom<Component> for CreateComponent<'_> {
 pub struct CreateSection<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
     components: Cow<'a, [CreateSectionComponent<'a>]>,
     accessory: CreateSectionAccessory<'a>,
@@ -200,9 +203,21 @@ impl<'a> CreateSection<'a> {
     ) -> Self {
         CreateSection {
             kind: ComponentType::Section,
+            id: None,
             components: components.into(),
             accessory,
         }
+    }
+
+    /// Sets the `id` for this section.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message and will be
+    /// generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets the components for the section. Replaces the current value as set in [`Self::new`].
@@ -234,11 +249,13 @@ impl<'a> CreateSection<'a> {
     pub fn into_owned(self) -> CreateSection<'static> {
         let Self {
             kind,
+            id,
             components,
             accessory,
         } = self;
         CreateSection {
             kind,
+            id,
             components: Cow::Owned(
                 components
                     .into_owned()
@@ -260,6 +277,7 @@ impl From<Section> for CreateSection<'_> {
 
         Self {
             kind: ComponentType::Section,
+            id: section.id,
             components: components.into(),
             accessory: CreateSectionAccessory::from(*section.accessory),
         }
@@ -295,6 +313,8 @@ impl From<SectionComponent> for CreateSectionComponent<'_> {
 pub struct CreateTextDisplay<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     content: Cow<'a, str>,
 }
 
@@ -305,8 +325,21 @@ impl<'a> CreateTextDisplay<'a> {
     pub fn new(content: impl Into<Cow<'a, str>>) -> Self {
         CreateTextDisplay {
             kind: ComponentType::TextDisplay,
+            id: None,
             content: content.into(),
         }
+    }
+
+    /// Sets the `id` for this text display component.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message or modal and will
+    /// be generated sequentially, avoiding existing `id`s, when not set.
+    #[must_use]
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets the content of this text display component. Replaces the current value as set in
@@ -323,10 +356,12 @@ impl<'a> CreateTextDisplay<'a> {
     pub fn into_owned(self) -> CreateTextDisplay<'static> {
         let Self {
             kind,
+            id,
             content,
         } = self;
         CreateTextDisplay {
             kind,
+            id,
             content: content.into_owned().into(),
         }
     }
@@ -336,6 +371,7 @@ impl From<TextDisplay> for CreateTextDisplay<'_> {
     fn from(text_display: TextDisplay) -> Self {
         Self {
             kind: ComponentType::TextDisplay,
+            id: text_display.id,
             content: text_display.content.into(),
         }
     }
@@ -374,6 +410,8 @@ impl From<SectionAccessory> for CreateSectionAccessory<'_> {
 pub struct CreateThumbnail<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     media: CreateUnfurledMediaItem<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<Cow<'a, str>>,
@@ -386,10 +424,22 @@ impl<'a> CreateThumbnail<'a> {
     pub fn new(media: CreateUnfurledMediaItem<'a>) -> Self {
         CreateThumbnail {
             kind: ComponentType::Thumbnail,
+            id: None,
             media,
             description: None,
             spoiler: None,
         }
+    }
+
+    /// Sets the `id` for this thumbnail.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message and will be
+    /// generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets the media item. Replaces the current value as set in [`Self::new`].
@@ -413,12 +463,14 @@ impl<'a> CreateThumbnail<'a> {
     pub fn into_owned(self) -> CreateThumbnail<'static> {
         let Self {
             kind,
+            id,
             media,
             description,
             spoiler,
         } = self;
         CreateThumbnail {
             kind,
+            id,
             media: media.into_owned(),
             description: description.map(|d| d.into_owned().into()),
             spoiler,
@@ -430,6 +482,7 @@ impl From<Thumbnail> for CreateThumbnail<'_> {
     fn from(thumbnail: Thumbnail) -> Self {
         Self {
             kind: ComponentType::Thumbnail,
+            id: thumbnail.id,
             media: thumbnail.media.into(),
             description: thumbnail.description.map(Into::into),
             spoiler: thumbnail.spoiler,
@@ -484,6 +537,8 @@ impl From<UnfurledMediaItem> for CreateUnfurledMediaItem<'_> {
 pub struct CreateMediaGallery<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     items: Cow<'a, [CreateMediaGalleryItem<'a>]>,
 }
 
@@ -492,8 +547,20 @@ impl<'a> CreateMediaGallery<'a> {
     pub fn new(items: impl Into<Cow<'a, [CreateMediaGalleryItem<'a>]>>) -> Self {
         CreateMediaGallery {
             kind: ComponentType::MediaGallery,
+            id: None,
             items: items.into(),
         }
+    }
+
+    /// Sets the `id` for this media gallery.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message and will be
+    /// generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets the items of the gallery. Replaces the current value as set in [`Self::new`].
@@ -516,10 +583,12 @@ impl<'a> CreateMediaGallery<'a> {
     pub fn into_owned(self) -> CreateMediaGallery<'static> {
         let Self {
             kind,
+            id,
             items,
         } = self;
         CreateMediaGallery {
             kind,
+            id,
             items: Cow::Owned(
                 items.into_owned().into_iter().map(CreateMediaGalleryItem::into_owned).collect(),
             ),
@@ -533,6 +602,7 @@ impl From<MediaGallery> for CreateMediaGallery<'_> {
 
         Self {
             kind: ComponentType::MediaGallery,
+            id: gallery.id,
             items: items.into(),
         }
     }
@@ -624,6 +694,8 @@ impl From<MediaGalleryItem> for CreateMediaGalleryItem<'_> {
 pub struct CreateFile<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     file: CreateUnfurledMediaItem<'a>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spoiler: Option<bool>,
@@ -635,9 +707,21 @@ impl<'a> CreateFile<'a> {
     pub fn new(file: CreateUnfurledMediaItem<'a>) -> Self {
         CreateFile {
             kind: ComponentType::File,
+            id: None,
             file,
             spoiler: None,
         }
+    }
+
+    /// Sets the `id` for this file component.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message and will be
+    /// generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Only supports `attachment://filename.extension` format. Refer to this builder's
@@ -656,11 +740,13 @@ impl<'a> CreateFile<'a> {
     pub fn into_owned(self) -> CreateFile<'static> {
         let Self {
             kind,
+            id,
             file,
             spoiler,
         } = self;
         CreateFile {
             kind,
+            id,
             file: file.into_owned(),
             spoiler,
         }
@@ -701,6 +787,7 @@ impl TryFrom<FileComponent> for CreateFile<'_> {
 
         Ok(Self {
             kind: ComponentType::File,
+            id: file.id,
             file: CreateUnfurledMediaItem::new(url),
             spoiler: file.spoiler,
         })
@@ -714,6 +801,8 @@ pub struct CreateSeparator {
     #[serde(rename = "type")]
     kind: ComponentType,
     #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     divider: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spacing: Option<SeparatorSpacingSize>,
@@ -724,9 +813,21 @@ impl CreateSeparator {
     pub fn new() -> Self {
         CreateSeparator {
             kind: ComponentType::Separator,
+            id: None,
             divider: None,
             spacing: None,
         }
+    }
+
+    /// Sets the `id` for this separator.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message and will be
+    /// generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets if this separator should have a divider or not.
@@ -752,6 +853,7 @@ impl From<Separator> for CreateSeparator {
     fn from(separator: Separator) -> Self {
         Self {
             kind: ComponentType::Separator,
+            id: separator.id,
             divider: Some(separator.divider),
             spacing: separator.spacing,
         }
@@ -765,6 +867,8 @@ pub struct CreateContainer<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
     #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     accent_color: Option<Colour>,
     #[serde(skip_serializing_if = "Option::is_none")]
     spoiler: Option<bool>,
@@ -776,10 +880,22 @@ impl<'a> CreateContainer<'a> {
     pub fn new(components: impl Into<Cow<'a, [CreateContainerComponent<'a>]>>) -> Self {
         CreateContainer {
             kind: ComponentType::Container,
+            id: None,
             accent_color: None,
             spoiler: None,
             components: components.into(),
         }
+    }
+
+    /// Sets the `id` for this container.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message and will be
+    /// generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Set the colour of the left-hand side of the container.
@@ -824,12 +940,14 @@ impl<'a> CreateContainer<'a> {
     pub fn into_owned(self) -> CreateContainer<'static> {
         let Self {
             kind,
+            id,
             accent_color,
             spoiler,
             components,
         } = self;
         CreateContainer {
             kind,
+            id,
             accent_color,
             spoiler,
             components: Cow::Owned(
@@ -866,6 +984,7 @@ impl TryFrom<Container> for CreateContainer<'_> {
 
         Ok(Self {
             kind: ComponentType::Container,
+            id: container.id,
             accent_color: container.accent_color,
             spoiler: container.spoiler,
             components: components.into(),
@@ -938,6 +1057,8 @@ impl TryFrom<ContainerComponent> for CreateContainerComponent<'_> {
 pub struct CreateLabel<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     label: Cow<'a, str>,
     description: Option<Cow<'a, str>>,
     component: CreateLabelComponent<'a>,
@@ -948,6 +1069,7 @@ impl<'a> CreateLabel<'a> {
     pub fn select_menu(label: impl Into<Cow<'a, str>>, select_menu: CreateSelectMenu<'a>) -> Self {
         Self {
             kind: ComponentType::Label,
+            id: None,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::SelectMenu(select_menu),
@@ -958,6 +1080,7 @@ impl<'a> CreateLabel<'a> {
     pub fn input_text(label: impl Into<Cow<'a, str>>, input_text: CreateInputText<'a>) -> Self {
         Self {
             kind: ComponentType::Label,
+            id: None,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::InputText(input_text),
@@ -968,6 +1091,7 @@ impl<'a> CreateLabel<'a> {
     pub fn file_upload(label: impl Into<Cow<'a, str>>, file_upload: CreateFileUpload<'a>) -> Self {
         Self {
             kind: ComponentType::Label,
+            id: None,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::FileUpload(file_upload),
@@ -978,6 +1102,7 @@ impl<'a> CreateLabel<'a> {
     pub fn radio_group(label: impl Into<Cow<'a, str>>, radio_group: CreateRadioGroup<'a>) -> Self {
         Self {
             kind: ComponentType::Label,
+            id: None,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::RadioGroup(radio_group),
@@ -991,6 +1116,7 @@ impl<'a> CreateLabel<'a> {
     ) -> Self {
         Self {
             kind: ComponentType::Label,
+            id: None,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::CheckboxGroup(checkbox_group),
@@ -1001,10 +1127,22 @@ impl<'a> CreateLabel<'a> {
     pub fn checkbox(label: impl Into<Cow<'a, str>>, checkbox: CreateCheckbox<'a>) -> Self {
         Self {
             kind: ComponentType::Label,
+            id: None,
             label: label.into(),
             description: None,
             component: CreateLabelComponent::Checkbox(checkbox),
         }
+    }
+
+    /// Sets the `id` for this label.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the modal and will be generated
+    /// sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets the description of this component, which will display below the label text.
@@ -1017,12 +1155,14 @@ impl<'a> CreateLabel<'a> {
     pub fn into_owned(self) -> CreateLabel<'static> {
         let Self {
             kind,
+            id,
             label,
             description,
             component,
         } = self;
         CreateLabel {
             kind,
+            id,
             label: label.into_owned().into(),
             description: description.map(|d| d.into_owned().into()),
             component: component.into_owned(),
@@ -1064,6 +1204,8 @@ impl CreateLabelComponent<'_> {
 pub struct CreateFileUpload<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     custom_id: Cow<'a, str>,
     min_values: u8,
     max_values: u8,
@@ -1077,12 +1219,24 @@ impl<'a> CreateFileUpload<'a> {
     pub fn new(custom_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             kind: ComponentType::FileUpload,
+            id: None,
             custom_id: custom_id.into(),
             min_values: 1,
             max_values: 1,
             required: true,
             file_types: Cow::default(),
         }
+    }
+
+    /// Sets the `id` for this file upload component.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the modal and will be generated
+    /// sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// The minimum number of files that must be uploaded. Must be a number from 0 through 10, and
@@ -1121,6 +1275,7 @@ impl<'a> CreateFileUpload<'a> {
     pub fn into_owned(self) -> CreateFileUpload<'static> {
         let Self {
             kind,
+            id,
             custom_id,
             min_values,
             max_values,
@@ -1129,6 +1284,7 @@ impl<'a> CreateFileUpload<'a> {
         } = self;
         CreateFileUpload {
             kind,
+            id,
             custom_id: custom_id.into_owned().into(),
             min_values,
             max_values,
@@ -1148,6 +1304,8 @@ impl<'a> CreateFileUpload<'a> {
 pub struct CreateRadioGroup<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     custom_id: Cow<'a, str>,
     options: Cow<'a, [CreateRadioGroupOption<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1165,10 +1323,22 @@ impl<'a> CreateRadioGroup<'a> {
     ) -> Self {
         Self {
             kind: ComponentType::RadioGroup,
+            id: None,
             custom_id: custom_id.into(),
             options: options.into(),
             required: None,
         }
+    }
+
+    /// Sets the `id` for this radio group.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the modal and will be generated
+    /// sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Whether the radio group is required.
@@ -1180,12 +1350,14 @@ impl<'a> CreateRadioGroup<'a> {
     pub fn into_owned(self) -> CreateRadioGroup<'static> {
         let Self {
             kind,
+            id,
             custom_id,
             options,
             required,
         } = self;
         CreateRadioGroup {
             kind,
+            id,
             custom_id: custom_id.into_owned().into(),
             options: Cow::Owned(
                 options.into_owned().into_iter().map(CreateRadioGroupOption::into_owned).collect(),
@@ -1269,6 +1441,8 @@ impl<'a> CreateRadioGroupOption<'a> {
 pub struct CreateCheckboxGroup<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     custom_id: Cow<'a, str>,
     options: Cow<'a, [CreateCheckboxGroupOption<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1290,12 +1464,24 @@ impl<'a> CreateCheckboxGroup<'a> {
     ) -> Self {
         Self {
             kind: ComponentType::CheckboxGroup,
+            id: None,
             custom_id: custom_id.into(),
             options: options.into(),
             min_values: None,
             max_values: None,
             required: None,
         }
+    }
+
+    /// Sets the `id` for this checkbox group.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the modal and will be generated
+    /// sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// The minimum number of checkboxes that must be checked. Must be a number from 0 through 10,
@@ -1333,6 +1519,7 @@ impl<'a> CreateCheckboxGroup<'a> {
     pub fn into_owned(self) -> CreateCheckboxGroup<'static> {
         let Self {
             kind,
+            id,
             custom_id,
             options,
             min_values,
@@ -1341,6 +1528,7 @@ impl<'a> CreateCheckboxGroup<'a> {
         } = self;
         CreateCheckboxGroup {
             kind,
+            id,
             custom_id: custom_id.into_owned().into(),
             options: Cow::Owned(
                 options
@@ -1430,6 +1618,8 @@ impl<'a> CreateCheckboxGroupOption<'a> {
 pub struct CreateCheckbox<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     custom_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default: Option<bool>,
@@ -1440,9 +1630,21 @@ impl<'a> CreateCheckbox<'a> {
     pub fn new(custom_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             kind: ComponentType::Checkbox,
+            id: None,
             custom_id: custom_id.into(),
             default: None,
         }
+    }
+
+    /// Sets the `id` for this checkbox.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the modal and will be generated
+    /// sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets this checkbox as selected by default.
@@ -1454,11 +1656,13 @@ impl<'a> CreateCheckbox<'a> {
     pub fn into_owned(self) -> CreateCheckbox<'static> {
         let Self {
             kind,
+            id,
             custom_id,
             default,
         } = self;
         CreateCheckbox {
             kind,
+            id,
             custom_id: custom_id.into_owned().into(),
             default,
         }
@@ -1472,6 +1676,8 @@ pub struct CreateButton<'a> {
     style: ButtonStyle,
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     url: Option<Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1495,6 +1701,7 @@ impl<'a> CreateButton<'a> {
         Self {
             style: ButtonStyle::Unknown(5),
             kind: ComponentType::Button,
+            id: None,
             url: Some(url.into()),
             custom_id: None,
             sku_id: None,
@@ -1511,6 +1718,7 @@ impl<'a> CreateButton<'a> {
         Self {
             style: ButtonStyle::Unknown(6),
             kind: ComponentType::Button,
+            id: None,
             url: None,
             custom_id: None,
             emoji: None,
@@ -1525,6 +1733,7 @@ impl<'a> CreateButton<'a> {
     pub fn new(custom_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             kind: ComponentType::Button,
+            id: None,
             style: ButtonStyle::Primary,
             url: None,
             custom_id: Some(custom_id.into()),
@@ -1533,6 +1742,17 @@ impl<'a> CreateButton<'a> {
             emoji: None,
             disabled: false,
         }
+    }
+
+    /// Sets the `id` for this button.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message and will be
+    /// generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets the custom id of the button, a developer-defined identifier. Replaces the current
@@ -1590,6 +1810,7 @@ impl<'a> CreateButton<'a> {
         let Self {
             style,
             kind,
+            id,
             url,
             custom_id,
             sku_id,
@@ -1600,6 +1821,7 @@ impl<'a> CreateButton<'a> {
         CreateButton {
             style,
             kind,
+            id,
             url: url.map(|u| u.into_owned().into()),
             custom_id: custom_id.map(|c| c.into_owned().into()),
             sku_id,
@@ -1628,6 +1850,7 @@ impl From<Button> for CreateButton<'_> {
         Self {
             style,
             kind: ComponentType::Button,
+            id: button.id,
             url,
             custom_id,
             sku_id,
@@ -1824,6 +2047,8 @@ impl TryFrom<SelectMenuKind> for CreateSelectMenuKind<'_> {
 #[derive(Clone, Debug, Serialize)]
 #[must_use]
 pub struct CreateSelectMenu<'a> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     custom_id: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
     placeholder: Option<Cow<'a, str>>,
@@ -1845,6 +2070,7 @@ impl<'a> CreateSelectMenu<'a> {
     /// options, leaving all other fields empty.
     pub fn new(custom_id: impl Into<Cow<'a, str>>, kind: CreateSelectMenuKind<'a>) -> Self {
         Self {
+            id: None,
             custom_id: custom_id.into(),
             placeholder: None,
             min_values: None,
@@ -1853,6 +2079,17 @@ impl<'a> CreateSelectMenu<'a> {
             disabled: None,
             kind,
         }
+    }
+
+    /// Sets the `id` for this select menu.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the message or modal and will
+    /// be generated sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// The placeholder of the select menu.
@@ -1894,6 +2131,7 @@ impl<'a> CreateSelectMenu<'a> {
 
     pub fn into_owned(self) -> CreateSelectMenu<'static> {
         let Self {
+            id,
             custom_id,
             placeholder,
             min_values,
@@ -1903,6 +2141,7 @@ impl<'a> CreateSelectMenu<'a> {
             kind,
         } = self;
         CreateSelectMenu {
+            id,
             custom_id: custom_id.into_owned().into(),
             placeholder: placeholder.map(|p| p.into_owned().into()),
             min_values,
@@ -1924,6 +2163,7 @@ impl TryFrom<SelectMenu> for CreateSelectMenu<'_> {
     /// [`SelectMenuKind::String`], as lossless conversion is not possible.
     fn try_from(select_menu: SelectMenu) -> StdResult<Self, Self::Error> {
         Ok(Self {
+            id: select_menu.id,
             custom_id: select_menu.custom_id.into(),
             placeholder: select_menu.placeholder.map(Into::into),
             min_values: select_menu.min_values,
@@ -2032,6 +2272,8 @@ impl From<SelectMenuOption> for CreateSelectMenuOption<'_> {
 pub struct CreateInputText<'a> {
     #[serde(rename = "type")]
     kind: ComponentType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    id: Option<NonMaxU32>,
     custom_id: Cow<'a, str>,
     style: InputTextStyle,
     min_length: Option<u16>,
@@ -2049,6 +2291,7 @@ impl<'a> CreateInputText<'a> {
     pub fn new(style: InputTextStyle, custom_id: impl Into<Cow<'a, str>>) -> Self {
         Self {
             style,
+            id: None,
             custom_id: custom_id.into(),
 
             placeholder: None,
@@ -2059,6 +2302,17 @@ impl<'a> CreateInputText<'a> {
 
             kind: ComponentType::InputText,
         }
+    }
+
+    /// Sets the `id` for this input text.
+    ///
+    /// **Note:** Must be between `0` and `2147483647`. A value of `0` is allowed but will be
+    /// treated as empty and replaced by the API. A negative value will be set to `0` and thus
+    /// be treated the same. Component `id`s must be unique within the modal and will be generated
+    /// sequentially, avoiding existing `id`s, when not set.
+    pub fn id(mut self, id: i32) -> Self {
+        self.id = NonMaxU32::new(id.max(0).unsigned_abs());
+        self
     }
 
     /// Sets the style of this input text. Replaces the current value as set in [`Self::new`].
@@ -2107,6 +2361,7 @@ impl<'a> CreateInputText<'a> {
     pub fn into_owned(self) -> CreateInputText<'static> {
         let Self {
             kind,
+            id,
             custom_id,
             style,
             min_length,
@@ -2117,6 +2372,7 @@ impl<'a> CreateInputText<'a> {
         } = self;
         CreateInputText {
             kind,
+            id,
             custom_id: custom_id.into_owned().into(),
             style,
             min_length,
