@@ -105,8 +105,7 @@ macro_rules! generate_permissions {
         impl Permissions {
             $(
                 #[doc = concat!("Shorthand for checking that the set of permissions contains the [", $name, "] permission.")]
-                #[doc = ""]
-                #[doc = concat!("[", $name, "]: Self::", stringify!($perm_upper))]
+                #[doc = concat!("\n\n[", $name, "]: Self::", stringify!($perm_upper))]
                 #[must_use]
                 $(
                     #[deprecated = $deprecated]
