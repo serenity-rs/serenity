@@ -2322,13 +2322,17 @@ impl Http {
     /// Gets all the users that are banned in specific guild, with additional options for
     /// filtering.
     ///
-    /// If `limit` is left unset, by default at most 1000 worths of data for banned users is
-    /// returned.
+    /// If `limit` is left unset, up to 1000 [`Ban`] objects will be returned. This is both the
+    /// default and the maximum.
     ///
     /// If `target` is set, then users will be filtered by Id, such that their Id comes before or
     /// after the provided [`UserId`] wrapped by the [`UserPagination`].
     ///
+    /// **Note**: Requires the [Ban Members] or [View Audit Log] permission.
+    ///
     /// [`UserId`]: crate::model::id::UserId
+    /// [Ban Members]: Permissions::BAN_MEMBERS
+    /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     pub async fn get_bans(
         &self,
         guild_id: GuildId,
@@ -2370,13 +2374,14 @@ impl Http {
     /// Gets a [`Ban`] for a specific user in a guild. Returns [`None`] if no ban was found
     /// matching both the [`GuildId`] and [`UserId`].
     ///
-    /// **Note**: Requires that you have the [Ban Members] permission
+    /// **Note**: Requires the [Ban Members] or [View Audit Log] permission.
     ///
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
+    /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     pub async fn get_ban(&self, guild_id: GuildId, user_id: UserId) -> Result<Option<Ban>> {
         let result = self
             .fire(Request {
