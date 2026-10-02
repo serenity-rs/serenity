@@ -230,6 +230,8 @@ enum_number! {
         ThreadLocked = 160005,
         MaxActiveThreadsReached = 160006,
         MaxActiveAnnouncementThreadsReached = 160007,
+        CannotReferenceMessageWithoutReadMessageHistory = 160009,
+        NsfwChannelMessageReferenceNotAllowed = 160010,
         CannotForwardUnreadableMessage = 160014,
 
         InvalidJsonForLottieFile = 170001,
