@@ -32,15 +32,14 @@ pub enum CreateInteractionResponse<'a> {
     ///
     /// Corresponds to Discord's `DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE`.
     Defer(CreateInteractionResponseMessage<'a>),
-    /// Only valid for component-based interactions (seems to work for modal submit interactions
-    /// too even though it's not documented).
+    /// Only valid for Modal and component-based interactions.
     ///
     /// Acknowledges the interaction. You can optionally edit the original message later. The user
     /// does not see a loading state.
     ///
     /// Corresponds to Discord's `DEFERRED_UPDATE_MESSAGE`.
     Acknowledge,
-    /// Only valid for component-based interactions.
+    /// Only valid for Modal and component-based interactions.
     ///
     /// Edits the message the component was attached to.
     ///
