@@ -3680,17 +3680,36 @@ impl Http {
 
     /// Gets a paginated list of the current user's guilds.
     ///
-    /// The `limit` has a maximum value of 200.
+    /// Optionally, `limit` specifies the maximum number of guilds to return (default is 200) and
+    /// `with_counts` determines whether approximate member and presence counts are included
+    /// (default is false). When `shard` is included, only guilds in that shard are returned.
+    ///
+    /// **Note:** Bots using [large bot sharding] must provide a value for `shard`. Valid values
+    /// are `0` through [`max_concurrency`]` - 1`. Iterate over every shard to retrieve the full
+    /// guild list.
+    ///
+    /// [large bot sharding]: https://docs.discord.com/developers/events/gateway#sharding-for-large-bots
+    /// [`max_concurrency`]: SessionStartLimit::max_concurrency
     pub async fn get_guilds(
         &self,
         target: Option<GuildPagination>,
         limit: Option<NonMaxU8>,
+        shard: Option<NonMaxU16>,
+        with_counts: Option<bool>,
     ) -> Result<Vec<GuildInfo>> {
-        let (limit_str, id_str);
-        let mut params = ArrayVec::<_, 2>::new();
+        let (limit_str, id_str, shard_str, with_counts_str);
+        let mut params = ArrayVec::<_, 4>::new();
         if let Some(limit) = limit {
             limit_str = limit.get().to_arraystring();
             params.push(("limit", limit_str.as_str()));
+        }
+        if let Some(shard) = shard {
+            shard_str = shard.get().to_arraystring();
+            params.push(("shard", shard_str.as_str()));
+        }
+        if let Some(with_counts) = with_counts {
+            with_counts_str = with_counts.to_arraystring();
+            params.push(("with_counts", with_counts_str.as_str()));
         }
         if let Some(target) = target {
             let (name, id) = match target {
