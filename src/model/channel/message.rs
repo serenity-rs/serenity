@@ -267,11 +267,11 @@ impl Message {
 
         let guild = cache.guild(guild_id)?;
         let (channel_id, thread_id) = self.channel_id.split();
-        let (channel, is_thread) = if let Some(channel) = guild.channels.get(&channel_id) {
+        let (channel, is_thread) = if let Some(channel) = guild.viewable_channels.get(&channel_id) {
             (channel, false)
         } else {
             let thread = guild.threads.get(&thread_id)?;
-            let channel = guild.channels.get(&thread.parent_id)?;
+            let channel = guild.viewable_channels.get(&thread.parent_id)?;
             (channel, true)
         };
 
@@ -638,7 +638,7 @@ impl Message {
         if let Some(cache) = cache_http.cache()
             && let Some(guild) = cache.guild(self.guild_id?)
         {
-            let channel = guild.channels.get(&self.channel_id.expect_channel())?;
+            let channel = guild.viewable_channels.get(&self.channel_id.expect_channel())?;
             return channel.parent_id;
         }
 
@@ -1363,7 +1363,7 @@ mod tests {
 
         // Guild with the author and channel cached, default (empty) permissions.
         let guild = Guild {
-            channels: new_extract_map(channel),
+            viewable_channels: new_extract_map(channel),
             members: new_extract_map(Member {
                 user: author.clone(),
                 ..Default::default()

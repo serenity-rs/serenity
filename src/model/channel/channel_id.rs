@@ -60,7 +60,7 @@ impl ChannelId {
         if let Some(cache) = cache_http.cache() {
             if let Some(guild_id) = guild_id
                 && let Some(guild) = cache.guild(guild_id)
-                && let Some(channel) = guild.channels.get(&self)
+                && let Some(channel) = guild.viewable_channels.get(&self)
             {
                 return Ok(channel.clone());
             }
@@ -656,8 +656,11 @@ impl GenericChannelId {
         #[cfg(feature = "cache")]
         if let Some(cache) = cache_http.cache() {
             match guild_id.and_then(|id| cache.guild(id)).as_ref().and_then(|g| g.channel(self)) {
-                Some(GenericGuildChannelRef::Channel(chan)) => {
-                    return Ok(Channel::Guild(chan.clone()));
+                Some(GenericGuildChannelRef::Channel(chan)) => match chan {
+                    GuildChannelRef::Viewable(gc) => return Ok(Channel::GuildViewable(gc.clone())),
+                    GuildChannelRef::Obfuscated(oc) => {
+                        return Ok(Channel::GuildObfuscated(*oc));
+                    },
                 },
                 Some(GenericGuildChannelRef::Thread(th)) => {
                     return Ok(Channel::GuildThread(th.clone()));
@@ -668,7 +671,11 @@ impl GenericChannelId {
             #[cfg(feature = "temp_cache")]
             {
                 if let Some(channel) = cache.temp_channels.get(&channel_id) {
-                    return Ok(Channel::Guild(GuildChannel::clone(&*channel)));
+                    return Ok(Channel::GuildViewable(GuildChannel::clone(&*channel)));
+                }
+
+                if let Some(obfuscated) = cache.temp_obfuscated_channels.get(&channel_id) {
+                    return Ok(Channel::GuildObfuscated(*obfuscated));
                 }
 
                 if let Some(thread) = cache.temp_threads.get(&thread_id) {
@@ -682,9 +689,13 @@ impl GenericChannelId {
         #[cfg(all(feature = "cache", feature = "temp_cache"))]
         if let Some(cache) = cache_http.cache() {
             match &channel {
-                Channel::Guild(guild_channel) => {
+                Channel::GuildViewable(guild_channel) => {
                     let cached_channel = MaybeOwnedArc::new(guild_channel.clone());
                     cache.temp_channels.insert(channel_id, cached_channel);
+                },
+                Channel::GuildObfuscated(obfuscated_channel) => {
+                    let cached_channel = MaybeOwnedArc::new(*obfuscated_channel);
+                    cache.temp_obfuscated_channels.insert(channel_id, cached_channel);
                 },
                 Channel::GuildThread(guild_thread) => {
                     let cached_thread = MaybeOwnedArc::new(guild_thread.clone());
@@ -1092,16 +1103,30 @@ impl From<&PrivateChannel> for ChannelId {
 }
 
 impl From<GuildChannel> for ChannelId {
-    /// Gets the Id of a guild channel.
+    /// Gets the Id of a viewable guild channel.
     fn from(public_channel: GuildChannel) -> ChannelId {
         public_channel.id
     }
 }
 
 impl From<&GuildChannel> for ChannelId {
-    /// Gets the Id of a guild channel.
+    /// Gets the Id of a viewable guild channel.
     fn from(public_channel: &GuildChannel) -> ChannelId {
         public_channel.id
+    }
+}
+
+impl From<ObfuscatedChannel> for ChannelId {
+    /// Gets the Id of an obfuscated guild channel.
+    fn from(obfuscated_channel: ObfuscatedChannel) -> ChannelId {
+        obfuscated_channel.id
+    }
+}
+
+impl From<&ObfuscatedChannel> for ChannelId {
+    /// Gets the Id of an obfuscated guild channel.
+    fn from(obfuscated_channel: &ObfuscatedChannel) -> ChannelId {
+        obfuscated_channel.id
     }
 }
 
