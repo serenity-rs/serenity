@@ -1098,14 +1098,17 @@ fn normalize(text: &str) -> String {
         .replace("discord.com/invite", "discord\u{2024}com/invite")
         .replace("discordapp.com/invite", "discordapp\u{2024}com/invite")
         // Remove right-to-left override and other similar annoying symbols
-        .replace([
-            '\u{202E}', // RTL Override
-            '\u{200F}', // RTL Mark
-            '\u{202B}', // RTL Embedding
-            '\u{200B}', // Zero-width space
-            '\u{200D}', // Zero-width joiner
-            '\u{200C}', // Zero-width non-joiner
-        ], " ")
+        .replace(
+            [
+                '\u{202E}', // RTL Override
+                '\u{200F}', // RTL Mark
+                '\u{202B}', // RTL Embedding
+                '\u{200B}', // Zero-width space
+                '\u{200D}', // Zero-width joiner
+                '\u{200C}', // Zero-width non-joiner
+            ],
+            " ",
+        )
         // Remove everyone and here mentions. Has to be put after ZWS replacement because it
         // utilises it itself.
         .replace("@everyone", "@\u{200B}everyone")

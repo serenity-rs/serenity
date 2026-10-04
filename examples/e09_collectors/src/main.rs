@@ -70,7 +70,7 @@ impl EventHandler for Handler {
 
                 // We can create a collector from scratch too using this builder future.
                 let collector = MessageCollector::new(ctx)
-                // Only collect messages by this user.
+                    // Only collect messages by this user.
                     .author_id(new_message.author.id)
                     .channel_id(new_message.channel_id)
                     .timeout(Duration::from_secs(10))
