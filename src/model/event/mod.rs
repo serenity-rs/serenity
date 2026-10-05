@@ -168,25 +168,11 @@ pub struct GuildBanRemoveEvent {
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-create).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct GuildCreateEvent {
-    pub guild: Guild,
-}
-
-// Manual impl needed to insert guild_id fields in GuildChannel, GuildThread, Member, Role
-impl<'de> Deserialize<'de> for GuildCreateEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        let mut guild: Guild = Guild::deserialize(deserializer)?;
-        guild.channels.iter_mut().for_each(|x| x.base.guild_id = guild.id);
-        guild.threads.iter_mut().for_each(|x| x.base.guild_id = guild.id);
-        guild.members.iter_mut().for_each(|x| x.guild_id = guild.id);
-        guild.roles.iter_mut().for_each(|x| x.guild_id = guild.id);
-        Ok(Self {
-            guild,
-        })
-    }
+    pub guild: GuildCreateGuild,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].

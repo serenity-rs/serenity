@@ -39,6 +39,7 @@ use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::prelude::*;
+use crate::model::utils::deserialize_available_guild;
 #[cfg(feature = "model")]
 use crate::model::utils::*;
 
@@ -1179,6 +1180,47 @@ pub struct UnavailableGuild {
     /// Indicator of whether the guild is unavailable.
     #[serde(default)]
     pub unavailable: bool,
+}
+
+/// Representation of the inner payload of a [`GuildCreateEvent`], which can include either a
+/// [`Guild`] or an [`UnavailableGuild`].
+///
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-create).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+#[expect(
+    clippy::large_enum_variant,
+    reason = "Almost always Present so boxing would be counter-productive"
+)]
+pub enum GuildCreateGuild {
+    #[serde(deserialize_with = "deserialize_available_guild")]
+    Available(Guild),
+    Unavailable(UnavailableGuild),
+}
+
+impl GuildCreateGuild {
+    /// Returns the [`GuildId`] of the [`GuildCreateGuild`].
+    #[must_use]
+    pub fn id(&self) -> GuildId {
+        match self {
+            GuildCreateGuild::Available(guild) => guild.id,
+            GuildCreateGuild::Unavailable(unavailable_guild) => unavailable_guild.id,
+        }
+    }
+
+    /// Whether this [`GuildCreateGuild`] is unavailable due to an outage.
+    ///
+    /// **Note:** Both [`Guild`] and [`UnavailableGuild`] will be marked as unavailable when
+    /// offline due to an outage. When an [`UnavailableGuild`] is ___not___ marked as unavailable,
+    /// this indicates that the current user has been removed from that guild.
+    #[must_use]
+    pub fn unavailable(&self) -> bool {
+        match self {
+            GuildCreateGuild::Available(guild) => guild.unavailable(),
+            GuildCreateGuild::Unavailable(unavailable_guild) => unavailable_guild.unavailable,
+        }
+    }
 }
 
 enum_number! {
