@@ -64,10 +64,13 @@ impl EventHandler for Bot {
                 } else if new_message.content.trim() == "~todo list" {
                     // "SELECT" will return the task of all rows where user_Id column = user_id in
                     // todo.
-                    let todos = sqlx::query!("SELECT task FROM todo WHERE user_id = ? ORDER BY rowid", user_id)
-                            .fetch_all(&self.database) // < All matched data will be sent to todos
-                            .await
-                            .unwrap();
+                    let todos = sqlx::query!(
+                        "SELECT task FROM todo WHERE user_id = ? ORDER BY rowid",
+                        user_id
+                    )
+                    .fetch_all(&self.database) // < All matched data will be sent to todos
+                    .await
+                    .unwrap();
 
                     let mut response = format!("You have {} pending tasks:\n", todos.len());
                     for (i, todo) in todos.iter().enumerate() {

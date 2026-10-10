@@ -135,7 +135,8 @@ impl EventHandler for Handler {
                             // This time we dont edit the message but reply to it
                             CreateInteractionResponse::Message(
                                 CreateInteractionResponseMessage::default()
-                                    // Make the message hidden for other users by setting `ephemeral(true)`.
+                                    // Make the message hidden for other users by setting
+                                    // `ephemeral(true)`.
                                     .ephemeral(true)
                                     .content(format!("The **{animal}** says __{sound}__")),
                             ),

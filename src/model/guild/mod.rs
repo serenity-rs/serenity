@@ -1145,6 +1145,10 @@ pub struct GuildInfo {
     pub permissions: Permissions,
     /// See [`Guild::features`].
     pub features: FixedArray<FixedString>,
+    /// Approximate number of members in this guild.
+    pub approximate_member_count: Option<MemberCount>,
+    /// Approximate number of non-offline members in this guild.
+    pub approximate_presence_count: Option<MemberCount>,
 }
 
 #[cfg(feature = "model")]
