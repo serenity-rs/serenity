@@ -771,11 +771,11 @@ mod test {
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
         let mut guild_create = GuildCreateEvent {
-            guild: Guild {
+            guild: GuildCreateGuild::Available(Guild {
                 id: GuildId::new(1),
                 channels: ExtractMap::from_iter([channel]),
                 ..Default::default()
-            },
+            }),
         };
         assert!(cache.update(&mut guild_create).is_some());
         assert!(cache.update(&mut event).is_none());
