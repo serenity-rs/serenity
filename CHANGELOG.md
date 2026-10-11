@@ -216,7 +216,7 @@ These types also require getters and setters:
 
 | `NonMax` | Getter | Setter |
 | :---: | :---: | :---: |
-| `not_max: NonMaxU8` | `not_max.get()` | `not_max.new(2).expect("2 should fit in a u8)` |
+| `not_max: NonMaxU8` | `not_max.get()` | `not_max.new(2).expect("2 should fit in a u8")` |
 
 ### Cow Builders
 
