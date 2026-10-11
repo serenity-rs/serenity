@@ -59,7 +59,7 @@ use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, WsClient
 use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
 use crate::model::event::{DeserializedEvent, Event, GatewayEvent};
-use crate::model::gateway::{ConnectionStage, GatewayIntents, ShardInfo};
+use crate::model::gateway::{ConnectionStage, GatewayCapabilities, GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
 use crate::model::id::ChannelId;
 use crate::model::id::{ApplicationId, GuildId, ShardId};
@@ -103,6 +103,7 @@ pub struct Shard {
     resume_metadata: Option<ResumeMetadata>,
     compression: TransportCompression,
     pub intents: GatewayIntents,
+    pub capabilities: Option<GatewayCapabilities>,
 }
 
 impl Shard {
@@ -142,6 +143,7 @@ impl Shard {
     ///     shard_info,
     ///     GatewayIntents::all(),
     ///     None,
+    ///     None,
     ///     TransportCompression::None,
     /// )
     /// .await?;
@@ -161,6 +163,7 @@ impl Shard {
         token: Token,
         info: ShardInfo,
         intents: GatewayIntents,
+        capabilities: Option<GatewayCapabilities>,
         presence: Option<PresenceData>,
         compression: TransportCompression,
     ) -> Result<Shard> {
@@ -183,6 +186,7 @@ impl Shard {
             resume_metadata: None,
             compression,
             intents,
+            capabilities,
         })
     }
 
@@ -578,7 +582,13 @@ impl Shard {
     #[cfg_attr(feature = "tracing_instrument", instrument(skip(self)))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client
-            .send_identify(&self.info, self.token.expose_secret(), self.intents, &self.presence)
+            .send_identify(
+                &self.info,
+                self.token.expose_secret(),
+                self.intents,
+                self.capabilities,
+                &self.presence,
+            )
             .await?;
 
         self.heartbeater.send();
