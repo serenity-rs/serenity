@@ -27,19 +27,19 @@ macro_rules! status {
     };
 }
 
-/// The `enum_number!` macro generates `From` implementations to convert between values and the
-/// enum which can then be utilized by `serde` with `#[serde(from = "u8", into = "u8")]`.
+/// The `enum_number!` macro generates a newtype wrapper struct with associated constants.
 ///
 /// When defining the enum like this:
 /// ```ignore
 /// enum_number! {
 ///     /// The `Foo` enum
 ///     #[derive(Clone, Copy, Deserialize, Serialize)]
-///     #[serde(from = "u8", into = "u8")]
+///     #[<default> = 1]
 ///     pub enum Foo {
 ///         /// First
 ///         Aah = 1,
 ///         /// Second
+///         #[cfg(feature = "unstable")]
 ///         Bar = 2,
 ///         _ => Unknown(u8),
 ///     }
@@ -51,34 +51,35 @@ macro_rules! status {
 /// ```
 /// # use serde::{Deserialize, Serialize};
 /// #
-/// /// The `Foo` enum
 /// #[derive(Clone, Copy, Deserialize, Serialize)]
-/// #[serde(from = "u8", into = "u8")]
-/// pub enum Foo {
-///     /// First
-///     Aah,
-///     /// Second,
-///     Bar,
-///     /// Variant value is unknown.
-///     Unknown(u8),
-/// }
+/// pub struct Foo(pub u8);
 ///
-/// impl From<u8> for Foo {
-///     fn from(value: u8) -> Self {
-///         match value {
-///             1 => Self::Aah,
-///             2 => Self::Bar,
-///             unknown => Self::Unknown(unknown),
-///         }
+/// impl Default for Foo {
+///     fn default() -> Self {
+///         Self(1)
 ///     }
 /// }
 ///
-/// impl From<Foo> for u8 {
-///     fn from(value: Foo) -> Self {
-///         match value {
-///             Foo::Aah => 1,
-///             Foo::Bar => 2,
-///             Foo::Unknown(unknown) => unknown,
+/// impl Foo {
+///     /// First
+///     pub const Aah: Self = Self(1);
+///     /// Second
+///     #[cfg(feature = "unstable")]
+///     pub const Bar: Self = Self(2);
+///
+///     /// Variant value is unknown.
+///     #[must_use]
+///     pub const fn Unknown(val: u8) -> Self {
+///         Self(val)
+///     }
+///
+///     /// Get a string representation.
+///     #[must_use]
+///     pub const fn as_str(&self) -> &'static str {
+///         match &self.0 {
+///             1 => "Aah",
+///             2 => "Bar",
+///             _ => "Unknown",
 ///         }
 ///     }
 /// }
@@ -122,7 +123,7 @@ macro_rules! enum_number {
                 Self(val)
             }
 
-            /// Get a string representation
+            /// Get a string representation.
             #[must_use]
             $vis const fn as_str(&self) -> &'static str {
                 match &self.0 {
