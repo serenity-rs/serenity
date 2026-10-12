@@ -143,19 +143,20 @@ pub struct RecurrenceRule {
     pub frequency: Frequency,
     /// The spacing between the events, defined by `frequency`.
     ///
-    /// For example, a `frequency` of `WEEKLY` and an `interval` of `2` would be "every other
-    /// week".
+    /// **Note**: Can only be set to [`Every`] unless frequency is [`Weekly`], in which case a
+    /// value of [`EveryOther`] can be used to define an "every other week" recurrence. Due to the
+    /// limitations placed on `by_weekday` this means that if you wish to use "every other week"
+    /// functionality you can only do so for a single day.
     ///
-    /// **Note**: Can only be set to a value of `1` unless frequency is [`Frequency::Weekly`],
-    /// in which case a value of `2` can be used to define an "every other week" recurrence. Due
-    /// to the limitations placed on `by_weekday` this means that if you wish to use "every other
-    /// week" functionality you can only do so for a single day.
-    pub interval: u8,
+    /// [`Weekly`]: Frequency::Weekly
+    /// [`EveryOther`]: Interval::EveryOther
+    /// [`Every`]: Interval::Every
+    pub interval: Interval,
     /// The set of specific days within a week for the event to recur on.
     ///
-    /// **Note**: Only valid for [`Frequency::Daily`] and [`Frequency::Weekly`] events.
+    /// **Note**: Only valid for [`Daily`] and [`Weekly`] events.
     ///
-    /// When used in a [`Frequency::Daily`] event, the following sets of days are allowed:
+    /// When used in a [`Daily`] event, the following sets of days are allowed:
     /// - Monday-Friday
     /// - Tuesday-Saturday
     /// - Sunday-Thursday
@@ -163,27 +164,36 @@ pub struct RecurrenceRule {
     /// - Saturday-Sunday
     /// - Sunday-Monday
     ///
-    /// When used in a [`Frequency::Weekly`] event, the `by_weekday` array currently can only be
-    /// a length of 1, meaning you can only select a single day within a week to have a recurring
-    /// event on. For multiple days within a week, use [`Frequency::Daily`].
-    pub by_weekday: Option<FixedArray<Weekday, u8>>,
-    /// The list of specific days within a specific week (1-5) of a month to recur on.
+    /// When used in a [`Weekly`] event, the `by_weekday` array currently can only be a length of
+    /// 1, meaning you can only select a single day within a week to have a recurring event on.
+    /// For multiple days within a week, use [`Daily`].
     ///
-    /// **Note**: Only valid for [`Frequency::Monthly`] events. The `by_n_weekday` array currently
-    /// can only be a length of 1, meaning you can only select a single day within a month to have
-    /// a recurring event on.
+    /// [`Daily`]: Frequency::Daily
+    /// [`Weekly`]: Frequency::Weekly
+    pub by_weekday: Option<FixedArray<Weekday, u8>>,
+    /// The list of specific days within a specific week of a month to recur on.
+    ///
+    /// **Note**: Only valid for [`Monthly`] events. The `by_n_weekday` array currently can only
+    /// be a length of 1, meaning you can only select a single day within a month to have a
+    /// recurring event on.
+    ///
+    /// [`Monthly`]: Frequency::Monthly
     pub by_n_weekday: Option<FixedArray<NWeekday, u8>>,
     /// The set of specific months to recur on.
     ///
-    /// **Note**: Only valid for [`Frequency::Yearly`] events. Both `by_month` and `by_month_day`
-    /// must be provided, and both arrays must have a length of 1, meaning you can only set a
-    /// single date for annual events.
+    /// **Note**: Only valid for [`Yearly`] events. Both `by_month` and `by_month_day` must be
+    /// provided, and both arrays must have a length of 1, meaning you can only set a single date
+    /// for annual events.
+    ///
+    /// [`Yearly`]: Frequency::Yearly
     pub by_month: Option<FixedArray<Month, u8>>,
     /// The set of specific dates within a month to recur on.
     ///
-    /// **Note**: Only valid for [`Frequency::Yearly`] events. Both `by_month` and `by_month_day`
-    /// must be provided, and both arrays must have a length of 1, meaning you can only set a
-    /// single date for annual events.
+    /// **Note**: Only valid for [`Yearly`] events. Both `by_month` and `by_month_day` must be
+    /// provided, and both arrays must have a length of 1, meaning you can only set a single date
+    /// for annual events.
+    ///
+    /// [`Yearly`]: Frequency::Yearly
     pub by_month_day: Option<FixedArray<u8, u8>>,
     /// The set of days within a year to recur on (1-364).
     ///
@@ -212,6 +222,23 @@ enum_number! {
 }
 
 enum_number! {
+    /// The spacing between events, defined by [`Frequency`].
+    ///
+    /// Currently, [`Interval::EveryOther`] is only valid for [`Frequency::Weekly`], a combination
+    /// used to denote an event that occurs every other week.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object).
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum Interval {
+        Every = 1,
+        EveryOther = 2,
+        _ => Unknown(u8),
+    }
+}
+
+enum_number! {
     /// Represents a specific day within a week for a scheduled event to recur on.
     ///
     /// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-weekday).
@@ -230,18 +257,32 @@ enum_number! {
     }
 }
 
-/// Represents a specific day within a specific week (1-5) of a month for a scheduled event to
-/// recur on.
+/// Represents a specific day within a specific week of a month for a scheduled event to recur on.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-nweekday-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct NWeekday {
-    /// The week to reoccur on (1-5).
-    pub n: u8,
+    /// The week to reoccur on.
+    pub n: WeekNumber,
     /// The day within the week to reoccur on.
     pub day: Weekday,
+}
+
+enum_number! {
+    /// Represents a specific week within a month.
+    #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[non_exhaustive]
+    pub enum WeekNumber {
+        One = 1,
+        Two = 2,
+        Three = 3,
+        Four = 4,
+        Five = 5,
+        _ => Unknown(u8),
+    }
 }
 
 enum_number! {

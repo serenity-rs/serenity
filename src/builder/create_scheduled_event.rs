@@ -194,7 +194,7 @@ pub struct CreateRecurrenceRule<'a> {
     start: Timestamp,
     // `end` cannot currently be set externally.
     frequency: Frequency,
-    interval: u8,
+    interval: Interval,
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
     by_weekday: Cow<'a, [Weekday]>,
     #[serde(skip_serializing_if = "<[_]>::is_empty")]
@@ -209,11 +209,18 @@ pub struct CreateRecurrenceRule<'a> {
 
 impl<'a> CreateRecurrenceRule<'a> {
     /// Creates a builder with the start, frequency, and interval, leaving all other fields empty.
-    pub fn new(start: impl Into<Timestamp>, frequency: Frequency, interval: u8) -> Self {
+    ///
+    /// **Note**: An interval of [`EveryOther`] is only valid for [`Frequency::Weekly`]. If any
+    /// other frequency is selected, `interval` will be set to [`Every`]. See [`Self::interval`]
+    /// for details.
+    ///
+    /// [`EveryOther`]: Interval::EveryOther
+    /// [`Every`]: Interval::Every
+    pub fn new(start: impl Into<Timestamp>, frequency: Frequency, interval: Interval) -> Self {
         Self {
             start: start.into(),
             frequency,
-            interval,
+            interval: if frequency == Frequency::Weekly { interval } else { Interval::Every },
             by_weekday: Cow::default(),
             by_n_weekday: ArrayVec::default(),
             by_month: ArrayVec::default(),
@@ -232,7 +239,16 @@ impl<'a> CreateRecurrenceRule<'a> {
     }
 
     /// Sets how often the event occurs, replacing the current value as set in [`Self::new`].
+    ///
+    /// **Note**: Setting this to any frequency other than [`Weekly`] will result in `interval`
+    /// being set to [`Every`], which is the only valid value for other frequencies.
+    ///
+    /// [`Weekly`]: Frequency::Weekly
+    /// [`Every`]: Interval::Every
     pub fn frequency(mut self, frequency: Frequency) -> Self {
+        if frequency != Frequency::Weekly {
+            self.interval = Interval::Every;
+        }
         self.frequency = frequency;
         self
     }
@@ -240,22 +256,26 @@ impl<'a> CreateRecurrenceRule<'a> {
     /// Sets the spacing between the events, defined by frequency, replacing the current value
     /// as set in [`Self::new`].
     ///
-    /// For example, a frequency of `WEEKLY` and an interval of `2` would be "every other week".
+    /// **Note**: Can only be set to [`Every`] unless frequency is [`Weekly`], in which case a
+    /// value of [`EveryOther`] can be used to define an "every other week" recurrence. Due to the
+    /// limitations placed on `by_weekday` this means that if you wish to use "every other week"
+    /// functionality you can only do so for a single day.
     ///
-    /// **Note**: Can only be set to a value of `1` unless frequency is [`Frequency::Weekly`],
-    /// in which case a value of `2` can be used to define an "every other week" recurrence. Due
-    /// to the limitations placed on `by_weekday` this means that if you wish to use "every other
-    /// week" functionality you can only do so for a single day.
-    pub fn interval(mut self, interval: u8) -> Self {
+    /// [`Weekly`]: Frequency::Weekly
+    /// [`EveryOther`]: Interval::EveryOther
+    /// [`Every`]: Interval::Every
+    pub fn interval(mut self, interval: Interval) -> Self {
+        // Checking against frequency could cause some shenanigans depending on the order of the
+        // setters used, so just leave validation to the API.
         self.interval = interval;
         self
     }
 
     /// Sets the specific days within a week for the event to recur on.
     ///
-    /// Only valid for [`Frequency::Daily`] and [`Frequency::Weekly`] events.
+    /// Only valid for [`Daily`] and [`Weekly`] events.
     ///
-    /// When used in a [`Frequency::Daily`] event, the following sets of days are allowed:
+    /// When used in a [`Daily`] event, the following sets of days are allowed:
     /// - Monday-Friday
     /// - Tuesday-Saturday
     /// - Sunday-Thursday
@@ -268,41 +288,47 @@ impl<'a> CreateRecurrenceRule<'a> {
     /// ```rust
     /// # use serenity::all::*;
     /// # let start = Timestamp::now();
-    /// let rule = CreateRecurrenceRule::new(start, Frequency::Daily, 1)
+    /// let rule = CreateRecurrenceRule::new(start, Frequency::Daily, Interval::Every)
     ///     .by_weekday(&[Weekday::Saturday, Weekday::Sunday]);
     /// ```
     ///
-    /// When used in a [`Frequency::Weekly`] event, the provided array currently can only be a
-    /// length of 1, meaning you can only select a single day within a week to have a recurring
-    /// event on. For multiple days within a week, use [`Frequency::Daily`].
+    /// When used in a [`Weekly`] event, the provided array currently can only be a length of 1,
+    /// meaning you can only select a single day within a week to have a recurring event on. For
+    /// multiple days within a week, use [`Daily`].
     ///
-    /// For example, the following rule would recur every Thursday:
+    /// For example, the following rule would recur every other Thursday:
     ///
     /// ```rust
     /// # use serenity::all::*;
     /// # let start = Timestamp::now();
-    /// let rule =
-    ///     CreateRecurrenceRule::new(start, Frequency::Weekly, 1).by_weekday(&[Weekday::Thursday]);
+    /// let rule = CreateRecurrenceRule::new(start, Frequency::Weekly, Interval::EveryOther)
+    ///     .by_weekday(&[Weekday::Thursday]);
     /// ```
+    ///
+    /// [`Daily`]: Frequency::Daily
+    /// [`Weekly`]: Frequency::Weekly
     pub fn by_weekday(mut self, weekday: impl Into<Cow<'a, [Weekday]>>) -> Self {
         self.by_weekday = weekday.into();
         self
     }
 
-    /// Sets the specific day within a specific week (1-5) of the month to recur on.
+    /// Sets the specific day within a specific week of the month to recur on.
     ///
-    /// Only valid for [`Frequency::Monthly`] events. You can only select a single day within a
-    /// month to have a recurring event on.
+    /// Frequency will be set to [`Monthly`], which is the only valid value for this type of rule.
+    /// You can only select a single day within a month to have a recurring event on.
     ///
     /// For example, the following rule would recur monthly on the second Friday:
     ///
     /// ```rust
     /// # use serenity::all::*;
     /// # let start = Timestamp::now();
-    /// let rule =
-    ///     CreateRecurrenceRule::new(start, Frequency::Monthly, 1).by_n_weekday(2, Weekday::Friday);
+    /// let rule = CreateRecurrenceRule::new(start, Frequency::Monthly, Interval::Every)
+    ///     .by_n_weekday(WeekNumber::Two, Weekday::Friday);
     /// ```
-    pub fn by_n_weekday(mut self, n: u8, day: Weekday) -> Self {
+    ///
+    /// [`Monthly`]: Frequency::Monthly
+    pub fn by_n_weekday(mut self, n: WeekNumber, day: Weekday) -> Self {
+        self.frequency = Frequency::Monthly;
         self.by_n_weekday = ArrayVec::from([NWeekday {
             n,
             day,
@@ -312,17 +338,21 @@ impl<'a> CreateRecurrenceRule<'a> {
 
     /// Sets the specific month and date within that month to recur on.
     ///
-    /// Only valid for [`Frequency::Yearly`] events. You can only set a single date for annual
-    /// events.
+    /// Frequency will be set to [`Yearly`], which is the only valid value for this type of rule.
+    /// You can only set a single date for annual events.
     ///
     /// For example, the following rule would recur annually on 22 July:
     ///
     /// ```rust
     /// # use serenity::all::*;
     /// # let start = Timestamp::now();
-    /// let rule = CreateRecurrenceRule::new(start, Frequency::Yearly, 1).by_month(Month::July, 22);
+    /// let rule = CreateRecurrenceRule::new(start, Frequency::Yearly, Interval::Every)
+    ///     .by_month(Month::July, 22);
     /// ```
+    ///
+    /// [`Yearly`]: Frequency::Yearly
     pub fn by_month(mut self, month: Month, day: u8) -> Self {
+        self.frequency = Frequency::Yearly;
         self.by_month = ArrayVec::from([month]);
         self.by_month_day = ArrayVec::from([day]);
         self
