@@ -103,8 +103,8 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.12"
-tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
+serenity = "0.13"
+tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread"] }
 ```
 
 ## MSRV Policy
@@ -132,16 +132,18 @@ Cargo.toml:
 [dependencies.serenity]
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
-version = "0.12"
+version = "0.13"
 ```
 
-The default features are: `builder`, `cache`, `chrono`, `client`, `framework`, `gateway`,
-`http`, `model`, `utils`, and `rustls_backend`.
+The default features are: `cache`, `chrono`, `framework`, `transport_compression_zlib`,
+`transport_compression_zstd`, and `rustls_backend`. Enabling `framework` also enables `gateway`,
+`model`, `builder`, `http`, and `utils`.
 
-There are these alternative default features, they require to set `default-features = false`:
+The following enable default features with alternative backends. To use these, you must set
+`default-features = false`.
 
+- **default_no_backend**: Excludes the backend; pick your own instead.
 - **default_native_tls**: Uses `native_tls_backend` instead of the default `rustls_backend`.
-- **default_no_backend**: Excludes the default backend, pick your own backend instead.
 - **default_rustls_no_provider**: Uses `rustls_backend_no_provider`, requiring manual registration of a Rustls crypto provider.
 
 If you are unsure which to pick, use the default features by not setting `default-features = false`.
@@ -153,8 +155,6 @@ The following is a full list of features:
 other data, to avoid performing REST requests. If you are low on RAM, do not
 enable this.
 - **collector**: A collector awaits events, such as receiving a message from a user or reactions on a message, and allows for responding to the events in a convenient fashion. Collectors can be configured to enforce certain criteria the events must meet.
-- **client**: A manager for shards and event handlers, abstracting away the
-work of handling shard events and updating the cache, if enabled.
 - **framework**: Enables the framework, which is a utility to allow simple
 command parsing, before/after command execution, prefix setting, and more.
 - **gateway**: A Shard, used as a higher-level interface for communicating with
@@ -163,6 +163,8 @@ the Discord gateway over a WebSocket client.
 enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
+- **transport_compression_zlib**: Enables zlib-stream transport compression of incoming gateway events.
+- **transport_compression_zstd**: Enables zstd-stream transport compression of incoming gateway events.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
 [lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
@@ -180,7 +182,7 @@ To enable all parts of the codebase, use the **"full"** feature.
 
 For possibly more up-to-date information, check the Cargo.toml.
 
-Serenity offers two TLS-backends, `rustls_backend` by default, you need to pick
+Serenity offers two TLS backends: `rustls_backend` (default) and `native_tls_backend`. You need to pick
 one if you do not use the default features:
 
 - **rustls_backend**: Uses Rustls for all platforms, a pure Rust
@@ -190,24 +192,20 @@ crypto provider, therefore requiring manual registration of a Rustls crypto prov
 - **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
 and OpenSSL on other platforms.
 
-If you want all of the default features except for `cache` for example, you can
+If you want all of the default features except for `cache`, for example, you can
 list all but that:
 
 ```toml
 [dependencies.serenity]
 default-features = false
 features = [
-    "builder",
     "chrono",
-    "client",
     "framework",
-    "gateway",
-    "http",
-    "model",
-    "utils",
+    "transport_compression_zlib",
+    "transport_compression_zstd",
     "rustls_backend",
 ]
-version = "0.12"
+version = "0.13"
 ```
 
 # Dependencies
