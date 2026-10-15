@@ -13,6 +13,11 @@ pub enum Maximum {
     WebhookName,
     AuditLogReason,
     BulkDeleteAmount,
+    MessageSearchContentLength,
+    MessageSearchChannelCount,
+    MessageSearchItemCount,
+    MessageSearchAttachmentFilenameLength,
+    MessageSearchStringItemLength,
 }
 
 #[cfg(feature = "http")]
@@ -37,6 +42,15 @@ impl Maximum {
             Self::StickerCount => crate::constants::STICKER_MAX_COUNT,
             Self::WebhookName | Self::BulkDeleteAmount => 100,
             Self::AuditLogReason => 512,
+            Self::MessageSearchContentLength => crate::constants::MESSAGE_SEARCH_CONTENT_CODE_LIMIT,
+            Self::MessageSearchChannelCount => crate::constants::MESSAGE_SEARCH_MAX_CHANNELS_COUNT,
+            Self::MessageSearchItemCount => crate::constants::MESSAGE_SEARCH_MAX_ITEMS_COUNT,
+            Self::MessageSearchAttachmentFilenameLength => {
+                crate::constants::MESSAGE_SEARCH_MAX_ATTACHMENT_FILENAME_CODE_LIMIT
+            },
+            Self::MessageSearchStringItemLength => {
+                crate::constants::MESSAGE_SEARCH_MAX_STRING_ITEM_CODE_LIMIT
+            },
         }
     }
 }
@@ -51,6 +65,13 @@ impl fmt::Display for Maximum {
             Self::WebhookName => f.write_str("Webhook name"),
             Self::AuditLogReason => f.write_str("Audit log reason"),
             Self::BulkDeleteAmount => f.write_str("Message bulk delete count"),
+            Self::MessageSearchContentLength => f.write_str("Content param length"),
+            Self::MessageSearchChannelCount => f.write_str("Channel count"),
+            Self::MessageSearchItemCount => f.write_str("Item count"),
+            Self::MessageSearchAttachmentFilenameLength => {
+                f.write_str("Attachment filename length")
+            },
+            Self::MessageSearchStringItemLength => f.write_str("String item length"),
         }
     }
 }

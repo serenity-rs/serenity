@@ -4588,6 +4588,34 @@ impl Http {
         .await
     }
 
+    /// Returns [`Message`]s in a [`Guild`] according to various search criteria.
+    pub async fn search_guild_messages(
+        &self,
+        guild_id: GuildId,
+        params: Option<&'_ [(&'_ str, &'_ str)]>,
+    ) -> Result<MessageSearchOutcome> {
+        // Depending on the response code, we need to deserialize into one type or the other. In
+        // theory we could deserialize into an untagged enum, but this has been observed to not work
+        // properly with larger responses, and furthermore is arguably less precise.
+        let response = self
+            .request(Request {
+                body: None,
+                multipart: None,
+                headers: None,
+                method: LightMethod::Get,
+                route: Route::GuildMessagesSearch {
+                    guild_id,
+                },
+                params,
+            })
+            .await?;
+        Ok(if response.status() == StatusCode::ACCEPTED {
+            MessageSearchOutcome::NotIndexed(response.json().await?)
+        } else {
+            MessageSearchOutcome::Results(response.json().await?)
+        })
+    }
+
     /// Fires off a request, deserializing the response reader via the given type bound.
     ///
     /// If you don't need to deserialize the response and want the response instance itself, use

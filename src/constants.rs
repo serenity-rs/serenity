@@ -20,6 +20,24 @@ pub const LARGE_THRESHOLD: u8 = 250;
 /// The maximum unicode code points allowed within a message by Discord.
 pub const MESSAGE_CODE_LIMIT: usize = 2000;
 
+/// The maximum unicode code points allowed within the content param of a message search by Discord.
+pub const MESSAGE_SEARCH_CONTENT_CODE_LIMIT: usize = 1024;
+
+/// The maximum number of channel ids allowed in a message search by Discord.
+pub const MESSAGE_SEARCH_MAX_CHANNELS_COUNT: usize = 500;
+
+/// The maximum number of items allowed in various parameters (users, roles, embed providers, etc)
+/// in a message search by Discord.
+pub const MESSAGE_SEARCH_MAX_ITEMS_COUNT: usize = 100;
+
+/// The maximum unicode code points allowed for each attachment filename param of a message search
+/// by Discord.
+pub const MESSAGE_SEARCH_MAX_ATTACHMENT_FILENAME_CODE_LIMIT: usize = 1024;
+
+/// The maximum unicode code points allowed for each item of various parameters (users, roles, embed
+/// providers, etc) in a message search by Discord.
+pub const MESSAGE_SEARCH_MAX_STRING_ITEM_CODE_LIMIT: usize = 256;
+
 /// The maximum number of members the bot can fetch at once
 pub const MEMBER_FETCH_LIMIT: NonMaxU16 = match NonMaxU16::new(1000) {
     Some(m) => m,
