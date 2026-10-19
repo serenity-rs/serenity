@@ -36,10 +36,14 @@ use std::str::FromStr;
 pub use chrono::ParseError as InnerError;
 #[cfg(feature = "chrono")]
 use chrono::{DateTime, SecondsFormat, TimeZone, Utc};
+#[cfg(feature = "jiff")]
+pub use jiff::Error as InnerError;
+#[cfg(feature = "jiff")]
+use jiff::Timestamp as JiffTimestamp;
 use serde::{Deserialize, Serialize};
-#[cfg(not(feature = "chrono"))]
+#[cfg(feature = "time_rs")]
 pub use time::error::Parse as InnerError;
-#[cfg(not(feature = "chrono"))]
+#[cfg(feature = "time_rs")]
 use time::{Duration, OffsetDateTime, format_description::well_known::Rfc3339, serde::rfc3339};
 
 /// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
@@ -52,9 +56,10 @@ const MAX_DISCORD_ID_MILLIS: u64 = 5_818_116_911_103;
 #[serde(transparent)]
 pub struct Timestamp(
     #[cfg(feature = "chrono")] DateTime<Utc>,
-    #[cfg(not(feature = "chrono"))]
+    #[cfg(feature = "time_rs")]
     #[serde(with = "rfc3339")]
     OffsetDateTime,
+    #[cfg(feature = "jiff")] JiffTimestamp,
 );
 
 impl Timestamp {
@@ -66,7 +71,9 @@ impl Timestamp {
     pub fn from_millis(millis: i64) -> Result<Self, InvalidTimestamp> {
         #[cfg(feature = "chrono")]
         let x = Utc.timestamp_millis_opt(millis).single();
-        #[cfg(not(feature = "chrono"))]
+        #[cfg(feature = "jiff")]
+        let x = JiffTimestamp::from_millisecond(millis).ok();
+        #[cfg(feature = "time_rs")]
         let x = OffsetDateTime::from_unix_timestamp_nanos(
             Duration::milliseconds(millis).whole_nanoseconds(),
         )
@@ -85,7 +92,9 @@ impl Timestamp {
     pub fn now() -> Self {
         #[cfg(feature = "chrono")]
         let x = Utc::now();
-        #[cfg(not(feature = "chrono"))]
+        #[cfg(feature = "jiff")]
+        let x = JiffTimestamp::now();
+        #[cfg(feature = "time_rs")]
         let x = OffsetDateTime::now_utc();
         Self(x)
     }
@@ -104,7 +113,9 @@ impl Timestamp {
     pub fn unix_timestamp(&self) -> i64 {
         #[cfg(feature = "chrono")]
         let x = self.0.timestamp();
-        #[cfg(not(feature = "chrono"))]
+        #[cfg(feature = "jiff")]
+        let x = self.0.as_second();
+        #[cfg(feature = "time_rs")]
         let x = self.0.unix_timestamp();
         x
     }
@@ -114,7 +125,9 @@ impl Timestamp {
     pub fn unix_timestamp_millis(&self) -> i64 {
         #[cfg(feature = "chrono")]
         let x = self.0.timestamp_millis();
-        #[cfg(not(feature = "chrono"))]
+        #[cfg(feature = "jiff")]
+        let x = self.0.as_millisecond();
+        #[cfg(feature = "time_rs")]
         let x =
             Duration::nanoseconds_i128(self.0.unix_timestamp_nanos()).whole_milliseconds() as i64;
         x
@@ -140,7 +153,9 @@ impl Timestamp {
     pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
         #[cfg(feature = "chrono")]
         let x = DateTime::parse_from_rfc3339(input).map_err(ParseError)?.with_timezone(&Utc);
-        #[cfg(not(feature = "chrono"))]
+        #[cfg(feature = "jiff")]
+        let x = input.parse::<JiffTimestamp>().map_err(ParseError)?;
+        #[cfg(feature = "time_rs")]
         let x = OffsetDateTime::parse(input, &Rfc3339).map_err(ParseError)?;
         Ok(Self(x))
     }
@@ -149,7 +164,9 @@ impl Timestamp {
     pub fn to_rfc3339(self) -> String {
         #[cfg(feature = "chrono")]
         return self.0.to_rfc3339_opts(SecondsFormat::Millis, true);
-        #[cfg(not(feature = "chrono"))]
+        #[cfg(feature = "jiff")]
+        return self.0.to_string();
+        #[cfg(feature = "time_rs")]
         return self
             .0
             .format(&Rfc3339)
@@ -175,7 +192,9 @@ impl std::fmt::Display for Timestamp {
 impl std::ops::Deref for Timestamp {
     #[cfg(feature = "chrono")]
     type Target = DateTime<Utc>;
-    #[cfg(not(feature = "chrono"))]
+    #[cfg(feature = "jiff")]
+    type Target = JiffTimestamp;
+    #[cfg(feature = "time_rs")]
     type Target = OffsetDateTime;
 
     fn deref(&self) -> &Self::Target {
@@ -189,7 +208,13 @@ impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp {
         Self(dt.with_timezone(&Utc))
     }
 }
-#[cfg(not(feature = "chrono"))]
+#[cfg(feature = "jiff")]
+impl From<JiffTimestamp> for Timestamp {
+    fn from(dt: JiffTimestamp) -> Self {
+        Self(dt)
+    }
+}
+#[cfg(feature = "time_rs")]
 impl From<OffsetDateTime> for Timestamp {
     fn from(dt: OffsetDateTime) -> Self {
         Self(dt)
@@ -200,7 +225,9 @@ impl Default for Timestamp {
     fn default() -> Self {
         #[cfg(feature = "chrono")]
         let x = DateTime::default();
-        #[cfg(not(feature = "chrono"))]
+        #[cfg(feature = "jiff")]
+        let x = JiffTimestamp::default();
+        #[cfg(feature = "time_rs")]
         let x = OffsetDateTime::UNIX_EPOCH;
         Self(x)
     }
