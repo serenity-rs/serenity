@@ -36,7 +36,6 @@ serde = { version = "1.0.228", features = ["derive", "rc"] }
 url = { version = "2.5.7", features = ["serde"] }
 tokio = { version = "1.48.0", features = ["macros", "rt", "sync", "time", "io-util"] }
 futures = { version = "0.3.32", default-features = false, features = ["std"] }
-time = { version = "0.3.47", features = ["formatting", "parsing", "serde-well-known"], optional = true }
 base64 = { version = "0.22.1" }
 zeroize = { version = "1.8.2" } # Not used in serenity, but bumps the minimal version from secrecy
 arrayvec = { version = "0.7.6", features = ["serde"] }
@@ -54,7 +53,6 @@ ref-cast = "1.0.25"
 jiff = { version = "0.2.38", default-features = false, features = ["alloc", "perf-inline", "serde", "std"] }
 # Optional dependencies
 foldhash = { version = "0.2.0", optional = true }
-chrono = { version = "0.4.42", default-features = false, features = ["clock", "serde"], optional = true }
 flate2 = { version = "1.1.9", features = ["zlib-rs"], optional = true }
 zstd = { version = "0.13", default-features = false, optional = true }
 reqwest = { version = ">=0.13", default-features = false, features = ["multipart", "stream", "json"], optional = true }
@@ -74,9 +72,6 @@ version = "1.4.0"
 package = "http"
 
 [features]
-# temporary feature for code conversion purposes
-time_rs = ["dep:time"]
-jiff = []
 # Defaults with different backends
 default = ["default_no_backend", "rustls_backend"]
 default_rustls_no_provider = ["default_no_backend", "rustls_backend_no_provider"]
@@ -85,7 +80,6 @@ default_native_tls = ["default_no_backend", "native_tls_backend"]
 # Serenity requires a backend, this picks all default features without a backend.
 default_no_backend = [
     "cache",
-    "jiff",
     "framework",
     "transport_compression_zlib",
     "transport_compression_zstd",
@@ -124,8 +118,6 @@ voice = ["gateway"]
 # Enables unstable tokio features to give explicit names to internally spawned tokio tasks
 tokio_task_builder = ["tokio/tracing"]
 interactions_endpoint = ["ed25519-dalek"]
-# Uses chrono for Timestamp, instead of time
-chrono = ["dep:chrono", "typesize?/chrono"]
 
 # This enables all parts of the serenity codebase
 # (Note: all feature-gated APIs to be documented should have their features listed here!)
