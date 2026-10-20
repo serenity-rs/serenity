@@ -232,17 +232,6 @@ impl Member {
         self.nick.as_ref().or(self.user.global_name.as_ref()).unwrap_or(&self.user.name)
     }
 
-    /// Returns the DiscordTag of a Member, taking possible nickname into account.
-    #[must_use]
-    #[deprecated = "Use User::tag to get the correct Discord username format or Self::display_name for the name that users will see."]
-    pub fn distinct(&self) -> String {
-        if let Some(discriminator) = self.user.discriminator {
-            format!("{}#{:04}", self.display_name(), discriminator.get())
-        } else {
-            self.display_name().to_string()
-        }
-    }
-
     /// Edits the member in place with the given data.
     ///
     /// See [`EditMember`] for the permission(s) required for separate builder methods, as well as
