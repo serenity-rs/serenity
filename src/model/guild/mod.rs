@@ -288,47 +288,6 @@ impl Guild {
         self.banner.as_ref().map(|banner| cdn!("/banners/{}/{}.webp?size=1024", self.id, banner))
     }
 
-    /// Creates a guild with the data provided.
-    ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
-    /// over a [`Shard`].
-    ///
-    /// # Examples
-    ///
-    /// Create a guild called `"test"` in the [US West region] with no icon:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::http::Http;
-    /// use serenity::model::guild::Guild;
-    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let http: Http = unimplemented!();
-    /// let guild = Guild::create(&http, "test", None).await;
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    /// # Errors
-    ///
-    /// Returns [`Error::Http`] if the current user cannot create a Guild.
-    ///
-    /// [`Shard`]: crate::gateway::Shard
-    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
-    pub async fn create(http: &Http, name: &str, icon: Option<ImageHash>) -> Result<PartialGuild> {
-        #[derive(serde::Serialize)]
-        struct CreateGuild<'a> {
-            name: &'a str,
-            icon: Option<ImageHash>,
-        }
-
-        let body = CreateGuild {
-            name,
-            icon,
-        };
-
-        #[expect(deprecated)]
-        http.create_guild(&body).await
-    }
-
     /// Deletes the current guild if the current user is the owner of the
     /// guild.
     ///
