@@ -432,7 +432,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 ### Removals
 
 - [#2624](https://github.com/serenity-rs/serenity/pull/2624) Remove temporary `vec!` usage from `http`
-- [#2645](https://github.com/serenity-rs/serenity/pull/2645), [#2651](https://github.com/serenity-rs/serenity/pull/2651), [#2719](https://github.com/serenity-rs/serenity/pull/2719), [#2792](https://github.com/serenity-rs/serenity/pull/2792), [#2796](https://github.com/serenity-rs/serenity/pull/2796), [#2817](https://github.com/serenity-rs/serenity/pull/2817), [#2898](https://github.com/serenity-rs/serenity/pull/2898), [#3033](https://github.com/serenity-rs/serenity/pull/3033), [#3042](https://github.com/serenity-rs/serenity/pull/3042), [7664f1c](https://github.com/serenity-rs/serenity/commit/7664f1cdc31f931ea8c37cdebcf0546b4b3a9ada), [#3115](https://github.com/serenity-rs/serenity/pull/3115) Remove deprecated items:
+- [#2645](https://github.com/serenity-rs/serenity/pull/2645), [#2651](https://github.com/serenity-rs/serenity/pull/2651), [#2719](https://github.com/serenity-rs/serenity/pull/2719), [#2792](https://github.com/serenity-rs/serenity/pull/2792), [#2796](https://github.com/serenity-rs/serenity/pull/2796), [#2817](https://github.com/serenity-rs/serenity/pull/2817), [#2898](https://github.com/serenity-rs/serenity/pull/2898), [#3033](https://github.com/serenity-rs/serenity/pull/3033), [#3042](https://github.com/serenity-rs/serenity/pull/3042), [7664f1c](https://github.com/serenity-rs/serenity/commit/7664f1cdc31f931ea8c37cdebcf0546b4b3a9ada), [#3115](https://github.com/serenity-rs/serenity/pull/3115), [#3621](https://github.com/serenity-rs/serenity/pull/3621) Remove deprecated items:
   - `RequestBuilder`: Use `Request ` directly.
   - `GuildChannel::permissions_for_role`, `GuildChannel::permissions_for_user`, `Guild::role_permissions_in`: Use `Guild::user_permissions_in` instead.
   - `AttachmentType`: Use `CreateAttachment` instead.
@@ -457,7 +457,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
   - `Member::permissions`, `Guild::member_permissions`: Use `Guild::member_permissions_in` instead.
   - `Guild::partial_member_permissions`, `PartialGuild::member_permissions`, `PartialGuild::partial_member_permissions`: Use `PartialGuild::partial_member_permissions_in` instead.
   - `CreateActionRow::input_text`: Use `CreateLabel::input_text` instead.
-  - `Emoji::find_guild_id`, `Emoji::try_find_guild_id`, `Event::PresencesReplace`, `TeamMember::permissions`, `ContentSafeOptions::show_discriminator`: No replacement.
+  - `Emoji::find_guild_id`, `Emoji::try_find_guild_id`, `Event::PresencesReplace`, `TeamMember::permissions`, `ContentSafeOptions::show_discriminator`, `Http::create_guild`, `Guild::create`, `Member::distinct`: No replacement.
 - [#2654](https://github.com/serenity-rs/serenity/pull/2654) Remove `_arc` methods on `ClientBuilder`
 - [#2662](https://github.com/serenity-rs/serenity/pull/2662) Remove `Cache::users`, which duplicated data available in `Guild::members`
 - [#2682](https://github.com/serenity-rs/serenity/pull/2682) Remove unneeded `#[allow(..)]` attributes
@@ -501,6 +501,8 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
   - Serenity voice model is now a separate crate: [GitHub](https://github.com/serenity-rs/voice-model), [crates.io](https://crates.io/crates/serenity-voice-model).
 - [#3531](https://github.com/serenity-rs/serenity/pull/3531) Remove component fields not included in interaction responses
 - [#3528](https://github.com/serenity-rs/serenity/pull/3528) Remove `UserFlags::ACTIVE_DEVELOPER`
+- [#3619](https://github.com/serenity-rs/serenity/pull/3619) Remove `time` dependency, `chrono` dependency and feature; replace with `jiff`
+- [#3629](https://github.com/serenity-rs/serenity/pull/3629) Remove `zeroize` dependency
 
 ### Fixes
 
@@ -553,6 +555,8 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3490](https://github.com/serenity-rs/serenity/pull/3490) Update Discord docs links
 - [2fdbd06](https://github.com/serenity-rs/serenity/commit/2fdbd0654803ac004cb2bdebf31c0992824ce2cb) Fix docs and deny rustdoc warnings in CI
 - [#3536](https://github.com/serenity-rs/serenity/pull/3536) Update docs for `Message::attachments` to clarify the behavior of components and embeds
+- [#3617](https://github.com/serenity-rs/serenity/pull/3617) Update docs for internal `enum_number!` macro
+- [#3624](https://github.com/serenity-rs/serenity/pull/3624) Update `Ready::guilds` documentation
 
 ### Miscellaneous
 
@@ -561,7 +565,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#2687](https://github.com/serenity-rs/serenity/pull/2687) Clean up `Ratelimiter`
 - [#2697](https://github.com/serenity-rs/serenity/pull/2697) Clean up codebase by moving overflow checks into `ModelError` variants
 - [#2700](https://github.com/serenity-rs/serenity/pull/2700) Clean up `Error` and shrink its size
-- [#2685](https://github.com/serenity-rs/serenity/pull/2685), [#2711](https://github.com/serenity-rs/serenity/pull/2711), [#2755](https://github.com/serenity-rs/serenity/pull/2755), [#2826](https://github.com/serenity-rs/serenity/pull/2826), [#2961](https://github.com/serenity-rs/serenity/pull/2961), [#3048](https://github.com/serenity-rs/serenity/pull/3048), [f560770](https://github.com/serenity-rs/serenity/commit/f560770a603b41eeb8a64a36f271d81102515e5d), [#3117](https://github.com/serenity-rs/serenity/pull/3117), [#3349](https://github.com/serenity-rs/serenity/pull/3349), [#3463](https://github.com/serenity-rs/serenity/pull/3463) Update dependencies
+- [#2685](https://github.com/serenity-rs/serenity/pull/2685), [#2711](https://github.com/serenity-rs/serenity/pull/2711), [#2755](https://github.com/serenity-rs/serenity/pull/2755), [#2826](https://github.com/serenity-rs/serenity/pull/2826), [#2961](https://github.com/serenity-rs/serenity/pull/2961), [#3048](https://github.com/serenity-rs/serenity/pull/3048), [f560770](https://github.com/serenity-rs/serenity/commit/f560770a603b41eeb8a64a36f271d81102515e5d), [#3117](https://github.com/serenity-rs/serenity/pull/3117), [#3349](https://github.com/serenity-rs/serenity/pull/3349), [#3463](https://github.com/serenity-rs/serenity/pull/3463), [#3623](https://github.com/serenity-rs/serenity/pull/3623) Update dependencies
 - [#2740](https://github.com/serenity-rs/serenity/pull/2740) Avoid cloning `FullEvent` in dispatch code
 - [#2744](https://github.com/serenity-rs/serenity/pull/2744) Use `Serializer::collect_seq` in `Serialize` implementations
 - [#2746](https://github.com/serenity-rs/serenity/pull/2746) Convert `enum_number!` to wrapper struct to reduce type sizes
@@ -580,6 +584,9 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3522](https://github.com/serenity-rs/serenity/pull/3522) Move `FullEvent` out of the gateway and into its own module under `model::event`
 - [#3583](https://github.com/serenity-rs/serenity/pull/3583) Move `ReactionType` unit tests into `reaction.rs`
 - [#3573](https://github.com/serenity-rs/serenity/pull/3573) Remove most dependencies of `http` on `model`
+- [#3620](https://github.com/serenity-rs/serenity/pull/3620) Use native certificate stores instead of WebPKI for gateway TLS
+- [#3628](https://github.com/serenity-rs/serenity/pull/3628) Make `tokio-tungstenite` optional for HTTP-only
+- [#3627](https://github.com/serenity-rs/serenity/pull/3627) Re-export `reqwest`
 
 ## [0.12.5] - 2025-12-20
 
