@@ -24,7 +24,6 @@ jobs:
           - no default features
           - no cache
           - no gateway
-          - chrono
           - zlib compression
           - zstd compression
           - zlib and zstd compression
@@ -46,8 +45,6 @@ jobs:
             features: framework rustls_backend
           - name: no gateway
             features: model rustls_backend
-          - name: chrono
-            features: chrono
           - name: zlib compression
             features: default transport_compression_zlib
           - name: zstd compression

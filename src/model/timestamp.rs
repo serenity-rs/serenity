@@ -1,7 +1,7 @@
 //! Utilities for parsing and formatting RFC 3339 timestamps.
 //!
-//! The [`Timestamp`] newtype wraps `chrono::DateTime<Utc>` or `time::OffsetDateTime` if the `time`
-//! feature is enabled.
+//! The [`Timestamp`] newtype wraps `jiff::Timestamp` and adds a few useful methods for Discord
+//! timestamps.
 //!
 //! # Formatting
 //! ```
@@ -32,15 +32,9 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[cfg(feature = "chrono")]
-pub use chrono::ParseError as InnerError;
-#[cfg(feature = "chrono")]
-use chrono::{DateTime, SecondsFormat, TimeZone, Utc};
+pub use jiff::Error as InnerError;
+use jiff::Timestamp as JiffTimestamp;
 use serde::{Deserialize, Serialize};
-#[cfg(not(feature = "chrono"))]
-pub use time::error::Parse as InnerError;
-#[cfg(not(feature = "chrono"))]
-use time::{Duration, OffsetDateTime, format_description::well_known::Rfc3339, serde::rfc3339};
 
 /// Discord's epoch starts at "2015-01-01T00:00:00+00:00"
 const DISCORD_EPOCH: u64 = 1_420_070_400_000;
@@ -50,12 +44,7 @@ const MAX_DISCORD_ID_MILLIS: u64 = 5_818_116_911_103;
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(transparent)]
-pub struct Timestamp(
-    #[cfg(feature = "chrono")] DateTime<Utc>,
-    #[cfg(not(feature = "chrono"))]
-    #[serde(with = "rfc3339")]
-    OffsetDateTime,
-);
+pub struct Timestamp(JiffTimestamp);
 
 impl Timestamp {
     /// Creates a new [`Timestamp`] from the number of milliseconds since 1970.
@@ -64,14 +53,7 @@ impl Timestamp {
     ///
     /// Returns `Err` if the value is invalid.
     pub fn from_millis(millis: i64) -> Result<Self, InvalidTimestamp> {
-        #[cfg(feature = "chrono")]
-        let x = Utc.timestamp_millis_opt(millis).single();
-        #[cfg(not(feature = "chrono"))]
-        let x = OffsetDateTime::from_unix_timestamp_nanos(
-            Duration::milliseconds(millis).whole_nanoseconds(),
-        )
-        .ok();
-        x.map(Self).ok_or(InvalidTimestamp)
+        JiffTimestamp::from_millisecond(millis).map(Self).map_err(|_| InvalidTimestamp)
     }
 
     pub(crate) fn from_discord_id(id: u64) -> Self {
@@ -83,11 +65,7 @@ impl Timestamp {
     /// Create a new `Timestamp` with the current date and time in UTC.
     #[must_use]
     pub fn now() -> Self {
-        #[cfg(feature = "chrono")]
-        let x = Utc::now();
-        #[cfg(not(feature = "chrono"))]
-        let x = OffsetDateTime::now_utc();
-        Self(x)
+        Self(JiffTimestamp::now())
     }
 
     /// Creates a new [`Timestamp`] from a UNIX timestamp (seconds since 1970).
@@ -102,22 +80,13 @@ impl Timestamp {
     /// Returns the number of non-leap seconds since January 1, 1970 0:00:00 UTC
     #[must_use]
     pub fn unix_timestamp(&self) -> i64 {
-        #[cfg(feature = "chrono")]
-        let x = self.0.timestamp();
-        #[cfg(not(feature = "chrono"))]
-        let x = self.0.unix_timestamp();
-        x
+        self.0.as_second()
     }
 
     /// Returns the number of non-leap milliseconds since January 1, 1970 0:00:00 UTC
     #[must_use]
     pub fn unix_timestamp_millis(&self) -> i64 {
-        #[cfg(feature = "chrono")]
-        let x = self.0.timestamp_millis();
-        #[cfg(not(feature = "chrono"))]
-        let x =
-            Duration::nanoseconds_i128(self.0.unix_timestamp_nanos()).whole_milliseconds() as i64;
-        x
+        self.0.as_millisecond()
     }
 
     /// Parse a timestamp from an RFC 3339 date and time string.
@@ -138,22 +107,13 @@ impl Timestamp {
     ///
     /// Returns `Err` if the string is not a valid RFC 3339 date and time string.
     pub fn parse(input: &str) -> Result<Timestamp, ParseError> {
-        #[cfg(feature = "chrono")]
-        let x = DateTime::parse_from_rfc3339(input).map_err(ParseError)?.with_timezone(&Utc);
-        #[cfg(not(feature = "chrono"))]
-        let x = OffsetDateTime::parse(input, &Rfc3339).map_err(ParseError)?;
+        let x = input.parse::<JiffTimestamp>().map_err(ParseError)?;
         Ok(Self(x))
     }
 
     #[must_use]
     pub fn to_rfc3339(self) -> String {
-        #[cfg(feature = "chrono")]
-        return self.0.to_rfc3339_opts(SecondsFormat::Millis, true);
-        #[cfg(not(feature = "chrono"))]
-        return self
-            .0
-            .format(&Rfc3339)
-            .expect("as the OffsetDateTime is always parsed from rfc3339, this should never fail");
+        self.0.to_string()
     }
 
     pub(crate) fn try_as_discord_id(self) -> Result<u64, TimestampOutOfRange> {
@@ -173,35 +133,22 @@ impl std::fmt::Display for Timestamp {
 }
 
 impl std::ops::Deref for Timestamp {
-    #[cfg(feature = "chrono")]
-    type Target = DateTime<Utc>;
-    #[cfg(not(feature = "chrono"))]
-    type Target = OffsetDateTime;
+    type Target = JiffTimestamp;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-#[cfg(feature = "chrono")]
-impl<Tz: TimeZone> From<DateTime<Tz>> for Timestamp {
-    fn from(dt: DateTime<Tz>) -> Self {
-        Self(dt.with_timezone(&Utc))
-    }
-}
-#[cfg(not(feature = "chrono"))]
-impl From<OffsetDateTime> for Timestamp {
-    fn from(dt: OffsetDateTime) -> Self {
+impl From<JiffTimestamp> for Timestamp {
+    fn from(dt: JiffTimestamp) -> Self {
         Self(dt)
     }
 }
 
 impl Default for Timestamp {
     fn default() -> Self {
-        #[cfg(feature = "chrono")]
-        let x = DateTime::default();
-        #[cfg(not(feature = "chrono"))]
-        let x = OffsetDateTime::UNIX_EPOCH;
+        let x = JiffTimestamp::default();
         Self(x)
     }
 }
@@ -272,11 +219,7 @@ mod tests {
     fn from_unix_timestamp() {
         let timestamp = Timestamp::from_unix_timestamp(1462015105).unwrap();
         assert_eq!(timestamp.unix_timestamp(), 1462015105);
-        if cfg!(feature = "chrono") {
-            assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25.000Z");
-        } else {
-            assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25Z");
-        }
+        assert_eq!(timestamp.to_string(), "2016-04-30T11:18:25Z");
     }
 
     #[test]

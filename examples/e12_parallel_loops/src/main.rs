@@ -3,7 +3,9 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-use chrono::offset::Utc;
+use jiff::Timestamp;
+use jiff::fmt::rfc2822;
+use jiff::tz::TimeZone;
 use serenity::async_trait;
 use serenity::builder::{CreateEmbed, CreateMessage};
 use serenity::gateway::ActivityData;
@@ -102,8 +104,8 @@ async fn log_system_load(ctx: &Context) {
 }
 
 fn set_activity_to_current_time(ctx: &Context) {
-    let current_time = Utc::now();
-    let formatted_time = current_time.to_rfc2822();
+    let current_time = Timestamp::now().to_zoned(TimeZone::UTC);
+    let formatted_time = rfc2822::to_string(&current_time).unwrap();
 
     ctx.set_activity(Some(ActivityData::playing(formatted_time)));
 }
