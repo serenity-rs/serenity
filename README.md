@@ -135,7 +135,7 @@ features = ["pick", "your", "feature", "names", "here"]
 version = "0.12"
 ```
 
-The default features are: `builder`, `cache`, `chrono`, `client`, `framework`, `gateway`,
+The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
 `http`, `model`, `utils`, and `rustls_backend`.
 
 There are these alternative default features, they require to set `default-features = false`:
@@ -173,7 +173,6 @@ instead of `rustls_backend`.
 - **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable"` is set.
 - **unstable**: Enables features of the Serenity and Discord API that do not have a stable interface. The features might not have official documentation and are subject to change without a breaking version bump.
 - **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
-- **chrono**: Uses the `chrono` crate to represent timestamps. If disabled, the `time` crate is used instead.
 - **interactions_endpoint**: Enables tools related to Discord's Interactions Endpoint URL feature
 
 To enable all parts of the codebase, use the **"full"** feature.
@@ -198,7 +197,6 @@ list all but that:
 default-features = false
 features = [
     "builder",
-    "chrono",
     "client",
     "framework",
     "gateway",
