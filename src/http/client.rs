@@ -617,25 +617,6 @@ impl Http {
         .await
     }
 
-    /// Creates a guild with the data provided.
-    ///
-    /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`] will be received
-    /// over a [`Shard`], if at least one is running.
-    ///
-    /// [`Shard`]: crate::gateway::Shard
-    #[deprecated = "This endpoint has been deprecated by Discord and will stop functioning after July 15, 2025. For more information, see: https://docs.discord.com/developers/change-log#deprecating-guild-creation-by-apps"]
-    pub async fn create_guild(&self, map: &impl serde::Serialize) -> Result<PartialGuild> {
-        self.fire(Request {
-            body: Some(to_vec(map)?),
-            multipart: None,
-            headers: None,
-            method: LightMethod::Post,
-            route: Route::Guilds,
-            params: None,
-        })
-        .await
-    }
-
     /// Creates a new guild command.
     ///
     /// New guild commands will be available in the guild immediately.
