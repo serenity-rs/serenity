@@ -91,16 +91,24 @@ impl CacheUpdate for GuildCreateEvent {
     type Output = Vec<GuildId>;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
-        cache.unavailable_guilds.remove(&self.guild.id);
-        let guild = self.guild.clone();
+        match &self.guild {
+            GuildCreateGuild::Available(guild) => {
+                cache.unavailable_guilds.remove(&guild.id);
 
-        cache.guilds.insert(self.guild.id, guild);
+                cache.guilds.insert(guild.id, guild.clone());
 
-        if cache.unavailable_guilds.len() == 0 {
-            cache.unavailable_guilds.shrink_to_fit();
-            Some(cache.guilds.iter().map(|i| *i.key()).collect())
-        } else {
-            None
+                if cache.unavailable_guilds.len() == 0 {
+                    cache.unavailable_guilds.shrink_to_fit();
+                    Some(cache.guilds.iter().map(|i| *i.key()).collect())
+                } else {
+                    None
+                }
+            },
+            GuildCreateGuild::Unavailable(unavailable_guild) => {
+                cache.unavailable_guilds.insert(unavailable_guild.id, ());
+                cache.guilds.remove(&unavailable_guild.id);
+                None
+            },
         }
     }
 }
