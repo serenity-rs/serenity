@@ -351,7 +351,7 @@ impl ExtractKey<UserId> for Presence {
 
 /// An initial set of information given after IDENTIFYing to the gateway.
 ///
-/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#ready-ready-event-fields).
+/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#ready).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
@@ -361,7 +361,7 @@ pub struct Ready {
     pub version: u8,
     /// Information about the user including email
     pub user: CurrentUser,
-    /// Guilds the user is in
+    /// Guilds the user is in. When sharding is used they are filtered to that shard.
     pub guilds: FixedArray<UnavailableGuild>,
     /// Used for resuming connections
     pub session_id: FixedString,
