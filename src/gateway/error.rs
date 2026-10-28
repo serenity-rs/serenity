@@ -1,7 +1,9 @@
 use std::error::Error as StdError;
 use std::fmt;
 
-use tokio_tungstenite::tungstenite::protocol::CloseFrame;
+use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
+
+use super::CloseFrame;
 
 /// An error that occurred while attempting to deal with the gateway.
 ///
@@ -13,7 +15,7 @@ pub enum Error {
     /// There was an error building a URL.
     BuildingUrl,
     /// The connection closed, potentially uncleanly.
-    Closed(Option<Box<CloseFrame>>),
+    Closed(Option<CloseFrame>),
     /// Expected a Hello during a handshake
     ExpectedHello,
     /// When there was an error sending a heartbeat.
@@ -63,6 +65,8 @@ pub enum Error {
     DecompressZstdCorrupted,
     /// When decompressed gateway data is not valid UTF-8.
     DecompressUtf8(Box<std::string::FromUtf8Error>),
+    /// Error received on the transport layer through `tungstenite`.
+    Transport(GatewayTransportError),
 }
 
 impl fmt::Display for Error {
@@ -85,16 +89,49 @@ impl fmt::Display for Error {
                 f.write_str("Disallowed gateway intents were provided")
             },
             #[cfg(feature = "transport_compression_zlib")]
-            Self::DecompressZlib(inner) => fmt::Display::fmt(&inner, f),
+            Self::DecompressZlib(inner) => fmt::Display::fmt(inner, f),
             #[cfg(feature = "transport_compression_zstd")]
             Self::DecompressZstd(code) => write!(f, "Zstd decompression error: {code}"),
             #[cfg(feature = "transport_compression_zstd")]
             Self::DecompressZstdCorrupted => {
                 f.write_str("Zstd decompression error: corrupted data")
             },
-            Self::DecompressUtf8(inner) => fmt::Display::fmt(&inner, f),
+            Self::DecompressUtf8(inner) => fmt::Display::fmt(inner, f),
+            Self::Transport(inner) => fmt::Display::fmt(inner, f),
         }
     }
 }
 
-impl StdError for Error {}
+impl StdError for Error {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        if let Self::Transport(source) = self { Some(source) } else { None }
+    }
+}
+
+/// Error received on the gateway transport layer through `tungstenite`.
+pub struct GatewayTransportError(pub(crate) Box<TungsteniteError>);
+
+impl GatewayTransportError {
+    pub(crate) fn new(err: TungsteniteError) -> Self {
+        Self(Box::new(err))
+    }
+
+    #[cfg(feature = "unstable")]
+    pub fn as_tungstenite_error(&self) -> &TungsteniteError {
+        &self.0
+    }
+}
+
+impl fmt::Debug for GatewayTransportError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&*self.0, f)
+    }
+}
+
+impl fmt::Display for GatewayTransportError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&*self.0, f)
+    }
+}
+
+impl StdError for GatewayTransportError {}

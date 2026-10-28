@@ -257,7 +257,9 @@ impl ShardRunner {
             Ok(None) => {
                 return Ok(None);
             },
-            Err(Error::Tungstenite(tung_err)) if matches!(*tung_err, TungsteniteError::Io(_)) => {
+            Err(Error::Gateway(GatewayError::Transport(tung_err)))
+                if matches!(*tung_err.0, TungsteniteError::Io(_)) =>
+            {
                 debug!("Attempting to auto-reconnect");
 
                 return Ok(Some(ShardAction::Reconnect));
