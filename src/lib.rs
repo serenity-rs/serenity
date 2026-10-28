@@ -159,4 +159,6 @@ pub mod all {
 pub use async_trait::async_trait;
 pub use futures;
 pub use nonmax;
+#[cfg(feature = "http")]
+pub use reqwest;
 pub use small_fixed_array;

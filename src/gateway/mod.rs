@@ -18,9 +18,7 @@ pub mod sharding;
 mod voice;
 mod ws;
 
-#[cfg(feature = "http")]
-use reqwest::IntoUrl;
-use reqwest::Url;
+use reqwest::{IntoUrl, Url};
 use serde::Serialize;
 
 pub use self::error::Error as GatewayError;
