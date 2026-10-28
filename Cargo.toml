@@ -97,7 +97,7 @@ collector = ["gateway"]
 # Enables the Framework trait which is an abstraction for old-style text commands.
 framework = ["gateway"]
 # Enables gateway support, which allows bots to listen for Discord events.
-gateway = ["model", "flate2", "dashmap"]
+gateway = ["model", "flate2", "dashmap", "dep:tokio-tungstenite"]
 # Enables HTTP, which enables bots to execute actions on Discord.
 http = ["dashmap", "mime", "mime_guess", "percent-encoding"]
 # Enables wrapper methods around HTTP requests on model types.
@@ -137,17 +137,17 @@ tracing_instrument = ["tracing/attributes"]
 # - Rustls Backends
 rustls_backend = [
     "reqwest/rustls",
-    "tokio-tungstenite/rustls-tls-native-roots",
+    "tokio-tungstenite?/rustls-tls-native-roots",
 ]
 rustls_backend_no_provider = [
     "reqwest/rustls-no-provider",
-    "tokio-tungstenite/rustls-tls-native-roots",
+    "tokio-tungstenite?/rustls-tls-native-roots",
 ]
 
 # - Native TLS Backends
 native_tls_backend = [
     "reqwest/native-tls",
-    "tokio-tungstenite/native-tls",
+    "tokio-tungstenite?/native-tls",
 ]
 
 
