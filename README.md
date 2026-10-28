@@ -184,6 +184,7 @@ features = [
 ]
 version = "0.12"
 ```
+
 ## MSRV Policy
 
 Serenity's minimum supported Rust version (MSRV) is Rust 1.74.
