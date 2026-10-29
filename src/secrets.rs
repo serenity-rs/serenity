@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use aformat::{CapStr, aformat};
 
-/// A cheaply clonable, zeroed on drop, String.
+/// A cheaply clonable String.
 ///
 /// This is a simple newtype of `Arc<str>` that does not reveal its
 /// content in its [`Debug`](std::fmt::Debug) output.
@@ -28,14 +28,6 @@ impl SecretString {
 impl std::fmt::Debug for SecretString {
     fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         fmt.debug_tuple(std::any::type_name::<Self>()).field(&"<secret>").finish()
-    }
-}
-
-impl zeroize::Zeroize for SecretString {
-    fn zeroize(&mut self) {
-        if let Some(string) = Arc::get_mut(&mut self.0) {
-            string.zeroize();
-        }
     }
 }
 
