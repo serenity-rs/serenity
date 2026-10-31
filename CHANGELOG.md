@@ -3,6 +3,591 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.13.0] - 2026-10-12
+
+Having been almost three years since the previous major version release, this is once again one of
+Serenity's largest updates, with over 300 PRs!
+
+Much of the development since 0.12 has been focused on performance, stability, reduced type sizes
+and cache size, and reduced compile times. Most of the recent changes and additions to the Discord
+API are also reflected in this update, including the long-awaited components V2.
+
+With many of the changes in this update happening under the hood, migration from 0.12 should not be
+too difficult. A simple guide to some of the more prominent breaking changes is provided below,
+followed by a full list of changes.
+
+Thanks to the following for their contributions:
+
+- [@anxyum]
+- [@arqunis]
+- [@beer-psi]
+- [@Cabbache]
+- [@calum4]
+- [@cheesycod]
+- [@DPlayer234]
+- [@Dramex]
+- [@Erk-]
+- [@fgardt]
+- [@Freyja-moth]
+- [@GnomedDev]
+- [@inklesspen]
+- [@ivinjabraham]
+- [@jamesbt365]
+- [@Joshix-1]
+- [@Kerollmops]
+- [@KiloOscarSix]
+- [@kshitijanurag]
+- [@lucascompython]
+- [@meditationmind]
+- [@Milo123459]
+- [@mkrasnitski]
+- [@NateDiamond13]
+- [@NotNorom]
+- [@NullSpaceBoy]
+- [@nwerosama]
+- [@paring-chan]
+- [@sadan4]
+- [@shimaenaga1123]
+- [@SirzBenjie]
+- [@TapGhoul]
+- [@tazz4843]
+- [@TheAirMike]
+- [@TheCataliasTNT2k]
+- [@UserIsntAvailable]
+- [@valentinegb]
+- [@vicky5124]
+- [@vt-d]
+- [@wdgasterdeltarune]
+- [@xacrimon]
+
+### Framework
+
+The standard framework was [deprecated in 0.12.1](/CHANGELOG.md#notable-changes) and has now
+been removed. [Poise](https://github.com/serenity-rs/poise) continues to be our recommended
+replacement.
+
+### Bot Token
+
+The bot token is now securely stored and passed around using the `Token` newtype. Pass your
+token to the `Client` builder from the environment with `Token::from_env` or via the `FromStr`
+implementation, e.g., `mybottoken.parse::<Token>()`.
+```rust
+let token = Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
+```
+Parsing from a string performs minimal validation to ensure the token: is not empty, is optionally
+prefixed with `"Bot "` or `"Bearer "`, and contains three parts (for bot tokens) (split by the
+period char `'.'`).
+
+### Event Handler
+
+The event handler trait now dispatches events from a single `dispatch` function. This simplifies
+the trait and allows for concurrent execution of the event handler and the framework, while adding
+new fields to events will no longer be a breaking change.
+
+Serenity 0.12:
+```rust
+#[async_trait]
+impl EventHandler for Handler {
+    async fn ready(&self, _: Context, ready: Ready) {
+        // ...
+    }
+}
+```
+
+Serenity 0.13:
+```rust
+#[async_trait]
+impl EventHandler for Handler {
+    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
+        match event {
+            FullEvent::Ready { data_about_bot, .. } => {
+                // ...
+            },
+            _ => {},
+        }
+    }
+}
+```
+
+**Support for multiple event handlers has been removed.** However, both `EventHandler` and
+`RawEventHandler` can be set, and the `EventHandler` trait now provides a `filter_event`
+method to enable event filtering. Events can also be mutated in `filter_event`, but **this
+should only be done with extreme caution.**
+
+### Global Data
+
+Global data (user data) is now `Arc<dyn Any>` instead of `Arc<RwLock<TypeMap>>`. This gives the
+user more control over locking, removes boilerplate, is less confusing for beginners to learn, and
+improves compile time.
+
+In Serenity 0.13, simply define the user data struct and pass it to the `Client` builder:
+```rust
+struct UserData {
+    message_count: AtomicUsize,
+}
+
+let data = UserData {
+    message_count: AtomicUsize::new(0),
+};
+
+let mut client = Client::builder(token, intents)
+    .data::<UserData>(Arc::new(data))
+    // ...
+```
+
+Specifying the data type as a type argument is optional, but guarantees that `Context::data`,
+which returns `Arc<Data>`, will not panic if the same type is given. Providing the incorrect type
+will result in a compiler error, rather than a runtime panic.
+
+### Guild Channels & Threads
+
+`GuildChannel`, `PartialChannel`, and `ChannelId` have been divided into shared, channel-specific,
+and thread-specific types.
+
+| Serenity 0.12 | 0.13 Shared fields/methods | 0.13 Channel-exclusive | 0.13 Thread-exclusive |
+| :--- | :---: | :---: | :---: |
+| `GuildChannel` | `BaseGuildChannel` | `GuildChannel` | `GuildThread` |
+| `PartialChannel` | `BaseInteractionChannel` | `InteractionChannel` | `InteractionThread` |
+| `ChannelId` | `GenericChannelId` | `ChannelId` | `ThreadId` |
+
+The `Base*` types are accessible via the `base` field of the exclusive types. For example, `name`
+is a shared field, accessible via the base type: `channel_or_thread.base.name`. However,
+`ChannelId` and `ThreadId` are exclusive to their respective types, and thus reside on the
+exclusive type: `some_thread.id` and `some_channel.id`. Methods work similarly, e.g.,
+`channel_or_thread::send_message()` and `some_channel::create_thread()`.
+
+Methods are provided to cast between the types:
+
+| Shared <-- | Type | --> Exclusive |
+| ---: | :---: | :--- |
+| `ChannelId::widen` | Guild Channel | `GenericChannelId::expect_channel` |
+| `ThreadId::widen` | Guild Thread | `GenericChannelId::expect_thread` |
+
+This allows one to easily use methods from both, e.g., `some_thread.widen().send_message()` or
+`channel_or_thread.expect_thread().get_thread_members()`. However, note that `expect_` should
+only be used when you know the correct type since the inner value is unchanged.
+
+### Collectors
+
+Collectors now take `&Context` instead of `&ShardMessenger`, and the feature-gated collector
+methods on various models have been moved into four traits: `CollectMessages`, `CollectReactions`,
+`CollectModalInteractions`, and `CollectComponentInteractions`.
+
+| Serenity 0.12 | Serenity 0.13 |
+| --- | --- |
+| `msg.author.await_reply(&ctx.shard)` | `msg.author.id.collect_messages(ctx)` |
+| `react_msg.await_reaction(&ctx.shard)` | `react_msg.id.collect_reactions(ctx)` |
+| `msg.await_modal_interactions(&ctx.shard)` | `msg.id.collect_modal_interactions(ctx)` |
+| `msg.await_component_interactions(&ctx.shard)` | `msg.id.collect_component_interactions(ctx)` |
+
+Quick modal has also been moved into the collector module and a `QuickModal` trait has been added.
+While `QuickModal::quick_modal` parameters are unchanged, the method now uses components V2. The
+`CreateQuickModal` builder also has new `text()` and `field_with_description()` methods.
+
+### FixedString and FixedArray
+
+Many models now use the `FixedString` and `FixedArray` types to reduce type sizes. These deref to
+`&str` and `&[T]`, respectively, and you can use `.into_string()` / `.into_vec()` or `.into()` to
+get a `String` / `Vec`. To construct the types, use:
+
+| Type | --> `Fixed*` |
+| :---: | :--- |
+| `Vec` | `FixedArray::from_vec_trunc` |
+| `&'static str` | `FixedString::from_static_trunc` |
+| `&str` | `FixedString::from_str_trunc` |
+| `String` | `FixedString::from_string_trunc` |
+
+### Bitpacked Booleans
+
+Many models now use `bool_to_bitflags` to compact multiple `bool`s into a single bitflags field to
+reduce type sizes. Accessing and modifying these `bool`s requires the use of getters and setters:
+in most cases, the field name of the `bool` and the field name prefixed with `set_`, respectively.
+
+| `bool` | Getter | Setter |
+| :---: | :---: | :---: |
+| `struct This { is_simple: bool }` | `this.is_simple()` | `this.set_is_simple(true)` |
+
+### NonMax
+
+Likewise, many models now use `NonMax*` types for integers to reduce type sizes. These are similar
+to the std `NonZero` types, with the requirement being that their values are not `MAX`. This affords
+the niche optimization of making `Option<NonMax*>` the same size as the corresponding `NonMax*`.
+These types also require getters and setters:
+
+| `NonMax` | Getter | Setter |
+| :---: | :---: | :---: |
+| `not_max: NonMaxU8` | `not_max.get()` | `not_max.new(2).expect("2 should fit in a u8")` |
+
+### Cow Builders
+
+Builders now use `Cow<'a, str>` and `Cow<'a, [T]>` instead of `String`, `Vec<T>`, and
+`impl IntoIterator`. This usually requires no change since most builder methods take
+`impl Into<Cow<T>>`, but sometimes you may need to use `.into()` or pass a `Cow` directly. For
+example, `Option<Cow<T>>` is often preferred since `Option<impl Into<Cow<T>>>` can be awkward
+to use with `None` values.
+```rust
+let builder = CreateEmbed::new().image(url, Some("my alt text".into()));
+```
+
+### Methods on Ids
+
+Many methods that take a snowflake Id have been moved to their respective Ids. If a method seems
+to have disappeared, check the relevant Id. This is particularly true for methods previously on
+`Guild`, `PartialGuild`, and `GuildChannel`. Several examples:
+
+| Serenity 0.12 | Serenity 0.13 |
+| --- | --- |
+| `Guild::add_member` | `GuildId::add_member` |
+| `GuildChannel::create_forum_post` | `ChannelId::create_forum_post` |
+| `GuildChannel::messages` | `GenericChannelId::messages` |
+| `User::dm` | `UserId::dm` |
+
+### Simplify, simplify, simplify!
+
+Many builders and methods have been changed to take the type they need directly, rather than
+accepting impl traits. Of particular note are `impl CacheHttp` and `impl Into<*Id>`.
+
+- `impl CacheHttp` --> `&Http`
+
+  | Serenity 0.12 | Serenity 0.13 |
+  | --- | --- |
+  | `channel_id.send_message(`<ins>**`&ctx`**</ins>`, builder).await` | `channel_id.send_message(`<ins>**`&ctx.http`**</ins>`, builder).await` |
+  | `user_id.direct_message(`<ins>**`&ctx`**</ins>`, builder).await` | `user_id.direct_message(`<ins>**`&http`**</ins>`, builder).await` |
+
+- `impl Into<*Id>` --> `*Id`
+
+  | Serenity 0.12 | Serenity 0.13 |
+  | --- | --- |
+  | `guild_id.ban(&ctx, `<ins>**`user`**</ins>`, 0).await` | `guild_id.ban(&http, `<ins>**`user_id`**</ins>`, 0, None).await` |
+  | `user.has_role(&ctx, `<ins>**`123456789`**</ins>`, `<ins>**`123456789`**</ins>`)` | `user.has_role(&ctx, `<ins>**`GuildId::new(123456789)`**</ins>`, `<ins>**`RoleId::new(123456789)`**</ins>`)` |
+
+### Caution: Ban + Delete Messages
+
+The `Http::ban_user`, `GuildId::ban`, and `Member::ban` methods previously used the deprecated
+`delete_message_days` parameter to specify how many days' worth of messages should be deleted when
+banning a member. This has been changed to `delete_message_seconds`. While the type also changed
+from `u8` to `u32`, the parameter in the `GuildId` and `Member` methods changed from `dmd` to
+`dms`, a small change that could easily be overlooked.
+
+| Serenity 0.12 | Serenity 0.13 |
+| --- | --- |
+| `member.ban(&http, `<ins>**`4`**</ins>`).await` | `member.ban(&http, `<ins>**`345600`**</ins>`, None).await` |
+
+### MSRV
+
+Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
+
+### Additions
+
+- [#2661](https://github.com/serenity-rs/serenity/pull/2661) Add support for `max_concurrency` when starting shards
+- [#2723](https://github.com/serenity-rs/serenity/pull/2723) Add `Client::try_data` to fallibly fetch the `Data` type
+- [#2821](https://github.com/serenity-rs/serenity/pull/2821) Add audit log reasons to model methods
+- [#2832](https://github.com/serenity-rs/serenity/pull/2832) Add `resume_gateway_url` support
+- [#2853](https://github.com/serenity-rs/serenity/pull/2853) Add `EventHandler`/`RawEventHandler::filter_event` for event filtering
+- [#2856](https://github.com/serenity-rs/serenity/pull/2856) Add `PartialGuild::member_highest_role` and `PartialGuild::greater_member_hierarchy`
+- [#2895](https://github.com/serenity-rs/serenity/pull/2895) Add `GuildId` param to `ChannelId::to_channel` to utilize cache when possible
+- [#2935](https://github.com/serenity-rs/serenity/pull/2935) Add `OAuth2Token`, `OAuth2TokenRevocation`, and `OAuth2AuthorizationCurrent` to `Route`
+- [#2933](https://github.com/serenity-rs/serenity/pull/2933) Add ability to set both `EventHandler` and `RawEventHandler`
+- [#2964](https://github.com/serenity-rs/serenity/pull/2964) Add `JsonErrorCode` enum for use in `DiscordJsonError`
+- [#3010](https://github.com/serenity-rs/serenity/pull/3010) Add `Serialize` derive to `FullEvent` and related structs
+- [#3017](https://github.com/serenity-rs/serenity/pull/3017) Add `Context::data_ref` to return a reference to user data
+- [#3028](https://github.com/serenity-rs/serenity/pull/3028) Add `EditCommand` builder
+- [#3031](https://github.com/serenity-rs/serenity/pull/3031) Add `wait_time_between_shard_start` to `ShardQueuer`, configurable via `ClientBuilder::wait_time_between_shard_start`
+- [#3050](https://github.com/serenity-rs/serenity/pull/3050) Add `AutoModRule` and `AuditLogEntryOptions`
+- [#3036](https://github.com/serenity-rs/serenity/pull/3036), [#3067](https://github.com/serenity-rs/serenity/pull/3067), [#3462](https://github.com/serenity-rs/serenity/pull/3462) Add support for transport compression via `transport_compression_zlib` and `transport_compression_zstd` features
+- [#3052](https://github.com/serenity-rs/serenity/pull/3052), [#3054](https://github.com/serenity-rs/serenity/pull/3054), [2d918be](https://github.com/serenity-rs/serenity/commit/2d918bed2f818b2455306a184af34c3a2f3d1313) Add `Token` type that can partially validate token strings; clean up `gateway` feature gates
+  - Pass token to `ClientBuilder` using `Token::from_env`, `Token::from_str`, or `str::parse::<Token>()`.
+- [#3058](https://github.com/serenity-rs/serenity/pull/3058) Add `guild_id` to `ReactionRemoveAll` event
+- [#3075](https://github.com/serenity-rs/serenity/pull/3075) Add ability to parse channel URLs for `GuildChannel` parameters
+- [#3084](https://github.com/serenity-rs/serenity/pull/3084) Add `newly_created` bool to `ThreadCreate` event
+- [#3095](https://github.com/serenity-rs/serenity/pull/3095) Add `roles` field to `GuildId::create_emoji` and `GuildId::edit_emoji` to restrict emoji use to specific roles
+- [#3346](https://github.com/serenity-rs/serenity/pull/3346) Add `CacheUpdate` implementations for the `GuildScheduledEvent*` events and `ThreadListSyncEvent`
+- [#3353](https://github.com/serenity-rs/serenity/pull/3353) Add `ShardManager::get_shutdown_trigger`
+- [#3123](https://github.com/serenity-rs/serenity/pull/3123) Add support for components V2
+- [#3390](https://github.com/serenity-rs/serenity/pull/3390) Add `Channel::guild_id` for easily obtaining the `GuildId` of a `Channel`
+- [#3417](https://github.com/serenity-rs/serenity/pull/3417) Add `after` parameter to `get_audit_logs` endpoint
+- [#3409](https://github.com/serenity-rs/serenity/pull/3409) Add `Permissions::PIN_MESSAGES` and `Http::get_pins`/`GenericChannelId::pins` pagination
+- [#3430](https://github.com/serenity-rs/serenity/pull/3430), [#3451](https://github.com/serenity-rs/serenity/pull/3451) Add support for `Label` and `FileUpload` components
+  - Also adds `CreateQuickModal` methods `text`, `field`, `short_field`, `paragraph_field`, and `field_with_description` for adding text display and text input components.
+- [#3454](https://github.com/serenity-rs/serenity/pull/3454), [#3476](https://github.com/serenity-rs/serenity/pull/3476) Add `ModalComponent` enum and `CreateModalComponent` builder; restrict top-level components in messages and modals
+- [#3461](https://github.com/serenity-rs/serenity/pull/3461), [1ea3706](https://github.com/serenity-rs/serenity/commit/1ea3706422316f2bf65ab4a1b85295c756aa646c) Add `content` field to `TextDisplay` component
+- [#3465](https://github.com/serenity-rs/serenity/pull/3465) Add `as_str` method to `enum_number!` enums
+- [#3466](https://github.com/serenity-rs/serenity/pull/3466) Add `required` field to `SelectMenu` components
+- [#3473](https://github.com/serenity-rs/serenity/pull/3473) Add `Permissions::BYPASS_SLOWMODE`
+- [#3470](https://github.com/serenity-rs/serenity/pull/3470) Add `CacheUpdate` implementations for `ReactionAddEvent`, `ReactionRemoveEvent`, `ReactionRemoveEmojiEvent`, and `ReactionRemoveAllEvent`
+- [#3475](https://github.com/serenity-rs/serenity/pull/3475), [#3477](https://github.com/serenity-rs/serenity/pull/3477) Add DAVE protocol support to `serenity-voice-model`
+- [#3487](https://github.com/serenity-rs/serenity/pull/3487) Add `Timestamp::unix_timestamp_millis` and `Timestamp::try_as_discord_id` for converting a `Timestamp` back into an Id
+- [#3483](https://github.com/serenity-rs/serenity/pull/3483) Add support for `RadioGroup`, `CheckboxGroup`, and `Checkbox` modal components
+- [#3489](https://github.com/serenity-rs/serenity/pull/3489) Add missing `dave_protocol_version` in `SessionDescription` payload
+- [#3518](https://github.com/serenity-rs/serenity/pull/3518) Add `collectibles` field to `Member` and `PartialMember`, update `GuildMemberUpdateEvent`
+- [#3519](https://github.com/serenity-rs/serenity/pull/3519) Add shared themes to `Message`
+- [#3517](https://github.com/serenity-rs/serenity/pull/3517) Add `default_rustls_no_provider` feature to allow opting out of a default Rustls crypto provider
+- [#3537](https://github.com/serenity-rs/serenity/pull/3537), [#3571](https://github.com/serenity-rs/serenity/pull/3571) Add missing `JsonErrorCode`s
+- [#3546](https://github.com/serenity-rs/serenity/pull/3546) Add full support for `EditCurrentMember` endpoint
+- [#3539](https://github.com/serenity-rs/serenity/pull/3539) Add `MessageFlags::HAS_SNAPSHOT`
+- [#3555](https://github.com/serenity-rs/serenity/pull/3555) Add `ReactionTypes` to `get_reaction_users` endpoint to allow fetching users who have super reacted
+- [#3560](https://github.com/serenity-rs/serenity/pull/3560) Add `CreateBotAuthParameters::integration_type`
+- [#3550](https://github.com/serenity-rs/serenity/pull/3550) Add `Scope::IdentifyPremium`
+- [#3514](https://github.com/serenity-rs/serenity/pull/3514) Add `push` and `extend` methods for `CreateAllowedMentions::users` and `CreateAllowedMentions::roles`
+- [#3566](https://github.com/serenity-rs/serenity/pull/3566) Add `call` and `channel_type` fields to `Message`; add `MessageType::PollResult`
+- [#3565](https://github.com/serenity-rs/serenity/pull/3565) Add missing fields to `Attachment` and `Embed` models; add support for setting alt text for images and thumbnails
+- [#3545](https://github.com/serenity-rs/serenity/pull/3545) Add support for voice channel status and start time
+- [#3576](https://github.com/serenity-rs/serenity/pull/3576) Add `CreateAttachment::spoiler`, support for editing attachment metadata via `EditAttachment`
+- [#3581](https://github.com/serenity-rs/serenity/pull/3581) Add `ChannelFlags::IS_SPOILER_CHANNEL`, support for setting channel flags when creating/editing channels, missing `InteractionChannel` fields
+- [#3586](https://github.com/serenity-rs/serenity/pull/3586) Add `GuildId::add_member_role` and `GuildId::remove_member_role`
+- [#3588](https://github.com/serenity-rs/serenity/pull/3588) Add `VoiceChannelEffectSend` event
+- [#3587](https://github.com/serenity-rs/serenity/pull/3587) Add `into_owned` method to most builders
+- [#3593](https://github.com/serenity-rs/serenity/pull/3593) Add `MessageActivityKind::StreamRequest`
+- [#3592](https://github.com/serenity-rs/serenity/pull/3592) Add `ClientStatus::vr` status
+- [#3596](https://github.com/serenity-rs/serenity/pull/3596) Add file type filtering support for command options and file uploads
+- [#3594](https://github.com/serenity-rs/serenity/pull/3594), [#3600](https://github.com/serenity-rs/serenity/pull/3600) Add missing audit log `Action`s and `Change`s; deserialize missing variants as `Other` and preserve their data; add support for `#[serde(rename = "")]` attribute in `generate_change!` macro
+- [#3523](https://github.com/serenity-rs/serenity/pull/3523) Add `From`/`TryFrom` implementations to message components for easy conversion to builders
+- [#3613](https://github.com/serenity-rs/serenity/pull/3613) Add `shard` and `with_counts` to `Http::get_guilds`
+- [#3614](https://github.com/serenity-rs/serenity/pull/3614) Add route for `GuildMessagesSearch` endpoint
+
+### Changes
+
+- [#2658](https://github.com/serenity-rs/serenity/pull/2658) Change `Message::thread` to be boxed
+- [#2656](https://github.com/serenity-rs/serenity/pull/2656), [#2675](https://github.com/serenity-rs/serenity/pull/2675), [#2674](https://github.com/serenity-rs/serenity/pull/2674), [#3418](https://github.com/serenity-rs/serenity/pull/3418) Change `Vec`/`String` to `FixedArray`/`FixedString` for models
+  - `FixedString` must be converted to `String` with `.into()` or `.into_string()` before it can be pushed to, but derefs to `&str` as is.
+  - `FixedArray` must be converted to `Vec` with `.into()` or `.into_vec()` before it can be pushed to, but derefs to `&[T]` as is.
+- [#2668](https://github.com/serenity-rs/serenity/pull/2668) Change `min_int_value`, `max_int_value`, `add_int_choice`, and `add_int_choice_localized` fields on `CreateCommandOption` to `i64`
+- [#2673](https://github.com/serenity-rs/serenity/pull/2673) Change `bool` and `Option<bool>` fields on structs to packed bitflags using `bool_to_bitflags`
+  - Requires use of getters and setters: `Self::bool_name()` and `Self::set_bool_name()`.
+- [#2681](https://github.com/serenity-rs/serenity/pull/2681), [#2689](https://github.com/serenity-rs/serenity/pull/2689), [#2703](https://github.com/serenity-rs/serenity/pull/2703), [#2803](https://github.com/serenity-rs/serenity/pull/2803) Change types in `Option`s, Ids, builders, `Http` function signatures to `NonMax`
+  - Requires use of getters and setters: `NonMax*::get()` and `NonMax*::new(x)`.
+- [#2688](https://github.com/serenity-rs/serenity/pull/2688), [#2985](https://github.com/serenity-rs/serenity/pull/2985) Change builders to take `Cow<'a, str>` and `Cow<'a, [T]>` instead of `String`, `Vec<T>`, and `impl IntoIterator`
+- [#2694](https://github.com/serenity-rs/serenity/pull/2694) Change `Request::params` to slice, instead of owning `ArrayVec`
+- [#2695](https://github.com/serenity-rs/serenity/pull/2695) Change `Request::params` back to `Option`
+- [#2707](https://github.com/serenity-rs/serenity/pull/2707) Change instrument macros to be gated behind the `tracing_instrument` feature
+- [#2701](https://github.com/serenity-rs/serenity/pull/2701) Change `impl Into<Option>` to `Option` for ease of use
+- [#2720](https://github.com/serenity-rs/serenity/pull/2720) Change user data struct to use `dyn Any` instead of `TypeMap`
+- [#2722](https://github.com/serenity-rs/serenity/pull/2722) Change `Context::data` to return `Arc<Data>` instead of `&Data`
+- [#2730](https://github.com/serenity-rs/serenity/pull/2730) Change unknown event errors back to debug level
+- [#2741](https://github.com/serenity-rs/serenity/pull/2741) Change builders to take required arguments instead of `Builder` trait
+- [#2745](https://github.com/serenity-rs/serenity/pull/2745) Change token storage from `SecretString` to `Arc<str>`
+- [#2748](https://github.com/serenity-rs/serenity/pull/2748) Change token storage back to `Secret` without losing `Arc<str>` opt
+- [#2749](https://github.com/serenity-rs/serenity/pull/2749) Change `ClientBuilder::new_with_http` to take `Arc<Http>`
+- [#2765](https://github.com/serenity-rs/serenity/pull/2765) Change `ClientBuilder::data` to a generic type argument
+- [#2766](https://github.com/serenity-rs/serenity/pull/2766) Change `VoiceServerUpdate::guild_id` from `Option<GuildId>` to `GuildId`
+- [#2767](https://github.com/serenity-rs/serenity/pull/2767) Change `MessageBuilder` to fit with other builders
+- [#2768](https://github.com/serenity-rs/serenity/pull/2768) Change `ChannelId::messages` and `ChannelId::pins` to fill the message cache
+- [#2788](https://github.com/serenity-rs/serenity/pull/2788) Change `Event` and `FullEvent` to use `strum` derives to get variant names
+- [#2789](https://github.com/serenity-rs/serenity/pull/2789) Change `unstable_discord_api` feature name to `unstable` and include Serenity API in its scope; make `FullEvent` exhaustive when using the feature
+- [#2793](https://github.com/serenity-rs/serenity/pull/2793) Change manual `Hash`/`Eq` implementations on `User`/`Role` to derives
+- [#2797](https://github.com/serenity-rs/serenity/pull/2797) Change `HashMap` to `ExtractMap` where possible
+- [#2818](https://github.com/serenity-rs/serenity/pull/2818), [#2822](https://github.com/serenity-rs/serenity/pull/2822), [#2855](https://github.com/serenity-rs/serenity/pull/2855) Change `impl CacheHttp` to `&Http`, remove permissions checks in builders
+- [#2824](https://github.com/serenity-rs/serenity/pull/2824) Change `fs` feature of `tokio` to be gated behind the `builder` feature
+- [#2833](https://github.com/serenity-rs/serenity/pull/2833) Change `Settings::time_to_live` to be gated behind the `temp_cache` feature
+- [#2844](https://github.com/serenity-rs/serenity/pull/2844) Change `EditGuild::banner` to take `CreateAttachment`
+- [#2851](https://github.com/serenity-rs/serenity/pull/2851) Change active collectors collection to use `RwLock` instead of `Mutex`
+- [#2852](https://github.com/serenity-rs/serenity/pull/2852) Change `PresenceUpdateEvent` to provide old presence data on cache update
+- [#2897](https://github.com/serenity-rs/serenity/pull/2897) Change `Message::reply` to respect default allowed mentions, remove monomorphisation of `Cow<'_, str>` argument, remove `reply_mention` method and duplicated documentation
+- [#2957](https://github.com/serenity-rs/serenity/pull/2957) Change `Cache::set_max_messages` to truncate cache if `max_messages` is set to a lower value
+- [#2968](https://github.com/serenity-rs/serenity/pull/2968) Change `CreateInteractionResponseFollowup::embeds` to `Option`
+- [#3016](https://github.com/serenity-rs/serenity/pull/3016) Change `CreateAttachment::data` from `Cow<'static, [u8]>` to `Bytes`
+- [#3034](https://github.com/serenity-rs/serenity/pull/3034) Change `Interaction::app_permissions` to return `Permissions` instead of `Option<Permissions>`
+- [#3062](https://github.com/serenity-rs/serenity/pull/3062) Change discriminant of `audit_log::Action` to `u16`
+- [#3055](https://github.com/serenity-rs/serenity/pull/3055) Change `await_` collector methods on models to traits: `CollectMessages`, `CollectReactions`, `CollectModalInteractions`, and `CollectComponentInteractions`; add new `QuickModal` trait
+- [#3061](https://github.com/serenity-rs/serenity/pull/3061) Change `MessageUpdateEvent` to just contain a full `Message`
+- [#3111](https://github.com/serenity-rs/serenity/pull/3111) Change from `fxhash` to `foldhash` due to hash quality issues
+- [#3088](https://github.com/serenity-rs/serenity/pull/3088) Change `delete_message_days` parameter of `Http::ban_user` to `delete_message_seconds`, `dmd` parameter of `Member::ban` and `GuildId::ban` to `dms`
+  - Period of time for which messages are deleted when banning is now specified in seconds, rather than days.
+- [#3327](https://github.com/serenity-rs/serenity/pull/3327) Change `ShardManagerMessage` check in `ShardManager::run` loop to avoid unnecessarily waiting `wait_time_between_shard_start` before first start
+- [#3324](https://github.com/serenity-rs/serenity/pull/3324) Change `EventHandler` trait to have a single dispatch function, allowing framework to be dispatched concurrently
+- [#3333](https://github.com/serenity-rs/serenity/pull/3333) Change event dispatch to avoid boxed event reallocations when possible
+- [#3026](https://github.com/serenity-rs/serenity/pull/3026), [#3343](https://github.com/serenity-rs/serenity/pull/3343), [#3344](https://github.com/serenity-rs/serenity/pull/3344), [#3352](https://github.com/serenity-rs/serenity/pull/3352) Change `GuildChannel`, `PartialChannel`, and `ChannelId` to include channel-specific, thread-specific, and shared types
+  - `GuildChannel` is now: `BaseGuildChannel` (shared fields), `GuildChannel` (channel-exclusive), `GuildThread` (thread-exclusive), and `GenericGuildChannelRef` (an enum over references to both).
+  - `PartialChannel` is now: `BaseInteractionChannel` (shared fields), `InteractionChannel` (channel-exclusive), `InteractionThread` (thread-exclusive), and `GenericInteractionChannel` (an enum over both).
+  - `ChannelId` is now: `GenericChannelId` (shared purpose/methods), `ChannelId` (channel-exclusive), `ThreadId` (thread-exclusive).
+  - `GenericChannelId::expect_channel` and `GenericChannelId::expect_thread` casts the Id types without touching the value.
+  - `GenericChannelId::split` returns both for when something needs to handle both cases.
+  - `ThreadId::widen` and `Channelid::widen` cast to `GenericChannelId` for when you have a specific Id and need to "widen" the number of methods you can call.
+  - `Guild::channel` checks both `Guild::channels` and `Guild::threads` and returns a reference via `GenericGuildChannelRef`.
+  - Fetch a `GuildChannel` or `GuildThread` with `ChannelId::to_guild_channel`, `ThreadId::to_thread`, `Message:guild_channel`, `Message::guild_thread`.
+- [#3322](https://github.com/serenity-rs/serenity/pull/3322), [52f1f1f](https://github.com/serenity-rs/serenity/commit/52f1f1f803e5bdeda2922efd0a83d1f0731907a9), [5314215](https://github.com/serenity-rs/serenity/commit/5314215afa1005b89b9ad196c919b418e65aaf29), [#3412](https://github.com/serenity-rs/serenity/pull/3412), [#3450](https://github.com/serenity-rs/serenity/pull/3450) Change `CreateAttachment` to stream data from disk when possible
+  - Builders now take base64-encoded data as `DataUri` via `DataUri::from_base64` or `CreateAttachment::encode`.
+  - `DataUri::as_base64` can be used to access the inner data.
+  - `CreateAttachment::to_base64` is replaced by `CreateAttachment::to_bytes`, which returns the `Bytes` type.
+- [#3351](https://github.com/serenity-rs/serenity/pull/3351) Change internal struct names for editing attachments
+- [#3383](https://github.com/serenity-rs/serenity/pull/3383) Change `User::tag` to return `Cow<'_, str>` instead of `String`
+- [#3415](https://github.com/serenity-rs/serenity/pull/3415), [e87c195](https://github.com/serenity-rs/serenity/commit/e87c1950253962afe000584bf37d16eab24326ae) Change `Message::link`/`MessageId::link` to return an intermediate `MessageLink` type that implements `Display`
+- [#3431](https://github.com/serenity-rs/serenity/pull/3431) Change `ClientBuilder` to directly accept boxed handler types
+- [#3453](https://github.com/serenity-rs/serenity/pull/3453) Change deserialization errors for unknown events to preserve the full payload
+- [#3471](https://github.com/serenity-rs/serenity/pull/3471) Change `GuildMemberUpdateEvent::joined_at` to `Option` to reflect Discord API
+- [#3496](https://github.com/serenity-rs/serenity/pull/3496) Change `FormattedTimestampStyle` variants to match Discord API
+- [#3498](https://github.com/serenity-rs/serenity/pull/3498) Change component models and builders to match Discord API
+- [#3508](https://github.com/serenity-rs/serenity/pull/3508) Change `String` to `Cow` or `FixedString` where possible
+- [#3509](https://github.com/serenity-rs/serenity/pull/3509) Change types on `Emoji` and `User` to reduce type size
+- [#3515](https://github.com/serenity-rs/serenity/pull/3515) Change `EventHandler::filter_event` to allow the event to be mutated
+- [#3538](https://github.com/serenity-rs/serenity/pull/3538) Change types to reduce model sizes
+- [#3559](https://github.com/serenity-rs/serenity/pull/3559), [#3561](https://github.com/serenity-rs/serenity/pull/3561) Change JSON decode error reporting to include HTTP codes and source errors; add missing `JsonErrorCode`s
+- [#3591](https://github.com/serenity-rs/serenity/pull/3591) Change `AutocompleteValue` lifetimes from `static` to elided
+- [#3597](https://github.com/serenity-rs/serenity/pull/3597) Change `channel` field on `CommandInteraction`, `ComponentInteraction`, and `ModalInteraction` to be non-optional
+- [#3598](https://github.com/serenity-rs/serenity/pull/3598) Change `ComponentInteraction::member` and `ModalInteraction::member` to be boxed
+- [#3601](https://github.com/serenity-rs/serenity/pull/3601) Change larger `Error` variants to be boxed
+- [#3607](https://github.com/serenity-rs/serenity/pull/3607) Change logging level to `info` for normal gateway closure codes (1000, 1001, and 1012)
+- [#3605](https://github.com/serenity-rs/serenity/pull/3605) Change `Request::build` to ensure URL parameters are encoded safely
+
+### Removals
+
+- [#2624](https://github.com/serenity-rs/serenity/pull/2624) Remove temporary `vec!` usage from `http`
+- [#2645](https://github.com/serenity-rs/serenity/pull/2645), [#2651](https://github.com/serenity-rs/serenity/pull/2651), [#2719](https://github.com/serenity-rs/serenity/pull/2719), [#2792](https://github.com/serenity-rs/serenity/pull/2792), [#2796](https://github.com/serenity-rs/serenity/pull/2796), [#2817](https://github.com/serenity-rs/serenity/pull/2817), [#2898](https://github.com/serenity-rs/serenity/pull/2898), [#3033](https://github.com/serenity-rs/serenity/pull/3033), [#3042](https://github.com/serenity-rs/serenity/pull/3042), [7664f1c](https://github.com/serenity-rs/serenity/commit/7664f1cdc31f931ea8c37cdebcf0546b4b3a9ada), [#3115](https://github.com/serenity-rs/serenity/pull/3115), [#3621](https://github.com/serenity-rs/serenity/pull/3621) Remove deprecated items:
+  - `RequestBuilder`: Use `Request ` directly.
+  - `GuildChannel::permissions_for_role`, `GuildChannel::permissions_for_user`, `Guild::role_permissions_in`: Use `Guild::user_permissions_in` instead.
+  - `AttachmentType`: Use `CreateAttachment` instead.
+  - `PartialGuild::role_permissions_in`: Use `PartialGuild::user_permissions_in` instead.
+  - `GatewayIntents::GUILD_BANS`, `GatewayIntents::guild_bans()`: Use `GatewayIntents::GUILD_MODERATION`, `GatewayIntents::guild_moderation()` instead.
+  - `Permissions::MANAGE_EMOJIS_AND_STICKERS`, `Permissions::manage_emojis_and_stickers()`: Use `Permissions::MANAGE_GUILD_EXPRESSIONS`, `Permissions::manage_guild_expressions()` instead.
+  - `StickerId::delete`, `StickerId::edit`: Use `GuildId::delete_sticker`, `GuildId::edit_sticker` instead.
+  - `utils::parse_username`, `utils::parse_role`, `utils::parse_channel`: Use `utils::parse_user_mention`, `utils::parse_role_mention`, `utils::parse_channel_mention` instead.
+  - `collector::make_specific_collector!`, `collector::build()`: Use `collector::collect()`, `collector::stream()` instead.
+  - `Emoji::delete`, `Emoji::edit`: Use `GuildId::delete_emoji`, `GuildId::edit_emoji` instead.
+  - `RoleId::to_role_cached`: Use `GuildId::roles` instead.
+  - `absolute_ratelimits` feature: Configure absolute ratelimits via `Ratelimiter::set_absolute_ratelimits`.
+  - `Channel::is_nsfw`, `GuildChannel::is_nsfw`, `PrivateChannel::is_nsfw`: Use the `GuildChannel::nsfw` field instead.
+  - `Cache::channels` and mapped refs: Use `Cache::guild` and `Guild::channels`/`Guild::members`/`Guild::roles` instead.
+  - `Member::highest_role_info` and `PartialGuild::greater_member_hierarchy`: Use `Guild::member_highest_role` instead.
+  - `Command::dm_permission`: Use `Command::contexts` instead.
+  - `MessageInteraction`: Use `Message::interaction_metadata` instead.
+  - `Message::is_private`: Check if `guild_id` is `None` if the message is received from the gateway.
+  - `Message::is_own`: Check if `Message::author` is equal to `Cache::current_user`.
+  - `Message::link_ensured`, `MessageId::link_ensured`: Use `Message::link` if message was recieved via an event, otherwise use `MessageId::link` to provide the `guild_id` yourself.
+  - `CreateInteractionResponse::PremiumRequired`: Use premium button components via `CreateButton::new_premium` instead.
+  - `Member::permissions`, `Guild::member_permissions`: Use `Guild::member_permissions_in` instead.
+  - `Guild::partial_member_permissions`, `PartialGuild::member_permissions`, `PartialGuild::partial_member_permissions`: Use `PartialGuild::partial_member_permissions_in` instead.
+  - `CreateActionRow::input_text`: Use `CreateLabel::input_text` instead.
+  - `Emoji::find_guild_id`, `Emoji::try_find_guild_id`, `Event::PresencesReplace`, `TeamMember::permissions`, `ContentSafeOptions::show_discriminator`, `Http::create_guild`, `Guild::create`, `Member::distinct`: No replacement.
+- [#2654](https://github.com/serenity-rs/serenity/pull/2654) Remove `_arc` methods on `ClientBuilder`
+- [#2662](https://github.com/serenity-rs/serenity/pull/2662) Remove `Cache::users`, which duplicated data available in `Guild::members`
+- [#2682](https://github.com/serenity-rs/serenity/pull/2682) Remove unneeded `#[allow(..)]` attributes
+- [#2686](https://github.com/serenity-rs/serenity/pull/2686) Remove all unsafe code and forbid unsafe code in the library
+- [#2705](https://github.com/serenity-rs/serenity/pull/2705) Remove unnecessary `Vec` in `WsClient`
+- [#2698](https://github.com/serenity-rs/serenity/pull/2698) Remove `IntoIterator` generics where inefficient; take required types instead
+- [#2702](https://github.com/serenity-rs/serenity/pull/2702) Remove manual `#[inline]` attributes
+- [#2704](https://github.com/serenity-rs/serenity/pull/2704) Remove `Into<Id>` and `AsRef<str>`; take required Ids and `&str` instead
+- [#2708](https://github.com/serenity-rs/serenity/pull/2708) Remove `Event::Unknown` variant
+- [#2710](https://github.com/serenity-rs/serenity/pull/2710), [#2806](https://github.com/serenity-rs/serenity/pull/2806), [#2986](https://github.com/serenity-rs/serenity/pull/2986), [#3000](https://github.com/serenity-rs/serenity/pull/3000) Remove use of `serde_json::Value`/`serde_json::json!` where possible
+- [#2714](https://github.com/serenity-rs/serenity/pull/2714) Remove `e15_simple_dashboard` example
+- [#2728](https://github.com/serenity-rs/serenity/pull/2728) Remove `From<i32>`/`From<u64>` implementations for `Colour`; un-allow several pedantic lints
+- [#2734](https://github.com/serenity-rs/serenity/pull/2734) Remove `PartialEq` implementations from all builders
+- [#2736](https://github.com/serenity-rs/serenity/pull/2736) Remove various instances of `impl AsRef<T>` to improve compile times
+- [#2735](https://github.com/serenity-rs/serenity/pull/2735), [#2875](https://github.com/serenity-rs/serenity/pull/2875) Remove `simd-json` feature/support
+- [#2731](https://github.com/serenity-rs/serenity/pull/2731) Remove standard framework
+- [#2759](https://github.com/serenity-rs/serenity/pull/2759) Remove duplicate `content_safe` implementation
+- [#2771](https://github.com/serenity-rs/serenity/pull/2771) Remove `CreateAttachment::id` field
+- [#2787](https://github.com/serenity-rs/serenity/pull/2787) Remove `ChannelId::name`, `GuildChannel::name`, and `PrivateChannel::name`; make `OnlineStatus::name` return `&'static str`
+- [#2795](https://github.com/serenity-rs/serenity/pull/2795) Remove useless method wrappers
+- [#2805](https://github.com/serenity-rs/serenity/pull/2805) Remove examples and inaccurate docs from `Http`
+- [#2813](https://github.com/serenity-rs/serenity/pull/2813) Remove `cache` feature-gated `shard_id` functions and replicated documentation
+- [#2849](https://github.com/serenity-rs/serenity/pull/2849) Remove support for multiple event handlers
+- [#2947](https://github.com/serenity-rs/serenity/pull/2947) Remove `client` feature/module; merge into gateway
+- [#2953](https://github.com/serenity-rs/serenity/pull/2953) Remove unneeded `get_token`, `application_id`, and `get_application_id` methods on `ClientBuilder`
+- [#2952](https://github.com/serenity-rs/serenity/pull/2952) Remove `InternalEventHandler`
+- [#2997](https://github.com/serenity-rs/serenity/pull/2997) Remove outdated `secrecy` library; use custom implementation instead
+- [#3023](https://github.com/serenity-rs/serenity/pull/3023) Remove misleading passthrough methods
+  - Use methods directly from their respective Ids instead, e.g., `Guild::method` -> `GuildId::method`.
+- [#3049](https://github.com/serenity-rs/serenity/pull/3049) Remove redundant status argument in `Http::wind`
+- [#3071](https://github.com/serenity-rs/serenity/pull/3071) Remove unused `json.rs` file
+- [#3108](https://github.com/serenity-rs/serenity/pull/3108) Remove `ShardQueuer`; merge functionality into `ShardManager`
+- [#3118](https://github.com/serenity-rs/serenity/pull/3118) Remove implicit invite parsing in `Invite::get`
+- [#3120](https://github.com/serenity-rs/serenity/pull/3120) Remove `ShardMessenger`; clean up `ShardRunner`
+  - Collectors now take `&Context` instead of `&ShardMessenger`.
+- [#3313](https://github.com/serenity-rs/serenity/pull/3313) Remove `JsonMap`; replace with combination of `RawValue` and helper structs
+- [#3336](https://github.com/serenity-rs/serenity/pull/3336) Remove precise capture clause on `collect` method
+- [#3357](https://github.com/serenity-rs/serenity/pull/3357) Remove `CreateMessage::reactions` as part of reducing future sizes
+- [#3053](https://github.com/serenity-rs/serenity/pull/3053) Remove `ArgumentConvert` trait and implementations
+- [#3502](https://github.com/serenity-rs/serenity/pull/3502) Remove `serenity-voice-model` workspace crate, `voice-model` feature
+  - Serenity voice model is now a separate crate: [GitHub](https://github.com/serenity-rs/voice-model), [crates.io](https://crates.io/crates/serenity-voice-model).
+- [#3531](https://github.com/serenity-rs/serenity/pull/3531) Remove component fields not included in interaction responses
+- [#3528](https://github.com/serenity-rs/serenity/pull/3528) Remove `UserFlags::ACTIVE_DEVELOPER`
+- [#3619](https://github.com/serenity-rs/serenity/pull/3619) Remove `time` dependency, `chrono` dependency and feature; replace with `jiff`
+- [#3629](https://github.com/serenity-rs/serenity/pull/3629) Remove `zeroize` dependency
+
+### Fixes
+
+- [#2660](https://github.com/serenity-rs/serenity/pull/2660) Fix `FixedString<u8>` truncation when multibyte characters push over the limit
+- [#2665](https://github.com/serenity-rs/serenity/pull/2665) Fix `before` parameter types for `get_archived_private_threads`, `get_archived_public_threads`, and `get_joined_archived_private_threads`
+- [#2713](https://github.com/serenity-rs/serenity/pull/2713), [#2999](https://github.com/serenity-rs/serenity/pull/2999), [#3051](https://github.com/serenity-rs/serenity/pull/3051), [#3078](https://github.com/serenity-rs/serenity/pull/3078), [#3081](https://github.com/serenity-rs/serenity/pull/3081), [ffd4c70](https://github.com/serenity-rs/serenity/commit/ffd4c7030ae410abfc56a128401a77d3584f7d4a), [569e410](https://github.com/serenity-rs/serenity/commit/569e4105f1b848ba46d966692c115f46cbdaf4f9), [9f5bae8](https://github.com/serenity-rs/serenity/commit/9f5bae8d226f54fc98e8e087a64b50c23d9ebad4), [c3242fe](https://github.com/serenity-rs/serenity/commit/c3242fec95e05ab526042209fc8cb4a02104c895), [a1651b2](https://github.com/serenity-rs/serenity/commit/a1651b2a042d0e0768ed570ec1faad3ab8bba89b), [97ead2b](https://github.com/serenity-rs/serenity/commit/97ead2bf5ab621bcaf7a10ee5c6f4b97a5f37809), [f1ec024](https://github.com/serenity-rs/serenity/commit/f1ec02437f714d2c3dec4ab418a04de24cfad8a5), [#3533](https://github.com/serenity-rs/serenity/pull/3533), [#3542](https://github.com/serenity-rs/serenity/pull/3542), [#3554](https://github.com/serenity-rs/serenity/pull/3554), [#3570](https://github.com/serenity-rs/serenity/pull/3570), [#3602](https://github.com/serenity-rs/serenity/pull/3602) Fix Clippy, CI errors
+- [#2716](https://github.com/serenity-rs/serenity/pull/2716) Fix `@everyone` role deserialisation
+- [#2715](https://github.com/serenity-rs/serenity/pull/2715) Fix `GuildChannel` deserialisation with `user_limit`
+- [#2727](https://github.com/serenity-rs/serenity/pull/2727) Fix voice manager initialisation
+- [#2739](https://github.com/serenity-rs/serenity/pull/2739) Fix excessive code size of `client::dispatch`
+- [#2742](https://github.com/serenity-rs/serenity/pull/2742) Fix `RoleTags` deserialisation after removal of `simd-json`
+- [#2764](https://github.com/serenity-rs/serenity/pull/2764) Fix invalid sequence numbers by deferring deserialisation of dispatch to handle errors
+- [#2846](https://github.com/serenity-rs/serenity/pull/2846) Fix `AuditLogEntry::user_id` to be nullable
+- [#2847](https://github.com/serenity-rs/serenity/pull/2847) Fix unintended removal of `Error::Gateway` variant
+- [#2954](https://github.com/serenity-rs/serenity/pull/2954) Fix `edit_role_position()` variants and change name to `edit_role_positions`
+- [#2955](https://github.com/serenity-rs/serenity/pull/2955) Fix model functions using `SerializeIter`
+- [#2970](https://github.com/serenity-rs/serenity/pull/2970) Fix unused warnings when compiling without certain features
+- [#2976](https://github.com/serenity-rs/serenity/pull/2976) Fix public doctests marked `ignore`
+- [#3086](https://github.com/serenity-rs/serenity/pull/3086), [#3104](https://github.com/serenity-rs/serenity/pull/3104) Fix deserialisation of `Token` type
+- [#3110](https://github.com/serenity-rs/serenity/pull/3110) Fix compilation with the `tracing_instrument` feature enabled
+- [#3121](https://github.com/serenity-rs/serenity/pull/3121) Fix `ShardQueue` batch size bug
+- [#3338](https://github.com/serenity-rs/serenity/pull/3338) Fix replacement of Bearer tokens
+- [#3342](https://github.com/serenity-rs/serenity/pull/3342) Fix out of order cache updates
+- [#3345](https://github.com/serenity-rs/serenity/pull/3345) Fix shard runner info
+- [#3355](https://github.com/serenity-rs/serenity/pull/3355) Fix `ShardRunner` not restarting when `WsClient` encounters an error
+- [#3369](https://github.com/serenity-rs/serenity/pull/3369), [#3378](https://github.com/serenity-rs/serenity/pull/3378) Fix failed resume shard issues by not waiting for websocket to close on shard disconnect
+- [#3384](https://github.com/serenity-rs/serenity/pull/3384) Fix missing `cache` variable when `temp_cache` feature is enabled
+- [#3066](https://github.com/serenity-rs/serenity/pull/3066) Fix `CacheUpdate` implementations for extra `FullEvent`s
+- [a4e22b7](https://github.com/serenity-rs/serenity/commit/a4e22b704274069aadac19b9235c51254f9fbdc0) Fix missing `values` field for `SelectMenu` component
+- [8c830ef](https://github.com/serenity-rs/serenity/commit/8c830ef0942f05aebd73128c48ff8bc3f3385243) Fix `-Zminimal-versions` build
+- [#3479](https://github.com/serenity-rs/serenity/pull/3479) Fix `EmbedMessageBuilding::push_named_link_safe`
+- [#3492](https://github.com/serenity-rs/serenity/pull/3492) Fix `rustls` feature name for `reqwest` 0.13 compatibility
+- [#3505](https://github.com/serenity-rs/serenity/pull/3505) Fix `is_new` returning `true` for existing guilds in `GuildCreate` event and add regression test
+- [#3511](https://github.com/serenity-rs/serenity/pull/3511) Fix deserialization of `User::collectibles`
+- [#3513](https://github.com/serenity-rs/serenity/pull/3513) Fix deserialization of `TextDisplay`
+- [#3525](https://github.com/serenity-rs/serenity/pull/3525) Fix typo in `RequestSoundboardSounds` opcode
+- [#3553](https://github.com/serenity-rs/serenity/pull/3553) Fix `CreateChannel` builder to use `CreateForumTag` instead of `ForumTag`; add `default_forum_layout` and `default_thread_rate_limit_per_user`
+- [#3552](https://github.com/serenity-rs/serenity/pull/3552) Fix a deserialization error when getting an `Invite` with certain permissions
+
+### Documentation improvements
+
+- [#2718](https://github.com/serenity-rs/serenity/pull/2718) Fix maximum length of `Embed::description` in docs
+- [#2809](https://github.com/serenity-rs/serenity/pull/2809) Correct docs for `UserId::to_user`
+- [#3027](https://github.com/serenity-rs/serenity/pull/3027), [#3589](https://github.com/serenity-rs/serenity/pull/3589), [#3612](https://github.com/serenity-rs/serenity/pull/3612) Various docs fixes/improvements
+- [#3388](https://github.com/serenity-rs/serenity/pull/3388) Adjust `SecretString` docs to match implementation
+- [#3436](https://github.com/serenity-rs/serenity/pull/3436) Fix documentation on `ReactionRemoveEmoji` event
+- [681a426](https://github.com/serenity-rs/serenity/commit/681a42632273bd7b4dbeb944ead44238cba1d071) Remove mention of removed function from docs
+- [#3481](https://github.com/serenity-rs/serenity/pull/3481) Update `README` badges
+- [#3482](https://github.com/serenity-rs/serenity/pull/3482) Remove mentions of `shuttle` from `README`
+- [#3490](https://github.com/serenity-rs/serenity/pull/3490) Update Discord docs links
+- [2fdbd06](https://github.com/serenity-rs/serenity/commit/2fdbd0654803ac004cb2bdebf31c0992824ce2cb) Fix docs and deny rustdoc warnings in CI
+- [#3536](https://github.com/serenity-rs/serenity/pull/3536) Update docs for `Message::attachments` to clarify the behavior of components and embeds
+- [#3617](https://github.com/serenity-rs/serenity/pull/3617) Update docs for internal `enum_number!` macro
+- [#3624](https://github.com/serenity-rs/serenity/pull/3624) Update `Ready::guilds` documentation
+
+### Miscellaneous
+
+- [#2646](https://github.com/serenity-rs/serenity/pull/2646) Replace `Request` generic param with const `MAX_PARAMS`
+- [#2653](https://github.com/serenity-rs/serenity/pull/2653) Clean up `ShardManager`/`ShardQueuer`/`ShardRunner`
+- [#2687](https://github.com/serenity-rs/serenity/pull/2687) Clean up `Ratelimiter`
+- [#2697](https://github.com/serenity-rs/serenity/pull/2697) Clean up codebase by moving overflow checks into `ModelError` variants
+- [#2700](https://github.com/serenity-rs/serenity/pull/2700) Clean up `Error` and shrink its size
+- [#2685](https://github.com/serenity-rs/serenity/pull/2685), [#2711](https://github.com/serenity-rs/serenity/pull/2711), [#2755](https://github.com/serenity-rs/serenity/pull/2755), [#2826](https://github.com/serenity-rs/serenity/pull/2826), [#2961](https://github.com/serenity-rs/serenity/pull/2961), [#3048](https://github.com/serenity-rs/serenity/pull/3048), [f560770](https://github.com/serenity-rs/serenity/commit/f560770a603b41eeb8a64a36f271d81102515e5d), [#3117](https://github.com/serenity-rs/serenity/pull/3117), [#3349](https://github.com/serenity-rs/serenity/pull/3349), [#3463](https://github.com/serenity-rs/serenity/pull/3463), [#3623](https://github.com/serenity-rs/serenity/pull/3623) Update dependencies
+- [#2740](https://github.com/serenity-rs/serenity/pull/2740) Avoid cloning `FullEvent` in dispatch code
+- [#2744](https://github.com/serenity-rs/serenity/pull/2744) Use `Serializer::collect_seq` in `Serialize` implementations
+- [#2746](https://github.com/serenity-rs/serenity/pull/2746) Convert `enum_number!` to wrapper struct to reduce type sizes
+- [#2757](https://github.com/serenity-rs/serenity/pull/2757) Simplify the message cache
+- [#2750](https://github.com/serenity-rs/serenity/pull/2750) Avoid `HashMap` in `ShardQueue`
+- [#2785](https://github.com/serenity-rs/serenity/pull/2785) Move `join_to_string` to `utils` and use throughout serenity
+- [#2786](https://github.com/serenity-rs/serenity/pull/2786), [#2857](https://github.com/serenity-rs/serenity/pull/2857), [#2902](https://github.com/serenity-rs/serenity/pull/2902) Use `ToArrayString` for int -> str, `Mention`, more places via `aformat`
+- [#2916](https://github.com/serenity-rs/serenity/pull/2916), [#3126](https://github.com/serenity-rs/serenity/pull/3126), [#3376](https://github.com/serenity-rs/serenity/pull/3376), [#3458](https://github.com/serenity-rs/serenity/pull/3458), [#3535](https://github.com/serenity-rs/serenity/pull/3535) Bump MSRV to Rust 1.95, edition to 2024
+- [#3099](https://github.com/serenity-rs/serenity/pull/3099), [#3102](https://github.com/serenity-rs/serenity/pull/3102) Clean up gateway connection handling
+- [#3114](https://github.com/serenity-rs/serenity/pull/3114) Avoid temporarily deserializing gateway messages to a `serde_json::Map<String, Value>` before typed deserialization to an `Event`
+- [#3119](https://github.com/serenity-rs/serenity/pull/3119), [116007b](https://github.com/serenity-rs/serenity/commit/116007b5fcc292f942ef24fbbf74b0cf2b264802) Avoid deferring gateway event deserialization
+- [#3414](https://github.com/serenity-rs/serenity/pull/3414) Refactor CI workflows
+- [#3457](https://github.com/serenity-rs/serenity/pull/3457) Refactor `FullEvent` cache update function
+- [#3459](https://github.com/serenity-rs/serenity/pull/3459) Refactor gateway heartbeating logic into a `HeartbeatMetadata` struct
+- [#3493](https://github.com/serenity-rs/serenity/pull/3493), [#3503](https://github.com/serenity-rs/serenity/pull/3503), [#3507](https://github.com/serenity-rs/serenity/pull/3507) Refactor and simplify `ShardRunner`
+- [#3522](https://github.com/serenity-rs/serenity/pull/3522) Move `FullEvent` out of the gateway and into its own module under `model::event`
+- [#3583](https://github.com/serenity-rs/serenity/pull/3583) Move `ReactionType` unit tests into `reaction.rs`
+- [#3573](https://github.com/serenity-rs/serenity/pull/3573) Remove most dependencies of `http` on `model`
+- [#3620](https://github.com/serenity-rs/serenity/pull/3620) Use native certificate stores instead of WebPKI for gateway TLS
+- [#3628](https://github.com/serenity-rs/serenity/pull/3628) Make `tokio-tungstenite` optional for HTTP-only
+- [#3627](https://github.com/serenity-rs/serenity/pull/3627) Re-export `reqwest`
+
 ## [0.12.5] - 2025-12-20
 
 This compiles all of the changes that had accumulated since the prior release,
@@ -5601,6 +6186,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.13.0]: https://github.com/serenity-rs/serenity/compare/v0.12.5...v0.13.0
 [0.12.5]: https://github.com/serenity-rs/serenity/compare/v0.12.4...v0.12.5
 [0.12.4]: https://github.com/serenity-rs/serenity/compare/v0.12.3...v0.12.4
 [0.12.3]: https://github.com/serenity-rs/serenity/compare/v0.12.2...v0.12.3
@@ -5715,8 +6301,10 @@ Initial commit.
 [@Atakku]: https://github.com/Atakku
 [@B-2U]: https://github.com/B-2U
 [@Baev1]: https://github.com/Baev1
+[@beer-psi]: https://github.com/beer-psi
 [@Bloectasy]: https://github.com/Bloectasy
 [@Bond-009]: https://github.com/Bond-009
+[@Cabbache]: https://github.com/Cabbache
 [@Caemor]: https://github.com/Caemor
 [@CarlGroth]: https://github.com/CarlGroth
 [@Celti]: https://github.com/Celti
@@ -5734,6 +6322,7 @@ Initial commit.
 [@DimiDimit]: https://github.com/DimiDimit
 [@Dinnerbone]: https://github.com/Dinnerbone
 [@DoumanAsh]: https://github.com/DoumanAsh
+[@Dramex]: https://github.com/Dramex
 [@DrBluefall]: https://github.com/DrBluefall
 [@Elinvynia]: https://github.com/Elinvynia
 [@Erk-]: https://github.com/Erk-
@@ -5742,6 +6331,7 @@ Initial commit.
 [@FelixMcFelix]: https://github.com/FelixMcFelix
 [@Flat]: https://github.com/Flat
 [@ForsakenHarmony]: https://github.com/ForsakenHarmony
+[@Freyja-moth]: https://github.com/Freyja-moth
 [@Friz64]: https://github.com/Friz64
 [@Gabriel-Paulucci]: https://github.com/Gabriel-Paulucci
 [@Gentoli]: https://github.com/Gentoli
@@ -5753,10 +6343,12 @@ Initial commit.
 [@JellyWX]: https://github.com/JellyWX
 [@Jerald]: https://github.com/Jerald
 [@JohnTheCoolingFan]: https://github.com/JohnTheCoolingFan
+[@Joshix-1]: https://github.com/Joshix-1
 [@Joshument]: https://github.com/Joshument
 [@KaDiWa4]: https://github.com/KaDiWa4
 [@KamranMackey]: https://github.com/KamranMackey
 [@KangarooCoder]: https://github.com/KangarooCoder
+[@Kerollmops]: https://github.com/Kerollmops
 [@KiloOscarSix]: https://github.com/KiloOscarSix
 [@Kneemund]: https://github.com/Kneemund
 [@Kroisse]: https://github.com/Kroisse
@@ -5780,6 +6372,7 @@ Initial commit.
 [@Milo123459]: https://github.com/Milo123459
 [@Mishio595]: https://github.com/Mishio595
 [@MonliH]: https://github.com/MonliH
+[@NateDiamond13]: https://github.com/NateDiamond13
 [@NieDzejkob]: https://github.com/NieDzejkob
 [@NiiightmareXD]: https://github.com/NiiightmareXD
 [@NilsIrl]: https://github.com/NilsIrl
@@ -5788,6 +6381,7 @@ Initial commit.
 [@Nonanti]: https://github.com/Nonanti
 [@NotNorom]: https://github.com/NotNorom
 [@NovusTheory]: https://github.com/NovusTheory
+[@NullSpaceBoy]: https://github.com/NullSpaceBoy
 [@OnlyCS]: https://github.com/OnlyCS
 [@OverHash]: https://github.com/OverHash
 [@Polyhistorian]: https://github.com/Polyhistorian
@@ -5808,6 +6402,7 @@ Initial commit.
 [@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
 [@SimonZehetner]: https://github.com/SimonZehetner
 [@SinsofSloth]: https://github.com/SinsofSloth
+[@SirzBenjie]: https://github.com/SirzBenjie
 [@Some-Dood]: https://github.com/Some-Dood
 [@Splingush]: https://github.com/Splingush
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
@@ -5817,11 +6412,14 @@ Initial commit.
 [@TehPers]: https://github.com/TehPers
 [@Th3-M4jor]: https://github.com/Th3-M4jor
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
+[@TheAirMike]: https://github.com/TheAirMike
 [@TheBlackfurGuy]: https://github.com/TheBlackfurGuy
+[@TheCataliasTNT2k]: https://github.com/TheCataliasTNT2k
 [@TheElec]: https://github.com/TheElec
 [@TheUnitedStatesOfAmerica]: https://github.com/TheUnitedStatesOfAmerica
 [@TitusEntertainment]: https://github.com/TitusEntertainment
 [@Unoqwy]: https://github.com/Unoqwy
+[@UserIsntAvailable]: https://github.com/UserIsntAvailable
 [@Vaimer9]: https://github.com/Vaimer9
 [@ValgulNecron]: https://github.com/ValgulNecron
 [@Web-44]: https://github.com/Web-44
@@ -5836,6 +6434,7 @@ Initial commit.
 [@almeidx]: https://github.com/almeidx
 [@anden3]: https://github.com/anden3
 [@andreasots]: https://github.com/andreasots
+[@anxyum]: https://github.com/anxyum
 [@archanyhm]: https://github.com/archanyhm
 [@aria-7553]: https://github.com/aria-7553
 [@arqunis]: https://github.com/arqunis
@@ -5851,6 +6450,7 @@ Initial commit.
 [@blaenk]: https://github.com/blaenk
 [@bumblepie]: https://github.com/bumblepie
 [@cab404]: https://github.com/cab404
+[@calum4]: https://github.com/calum4
 [@campbellcole]: https://github.com/campbellcole
 [@caoculus]: https://github.com/caoculus
 [@casey]: https://github.com/casey
@@ -5874,6 +6474,7 @@ Initial commit.
 [@elkowar]: https://github.com/elkowar
 [@emoticon]: https://github.com/emoticon
 [@fenhl]: https://github.com/fenhl
+[@fgardt]: https://github.com/fgardt
 [@float3]: https://github.com/float3
 [@float3]: https://github.com/float3
 [@foxbot]: https://github.com/foxbot
@@ -5891,6 +6492,7 @@ Initial commit.
 [@ikkerens]: https://github.com/ikkerens
 [@imnotbad]: https://github.com/imnotbad
 [@indiv0]: https://github.com/indiv0
+[@inklesspen]: https://github.com/inklesspen
 [@ivancernja]: https://github.com/ivancernja
 [@ivinjabraham]: https://github.com/ivinjabraham
 [@james7132]: https://github.com/james7132
@@ -5907,6 +6509,7 @@ Initial commit.
 [@kotx]: https://github.com/kotx
 [@kristopherbullinger]: https://github.com/kristopherbullinger
 [@ks129]: https://github.com/ks129
+[@kshitijanurag]: https://github.com/kshitijanurag
 [@kyranet]: https://github.com/kyranet
 [@lapin-b]: https://github.com/lapin-b
 [@legendofmiracles]: https://github.com/legendofmiracles
@@ -5917,6 +6520,7 @@ Initial commit.
 [@lo48576]: https://github.com/lo48576
 [@logand22]: https://github.com/logand22
 [@lolzballs]: https://github.com/lolzballs
+[@lucascompython]: https://github.com/lucascompython
 [@m1sk9]: https://github.com/m1sk9
 [@mTvare6]: https://github.com/mTvare6
 [@marcantoinem]: https://github.com/marcantoinem
@@ -5924,6 +6528,7 @@ Initial commit.
 [@mattico]: https://github.com/mattico
 [@mbenoukaiss]: https://github.com/mbenoukaiss
 [@mdonoughe]: https://github.com/mdonoughe
+[@meditationmind]: https://github.com/meditationmind
 [@megumisonoda]: https://github.com/megumisonoda
 [@mendess]: https://github.com/mendess
 [@merlleu]: https://github.com/merlleu
@@ -5942,6 +6547,7 @@ Initial commit.
 [@nycex]: https://github.com/nycex
 [@oSumAtrIX]: https://github.com/oSumAtrIX
 [@onzecki]: https://github.com/onzecki
+[@paring-chan]: https://github.com/paring-chan
 [@pascalharp]: https://github.com/pascalharp
 [@peppizza]: https://github.com/peppizza
 [@perryprog]: https://github.com/perryprog
@@ -5951,9 +6557,11 @@ Initial commit.
 [@rhgndf]: https://github.com/rhgndf
 [@rsaihe]: https://github.com/rsaihe
 [@s0lst1ce]: https://github.com/s0lst1ce
+[@sadan4]: https://github.com/sadan4
 [@sam-kirby]: https://github.com/sam-kirby
 [@sandlotie]: https://github.com/sandlotie
 [@sbrocket]: https://github.com/sbrocket
+[@shimaenaga1123]: https://github.com/shimaenaga1123
 [@shnarazk]: https://github.com/shnarazk
 [@skreborn]: https://github.com/skreborn
 [@smolestcookie]: https://github.com/smolestcookie
@@ -5982,6 +6590,8 @@ Initial commit.
 [@vidhanio]: https://github.com/vidhanio
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
+[@vt-d]: https://github.com/vt-d
+[@wdgasterdeltarune]: https://github.com/wdgasterdeltarune
 [@woongzeyi]: https://github.com/woongzeyi
 [@xMAC94x]: https://github.com/xMAC94x
 [@xSke]: https://github.com/xSke
