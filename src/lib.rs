@@ -105,8 +105,8 @@ pub mod interactions_endpoint;
 pub mod secrets;
 #[cfg(feature = "utils")]
 pub mod utils;
-
-mod error;
+// public so rarely used error types are accessible
+pub mod error;
 
 pub use crate::error::{Error, Result};
 #[cfg(feature = "gateway")]

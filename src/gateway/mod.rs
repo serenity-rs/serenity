@@ -20,12 +20,14 @@ mod ws;
 
 use reqwest::{IntoUrl, Url};
 use serde::Serialize;
+use tokio_tungstenite::tungstenite::protocol::CloseFrame as TungsteniteCloseFrame;
 
-pub use self::error::Error as GatewayError;
+pub use self::error::{Error as GatewayError, GatewayTransportError};
 pub use self::sharding::*;
 #[cfg(feature = "voice")]
 pub use self::voice::VoiceGatewayManager;
 pub use self::ws::WsClient;
+use crate::constants::CloseCode;
 use crate::internal::prelude::*;
 use crate::model::gateway::{Activity, ActivityType};
 use crate::model::id::UserId;
@@ -152,4 +154,31 @@ pub enum ChunkGuildFilter {
     ///
     /// Will return a maximum of 100 members.
     UserIds(Vec<UserId>),
+}
+
+/// A gateway close command.
+#[derive(Clone, Debug)]
+pub struct CloseFrame(pub(crate) Box<TungsteniteCloseFrame>);
+
+impl CloseFrame {
+    pub(crate) fn new(frame: TungsteniteCloseFrame) -> Self {
+        Self(Box::new(frame))
+    }
+
+    /// The reason as a code.
+    #[must_use]
+    pub fn code(&self) -> CloseCode {
+        CloseCode(self.0.code.into())
+    }
+
+    /// The reason as a text string.
+    #[must_use]
+    pub fn reason(&self) -> &str {
+        &self.0.reason
+    }
+
+    #[cfg(feature = "unstable")]
+    pub fn as_tungstenite_frame(&self) -> &TungsteniteCloseFrame {
+        &self.0
+    }
 }
