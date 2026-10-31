@@ -258,13 +258,17 @@ impl PartialGuild {
 
     /// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
     ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+    /// the member.
+    ///
     /// # Panics
     ///
     /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
     #[must_use]
-    pub fn partial_member_permissions_in(
+    pub fn partial_member_permissions_in<'a>(
         &self,
-        channel: &GuildChannel,
+        channel: impl Into<GuildChannelRef<'a>>,
         member_id: UserId,
         member: &PartialMember,
     ) -> Permissions {
@@ -273,7 +277,7 @@ impl PartialGuild {
         }
 
         Guild::user_permissions_in_(
-            Some(channel),
+            Some(channel.into()),
             member_id,
             &member.roles,
             self.id,
@@ -295,10 +299,18 @@ impl PartialGuild {
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
+    ///
+    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+    /// the member.
     #[must_use]
-    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Permissions {
+    pub fn user_permissions_in<'a>(
+        &self,
+        channel: impl Into<GuildChannelRef<'a>>,
+        member: &Member,
+    ) -> Permissions {
         Guild::user_permissions_in_(
-            Some(channel),
+            Some(channel.into()),
             member.user.id,
             &member.roles,
             self.id,
