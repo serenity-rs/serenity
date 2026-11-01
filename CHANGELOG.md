@@ -167,6 +167,33 @@ This allows one to easily use methods from both, e.g., `some_thread.widen().send
 `channel_or_thread.expect_thread().get_thread_members()`. However, note that `expect_` should
 only be used when you know the correct type since the inner value is unchanged.
 
+### Obfuscated Channels
+
+Discord now [obfuscates channels](https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels)
+that a user does not have access to. Since much of the channel data is missing from obfuscated
+channels, a new `ObfuscatedChannel` type has been added to reduce cache size.
+
+`Guild::channels` has been split into `Guild::viewable_channels` and `Guild::obfuscated_channels`.
+The new `Guild::channels()` method returns an `impl Iterator` over both, and the provided
+`GuildChannelRef` type offers convenience methods to access shared fields.
+
+Similarly, `Channel::Guild` has been split into `Channel::GuildViewable` and
+`Channel::GuildObfuscated`. The existing `Channel::guild()` now returns the former, and the new
+`Channel::obfuscated()` returns the latter.
+
+Gateway events now use the `MaybeObfuscated` type instead of `GuildChannel`, as do a handful of
+methods: `Cache::guild_categories`, `Channel::category` and `Member::default_channel`. This type
+also offers convenience methods to access shared fields.
+
+`Cache::temp_obfuscated_channels` has been added for those using the `temp_cache` feature.
+
+| Serenity 0.12 | Serenity 0.13 |
+| --- | --- |
+| `Guild::channels` | `Guild::viewable_channels` / `Guild::obfuscated_channels` |
+| `Channel::Guild` | `Channel::GuildViewable` / `Channel::GuildObfuscated` |
+| `GuildChannel` (in events) | `MaybeObfuscated::Viewable` / `MaybeObfuscated::Obfuscated` |
+| `Cache::temp_channels` | `Cache::temp_channels` / `Cache::temp_obfuscated_channels` |
+
 ### Collectors
 
 Collectors now take `&Context` instead of `&ShardMessenger`, and the feature-gated collector
@@ -344,6 +371,13 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3523](https://github.com/serenity-rs/serenity/pull/3523) Add `From`/`TryFrom` implementations to message components for easy conversion to builders
 - [#3613](https://github.com/serenity-rs/serenity/pull/3613) Add `shard` and `with_counts` to `Http::get_guilds`
 - [#3614](https://github.com/serenity-rs/serenity/pull/3614) Add route for `GuildMessagesSearch` endpoint
+- [#3609](https://github.com/serenity-rs/serenity/pull/3609) Add guild message search
+- [#3635](https://github.com/serenity-rs/serenity/pull/3635) Add `ChannelAction::PositionUpdate` and `RoleAction::PositionUpdate` audit log events
+- [#3582](https://github.com/serenity-rs/serenity/pull/3582) Add support for private channel obfuscation
+  - `Guild::channels` has been split into `Guild::viewable_channels` and `Guild::obfuscated_channels`; `Guild::channels()` provides an `impl Iterator` over both.
+  - `Channel::Guild` has been split into `Channel::GuildViewable` and `Channel::GuildObfuscated`; `Channel::guild()` returns the former and `Channel::obfuscated()` returns the latter.
+  - `GuildChannel` is now `MaybeObfuscated` in events, `Cache::guild_categories`, `Channel::category` and `Member::default_channel`.
+  - `Cache::temp_obfuscated_channels` has been added.
 
 ### Changes
 
@@ -501,14 +535,14 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
   - Serenity voice model is now a separate crate: [GitHub](https://github.com/serenity-rs/voice-model), [crates.io](https://crates.io/crates/serenity-voice-model).
 - [#3531](https://github.com/serenity-rs/serenity/pull/3531) Remove component fields not included in interaction responses
 - [#3528](https://github.com/serenity-rs/serenity/pull/3528) Remove `UserFlags::ACTIVE_DEVELOPER`
-- [#3619](https://github.com/serenity-rs/serenity/pull/3619) Remove `time` dependency, `chrono` dependency and feature; replace with `jiff`
+- [#3619](https://github.com/serenity-rs/serenity/pull/3619), [#3630](https://github.com/serenity-rs/serenity/pull/3630) Remove `time` dependency, `chrono` dependency and feature; replace with `jiff`
 - [#3629](https://github.com/serenity-rs/serenity/pull/3629) Remove `zeroize` dependency
 
 ### Fixes
 
 - [#2660](https://github.com/serenity-rs/serenity/pull/2660) Fix `FixedString<u8>` truncation when multibyte characters push over the limit
 - [#2665](https://github.com/serenity-rs/serenity/pull/2665) Fix `before` parameter types for `get_archived_private_threads`, `get_archived_public_threads`, and `get_joined_archived_private_threads`
-- [#2713](https://github.com/serenity-rs/serenity/pull/2713), [#2999](https://github.com/serenity-rs/serenity/pull/2999), [#3051](https://github.com/serenity-rs/serenity/pull/3051), [#3078](https://github.com/serenity-rs/serenity/pull/3078), [#3081](https://github.com/serenity-rs/serenity/pull/3081), [ffd4c70](https://github.com/serenity-rs/serenity/commit/ffd4c7030ae410abfc56a128401a77d3584f7d4a), [569e410](https://github.com/serenity-rs/serenity/commit/569e4105f1b848ba46d966692c115f46cbdaf4f9), [9f5bae8](https://github.com/serenity-rs/serenity/commit/9f5bae8d226f54fc98e8e087a64b50c23d9ebad4), [c3242fe](https://github.com/serenity-rs/serenity/commit/c3242fec95e05ab526042209fc8cb4a02104c895), [a1651b2](https://github.com/serenity-rs/serenity/commit/a1651b2a042d0e0768ed570ec1faad3ab8bba89b), [97ead2b](https://github.com/serenity-rs/serenity/commit/97ead2bf5ab621bcaf7a10ee5c6f4b97a5f37809), [f1ec024](https://github.com/serenity-rs/serenity/commit/f1ec02437f714d2c3dec4ab418a04de24cfad8a5), [#3533](https://github.com/serenity-rs/serenity/pull/3533), [#3542](https://github.com/serenity-rs/serenity/pull/3542), [#3554](https://github.com/serenity-rs/serenity/pull/3554), [#3570](https://github.com/serenity-rs/serenity/pull/3570), [#3602](https://github.com/serenity-rs/serenity/pull/3602) Fix Clippy, CI errors
+- [#2713](https://github.com/serenity-rs/serenity/pull/2713), [#2999](https://github.com/serenity-rs/serenity/pull/2999), [#3051](https://github.com/serenity-rs/serenity/pull/3051), [#3078](https://github.com/serenity-rs/serenity/pull/3078), [#3081](https://github.com/serenity-rs/serenity/pull/3081), [ffd4c70](https://github.com/serenity-rs/serenity/commit/ffd4c7030ae410abfc56a128401a77d3584f7d4a), [569e410](https://github.com/serenity-rs/serenity/commit/569e4105f1b848ba46d966692c115f46cbdaf4f9), [9f5bae8](https://github.com/serenity-rs/serenity/commit/9f5bae8d226f54fc98e8e087a64b50c23d9ebad4), [c3242fe](https://github.com/serenity-rs/serenity/commit/c3242fec95e05ab526042209fc8cb4a02104c895), [a1651b2](https://github.com/serenity-rs/serenity/commit/a1651b2a042d0e0768ed570ec1faad3ab8bba89b), [97ead2b](https://github.com/serenity-rs/serenity/commit/97ead2bf5ab621bcaf7a10ee5c6f4b97a5f37809), [f1ec024](https://github.com/serenity-rs/serenity/commit/f1ec02437f714d2c3dec4ab418a04de24cfad8a5), [#3533](https://github.com/serenity-rs/serenity/pull/3533), [#3542](https://github.com/serenity-rs/serenity/pull/3542), [#3554](https://github.com/serenity-rs/serenity/pull/3554), [#3570](https://github.com/serenity-rs/serenity/pull/3570), [#3602](https://github.com/serenity-rs/serenity/pull/3602), [#3633](https://github.com/serenity-rs/serenity/pull/3633) Fix Clippy, CI errors
 - [#2716](https://github.com/serenity-rs/serenity/pull/2716) Fix `@everyone` role deserialisation
 - [#2715](https://github.com/serenity-rs/serenity/pull/2715) Fix `GuildChannel` deserialisation with `user_limit`
 - [#2727](https://github.com/serenity-rs/serenity/pull/2727) Fix voice manager initialisation
@@ -587,6 +621,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3620](https://github.com/serenity-rs/serenity/pull/3620) Use native certificate stores instead of WebPKI for gateway TLS
 - [#3628](https://github.com/serenity-rs/serenity/pull/3628) Make `tokio-tungstenite` optional for HTTP-only
 - [#3627](https://github.com/serenity-rs/serenity/pull/3627) Re-export `reqwest`
+- [#3626](https://github.com/serenity-rs/serenity/pull/3626) Hide `tungstenite` from public API
 
 ## [0.12.5] - 2025-12-20
 
