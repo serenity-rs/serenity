@@ -1735,14 +1735,13 @@ impl GuildId {
 
     /// Executes message search in the guild.
     ///
-    /// If should_cache is `Yes`, this method will fill up the message cache for the guild, if the
-    /// messages returned are newer than the existing cached messages or the cache is not full yet.
-    /// Since messages are cached in their respective channels, the returned messages will need to
-    /// be grouped by channel before being added to the cache.
+    /// If should_cache is `Yes`, then this method will fill the message cache for the guild,
+    /// keeping only the most recent messages according to the value of [`max_messages`] for the
+    /// cache.
     ///
-    /// If Discord returns a not-ready response, this method will retry the query as needed. If you
-    /// need to impose a timeout on the retry logic, refer to [`tokio::time::timeout`] or a similar
-    /// library.
+    /// If Discord returns a not-ready response, this method will automatically retry the query as
+    /// needed until search results are received. If you need to impose a timeout on the retry
+    /// logic, use [`tokio::time::timeout`] or similar.
     ///
     /// **Note**: The user must have the [Read Message History] permission and the [Message Content]
     /// privileged intent to perform a search.
@@ -1752,6 +1751,7 @@ impl GuildId {
     /// Returns [`Error::Model`] if one or more query parameters exceed Discord's limits.
     /// Returns [`Error::Http`] if the current user lacks permission.
     ///
+    /// [`max_messages`]: crate::cache::Settings::max_messages
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     /// [Message Content]: GatewayIntents::MESSAGE_CONTENT
     pub async fn search_messages(
