@@ -4591,7 +4591,7 @@ impl Http {
                 params,
             })
             .await?;
-        Ok(if response.status() == StatusCode::ACCEPTED {
+        Ok(if response.status() == 202 {
             MessageSearchOutcome::NotIndexed(response.json().await?)
         } else {
             MessageSearchOutcome::Results(response.json().await?)
