@@ -33,7 +33,7 @@ use crate::builder::{
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
-use crate::http::{Http, UserPagination};
+use crate::http::{Http, MessageSearchResults, UserPagination};
 #[cfg(feature = "model")]
 use crate::model::error::Maximum;
 use crate::model::prelude::*;

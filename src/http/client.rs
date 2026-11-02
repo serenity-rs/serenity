@@ -30,6 +30,7 @@ use super::{
     HttpError,
     LightMethod,
     MessagePagination,
+    MessageSearchOutcome,
     UserPagination,
 };
 use crate::builder::{AttachmentData, CreateAllowedMentions};
