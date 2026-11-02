@@ -10,11 +10,6 @@ use strum::{AsRefStr, IntoStaticStr};
 
 use crate::model::prelude::*;
 
-// Discord says "If the retry_after field is 0, you should retry the request after a short delay."
-// We'll interpret this as half a second.
-#[cfg(feature = "http")]
-const SHORT_DELAY: Duration = Duration::from_millis(500);
-
 /// Builds a request to the API to search messages in a Guild.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages)
@@ -431,7 +426,14 @@ impl<'a> MessageQuery<'a> {
         let results = loop {
             match http.search_guild_messages(guild_id, Some(params.as_slice())).await? {
                 MessageSearchOutcome::NotIndexed(not_indexed) => {
-                    tokio::time::sleep(not_indexed.retry_after.max(SHORT_DELAY)).await;
+                    // Discord says "If the retry_after field is 0, you should retry the request
+                    // after a short delay." We'll interpret this as half a second.
+                    tokio::time::sleep(if not_indexed.retry_after.is_zero() {
+                        Duration::from_millis(500)
+                    } else {
+                        not_indexed.retry_after
+                    })
+                    .await;
                 },
                 MessageSearchOutcome::Results(results) => {
                     break results;
