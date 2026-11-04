@@ -696,7 +696,7 @@ impl CacheUpdate for ReactionAddEvent {
                     burst: u64::from(reaction.burst),
                     normal: u64::from(!reaction.burst),
                 },
-                me_burst: if me { reaction.burst } else { false },
+                me_burst: me && reaction.burst,
                 reaction_type: reaction.emoji.clone(),
             };
 
