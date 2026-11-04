@@ -153,11 +153,14 @@ pub struct MessageSearchResults {
     pub doing_deep_historical_index: bool,
     /// The number of documents that have been indexed during the current index operation, if any.
     pub documents_indexed: Option<u32>,
-    /// The total number of results that match the query. This field may not be accurate "when
-    /// messages are actively being created or deleted".
+    /// The total number of results that match the query.
+    ///
+    /// **Note**: This field may not be accurate "when messages are actively being created or
+    /// deleted".
     pub total_results: u32,
-    /// The messages that match the query. Clients should not rely on the length of
-    /// this field to paginate results.
+    /// The messages that match the query.
+    ///
+    /// **Note**: Clients should not rely on the length of this field to paginate results.
     #[serde(deserialize_with = "de_flatten_vec")]
     pub messages: Vec<Message>,
     /// The threads that contain returned messages (if any).
