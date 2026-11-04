@@ -121,8 +121,8 @@ where
 
 /// Error-like response to a guild message search when indexing is not yet complete.
 ///
-/// > You should retry the request after the timeframe specified in the `retry_after` field. If the
-/// > `retry_after` field is 0, you should retry the request after a short delay.
+/// You should retry the request after the timeframe specified in the `retry_after` field. If the
+/// `retry_after` field is 0, you should retry the request after "a short delay".
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
 #[derive(Clone, Debug, Deserialize)]
@@ -145,13 +145,6 @@ where
 
 /// Successful result of a guild message search.
 ///
-/// > Due to speed optimizations, search may return slightly fewer results than the limit specified
-/// > when messages have not been accessed for a long time. Clients should not rely on the length of
-/// > the `messages` array to paginate results.
-/// >
-/// > Additionally, when messages are actively being created or deleted, the `total_results` field
-/// > may not be accurate.
-///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
 #[derive(Clone, Debug, Deserialize)]
 #[non_exhaustive]
@@ -160,9 +153,11 @@ pub struct MessageSearchResults {
     pub doing_deep_historical_index: bool,
     /// The number of documents that have been indexed during the current index operation, if any.
     pub documents_indexed: Option<u32>,
-    /// The total number of results that match the query.
+    /// The total number of results that match the query. This field may not be accurate "when
+    /// messages are actively being created or deleted".
     pub total_results: u32,
-    /// The messages that match the query.
+    /// The messages that match the query. Clients should not rely on the length of
+    /// this field to paginate results.
     #[serde(deserialize_with = "de_flatten_vec")]
     pub messages: Vec<Message>,
     /// The threads that contain returned messages (if any).
