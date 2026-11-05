@@ -109,6 +109,17 @@ impl Interaction {
         }
     }
 
+    /// Gets the invoking user.
+    #[must_use]
+    pub fn user(&self) -> Option<&User> {
+        match &self {
+            Interaction::Ping(_) => None,
+            Interaction::Command(i) | Interaction::Autocomplete(i) => Some(&i.user),
+            Interaction::Component(i) => Some(&i.user),
+            Interaction::Modal(i) => Some(&i.user),
+        }
+    }
+
     /// For monetized applications, gets the invoking user's granted entitlements.
     #[must_use]
     pub fn entitlements(&self) -> Option<&[Entitlement]> {
