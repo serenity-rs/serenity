@@ -59,6 +59,9 @@ full_event! {
     /// This process happens upon starting your bot and should be fairly quick. However, cache
     /// actions performed prior this event may fail as the data could be not inserted yet.
     ///
+    /// **Note:** Because [`GuildCreateEvent`] can include an [`UnavailableGuild`] in the payload,
+    /// this event may be dispatched multiple times.
+    ///
     /// Provides the cached guilds' ids.
     #[cfg(feature = "cache")]
     CacheReady { guilds: Vec<GuildId> };
@@ -108,7 +111,7 @@ full_event! {
     /// Dispatched when a guild is created; or an existing guild's data is sent to us.
     ///
     /// Provides the guild's data and whether the guild is new (only when cache feature is enabled).
-    GuildCreate { guild: Guild, is_new: Option<bool> };
+    GuildCreate { guild: GuildCreateGuild, is_new: Option<bool> };
     /// Dispatched when a guild is deleted.
     ///
     /// Provides the partial data of the guild sent by discord, and the full data from the cache,
@@ -514,7 +517,7 @@ impl FullEvent {
             },
             Event::GuildCreate(event) => {
                 #[cfg(feature = "cache")]
-                let is_new = Some(is_guild_new(cache, event.guild.id));
+                let is_new = Some(is_guild_new(cache, event.guild.id()));
                 #[cfg(not(feature = "cache"))]
                 let is_new = None;
 
@@ -971,12 +974,20 @@ mod tests {
     use crate::cache::Cache;
     use crate::model::Timestamp;
     use crate::model::application::{ApplicationFlags, PartialCurrentApplicationInfo};
-    use crate::model::event::{Event, FullEvent, GuildCreateEvent, ReadyEvent};
+    use crate::model::event::{
+        DeserializedEvent,
+        Event,
+        FullEvent,
+        GatewayEvent,
+        GuildCreateEvent,
+        ReadyEvent,
+    };
     use crate::model::gateway::Ready;
     use crate::model::guild::{
         DefaultMessageNotificationLevel,
         ExplicitContentFilter,
         Guild,
+        GuildCreateGuild,
         GuildGeneratedFlags,
         MemberCount,
         MfaLevel,
@@ -1023,7 +1034,7 @@ mod tests {
         assert!(!is_guild_new(&cache, guild_id));
 
         let event = Box::new(Event::GuildCreate(GuildCreateEvent {
-            guild: Guild {
+            guild: GuildCreateGuild::Available(Guild {
                 __generated_flags: GuildGeneratedFlags::default(),
                 id: guild_id,
                 name: FixedString::new(),
@@ -1072,7 +1083,7 @@ mod tests {
                 stage_instances: FixedArray::new(),
                 threads: ExtractMap::new(),
                 voice_states: ExtractMap::new(),
-            },
+            }),
         }));
 
         assert_eq!(cache.unavailable_guilds().len(), 1);
@@ -1093,7 +1104,7 @@ mod tests {
         let guild_id2 = GuildId::new(2);
 
         let event = Box::new(Event::GuildCreate(GuildCreateEvent {
-            guild: Guild {
+            guild: GuildCreateGuild::Available(Guild {
                 __generated_flags: GuildGeneratedFlags::default(),
                 id: guild_id2,
                 name: FixedString::new(),
@@ -1142,7 +1153,7 @@ mod tests {
                 stage_instances: FixedArray::new(),
                 threads: ExtractMap::new(),
                 voice_states: ExtractMap::new(),
-            },
+            }),
         }));
 
         assert_eq!(cache.unavailable_guilds().len(), 0);
@@ -1157,5 +1168,96 @@ mod tests {
         assert_eq!(cache.unavailable_guilds().len(), 0);
 
         assert!(is_guild_new(&cache, guild_id2));
+
+        let guild_id3 = GuildId::new(3);
+
+        let event = Box::new(Event::GuildCreate(GuildCreateEvent {
+            guild: GuildCreateGuild::Unavailable(UnavailableGuild {
+                id: guild_id3,
+                unavailable: true,
+            }),
+        }));
+
+        assert_eq!(cache.unavailable_guilds().len(), 0);
+
+        let full_event = FullEvent::from_event(event, &mut extra_event, &cache);
+
+        assert!(matches!(full_event, FullEvent::GuildCreate {
+            is_new: Some(true),
+            ..
+        }));
+
+        assert_eq!(cache.unavailable_guilds().len(), 1);
+
+        assert!(!is_guild_new(&cache, guild_id3));
+    }
+
+    #[test]
+    fn unavailable_guild_in_guild_create() {
+        let cache = Cache::new();
+        let mut extra_event = None;
+
+        let guild_id = GuildId::new(1);
+
+        let payload = r#"
+            {
+                "op": 0,
+                "d": {
+                    "id": "1",
+                    "unavailable": true
+                },
+                "s": 42,
+                "t": "GUILD_CREATE"
+            }
+        "#;
+
+        let gateway_event = serde_json::from_str::<GatewayEvent>(payload).unwrap();
+
+        let GatewayEvent::Dispatch {
+            event: DeserializedEvent::Success(event), ..
+        } = gateway_event
+        else {
+            panic!("Event deserialization failed");
+        };
+
+        assert_eq!(cache.guild_count(), 0);
+        assert_eq!(cache.unavailable_guilds().len(), 0);
+
+        let full_event = FullEvent::from_event(event, &mut extra_event, &cache);
+
+        assert!(matches!(full_event, FullEvent::GuildCreate {
+            guild: GuildCreateGuild::Unavailable(_),
+            is_new: Some(true),
+            ..
+        }));
+
+        assert_eq!(cache.guild_count(), 0);
+        assert_eq!(cache.unavailable_guilds().len(), 1);
+        assert!(cache.unavailable_guilds().contains(&guild_id));
+
+        let event = Box::new(Event::GuildCreate(GuildCreateEvent {
+            guild: GuildCreateGuild::Available(Guild {
+                id: guild_id,
+                ..Default::default()
+            }),
+        }));
+
+        let full_event = FullEvent::from_event(event, &mut extra_event, &cache);
+
+        assert!(matches!(full_event, FullEvent::GuildCreate {
+            is_new: Some(false),
+            ..
+        }));
+
+        assert!(matches!(
+            extra_event,
+            Some(FullEvent::CacheReady {
+                guilds: _
+            })
+        ));
+
+        assert_eq!(cache.guild_count(), 1);
+        assert!(cache.guild(guild_id).is_some());
+        assert_eq!(cache.unavailable_guilds().len(), 0);
     }
 }
