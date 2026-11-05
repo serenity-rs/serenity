@@ -4,8 +4,6 @@ use std::io::Error as IoError;
 
 #[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
-#[cfg(feature = "gateway")]
-use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 
@@ -46,9 +44,6 @@ pub enum Error {
     /// [`http`]: crate::http
     #[cfg(feature = "http")]
     Http(HttpError),
-    /// An error from the `tungstenite` crate.
-    #[cfg(feature = "gateway")]
-    Tungstenite(Box<TungsteniteError>),
     /// An error from the [`secrets`] module.
     ///
     /// [`secrets`]: crate::secrets
@@ -107,13 +102,6 @@ impl From<ModelError> for Error {
     }
 }
 
-#[cfg(feature = "gateway")]
-impl From<TungsteniteError> for Error {
-    fn from(e: TungsteniteError) -> Error {
-        Error::Tungstenite(Box::new(e))
-    }
-}
-
 #[cfg(feature = "http")]
 impl From<HttpError> for Error {
     fn from(e: HttpError) -> Error {
@@ -163,8 +151,6 @@ impl fmt::Display for Error {
             Self::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
             Self::Http(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "gateway")]
-            Self::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
             Self::Token(inner) => fmt::Display::fmt(&inner, f),
             Self::Url(inner) => fmt::Display::fmt(&inner, f),
         }
@@ -182,8 +168,6 @@ impl StdError for Error {
             Self::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
             Self::Http(inner) => Some(inner),
-            #[cfg(feature = "gateway")]
-            Self::Tungstenite(inner) => Some(inner),
             Self::Token(inner) => Some(inner),
             Self::Url(inner) => Some(inner),
         }
