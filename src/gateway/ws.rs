@@ -21,7 +21,7 @@ use zstd::stream::write::Decoder as ZstdWriter;
 use super::{ActivityData, ChunkGuildFilter, GatewayError, PresenceData, TransportCompression};
 use crate::constants::{self, Opcode};
 use crate::model::event::GatewayEvent;
-use crate::model::gateway::{GatewayIntents, ShardInfo};
+use crate::model::gateway::{GatewayCapabilities, GatewayIntents, ShardInfo};
 #[cfg(feature = "voice")]
 use crate::model::id::ChannelId;
 use crate::model::id::{GuildId, UserId};
@@ -68,6 +68,7 @@ enum WebSocketMessageData<'a> {
         large_threshold: u8,
         shard: &'a ShardInfo,
         intents: GatewayIntents,
+        capabilities: Option<GatewayCapabilities>,
         properties: IdentifyProperties,
         presence: PresenceUpdateMessage<'a>,
     },
@@ -364,6 +365,7 @@ impl WsClient {
         shard: &ShardInfo,
         token: &str,
         intents: GatewayIntents,
+        capabilities: Option<GatewayCapabilities>,
         presence: &PresenceData,
     ) -> Result<()> {
         let now = SystemTime::now();
@@ -377,6 +379,7 @@ impl WsClient {
                 token,
                 shard,
                 intents,
+                capabilities,
                 compress: matches!(self.compression, Compression::Payload { .. }),
                 large_threshold: constants::LARGE_THRESHOLD,
                 properties: IdentifyProperties {

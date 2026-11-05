@@ -34,7 +34,7 @@ use crate::gateway::{GatewayError, PresenceData, TransportCompression};
 use crate::http::Http;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
-use crate::model::gateway::{ConnectionStage, GatewayIntents};
+use crate::model::gateway::{ConnectionStage, GatewayCapabilities, GatewayIntents};
 
 /// The default time to wait between starting each shard or set of shards.
 pub const DEFAULT_WAIT_BETWEEN_SHARD_START: Duration = Duration::from_secs(5);
@@ -84,6 +84,7 @@ pub struct ShardManager {
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
+    pub capabilities: Option<GatewayCapabilities>,
     pub presence: Option<PresenceData>,
 }
 
@@ -114,6 +115,7 @@ impl ShardManager {
             cache: opt.cache,
             http: opt.http,
             intents: opt.intents,
+            capabilities: opt.capabilities,
             presence: opt.presence,
             wait_time_between_shard_start: opt.wait_time_between_shard_start,
         }
@@ -238,6 +240,7 @@ impl ShardManager {
             self.token.clone(),
             shard_info,
             self.intents,
+            self.capabilities,
             self.presence.clone(),
             self.compression,
         )
@@ -333,6 +336,7 @@ pub struct ShardManagerOptions {
     pub cache: Arc<Cache>,
     pub http: Arc<Http>,
     pub intents: GatewayIntents,
+    pub capabilities: Option<GatewayCapabilities>,
     pub presence: Option<PresenceData>,
 }
 
