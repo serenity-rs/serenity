@@ -60,6 +60,72 @@ pub enum Component {
     Unknown(u8),
 }
 
+impl Component {
+    #[must_use]
+    pub fn into_action_row(self) -> Option<ActionRow> {
+        match self {
+            Component::ActionRow(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_section(self) -> Option<Section> {
+        match self {
+            Component::Section(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_text_display(self) -> Option<TextDisplay> {
+        match self {
+            Component::TextDisplay(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_media_gallery(self) -> Option<MediaGallery> {
+        match self {
+            Component::MediaGallery(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_file(self) -> Option<FileComponent> {
+        match self {
+            Component::File(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_separator(self) -> Option<Separator> {
+        match self {
+            Component::Separator(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_container(self) -> Option<Container> {
+        match self {
+            Component::Container(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_label(self) -> Option<Label> {
+        match self {
+            Component::Label(component) => Some(component),
+            _ => None,
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for Component {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -122,6 +188,16 @@ pub enum SectionComponent {
     TextDisplay(TextDisplay),
 }
 
+impl SectionComponent {
+    #[must_use]
+    #[expect(clippy::unnecessary_wraps)] // Returns option to avoid a future breaking change
+    pub fn into_text_display(self) -> Option<TextDisplay> {
+        match self {
+            SectionComponent::TextDisplay(component) => Some(component),
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for SectionComponent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         #[derive(Deserialize)]
@@ -155,6 +231,24 @@ impl<'de> Deserialize<'de> for SectionComponent {
 pub enum SectionAccessory {
     Button(Button),
     Thumbnail(Thumbnail),
+}
+
+impl SectionAccessory {
+    #[must_use]
+    pub fn into_into_button(self) -> Option<Button> {
+        match self {
+            SectionAccessory::Button(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_into_thumbnail(self) -> Option<Thumbnail> {
+        match self {
+            SectionAccessory::Thumbnail(component) => Some(component),
+            _ => None,
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for SectionAccessory {
@@ -351,6 +445,56 @@ pub enum ContainerComponent {
     Separator(Separator),
 }
 
+impl ContainerComponent {
+    #[must_use]
+    pub fn into_action_row(self) -> Option<ActionRow> {
+        match self {
+            ContainerComponent::ActionRow(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_section(self) -> Option<Section> {
+        match self {
+            ContainerComponent::Section(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_text_display(self) -> Option<TextDisplay> {
+        match self {
+            ContainerComponent::TextDisplay(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_media_gallery(self) -> Option<MediaGallery> {
+        match self {
+            ContainerComponent::MediaGallery(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_file(self) -> Option<FileComponent> {
+        match self {
+            ContainerComponent::File(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_separator(self) -> Option<Separator> {
+        match self {
+            ContainerComponent::Separator(component) => Some(component),
+            _ => None,
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for ContainerComponent {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -420,6 +564,32 @@ pub enum LabelComponent {
     RadioGroup(RadioGroup),
     CheckboxGroup(CheckboxGroup),
     Checkbox(Checkbox),
+}
+
+impl LabelComponent {
+    #[must_use]
+    pub fn into_select_menu(self) -> Option<SelectMenu> {
+        match self {
+            LabelComponent::SelectMenu(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_input_text(self) -> Option<InputText> {
+        match self {
+            LabelComponent::InputText(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_file_upload(self) -> Option<FileUpload> {
+        match self {
+            LabelComponent::FileUpload(component) => Some(component),
+            _ => None,
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for LabelComponent {
@@ -547,6 +717,24 @@ pub struct ActionRow {
 pub enum ActionRowComponent {
     Button(Button),
     SelectMenu(SelectMenu),
+}
+
+impl ActionRowComponent {
+    #[must_use]
+    pub fn into_button(self) -> Option<Button> {
+        match self {
+            ActionRowComponent::Button(component) => Some(component),
+            _ => None,
+        }
+    }
+
+    #[must_use]
+    pub fn into_select_menu(self) -> Option<SelectMenu> {
+        match self {
+            ActionRowComponent::SelectMenu(component) => Some(component),
+            _ => None,
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for ActionRowComponent {
