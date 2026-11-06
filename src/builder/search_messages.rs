@@ -163,7 +163,7 @@ impl<'a> MessageQuery<'a> {
         self
     }
 
-    /// Offset to paginate through results.
+    /// Paginate the results to the given offset.
     ///
     /// **Note**: This field is capped to 9975 due to a Discord limitation. If an amount larger than
     /// 9975 is supplied, it will be truncated.
@@ -172,19 +172,19 @@ impl<'a> MessageQuery<'a> {
         self
     }
 
-    /// Indicates to query messages after a specific message, given its Id.
+    /// Query messages sent after the given message id.
     pub fn after(mut self, message_id: MessageId) -> Self {
         self.min_id = Some(message_id);
         self
     }
 
-    /// Indicates to query messages before a specific message, given its Id.
+    /// Query messages sent before the given message id.
     pub fn before(mut self, message_id: MessageId) -> Self {
         self.max_id = Some(message_id);
         self
     }
 
-    /// Search message content.
+    /// Search for specific message content.
     ///
     /// **Note**: Message content query must be a maximum of 1024 unicode code points.
     pub fn content(mut self, content: impl Into<Cow<'a, str>>) -> Self {
@@ -293,7 +293,7 @@ impl<'a> MessageQuery<'a> {
         self
     }
 
-    /// Whether to include results from age-restricted channels.
+    /// Include results from age-restricted channels.
     ///
     /// **Note**: If not specified, Discord currently defaults this to false.
     pub fn include_nsfw(mut self, include_nsfw: bool) -> Self {
