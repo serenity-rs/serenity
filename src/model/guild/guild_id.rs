@@ -27,11 +27,13 @@ use crate::builder::{
     EditScheduledEvent,
     EditSoundboard,
     EditSticker,
+    MessageQuery,
+    ShouldCache,
 };
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::{Cache, GuildRef};
 #[cfg(feature = "model")]
-use crate::http::{Http, UserPagination};
+use crate::http::{Http, MessageSearchResults, UserPagination};
 #[cfg(feature = "model")]
 use crate::model::error::Maximum;
 use crate::model::prelude::*;
@@ -1729,6 +1731,36 @@ impl GuildId {
         reason: Option<&str>,
     ) -> Result<()> {
         http.remove_member_role(self, user_id, role_id, reason).await
+    }
+
+    /// Executes message search in the guild.
+    ///
+    /// If should_cache is `Yes`, then this method will fill the message cache for the guild,
+    /// keeping only the most recent messages according to the value of [`max_messages`] for the
+    /// cache.
+    ///
+    /// If Discord returns a not-ready response, this method will automatically retry the query as
+    /// needed until search results are received. If you need to impose a timeout on the retry
+    /// logic, use [`tokio::time::timeout`] or similar.
+    ///
+    /// **Note**: The user must have the [Read Message History] permission and the [Message Content]
+    /// privileged intent to perform a search.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if one or more query parameters exceed Discord's limits.
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [`max_messages`]: crate::cache::Settings::max_messages
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
+    /// [Message Content]: GatewayIntents::MESSAGE_CONTENT
+    pub async fn search_messages(
+        self,
+        http: &Http,
+        query: MessageQuery<'_>,
+        should_cache: ShouldCache,
+    ) -> Result<MessageSearchResults> {
+        query.execute(http, self, should_cache).await
     }
 }
 

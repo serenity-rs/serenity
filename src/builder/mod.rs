@@ -79,6 +79,7 @@ mod edit_webhook_message;
 mod entitlements;
 mod execute_webhook;
 mod get_messages;
+mod search_messages;
 
 pub use add_member::*;
 pub use attachments::*;
@@ -126,6 +127,7 @@ pub use edit_webhook_message::*;
 pub use entitlements::*;
 pub use execute_webhook::*;
 pub use get_messages::*;
+pub use search_messages::*;
 
 macro_rules! button_and_select_menu_convenience_methods {
     ($self:ident $(. $components_path:tt)+) => {
