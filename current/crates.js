@@ -1,2 +1,2 @@
-window.ALL_CRATES = ["command_attr","serenity"];
-//{"start":21,"fragment_lengths":[14,11]}
+window.ALL_CRATES = [{"c":"command_attr"},{"c":"serenity"}];
+//{"start":21,"fragment_lengths":[20,17]}

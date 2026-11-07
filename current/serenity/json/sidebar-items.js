@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["NULL"],"fn":["from_reader","from_slice","from_str","from_value","hashmap_to_json_map","to_string","to_string_pretty","to_value","to_vec","to_vec_pretty"],"macro":["json"],"struct":["JsonError"],"type":["JsonMap","Value"]};
+window.SIDEBAR_ITEMS = {"constant":["NULL"],"fn":["from_reader","from_slice","from_str","from_value","hashmap_to_json_map","to_string","to_string_pretty","to_value","to_vec","to_vec_pretty"],"macro":[["json",1]],"struct":["JsonError"],"type":["JsonMap","Value"]};
