@@ -11,6 +11,29 @@ commands, see the [poise](https://github.com/serenity-rs/poise) framework built 
 To send and receive data from voice channels, see the
 [songbird](https://github.com/serenity-rs/songbird) library.
 
+Note that - although this documentation will try to be as up-to-date and
+accurate as possible - Discord hosts [official documentation][discord docs]. If
+you need to be sure that some information piece is accurate, refer to their
+docs.
+
+# Installation
+
+Run:
+
+```
+cargo add serenity
+```
+
+Or add the following to your `Cargo.toml` file:
+
+```toml
+[dependencies]
+serenity = "0.13"
+tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread"] }
+```
+
+# Usage
+
 Serenity supports bot login via the use of [`Client::builder`].
 
 You may also check your tokens prior to login via the use of
@@ -32,13 +55,6 @@ you as data is received from the Discord API via events. When calling a
 method on a [`Context`], the cache will first be searched for relevant data
 to avoid unnecessary HTTP requests to the Discord API. For more information,
 see the [cache's module-level documentation][cache docs].
-
-Note that - although this documentation will try to be as up-to-date and
-accurate as possible - Discord hosts [official documentation][discord docs]. If
-you need to be sure that some information piece is accurate, refer to their
-docs.
-
-# Example Bot
 
 A basic ping-pong bot looks like:
 
@@ -92,36 +108,8 @@ async fn main() {
 }
 ```
 
-## Full Examples
+### Full Examples detailing and explaining usage of the basic functionality of the library can be found in the [`examples`] directory.
 
-Full examples, detailing and explaining usage of the basic functionality of the
-library, can be found in the [`examples`] directory.
-
-# Installation
-
-Add the following to your `Cargo.toml` file:
-
-```toml
-[dependencies]
-serenity = "0.13"
-tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread"] }
-```
-
-## MSRV Policy
-
-Serenity's minimum supported Rust version (MSRV) is Rust 1.95.
-
-We opt to keep MSRV stable on the `current` branch. This means it will remain
-unchanged between minor releases. Occasionally, dependencies may violate SemVer
-and update their own MSRV in a breaking way. As a result, pinning their
-versions will become necessary to successfully build Serenity using an older
-Rust release.
-
-The `next` branch tracks the latest Rust release as its MSRV. This allows for
-swift development as new languages features are stabilized, and reduces
-technical debt in the long run. When a new major release is cut, the MSRV on
-`current` will be updated to that of `next`, and we will commit to supporting
-that MSRV until the following major release.
 
 # Features
 
@@ -205,6 +193,22 @@ features = [
 ]
 version = "0.13"
 ```
+
+## MSRV Policy
+
+Serenity's minimum supported Rust version (MSRV) is Rust 1.95.
+
+We opt to keep MSRV stable on the `current` branch. This means it will remain
+unchanged between minor releases. Occasionally, dependencies may violate SemVer
+and update their own MSRV in a breaking way. As a result, pinning their
+versions will become necessary to successfully build Serenity using an older
+Rust release.
+
+The `next` branch tracks the latest Rust release as its MSRV. This allows for
+swift development as new languages features are stabilized, and reduces
+technical debt in the long run. When a new major release is cut, the MSRV on
+`current` will be updated to that of `next`, and we will commit to supporting
+that MSRV until the following major release.
 
 # Dependencies
 
