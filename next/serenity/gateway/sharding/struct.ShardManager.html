@@ -41,7 +41,7 @@ notified to shut down, or false if it has already shut down and been dropped.</p
     shard_index: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>,
     shard_init: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>,
     shard_total: <a class="type" href="https://doc.rust-lang.org/nightly/core/num/nonzero/type.NonZeroU16.html" title="type core::num::nonzero::NonZeroU16">NonZeroU16</a>,
-) -&gt; <a class="type" href="../../type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>, <a class="enum" href="../enum.GatewayError.html" title="enum serenity::gateway::GatewayError">GatewayError</a>&gt;</h4></section></summary><div class="docblock"><p>The main interface for starting the management of shards. Initializes the shards by
+) -&gt; <a class="type" href="../../error/type.Result.html" title="type serenity::error::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>, <a class="enum" href="../enum.GatewayError.html" title="enum serenity::gateway::GatewayError">GatewayError</a>&gt;</h4></section></summary><div class="docblock"><p>The main interface for starting the management of shards. Initializes the shards by
 queueing them for starting, and then listens for <a href="enum.ShardManagerMessage.html" title="enum serenity::gateway::sharding::ShardManagerMessage"><code>ShardManagerMessage</code></a>s in a loop.</p>
 <p>This function takes care of:</p>
 <ol>

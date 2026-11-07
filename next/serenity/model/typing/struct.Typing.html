@@ -21,7 +21,7 @@ command is still being processed.</p>
 returned <a href="struct.Typing.html" title="struct serenity::model::typing::Typing"><code>Typing</code></a> object or wait for it to be dropped. Note that on some clients, typing
 may persist for a few seconds after stopped.</p>
 <h5 id="errors"><a class="doc-anchor" href="#errors">§</a>Errors</h5>
-<p>Returns an  <a href="../../enum.Error.html#variant.Http" title="variant serenity::Error::Http"><code>Error::Http</code></a> if there is an error.</p>
+<p>Returns an  <a href="../../error/enum.Error.html#variant.Http" title="variant serenity::error::Error::Http"><code>Error::Http</code></a> if there is an error.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.stop" class="method"><a class="src rightside" href="../../../src/serenity/model/typing.rs.html#100-102">Source</a><h4 class="code-header">pub fn <a href="#method.stop" class="fn">stop</a>(self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></h4></section></summary><div class="docblock"><p>Stops typing in <a href="../channel/enum.Channel.html" title="enum serenity::model::channel::Channel"><code>Channel</code></a>.</p>
 <p>This should be used to stop typing after it is started using <a href="struct.Typing.html#method.start" title="associated function serenity::model::typing::Typing::start"><code>Typing::start</code></a>. Typing may
 persist for a few seconds on some clients after this is called. Returns false if typing has

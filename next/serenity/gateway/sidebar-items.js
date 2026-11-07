@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["ChunkGuildFilter","GatewayError"],"mod":["client","sharding"],"struct":["ActivityData","PresenceData","WsClient"],"trait":["VoiceGatewayManager"]};
+window.SIDEBAR_ITEMS = {"enum":["ChunkGuildFilter","GatewayError"],"mod":["client","sharding"],"struct":["ActivityData","CloseFrame","GatewayTransportError","PresenceData","WsClient"],"trait":["VoiceGatewayManager"]};
