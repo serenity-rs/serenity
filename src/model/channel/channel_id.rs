@@ -1070,6 +1070,70 @@ impl GenericChannelId {
     pub async fn end_poll(self, http: &Http, message_id: MessageId) -> Result<Message> {
         http.expire_poll(self, message_id).await
     }
+
+    /// Gets a member's computed permissions in a guild channel or thread.
+    ///
+    /// Includes the member's roles and member-specific overwrites. Threads use their parent
+    /// channel's overwrites.
+    ///
+    /// Applies [implicit permission masking] unless `implicit` is set to `false`.
+    ///
+    /// **Note**: Requires the [View Channel] permission, and additionally the [Connect]
+    /// permission for voice and stage channels.
+    ///
+    /// To get a member's permissions in a [`GuildChannel`] without making an HTTP call, use
+    /// [`Guild::user_permissions_in`], [`Guild::partial_member_permissions_in`],
+    /// [`PartialGuild::user_permissions_in`], or [`PartialGuild::partial_member_permissions_in`].
+    /// See also [`Message::author_permissions`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, if invalid data is given, or
+    /// if the channel is a DM.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [View Channel]: Permissions::VIEW_CHANNEL
+    /// [Connect]: Permissions::CONNECT
+    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+    pub async fn member_permissions(
+        self,
+        http: &Http,
+        user_id: UserId,
+        implicit: Option<bool>,
+    ) -> Result<Permissions> {
+        http.get_channel_member_permissions(self, user_id, implicit).await
+    }
+
+    /// Gets the permissions granted in a guild channel or thread by a specified role together
+    /// with `@everyone`.
+    ///
+    /// Channel overwrites are applied. Other roles and member-specific overwrites are not
+    /// included. Threads use their parent channel's overwrites.
+    ///
+    /// Applies [implicit permission masking] unless `implicit` is set to `false`.
+    ///
+    /// **Note**: Requires the [View Channel] permission, and additionally the [Connect]
+    /// permission for voice and stage channels.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission, if invalid data is given, or
+    /// if the channel is a DM.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    ///
+    /// [View Channel]: Permissions::VIEW_CHANNEL
+    /// [Connect]: Permissions::CONNECT
+    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+    pub async fn role_permissions(
+        self,
+        http: &Http,
+        role_id: RoleId,
+        implicit: Option<bool>,
+    ) -> Result<Permissions> {
+        http.get_channel_role_permissions(self, role_id, implicit).await
+    }
 }
 
 #[cfg(feature = "model")]
