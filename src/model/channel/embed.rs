@@ -69,6 +69,9 @@ pub struct Embed {
     #[serde(default)]
     #[serde(skip_serializing_if = "FixedArray::is_empty")]
     pub fields: FixedArray<EmbedField, u8>,
+    /// The flags for the embed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flags: Option<EmbedFlags>,
 }
 
 /// An author object in an embed.
@@ -244,5 +247,23 @@ bitflags! {
     pub struct EmbedMediaFlags: u8 {
         /// This image is animated.
         const IS_ANIMATED = 1 << 5;
+    }
+}
+
+bitflags! {
+    /// Flags for an embed.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-flags).
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+    pub struct EmbedFlags: u8 {
+        /// This embed's media was flagged as explicit by Discord's content scanning.
+        const CONTAINS_EXPLICIT_CONTENT	= 1 << 4;
+        /// This embed is a fallback for a reply to an activity card.
+        const IS_CONTENT_INVENTORY_ENTRY = 1 << 5;
+        /// This embed's media was flagged as gore by Discord's content scanning.
+        const CONTAINS_GORE_CONTENT = 1 << 6;
+        /// This embed's media was flagged as self-harm by Discord's content scanning.
+        const CONTAINS_SELF_HARM_CONTENT = 1 << 7;
     }
 }

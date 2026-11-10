@@ -183,6 +183,10 @@ impl ExtractKey<AttachmentId> for Attachment {
 bitflags! {
     /// Flags for an attachment.
     ///
+    /// **Note**: `CONTAINS_*` flags may not be present on the initial message and can be added
+    /// later in a [`MessageUpdateEvent`]. Additionally, these flags are only set once media is
+    /// sent in a message and are not included for attachments in an interaction's resolved data.
+    ///
     /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
@@ -194,7 +198,13 @@ bitflags! {
         const IS_THUMBNAIL = 1 << 1;
         /// This attachment was marked as a spoiler and is blurred until clicked.
         const IS_SPOILER = 1 << 3;
+        /// This attachment was flagged as explicit by Discord's content scanning.
+        const CONTAINS_EXPLICIT_CONTENT = 1 << 4;
         /// This attachment is an animated image.
         const IS_ANIMATED = 1 << 5;
+        /// This attachment was flagged as gore by Discord's content scanning.
+        const CONTAINS_GORE_CONTENT = 1 << 6;
+        /// This attachment was flagged as self-harm by Discord's content scanning.
+        const CONTAINS_SELF_HARM_CONTENT = 1 << 7;
     }
 }

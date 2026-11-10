@@ -214,14 +214,67 @@ pub struct Thumbnail {
 pub struct UnfurledMediaItem {
     /// The url of this item.
     pub url: FixedString<u16>,
-    /// The proxied discord url.
+    /// The proxied Discord url.
     pub proxy_url: Option<FixedString<u16>>,
-    /// The width of the media item.
+    /// The width of the media item (if image or video).
     pub width: Option<NonMaxU32>,
-    /// The height of the media item.
+    /// The height of the media item (if image or video).
     pub height: Option<NonMaxU32>,
+    /// The [thumbhash] placeholder of the media item (if image or video).
+    ///
+    /// [thumbhash]: https://evanw.github.io/thumbhash/
+    pub placeholder: Option<FixedString>,
+    /// The version of the placeholder (if image or video).
+    pub placeholder_version: Option<NonMaxU32>,
     /// The content type of the media item.
     pub content_type: Option<FixedString>,
+    /// The flags for the media item.
+    pub flags: Option<UnfurledMediaItemFlags>,
+    /// The results of Discord's content scanning, if the media item has been scanned.
+    pub content_scan_metadata: Option<ContentScanMetadata>,
+    /// The Id of the attachment, if the media item was uploaded as an attachment.
+    pub attachment_id: Option<AttachmentId>,
+}
+
+bitflags! {
+    /// Flags for an unfurled media item.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/components/reference#unfurled-media-item-unfurled-media-item-flags).
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+    pub struct UnfurledMediaItemFlags: u8 {
+        /// This image is animated.
+        const IS_ANIMATED = 1 << 0;
+    }
+}
+
+/// Content scan metadata for an unfurled media item.
+///
+/// **Note**: Content scan metadata may not be present on the initial message and can be added
+/// later in a [`MessageUpdateEvent`].
+///
+/// [Discord docs](https://docs.discord.com/developers/components/reference#unfurled-media-item-content-scan-metadata-structure)
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ContentScanMetadata {
+    pub flags: Option<ContentScanMetadataFlags>,
+}
+
+bitflags! {
+    /// Flags for content scan metadata.
+    ///
+    /// [Discord docs](https://docs.discord.com/developers/components/reference#unfurled-media-item-content-scan-metadata-flags).
+    #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+    pub struct ContentScanMetadataFlags: u8 {
+        /// This media was flagged as explicit by Discord's content scanning.
+        const IS_EXPLICIT_CONTENT	= 1 << 0;
+        /// This media was flagged as gore by Discord's content scanning.
+        const IS_GORE_CONTENT = 1 << 1;
+        /// This media was flagged as self-harm by Discord's content scanning.
+        const IS_SELF_HARM_CONTENT = 1 << 2;
+    }
 }
 
 /// A component that allows you to add text to your message, similiar to the `content` field of a
