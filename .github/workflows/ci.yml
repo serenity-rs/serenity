@@ -46,11 +46,11 @@ jobs:
           - name: no gateway
             features: model rustls_backend
           - name: zlib compression
-            features: default transport_compression_zlib
+            features: cache framework rustls_backend transport_compression_zlib
           - name: zstd compression
-            features: default transport_compression_zstd
+            features: cache framework rustls_backend transport_compression_zstd
           - name: zlib and zstd compression
-            features: default transport_compression_zlib transport_compression_zstd
+            features: cache framework rustls_backend transport_compression_zlib transport_compression_zstd
 
     steps:
       - name: Checkout sources
