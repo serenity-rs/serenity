@@ -117,6 +117,7 @@ impl GatewayTransportError {
     }
 
     #[cfg(feature = "unstable")]
+    #[must_use]
     pub fn as_tungstenite_error(&self) -> &TungsteniteError {
         &self.0
     }

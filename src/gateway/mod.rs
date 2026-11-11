@@ -178,6 +178,7 @@ impl CloseFrame {
     }
 
     #[cfg(feature = "unstable")]
+    #[must_use]
     pub fn as_tungstenite_frame(&self) -> &TungsteniteCloseFrame {
         &self.0
     }
