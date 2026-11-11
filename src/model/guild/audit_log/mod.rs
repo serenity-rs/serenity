@@ -83,6 +83,7 @@ impl Action {
             13 => Action::ChannelOverwrite(ChannelOverwriteAction::Create),
             14 => Action::ChannelOverwrite(ChannelOverwriteAction::Update),
             15 => Action::ChannelOverwrite(ChannelOverwriteAction::Delete),
+            16 => Action::Channel(ChannelAction::PositionUpdate),
             20 => Action::Member(MemberAction::Kick),
             21 => Action::Member(MemberAction::Prune),
             22 => Action::Member(MemberAction::BanAdd),
@@ -95,6 +96,7 @@ impl Action {
             30 => Action::Role(RoleAction::Create),
             31 => Action::Role(RoleAction::Update),
             32 => Action::Role(RoleAction::Delete),
+            33 => Action::Role(RoleAction::PositionUpdate),
             40 => Action::Invite(InviteAction::Create),
             41 => Action::Invite(InviteAction::Update),
             42 => Action::Invite(InviteAction::Delete),
@@ -172,6 +174,7 @@ pub enum ChannelAction {
     Create = 10,
     Update = 11,
     Delete = 12,
+    PositionUpdate = 16,
 }
 
 /// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
@@ -208,6 +211,7 @@ pub enum RoleAction {
     Create = 30,
     Update = 31,
     Delete = 32,
+    PositionUpdate = 33,
 }
 
 /// [Discord docs](https://docs.discord.com/developers/resources/audit-log#audit-log-entry-object-audit-log-events).
@@ -508,6 +512,7 @@ mod tests {
         assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Create), 13);
         assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Update), 14);
         assert_action!(Action::ChannelOverwrite(ChannelOverwriteAction::Delete), 15);
+        assert_action!(Action::Channel(ChannelAction::PositionUpdate), 16);
         assert_action!(Action::Member(MemberAction::Kick), 20);
         assert_action!(Action::Member(MemberAction::Prune), 21);
         assert_action!(Action::Member(MemberAction::BanAdd), 22);
@@ -520,6 +525,7 @@ mod tests {
         assert_action!(Action::Role(RoleAction::Create), 30);
         assert_action!(Action::Role(RoleAction::Update), 31);
         assert_action!(Action::Role(RoleAction::Delete), 32);
+        assert_action!(Action::Role(RoleAction::PositionUpdate), 33);
         assert_action!(Action::Invite(InviteAction::Create), 40);
         assert_action!(Action::Invite(InviteAction::Update), 41);
         assert_action!(Action::Invite(InviteAction::Delete), 42);
