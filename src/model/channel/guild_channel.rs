@@ -607,6 +607,15 @@ impl MaybeObfuscated {
         }
     }
 
+    /// Returns the [`ChannelType`] of [`MaybeObfuscated`].
+    #[must_use]
+    pub fn kind(&self) -> ChannelType {
+        match self {
+            MaybeObfuscated::Viewable(gc) => gc.base.kind,
+            MaybeObfuscated::Obfuscated(oc) => oc.kind,
+        }
+    }
+
     /// Returns the name of [`MaybeObfuscated`], if viewable.
     ///
     /// **Note**: If the channel is obfuscated, this will return `None`.
