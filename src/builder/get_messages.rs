@@ -119,7 +119,7 @@ impl GetMessages {
     }
 }
 
-#[cfg_attr(not(feature = "http"), allow(dead_code))]
+#[cfg_attr(not(feature = "http"), expect(dead_code))]
 #[derive(Clone, Copy, Debug)]
 enum SearchFilter {
     After(MessageId),

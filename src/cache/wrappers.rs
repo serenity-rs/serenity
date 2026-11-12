@@ -54,7 +54,7 @@ impl<K: Eq + Hash, V> MaybeMap<K, V> {
 #[cfg(feature = "typesize")]
 impl<K: Eq + Hash + TypeSize, V: TypeSize> TypeSize for MaybeMap<K, V> {
     fn extra_size(&self) -> usize {
-        self.0.as_ref().map(DashMap::extra_size).unwrap_or_default()
+        self.0.as_ref().map_or_default(DashMap::extra_size)
     }
 
     typesize::if_typesize_details! {
