@@ -203,6 +203,8 @@ impl FromStr for FormattedTimestampStyle {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use aformat::aformat;
 
     use super::*;
@@ -272,14 +274,14 @@ mod tests {
 
     #[test]
     fn test_message_time_style_parse() {
-        assert!(matches!("t".parse(), Ok(FormattedTimestampStyle::ShortTime)));
-        assert!(matches!("T".parse(), Ok(FormattedTimestampStyle::MediumTime)));
-        assert!(matches!("d".parse(), Ok(FormattedTimestampStyle::ShortDate)));
-        assert!(matches!("D".parse(), Ok(FormattedTimestampStyle::LongDate)));
-        assert!(matches!("f".parse(), Ok(FormattedTimestampStyle::LongDateShortTime)));
-        assert!(matches!("F".parse(), Ok(FormattedTimestampStyle::FullDateShortTime)));
-        assert!(matches!("s".parse(), Ok(FormattedTimestampStyle::ShortDateShortTime)));
-        assert!(matches!("S".parse(), Ok(FormattedTimestampStyle::ShortDateMediumTime)));
-        assert!(matches!("R".parse(), Ok(FormattedTimestampStyle::RelativeTime)));
+        assert_matches!("t".parse(), Ok(FormattedTimestampStyle::ShortTime));
+        assert_matches!("T".parse(), Ok(FormattedTimestampStyle::MediumTime));
+        assert_matches!("d".parse(), Ok(FormattedTimestampStyle::ShortDate));
+        assert_matches!("D".parse(), Ok(FormattedTimestampStyle::LongDate));
+        assert_matches!("f".parse(), Ok(FormattedTimestampStyle::LongDateShortTime));
+        assert_matches!("F".parse(), Ok(FormattedTimestampStyle::FullDateShortTime));
+        assert_matches!("s".parse(), Ok(FormattedTimestampStyle::ShortDateShortTime));
+        assert_matches!("S".parse(), Ok(FormattedTimestampStyle::ShortDateMediumTime));
+        assert_matches!("R".parse(), Ok(FormattedTimestampStyle::RelativeTime));
     }
 }

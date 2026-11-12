@@ -489,6 +489,8 @@ pub struct AuditLogEntryOptions {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use super::*;
 
     #[test]
@@ -496,7 +498,7 @@ mod tests {
         macro_rules! assert_action {
             ($action:pat, $num:literal) => {{
                 let a = Action::from_value($num);
-                assert!(matches!(a, $action), "{:?} didn't match the variant", a);
+                assert_matches!(a, $action, "{:?} didn't match the variant", a);
                 assert_eq!(a.num(), $num);
             }};
         }
@@ -589,6 +591,6 @@ mod tests {
         let value = from_value::<T>(value).unwrap();
         assert_eq!(value.action.num(), 234);
 
-        assert!(matches!(value.action, Action::Unknown(234)));
+        assert_matches!(value.action, Action::Unknown(234));
     }
 }
