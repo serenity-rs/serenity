@@ -273,7 +273,7 @@ impl Channel {
                 public_channel.delete(http, reason).await?;
             },
             Self::GuildObfuscated(_) => {
-                return Err(Error::Model(ModelError::InvalidChannelType));
+                return Err(Error::Model(ModelError::InvalidUser));
             },
             Self::GuildThread(thread) => {
                 thread.delete(http, reason).await?;
