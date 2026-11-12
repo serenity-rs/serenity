@@ -789,10 +789,10 @@ mod test {
         // Add a channel delete event to the cache, the cached messages for that channel should now
         // be gone.
         let mut delete = ChannelDeleteEvent {
-            channel: channel.clone(),
+            channel: channel.clone().into(),
         };
         assert!(cache.update(&mut delete).is_some());
-        assert!(!cache.messages.contains_key(&delete.channel.id.into()));
+        assert!(!cache.messages.contains_key(&delete.channel.id().into()));
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
         let mut guild_create = GuildCreateEvent {

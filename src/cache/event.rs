@@ -10,11 +10,14 @@ impl CacheUpdate for ChannelCreateEvent {
     type Output = MaybeObfuscated;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
-        let mut guild = cache.guilds.get_mut(&self.channel.base.guild_id)?;
-        if self.channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
-            guild.obfuscated_channels.insert((&self.channel).into()).map(Into::into)
-        } else {
-            guild.viewable_channels.insert(self.channel.clone()).map(Into::into)
+        let mut guild = cache.guilds.get_mut(&self.channel.guild_id())?;
+        match &self.channel {
+            MaybeObfuscated::Viewable(guild_channel) => {
+                guild.viewable_channels.insert(guild_channel.clone()).map(Into::into)
+            },
+            MaybeObfuscated::Obfuscated(obfuscated_channel) => {
+                guild.obfuscated_channels.insert(*obfuscated_channel).map(Into::into)
+            },
         }
     }
 }
@@ -23,7 +26,7 @@ impl CacheUpdate for ChannelDeleteEvent {
     type Output = VecDeque<Message>;
 
     fn update(&self, cache: &Cache) -> Option<VecDeque<Message>> {
-        let (channel_id, guild_id) = (self.channel.id, self.channel.base.guild_id);
+        let (channel_id, guild_id) = (self.channel.id(), self.channel.guild_id());
 
         if let Some(mut guild) = cache.guilds.get_mut(&guild_id)
             && guild.viewable_channels.remove(&channel_id).is_none()
@@ -40,19 +43,22 @@ impl CacheUpdate for ChannelUpdateEvent {
     type Output = MaybeObfuscated;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
-        let mut guild = cache.guilds.get_mut(&self.channel.base.guild_id)?;
+        let mut guild = cache.guilds.get_mut(&self.channel.guild_id())?;
         let updated_channel = &self.channel;
 
-        if updated_channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
-            match guild.obfuscated_channels.insert(updated_channel.into()) {
-                Some(obfuscated_channel) => Some(obfuscated_channel.into()),
-                None => guild.viewable_channels.remove(&updated_channel.id).map(Into::into),
-            }
-        } else {
-            match guild.viewable_channels.insert(updated_channel.clone()) {
-                Some(viewable_channel) => Some(viewable_channel.into()),
-                None => guild.obfuscated_channels.remove(&updated_channel.id).map(Into::into),
-            }
+        match updated_channel {
+            MaybeObfuscated::Viewable(guild_channel) => {
+                match guild.viewable_channels.insert(guild_channel.clone()) {
+                    Some(viewable_channel) => Some(viewable_channel.into()),
+                    None => guild.obfuscated_channels.remove(&updated_channel.id()).map(Into::into),
+                }
+            },
+            MaybeObfuscated::Obfuscated(obfuscated_channel) => {
+                match guild.obfuscated_channels.insert(*obfuscated_channel) {
+                    Some(obfuscated_channel) => Some(obfuscated_channel.into()),
+                    None => guild.viewable_channels.remove(&updated_channel.id()).map(Into::into),
+                }
+            },
         }
     }
 }
