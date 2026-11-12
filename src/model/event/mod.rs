@@ -84,7 +84,7 @@ pub struct AutoModActionExecutionEvent {
 #[non_exhaustive]
 pub struct ChannelCreateEvent {
     /// The channel that was created.
-    pub channel: GuildChannel,
+    pub channel: MaybeObfuscated,
 }
 
 /// Requires [`GatewayIntents::GUILDS`].
@@ -95,7 +95,7 @@ pub struct ChannelCreateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ChannelDeleteEvent {
-    pub channel: GuildChannel,
+    pub channel: MaybeObfuscated,
 }
 
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#channel-info).
@@ -127,7 +127,7 @@ pub struct ChannelPinsUpdateEvent {
 #[serde(transparent)]
 #[non_exhaustive]
 pub struct ChannelUpdateEvent {
-    pub channel: GuildChannel,
+    pub channel: MaybeObfuscated,
 }
 
 /// Requires [`GatewayIntents::GUILD_MODERATION`] and [`Permissions::VIEW_AUDIT_LOG`].
@@ -175,11 +175,13 @@ pub struct GuildCreateEvent {
     pub guild: Guild,
 }
 
-// Manual impl needed to insert guild_id fields in GuildChannel, GuildThread, Member, Role
+// Manual impl needed to insert guild_id fields in GuildChannel/ObfuscatedChannel, GuildThread,
+// Member, and Role.
 impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut guild: Guild = Guild::deserialize(deserializer)?;
         guild.viewable_channels.iter_mut().for_each(|x| x.base.guild_id = guild.id);
+        guild.obfuscated_channels.iter_mut().for_each(|x| x.guild_id = guild.id);
         guild.threads.iter_mut().for_each(|x| x.base.guild_id = guild.id);
         guild.members.iter_mut().for_each(|x| x.guild_id = guild.id);
         guild.roles.iter_mut().for_each(|x| x.guild_id = guild.id);

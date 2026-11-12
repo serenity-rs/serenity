@@ -446,13 +446,13 @@ impl FullEvent {
                 event.update(cache);
 
                 let channel = event.channel;
-                if channel.base.kind == ChannelType::Category {
+                if channel.kind() == ChannelType::Category {
                     Self::CategoryCreate {
-                        category: channel.into(),
+                        category: channel,
                     }
                 } else {
                     Self::ChannelCreate {
-                        channel: channel.into(),
+                        channel,
                     }
                 }
             },
@@ -463,13 +463,13 @@ impl FullEvent {
                 let cached_messages = None;
 
                 let channel = event.channel;
-                if channel.base.kind == ChannelType::Category {
+                if channel.kind() == ChannelType::Category {
                     Self::CategoryDelete {
-                        category: channel.into(),
+                        category: channel,
                     }
                 } else {
                     Self::ChannelDelete {
-                        channel: channel.into(),
+                        channel,
                         messages: cached_messages,
                     }
                 }
@@ -497,7 +497,7 @@ impl FullEvent {
 
                 Self::ChannelUpdate {
                     old: old_channel,
-                    new: event.channel.into(),
+                    new: event.channel,
                 }
             },
             Event::GuildAuditLogEntryCreate(event) => Self::GuildAuditLogEntryCreate {
