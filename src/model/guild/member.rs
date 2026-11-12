@@ -200,7 +200,7 @@ impl Member {
                     && guild.user_permissions_in(channel, self).view_channel()
             })
             .collect::<Vec<_>>();
-        sorted.sort_by_key(|channel| channel.position());
+        sorted.sort_unstable_by_key(|channel| channel.position());
         sorted.first().map(|&gc_ref| match gc_ref {
             GuildChannelRef::Viewable(gc) => MaybeObfuscated::Viewable(gc.clone()),
             GuildChannelRef::Obfuscated(oc) => MaybeObfuscated::Obfuscated(*oc),
