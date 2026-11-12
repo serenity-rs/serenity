@@ -26,11 +26,8 @@ mod ratelimiting;
 mod request;
 mod routing;
 
-use std::time::Duration;
-
 use reqwest::Method;
 pub use reqwest::StatusCode;
-use serde::{Deserialize, Deserializer};
 
 pub use self::client::*;
 pub use self::error::*;
@@ -38,8 +35,6 @@ pub use self::multipart::*;
 pub use self::ratelimiting::*;
 pub use self::request::*;
 pub use self::routing::*;
-use crate::internal::prelude::*;
-use crate::model::channel::{GuildThread, Message, ThreadMember};
 use crate::model::id::*;
 
 /// An method used for ratelimiting special routes.
@@ -97,74 +92,4 @@ pub enum MessagePagination {
     After(MessageId),
     Around(MessageId),
     Before(MessageId),
-}
-
-/// Outcome of a guild message search.
-///
-/// This is an unusual response type; it can hold either an error-like response or search results.
-///
-/// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
-#[derive(Clone, Debug)]
-pub enum MessageSearchOutcome {
-    NotIndexed(MessageSearchNotIndexed),
-    Results(MessageSearchResults),
-}
-
-fn duration_via_secs<'de, D>(deserializer: D) -> Result<Duration, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    // It's actually an i32 in the spec, but that's because JSON doesn't have unsigned types.
-    // It would make no sense for the value to ever be negative, so we can act as if it's a u64.
-    u64::deserialize(deserializer).map(Duration::from_secs)
-}
-
-/// Error-like response to a guild message search when indexing is not yet complete.
-///
-/// You should retry the request after the timeframe specified in the `retry_after` field. If the
-/// `retry_after` field is 0, you should retry the request after "a short delay".
-///
-/// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
-#[derive(Clone, Debug, Deserialize)]
-pub struct MessageSearchNotIndexed {
-    pub code: JsonErrorCode,
-    pub message: FixedString,
-    pub documents_indexed: u32,
-    #[serde(deserialize_with = "duration_via_secs")]
-    pub retry_after: Duration,
-}
-
-/// Unnest a `Vec` of single-element `Vec`s.
-fn de_flatten_vec<'de, T, D>(deserializer: D) -> Result<Vec<T>, D::Error>
-where
-    T: Deserialize<'de>,
-    D: Deserializer<'de>,
-{
-    <Vec<[T; 1]>>::deserialize(deserializer).map(Vec::into_flattened)
-}
-
-/// Successful result of a guild message search.
-///
-/// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
-#[derive(Clone, Debug, Deserialize)]
-#[non_exhaustive]
-pub struct MessageSearchResults {
-    /// Whether the guild is undergoing a deep historical indexing operation.
-    pub doing_deep_historical_index: bool,
-    /// The number of documents that have been indexed during the current index operation, if any.
-    pub documents_indexed: Option<u32>,
-    /// The total number of results that match the query.
-    ///
-    /// **Note**: This field may not be accurate "when messages are actively being created or
-    /// deleted".
-    pub total_results: u32,
-    /// The messages that match the query.
-    ///
-    /// **Note**: Clients should not rely on the length of this field to paginate results.
-    #[serde(deserialize_with = "de_flatten_vec")]
-    pub messages: Vec<Message>,
-    /// The threads that contain returned messages (if any).
-    pub threads: Option<Vec<GuildThread>>,
-    /// A thread member object for each returned thread the current user has joined.
-    pub members: Option<Vec<ThreadMember>>,
 }

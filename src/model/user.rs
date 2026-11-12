@@ -672,7 +672,7 @@ impl UserId {
             recipient_id: self,
         };
 
-        let channel = cache_http.http().create_private_channel(&body).await?;
+        let channel: PrivateChannel = cache_http.http().create_private_channel(&body).await?;
 
         #[cfg(feature = "temp_cache")]
         if let Some(cache) = cache_http.cache() {
@@ -758,7 +758,7 @@ impl UserId {
             }
         }
 
-        let user = cache_http.http().get_user(self).await?;
+        let user: User = cache_http.http().get_user(self).await?;
 
         #[cfg(feature = "temp_cache")]
         {
