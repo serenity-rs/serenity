@@ -122,12 +122,12 @@ pub enum GuildChannelRef<'a> {
 }
 
 impl<'a> GuildChannelRef<'a> {
-    /// Returns the [`GenericChannelId`] of the [`GuildChannelRef`].
+    /// Returns the [`ChannelId`] of the [`GuildChannelRef`].
     #[must_use]
-    pub fn id(self) -> GenericChannelId {
+    pub fn id(self) -> ChannelId {
         match self {
-            GuildChannelRef::Viewable(gc) => gc.id.widen(),
-            GuildChannelRef::Obfuscated(oc) => oc.id.widen(),
+            GuildChannelRef::Viewable(gc) => gc.id,
+            GuildChannelRef::Obfuscated(oc) => oc.id,
         }
     }
 
