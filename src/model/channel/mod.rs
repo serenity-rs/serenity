@@ -140,14 +140,14 @@ impl<'a> GuildChannelRef<'a> {
         }
     }
 
-    /// Returns the name of the [`GuildChannelRef`].
+    /// Returns the name of the [`GuildChannelRef`], if viewable.
     ///
-    /// **Note**: If the channel is obfuscated, this will return `___hidden___`.
+    /// **Note**: If the channel is obfuscated, this will return `None`.
     #[must_use]
-    pub fn name(self) -> &'a str {
+    pub fn name(self) -> Option<&'a str> {
         match self {
-            GuildChannelRef::Viewable(gc) => gc.base.name.as_str(),
-            GuildChannelRef::Obfuscated(_) => "___hidden___",
+            GuildChannelRef::Viewable(gc) => Some(gc.base.name.as_str()),
+            GuildChannelRef::Obfuscated(_) => None,
         }
     }
 
