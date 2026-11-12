@@ -591,7 +591,7 @@ impl From<&GuildChannel> for ObfuscatedChannel {
 
 /// A container for a guild channel that might be obfuscated.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub enum MaybeObfuscated {
     Viewable(GuildChannel),
     Obfuscated(ObfuscatedChannel),
@@ -686,5 +686,27 @@ impl From<GuildChannel> for MaybeObfuscated {
 impl From<ObfuscatedChannel> for MaybeObfuscated {
     fn from(obfuscated_channel: ObfuscatedChannel) -> Self {
         Self::Obfuscated(obfuscated_channel)
+    }
+}
+
+impl<'de> Deserialize<'de> for MaybeObfuscated {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::Error as DeError;
+        use serde_json::value::RawValue;
+
+        #[derive(Deserialize)]
+        struct MaybeObfuscatedRaw {
+            flags: ChannelFlags,
+        }
+
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = MaybeObfuscatedRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        if raw.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+            Deserialize::deserialize(raw_data).map(MaybeObfuscated::Obfuscated)
+        } else {
+            Deserialize::deserialize(raw_data).map(MaybeObfuscated::Viewable)
+        }
+        .map_err(DeError::custom)
     }
 }
