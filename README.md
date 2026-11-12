@@ -253,7 +253,7 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 [current docs badge]: https://img.shields.io/badge/docs-current-4d76ae.svg?style=flat-square
 [next docs]: https://serenity-rs.github.io/serenity/next/serenity/index.html
 [next docs badge]: https://img.shields.io/badge/docs-next-4d76ae.svg?style=flat-square
-[msrv]: https://blog.rust-lang.org/2026/11/12/Rust-1.100
+[msrv]: https://blog.rust-lang.org/releases/1.100.0
 [msrv badge]: https://img.shields.io/badge/rust-1.100+-93450a.svg?style=flat-square
 [license]: LICENSE
 [license badge]: https://img.shields.io/crates/l/serenity.svg?style=flat-square&color=yellow
