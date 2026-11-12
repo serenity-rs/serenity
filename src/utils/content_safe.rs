@@ -214,7 +214,7 @@ mod tests {
             ..Default::default()
         };
 
-        guild.channels.insert(channel.clone());
+        guild.viewable_channels.insert(channel.clone());
         guild.members.insert(member.clone());
         guild.roles.insert(role);
 

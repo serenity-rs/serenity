@@ -154,6 +154,12 @@ pub struct Cache {
     /// The TTL for each value is configured in CacheSettings.
     #[cfg(feature = "temp_cache")]
     pub(crate) temp_channels: MokaCache<ChannelId, MaybeOwnedArc<GuildChannel>, BuildHasher>,
+    /// Cache of obfuscated channels that have been fetched via to_channel.
+    ///
+    /// The TTL for each value is configured in CacheSettings.
+    #[cfg(feature = "temp_cache")]
+    pub(crate) temp_obfuscated_channels:
+        MokaCache<ChannelId, MaybeOwnedArc<ObfuscatedChannel>, BuildHasher>,
     /// Cache of threads that have been fetched via to_channel.
     ///
     /// The TTL for each value is configured in CacheSettings.
@@ -240,6 +246,8 @@ impl Cache {
             temp_private_channels: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_channels: temp_cache(settings.time_to_live),
+            #[cfg(feature = "temp_cache")]
+            temp_obfuscated_channels: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
             temp_threads: temp_cache(settings.time_to_live),
             #[cfg(feature = "temp_cache")]
@@ -463,15 +471,32 @@ impl Cache {
         CacheRef::from_guard(self.user.read())
     }
 
-    /// Clones all channel categories in the given guild and returns them.
+    /// Returns all channel categories in the given guild as [`MaybeObfuscated`].
+    ///
+    /// This will clone viewable categories and copy obfuscated categories.
     pub fn guild_categories(
         &self,
         guild_id: GuildId,
-    ) -> Option<ExtractMap<ChannelId, GuildChannel>> {
+    ) -> Option<ExtractMap<ChannelId, MaybeObfuscated>> {
         let guild = self.guilds.get(&guild_id)?;
 
-        let filter = |channel: &&GuildChannel| channel.base.kind == ChannelType::Category;
-        Some(guild.channels.iter().filter(filter).cloned().collect())
+        let categories = guild
+            .viewable_channels
+            .iter()
+            .filter(|channel| channel.base.kind == ChannelType::Category)
+            .cloned()
+            .map(MaybeObfuscated::Viewable)
+            .chain(
+                guild
+                    .obfuscated_channels
+                    .iter()
+                    .filter(|channel| channel.kind == ChannelType::Category)
+                    .copied()
+                    .map(MaybeObfuscated::Obfuscated),
+            )
+            .collect();
+
+        Some(categories)
     }
 
     /// Inserts new messages into the message cache for a channel manually.
@@ -764,16 +789,16 @@ mod test {
         // Add a channel delete event to the cache, the cached messages for that channel should now
         // be gone.
         let mut delete = ChannelDeleteEvent {
-            channel: channel.clone(),
+            channel: channel.clone().into(),
         };
         assert!(cache.update(&mut delete).is_some());
-        assert!(!cache.messages.contains_key(&delete.channel.id.into()));
+        assert!(!cache.messages.contains_key(&delete.channel.id().into()));
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
         let mut guild_create = GuildCreateEvent {
             guild: Guild {
                 id: GuildId::new(1),
-                channels: ExtractMap::from_iter([channel]),
+                viewable_channels: ExtractMap::from_iter([channel]),
                 ..Default::default()
             },
         };
