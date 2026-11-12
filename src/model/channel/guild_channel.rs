@@ -607,14 +607,14 @@ impl MaybeObfuscated {
         }
     }
 
-    /// Returns the name of [`MaybeObfuscated`].
+    /// Returns the name of [`MaybeObfuscated`], if viewable.
     ///
-    /// **Note**: If the channel is obfuscated, this will return `___hidden___`.
+    /// **Note**: If the channel is obfuscated, this will return `None`.
     #[must_use]
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> Option<&str> {
         match self {
-            MaybeObfuscated::Viewable(gc) => &gc.base.name,
-            MaybeObfuscated::Obfuscated(_) => "___hidden___",
+            MaybeObfuscated::Viewable(gc) => Some(gc.base.name.as_str()),
+            MaybeObfuscated::Obfuscated(_) => None,
         }
     }
 
