@@ -926,6 +926,7 @@ enum_number! {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::Value::Null;
     use serde_json::json;
 
     use super::*;
@@ -946,7 +947,7 @@ mod tests {
         };
         assert_json(
             &button,
-            json!({"type": 2, "style": 4, "custom_id": "hello", "label": "a", "disabled": false}),
+            json!({"type": 2, "id": Null, "style": 4, "custom_id": "hello", "label": "a", "disabled": false}),
         );
 
         button.data = ButtonKind::Link {
@@ -954,7 +955,7 @@ mod tests {
         };
         assert_json(
             &button,
-            json!({"type": 2, "style": 5, "url": "https://google.com", "label": "a", "disabled": false}),
+            json!({"type": 2, "id": Null, "style": 5, "url": "https://google.com", "label": "a", "disabled": false}),
         );
 
         button.data = ButtonKind::Premium {
@@ -962,7 +963,7 @@ mod tests {
         };
         assert_json(
             &button,
-            json!({"type": 2, "style": 6, "sku_id": "1234965026943668316", "label": "a", "disabled": false}),
+            json!({"type": 2, "id": Null, "style": 6, "sku_id": "1234965026943668316", "label": "a", "disabled": false}),
         );
     }
 }
