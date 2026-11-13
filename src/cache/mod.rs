@@ -75,15 +75,15 @@ enum CacheRefInner<'a, K, V, T> {
 /// `.await`-ing `!Send` futures in its body. In this case the compiler will **not** prevent you
 /// from holding a `CacheRef` over an `.await` point, and a deadlock may still occur.
 ///
-/// As a rule of thumb, never hold a `CacheRef` across an `.await` point. Instead, clone or copy the
-/// data you need and drop the reference before awaiting:
+/// As a rule of thumb, never hold a `CacheRef` across an `.await` point. Instead, clone or copy
+/// the data you need and drop the reference before awaiting:
 ///
 /// ```rust,no_run
 /// # use serenity::cache::Cache;
 /// # use serenity::model::prelude::*;
 /// # fn example(cache: &Cache, guild_id: GuildId) {
 /// // Good: extract what you need, then drop the reference.
-/// let channel_count = cache.guild(guild_id).map(|g| g.channels.len());
+/// let channel_count = cache.guild(guild_id).map(|g| g.channels().count());
 /// # }
 /// ```
 pub struct CacheRef<'a, K, V, T = ()> {
