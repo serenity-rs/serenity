@@ -27,6 +27,7 @@ Thanks to the following for their contributions:
 - [@DPlayer234]
 - [@Dramex]
 - [@Erk-]
+- [@Fangoboyo]
 - [@fgardt]
 - [@Freyja-moth]
 - [@GnomedDev]
@@ -48,6 +49,7 @@ Thanks to the following for their contributions:
 - [@paring-chan]
 - [@sadan4]
 - [@shimaenaga1123]
+- [@Sim-hu]
 - [@SirzBenjie]
 - [@TapGhoul]
 - [@tazz4843]
@@ -6369,6 +6371,7 @@ Initial commit.
 [@Erk-]: https://github.com/Erk-
 [@FabseGP]: https://github.com/FabseGP
 [@FallenWarrior2k]: https://github.com/FallenWarrior2k
+[@Fangoboyo]: https://github.com/Fangoboyo
 [@FelixMcFelix]: https://github.com/FelixMcFelix
 [@Flat]: https://github.com/Flat
 [@ForsakenHarmony]: https://github.com/ForsakenHarmony
@@ -6441,6 +6444,7 @@ Initial commit.
 [@SenseiHiraku]: https://github.com/SenseiHiraku
 [@Sergiovan]: https://github.com/Sergiovan
 [@ShashankKumarSaxena]: https://github.com/ShashankKumarSaxena
+[@Sim-hu]: https://github.com/Sim-hu
 [@SimonZehetner]: https://github.com/SimonZehetner
 [@SinsofSloth]: https://github.com/SinsofSloth
 [@SirzBenjie]: https://github.com/SirzBenjie
