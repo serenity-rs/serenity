@@ -967,11 +967,10 @@ fn is_guild_new(cache: &Cache, guild_id: GuildId) -> bool {
 
 #[cfg(all(test, feature = "cache"))]
 mod tests {
-    use extract_map::ExtractMap;
     use small_fixed_array::{FixedArray, FixedString};
 
     use super::is_guild_new;
-    use crate::cache::Cache;
+    use crate::cache::{Cache, ExtractMap};
     use crate::model::Timestamp;
     use crate::model::application::{ApplicationFlags, PartialCurrentApplicationInfo};
     use crate::model::event::{
@@ -1048,8 +1047,8 @@ mod tests {
                 verification_level: VerificationLevel::None,
                 default_message_notifications: DefaultMessageNotificationLevel::Mentions,
                 explicit_content_filter: ExplicitContentFilter::None,
-                roles: ExtractMap::new(),
-                emojis: ExtractMap::new(),
+                roles: ExtractMap::default(),
+                emojis: ExtractMap::default(),
                 features: FixedArray::new(),
                 mfa_level: MfaLevel::None,
                 application_id: None,
@@ -1071,19 +1070,19 @@ mod tests {
                 approximate_presence_count: None,
                 welcome_screen: None,
                 nsfw_level: NsfwLevel::Default,
-                stickers: ExtractMap::new(),
+                stickers: ExtractMap::default(),
                 joined_at: Timestamp::now(),
-                viewable_channels: ExtractMap::new(),
-                obfuscated_channels: ExtractMap::new(),
+                viewable_channels: ExtractMap::default(),
+                obfuscated_channels: ExtractMap::default(),
                 member_count: MemberCount::ZERO,
-                members: ExtractMap::new(),
+                members: ExtractMap::default(),
                 incidents_data: None,
-                presences: ExtractMap::new(),
+                presences: ExtractMap::default(),
                 safety_alerts_channel_id: None,
-                scheduled_events: ExtractMap::new(),
+                scheduled_events: ExtractMap::default(),
                 stage_instances: FixedArray::new(),
-                threads: ExtractMap::new(),
-                voice_states: ExtractMap::new(),
+                threads: ExtractMap::default(),
+                voice_states: ExtractMap::default(),
             }),
         }));
 
@@ -1119,8 +1118,8 @@ mod tests {
                 verification_level: VerificationLevel::None,
                 default_message_notifications: DefaultMessageNotificationLevel::Mentions,
                 explicit_content_filter: ExplicitContentFilter::None,
-                roles: ExtractMap::new(),
-                emojis: ExtractMap::new(),
+                roles: ExtractMap::default(),
+                emojis: ExtractMap::default(),
                 features: FixedArray::new(),
                 mfa_level: MfaLevel::None,
                 application_id: None,
@@ -1142,19 +1141,19 @@ mod tests {
                 approximate_presence_count: None,
                 welcome_screen: None,
                 nsfw_level: NsfwLevel::Default,
-                stickers: ExtractMap::new(),
+                stickers: ExtractMap::default(),
                 joined_at: Timestamp::now(),
-                viewable_channels: ExtractMap::new(),
-                obfuscated_channels: ExtractMap::new(),
+                viewable_channels: ExtractMap::default(),
+                obfuscated_channels: ExtractMap::default(),
                 member_count: MemberCount::ZERO,
-                members: ExtractMap::new(),
+                members: ExtractMap::default(),
                 incidents_data: None,
-                presences: ExtractMap::new(),
+                presences: ExtractMap::default(),
                 safety_alerts_channel_id: None,
-                scheduled_events: ExtractMap::new(),
+                scheduled_events: ExtractMap::default(),
                 stage_instances: FixedArray::new(),
-                threads: ExtractMap::new(),
-                voice_states: ExtractMap::new(),
+                threads: ExtractMap::default(),
+                voice_states: ExtractMap::default(),
             }),
         }));
 

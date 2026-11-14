@@ -14,6 +14,7 @@ use crate::builder::{
 };
 #[cfg(feature = "model")]
 use crate::http::Http;
+use crate::internal::hasher::BuildHasher;
 use crate::model::prelude::*;
 
 /// An interaction when a user invokes a slash command.
@@ -458,7 +459,7 @@ pub struct CommandDataResolved {
     /// The resolved partial members.
     // Cannot use ExtractMap, as PartialMember does not always store an ID.
     #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub members: HashMap<UserId, PartialMember>,
+    pub members: HashMap<UserId, PartialMember, BuildHasher>,
     /// The resolved roles.
     #[serde(
         default,

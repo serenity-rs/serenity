@@ -10,6 +10,8 @@ use dashmap::mapref::one::{Ref, RefMut};
 #[cfg(feature = "typesize")]
 use typesize::TypeSize;
 
+use crate::internal::hasher::BuildHasher;
+
 #[derive(Debug)]
 /// A wrapper around Option<DashMap<K, V>> to ease disabling specific cache fields.
 pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(crate) Option<DashMap<K, V, BuildHasher>>);
@@ -83,32 +85,6 @@ impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
         self.0.is_some_and(|m| m.contains_key(k))
     }
 }
-pub struct Hasher<'a>(foldhash::fast::FoldHasher<'a>);
-impl std::hash::Hasher for Hasher<'_> {
-    fn finish(&self) -> u64 {
-        self.0.finish()
-    }
-
-    fn write(&mut self, bytes: &[u8]) {
-        self.0.write(bytes);
-    }
-}
-
-#[cfg(feature = "typesize")]
-impl typesize::TypeSize for Hasher<'_> {}
-
-#[derive(Clone, Default)]
-pub struct BuildHasher(foldhash::fast::RandomState);
-impl std::hash::BuildHasher for BuildHasher {
-    type Hasher = Hasher<'static>;
-
-    fn build_hasher(&self) -> Self::Hasher {
-        Hasher(self.0.build_hasher())
-    }
-}
-
-#[cfg(feature = "typesize")]
-impl typesize::TypeSize for BuildHasher {}
 
 /// Wrapper around `SizableArc<T, Owned>`` with support for disabling typesize.
 ///

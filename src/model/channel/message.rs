@@ -1314,7 +1314,6 @@ pub struct MessageCall {
 // all tests here require cache, move if non-cache test is added
 #[cfg(all(test, feature = "cache"))]
 mod tests {
-    use extract_map::ExtractMap;
     use small_fixed_array::FixedArray;
 
     use super::{
@@ -1329,7 +1328,7 @@ mod tests {
         User,
         UserId,
     };
-    use crate::cache::Cache;
+    use crate::cache::{Cache, ExtractMap};
     use crate::model::event::GuildCreateEvent;
 
     fn new_extract_map<K, T>(val: T) -> ExtractMap<K, T>
@@ -1337,7 +1336,7 @@ mod tests {
         K: std::hash::Hash + Eq,
         T: extract_map::ExtractKey<K>,
     {
-        let mut map = ExtractMap::new();
+        let mut map = ExtractMap::default();
         map.insert(val);
         map
     }

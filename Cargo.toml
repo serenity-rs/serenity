@@ -51,7 +51,7 @@ ref-cast = "1.0.25"
 # We don't need any of the timezone support, since we'll only be using the Timestamp type.
 jiff = { version = "0.2.38", default-features = false, features = ["alloc", "perf-inline", "serde", "std"] }
 # Optional dependencies
-foldhash = { version = "0.2.0", optional = true }
+foldhash = "0.2.0"
 flate2 = { version = "1.1.9", features = ["zlib-rs"], optional = true }
 zstd = { version = "0.14.3", default-features = false, optional = true }
 reqwest = { version = ">=0.13", default-features = false, features = ["multipart", "stream", "json"], optional = true }
@@ -87,7 +87,7 @@ default_no_backend = [
 builder = ["tokio/fs"]
 # Enables the cache, which stores the data received from Discord gateway to provide access to
 # complete guild data, channels, users and more without needing HTTP requests.
-cache = ["foldhash", "dashmap"]
+cache = ["dashmap"]
 # Enables collectors, a utility feature that lets you await interaction events in code with
 # zero setup, without needing to setup an InteractionCreate event listener.
 collector = ["gateway"]
