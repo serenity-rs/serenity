@@ -142,7 +142,7 @@ impl ThreadId {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct GuildThread {
     /// The shared fields between [`GuildChannel`] and [`GuildThread`].
     #[serde(flatten)]
@@ -227,7 +227,7 @@ impl ExtractKey<ThreadId> for GuildThread {
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ThreadMetadata {
     /// Whether the thread is archived.
     pub archived: bool,
@@ -256,7 +256,7 @@ pub struct ThreadMetadata {
 /// [subset description](https://docs.discord.com/developers/events/gateway-events#thread-delete)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct PartialGuildThread {
     /// The thread Id.
     pub id: ThreadId,
@@ -271,7 +271,7 @@ pub struct PartialGuildThread {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct PartialThreadMember {
     /// The time the current user last joined the thread.
     pub join_timestamp: Timestamp,
@@ -287,7 +287,7 @@ pub struct PartialThreadMember {
 /// [extra fields]: https://docs.discord.com/developers/events/gateway-events#thread-member-update-thread-member-update-event-extra-fields
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ThreadMember {
     #[serde(flatten)]
     pub inner: PartialThreadMember,

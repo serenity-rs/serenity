@@ -16,7 +16,7 @@ macro_rules! full_event {
         $variant_name:ident { $( $arg_name:ident: $arg_type:ty ),* };
     )* ) => {
         /// This enum stores every possible event that an `EventHandler` can receive.
-        #[cfg_attr(not(feature = "unstable"), non_exhaustive)]
+        #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
         #[derive(Clone, Debug, VariantNames, IntoStaticStr, EnumCount, Serialize)]
         #[strum(serialize_all = "SCREAMING_SNAKE_CASE")]
         pub enum FullEvent {
@@ -24,7 +24,7 @@ macro_rules! full_event {
                 $( #[doc = $doc] )*
                 $( #[deprecated = $deprecated] )?
                 $( #[cfg(feature = $feature)] )?
-                #[cfg_attr(not(feature = "unstable"), non_exhaustive)]
+                #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
                 $variant_name {
                     $( $arg_name: $arg_type ),*
                 },

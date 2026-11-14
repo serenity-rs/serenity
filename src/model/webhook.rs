@@ -12,7 +12,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/resources/webhook#webhook-object-webhook-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum WebhookType {
         /// An indicator that the webhook can post messages to channels with a token.
         Incoming = 1,
@@ -43,7 +43,7 @@ impl WebhookType {
 /// [Discord docs](https://docs.discord.com/developers/resources/webhook#webhook-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Webhook {
     /// The unique Id.
     ///
@@ -91,7 +91,7 @@ impl ExtractKey<WebhookId> for Webhook {
 /// The guild object returned by a [`Webhook`], of type [`WebhookType::ChannelFollower`].
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct WebhookGuild {
     /// The unique Id identifying the guild.
     pub id: GuildId,
@@ -105,7 +105,7 @@ pub struct WebhookGuild {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct WebhookChannel {
     /// The unique Id of the channel.
     pub id: ChannelId,

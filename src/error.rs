@@ -24,7 +24,7 @@ pub type Result<T, E = Error> = StdResult<T, E>;
 
 /// A common error enum returned by most of the library's functionality within a custom [`Result`].
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Error {
     /// An [`std::io`] error.
     Io(IoError),
@@ -53,7 +53,7 @@ pub enum Error {
 }
 
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum UrlError {
     Parsing(url::ParseError),
     InvalidDataURI,

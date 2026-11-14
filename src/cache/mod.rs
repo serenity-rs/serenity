@@ -147,7 +147,7 @@ struct CachedShardData {
 /// [`http`]: crate::http
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Cache {
     // Temp cache:
     // ---

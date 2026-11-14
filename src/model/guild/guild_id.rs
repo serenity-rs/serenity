@@ -1955,7 +1955,7 @@ impl<'a> MembersIter<'a> {
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum GuildWidgetStyle {
     Shield,
     Banner1,

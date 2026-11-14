@@ -754,7 +754,7 @@ struct ResumeMetadata {
 }
 
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum ShardAction {
     Heartbeat,
     Identify,
@@ -783,7 +783,7 @@ pub struct CollectorCallback(pub Arc<dyn Fn(&Event) -> bool + Send + Sync>);
 
 /// The transport compression method to use.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum TransportCompression {
     /// No transport compression. Payload compression will be used instead.
     None,

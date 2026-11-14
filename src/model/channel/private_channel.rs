@@ -10,7 +10,7 @@ use crate::model::utils::single_recipient;
 /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct PrivateChannel {
     /// The unique Id of the private channel.
     ///

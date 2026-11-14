@@ -5,7 +5,7 @@ use crate::model::utils::StrOrInt;
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct AffectedRole {
     pub id: RoleId,
     pub name: FixedString,
@@ -14,7 +14,7 @@ pub struct AffectedRole {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum EntityType {
     Int(u64),
     Str(FixedString),
@@ -34,7 +34,7 @@ macro_rules! generate_change {
     )* ) => {
         #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
         #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
-        #[non_exhaustive]
+        #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
         #[serde(tag = "key")]
         #[serde(rename_all = "snake_case")]
         pub enum Change {

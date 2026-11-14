@@ -10,7 +10,7 @@ use crate::model::prelude::*;
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Integration {
     pub id: IntegrationId,
     pub name: FixedString,
@@ -40,7 +40,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-object-integration-expire-behaviors).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum IntegrationExpireBehaviour {
         RemoveRole = 0,
         Kick = 1,
@@ -60,7 +60,7 @@ impl From<Integration> for IntegrationId {
 /// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-account-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct IntegrationAccount {
     pub id: FixedString,
     pub name: FixedString,
@@ -71,7 +71,7 @@ pub struct IntegrationAccount {
 /// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-application-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct IntegrationApplication {
     pub id: ApplicationId,
     pub name: FixedString,

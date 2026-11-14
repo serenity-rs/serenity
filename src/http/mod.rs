@@ -73,7 +73,7 @@ impl LightMethod {
 }
 
 /// Representation of the method of a query to send for the [`Http::get_guilds`] function.
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum GuildPagination {
     /// The Id to get the guilds after.
     After(GuildId),
@@ -83,7 +83,7 @@ pub enum GuildPagination {
 
 /// Representation of the method of a query to send for the [`Http::get_scheduled_event_users`] and
 /// [`Http::get_bans`] functions.
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum UserPagination {
     /// The Id to get the users after.
     After(UserId),
@@ -92,7 +92,7 @@ pub enum UserPagination {
 }
 
 #[derive(Clone, Copy, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum MessagePagination {
     After(MessageId),
     Around(MessageId),
@@ -147,7 +147,7 @@ where
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#search-guild-messages).
 #[derive(Clone, Debug, Deserialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct MessageSearchResults {
     /// Whether the guild is undergoing a deep historical indexing operation.
     pub doing_deep_historical_index: bool,
