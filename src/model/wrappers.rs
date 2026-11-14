@@ -2,7 +2,7 @@
 //!
 //! Maps and sets that the library fills itself (the cache, deserialized models, ...) use
 //! [`BuildHasher`], a fast hasher specialized for integer keys. Collections that users construct
-//! and hand to the library (e.g. localizations in builders) use [`UserProvidedHashMap`], which has
+//! and hand to the library (e.g. localizations in builders) use [`UserHashMap`], which has
 //! the standard library's default hasher so that `HashMap::from([...])` and `.collect()` keep
 //! working.
 //!
@@ -14,7 +14,7 @@ pub use crate::internal::hasher::BuildHasher;
 /// A [`HashMap`](std::collections::HashMap) that is provided by the user, using the default
 /// hasher.
 #[expect(clippy::disallowed_types, reason = "this is the sanctioned alias for the std type")]
-pub type UserProvidedHashMap<K, V> = std::collections::HashMap<K, V>;
+pub type UserHashMap<K, V> = std::collections::HashMap<K, V>;
 
 /// A [`HashMap`](std::collections::HashMap) using the library's fast hasher.
 #[expect(clippy::disallowed_types, reason = "this is the sanctioned alias for the std type")]

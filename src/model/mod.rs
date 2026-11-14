@@ -153,7 +153,7 @@ pub mod prelude {
     #[doc(hidden)]
     pub use super::typing::*;
     #[doc(hidden)]
-    pub use super::wrappers::{BuildHasher, ExtractMap, HashMap, HashSet, UserProvidedHashMap};
+    pub use super::wrappers::{BuildHasher, ExtractMap, HashMap, HashSet, UserHashMap};
     #[doc(hidden)]
     pub use super::{
         ModelError,

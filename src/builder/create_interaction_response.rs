@@ -347,7 +347,7 @@ impl From<f64> for AutocompleteValue<'_> {
 pub struct AutocompleteChoice<'a> {
     pub name: Cow<'a, str>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<UserProvidedHashMap<Cow<'a, str>, Cow<'a, str>>>,
+    pub name_localizations: Option<UserHashMap<Cow<'a, str>, Cow<'a, str>>>,
     pub value: AutocompleteValue<'a>,
 }
 
