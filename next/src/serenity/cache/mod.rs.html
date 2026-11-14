@@ -796,11 +796,11 @@
 <a href=#796 id=796 data-nosnippet>796</a>
 <a href=#797 id=797 data-nosnippet>797</a>        <span class="comment">// Test deletion of a guild channel's message cache when a GuildDeleteEvent is received.
 <a href=#798 id=798 data-nosnippet>798</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>guild_create = GuildCreateEvent {
-<a href=#799 id=799 data-nosnippet>799</a>            guild: Guild {
+<a href=#799 id=799 data-nosnippet>799</a>            guild: GuildCreateGuild::Available(Guild {
 <a href=#800 id=800 data-nosnippet>800</a>                id: GuildId::new(<span class="number">1</span>),
 <a href=#801 id=801 data-nosnippet>801</a>                viewable_channels: ExtractMap::from_iter([channel]),
 <a href=#802 id=802 data-nosnippet>802</a>                ..Default::default()
-<a href=#803 id=803 data-nosnippet>803</a>            },
+<a href=#803 id=803 data-nosnippet>803</a>            }),
 <a href=#804 id=804 data-nosnippet>804</a>        };
 <a href=#805 id=805 data-nosnippet>805</a>        <span class="macro">assert!</span>(cache.update(<span class="kw-2">&amp;mut </span>guild_create).is_some());
 <a href=#806 id=806 data-nosnippet>806</a>        <span class="macro">assert!</span>(cache.update(<span class="kw-2">&amp;mut </span>event).is_none());

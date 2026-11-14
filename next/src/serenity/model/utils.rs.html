@@ -258,11 +258,26 @@
 <a href=#258 id=258 data-nosnippet>258</a>        .map_err(D::Error::custom)
 <a href=#259 id=259 data-nosnippet>259</a>}
 <a href=#260 id=260 data-nosnippet>260</a>
-<a href=#261 id=261 data-nosnippet>261</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_null_as_default&lt;<span class="lifetime">'de</span>, D, T&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;T, D::Error&gt;
-<a href=#262 id=262 data-nosnippet>262</a><span class="kw">where
-<a href=#263 id=263 data-nosnippet>263</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
-<a href=#264 id=264 data-nosnippet>264</a>    T: Default + serde::Deserialize&lt;<span class="lifetime">'de</span>&gt;,
-<a href=#265 id=265 data-nosnippet>265</a>{
-<a href=#266 id=266 data-nosnippet>266</a>    <span class="prelude-ty">Option</span>::&lt;T&gt;::deserialize(deserializer).map(Option::unwrap_or_default)
-<a href=#267 id=267 data-nosnippet>267</a>}
+<a href=#261 id=261 data-nosnippet>261</a><span class="comment">// Needed to insert guild_id fields in GuildChannel/ObfuscatedChannel, GuildThread, Member, and
+<a href=#262 id=262 data-nosnippet>262</a>// Role when deserializing a [`GuildCreateGuild::Available`] guild.
+<a href=#263 id=263 data-nosnippet>263</a></span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_available_guild&lt;<span class="lifetime">'de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Guild, D::Error&gt;
+<a href=#264 id=264 data-nosnippet>264</a><span class="kw">where
+<a href=#265 id=265 data-nosnippet>265</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#266 id=266 data-nosnippet>266</a>{
+<a href=#267 id=267 data-nosnippet>267</a>    <span class="kw">let </span><span class="kw-2">mut </span>guild: Guild = Guild::deserialize(deserializer)<span class="question-mark">?</span>;
+<a href=#268 id=268 data-nosnippet>268</a>    guild.viewable_channels.iter_mut().for_each(|x| x.base.guild_id = guild.id);
+<a href=#269 id=269 data-nosnippet>269</a>    guild.obfuscated_channels.iter_mut().for_each(|x| x.guild_id = guild.id);
+<a href=#270 id=270 data-nosnippet>270</a>    guild.threads.iter_mut().for_each(|x| x.base.guild_id = guild.id);
+<a href=#271 id=271 data-nosnippet>271</a>    guild.members.iter_mut().for_each(|x| x.guild_id = guild.id);
+<a href=#272 id=272 data-nosnippet>272</a>    guild.roles.iter_mut().for_each(|x| x.guild_id = guild.id);
+<a href=#273 id=273 data-nosnippet>273</a>    <span class="prelude-val">Ok</span>(guild)
+<a href=#274 id=274 data-nosnippet>274</a>}
+<a href=#275 id=275 data-nosnippet>275</a>
+<a href=#276 id=276 data-nosnippet>276</a><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deserialize_null_as_default&lt;<span class="lifetime">'de</span>, D, T&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;T, D::Error&gt;
+<a href=#277 id=277 data-nosnippet>277</a><span class="kw">where
+<a href=#278 id=278 data-nosnippet>278</a>    </span>D: Deserializer&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#279 id=279 data-nosnippet>279</a>    T: Default + serde::Deserialize&lt;<span class="lifetime">'de</span>&gt;,
+<a href=#280 id=280 data-nosnippet>280</a>{
+<a href=#281 id=281 data-nosnippet>281</a>    <span class="prelude-ty">Option</span>::&lt;T&gt;::deserialize(deserializer).map(Option::unwrap_or_default)
+<a href=#282 id=282 data-nosnippet>282</a>}
 </code></pre></div></section></main></body></html>
