@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/attachment.rs`."><title>attachment.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-1f5a765c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.102.0-nightly (5f4effd57 2026-11-13)" data-channel="nightly" data-search-js="search-69faa2c4.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-9b351432.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-419f3a3f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-101b5a15.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/channel/</div>attachment.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>nonmax::NonMaxU32;
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/channel/attachment.rs`."><title>attachment.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-1f5a765c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="serenity" data-themes="" data-resource-suffix="" data-rustdoc-version="1.102.0-nightly (5f4effd57 2026-11-13)" data-channel="nightly" data-search-js="search-69faa2c4.js" data-stringdex-js="stringdex-b5109af9.js" data-settings-js="settings-9b351432.js" ><script src="../../../../static.files/storage-41dd4d93.js"></script><script defer src="../../../../static.files/src-script-813739b1.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-419f3a3f.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-101b5a15.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><a class="skip-main-content" href="#main-content">Skip to main content</a><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content" tabindex="-1"><div class="main-heading"><h1><div class="sub-heading">serenity/model/channel/</div>attachment.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>nonmax::{NonMaxU8, NonMaxU32};
 <a href=#2 id=2 data-nosnippet>2</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
 <a href=#3 id=3 data-nosnippet>3</a></span><span class="kw">use </span>reqwest::Client <span class="kw">as </span>ReqwestClient;
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>serde_cow::CowStr;
@@ -63,9 +63,9 @@
 <a href=#63 id=63 data-nosnippet>63</a>    <span class="doccomment">/// The [thumbhash] placeholder of the attachment (if image or video).
 <a href=#64 id=64 data-nosnippet>64</a>    ///
 <a href=#65 id=65 data-nosnippet>65</a>    /// [thumbhash]: https://evanw.github.io/thumbhash/
-<a href=#66 id=66 data-nosnippet>66</a>    </span><span class="kw">pub </span>placeholder: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+<a href=#66 id=66 data-nosnippet>66</a>    </span><span class="kw">pub </span>placeholder: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
 <a href=#67 id=67 data-nosnippet>67</a>    <span class="doccomment">/// The version of the placeholder (if image or video).
-<a href=#68 id=68 data-nosnippet>68</a>    </span><span class="kw">pub </span>placeholder_version: <span class="prelude-ty">Option</span>&lt;NonMaxU32&gt;,
+<a href=#68 id=68 data-nosnippet>68</a>    </span><span class="kw">pub </span>placeholder_version: <span class="prelude-ty">Option</span>&lt;NonMaxU8&gt;,
 <a href=#69 id=69 data-nosnippet>69</a>    <span class="doccomment">/// Whether this attachment is ephemeral.
 <a href=#70 id=70 data-nosnippet>70</a>    ///
 <a href=#71 id=71 data-nosnippet>71</a>    /// Ephemeral attachments will automatically be removed after a set period of time.
@@ -183,19 +183,29 @@
 <a href=#183 id=183 data-nosnippet>183</a><span class="macro">bitflags!</span> {
 <a href=#184 id=184 data-nosnippet>184</a>    <span class="doccomment">/// Flags for an attachment.
 <a href=#185 id=185 data-nosnippet>185</a>    ///
-<a href=#186 id=186 data-nosnippet>186</a>    /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-flags).
-<a href=#187 id=187 data-nosnippet>187</a>    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#188 id=188 data-nosnippet>188</a>    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-<a href=#189 id=189 data-nosnippet>189</a>    </span><span class="kw">pub struct </span>AttachmentFlags: u8 {
-<a href=#190 id=190 data-nosnippet>190</a>        <span class="doccomment">/// This attachment is a Clip from a stream.
-<a href=#191 id=191 data-nosnippet>191</a>        </span><span class="kw">const </span>IS_CLIP = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
-<a href=#192 id=192 data-nosnippet>192</a>        <span class="doccomment">/// This attachment is the thumbnail of a thread in a media channel, displayed in the grid
-<a href=#193 id=193 data-nosnippet>193</a>        /// but not on the message.
-<a href=#194 id=194 data-nosnippet>194</a>        </span><span class="kw">const </span>IS_THUMBNAIL = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
-<a href=#195 id=195 data-nosnippet>195</a>        <span class="doccomment">/// This attachment was marked as a spoiler and is blurred until clicked.
-<a href=#196 id=196 data-nosnippet>196</a>        </span><span class="kw">const </span>IS_SPOILER = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
-<a href=#197 id=197 data-nosnippet>197</a>        <span class="doccomment">/// This attachment is an animated image.
-<a href=#198 id=198 data-nosnippet>198</a>        </span><span class="kw">const </span>IS_ANIMATED = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
-<a href=#199 id=199 data-nosnippet>199</a>    }
-<a href=#200 id=200 data-nosnippet>200</a>}
+<a href=#186 id=186 data-nosnippet>186</a>    /// **Note**: `CONTAINS_*` flags may not be present on the initial message and can be added
+<a href=#187 id=187 data-nosnippet>187</a>    /// later in a [`MessageUpdateEvent`]. Additionally, these flags are only set once media is
+<a href=#188 id=188 data-nosnippet>188</a>    /// sent in a message and are not included for attachments in an interaction's resolved data.
+<a href=#189 id=189 data-nosnippet>189</a>    ///
+<a href=#190 id=190 data-nosnippet>190</a>    /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-flags).
+<a href=#191 id=191 data-nosnippet>191</a>    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#192 id=192 data-nosnippet>192</a>    #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
+<a href=#193 id=193 data-nosnippet>193</a>    </span><span class="kw">pub struct </span>AttachmentFlags: u16 {
+<a href=#194 id=194 data-nosnippet>194</a>        <span class="doccomment">/// This attachment is a Clip from a stream.
+<a href=#195 id=195 data-nosnippet>195</a>        </span><span class="kw">const </span>IS_CLIP = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+<a href=#196 id=196 data-nosnippet>196</a>        <span class="doccomment">/// This attachment is the thumbnail of a thread in a media channel, displayed in the grid
+<a href=#197 id=197 data-nosnippet>197</a>        /// but not on the message.
+<a href=#198 id=198 data-nosnippet>198</a>        </span><span class="kw">const </span>IS_THUMBNAIL = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+<a href=#199 id=199 data-nosnippet>199</a>        <span class="doccomment">/// This attachment was marked as a spoiler and is blurred until clicked.
+<a href=#200 id=200 data-nosnippet>200</a>        </span><span class="kw">const </span>IS_SPOILER = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+<a href=#201 id=201 data-nosnippet>201</a>        <span class="doccomment">/// This attachment was flagged as explicit by Discord's content scanning.
+<a href=#202 id=202 data-nosnippet>202</a>        </span><span class="kw">const </span>CONTAINS_EXPLICIT_CONTENT = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+<a href=#203 id=203 data-nosnippet>203</a>        <span class="doccomment">/// This attachment is an animated image.
+<a href=#204 id=204 data-nosnippet>204</a>        </span><span class="kw">const </span>IS_ANIMATED = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+<a href=#205 id=205 data-nosnippet>205</a>        <span class="doccomment">/// This attachment was flagged as gore by Discord's content scanning.
+<a href=#206 id=206 data-nosnippet>206</a>        </span><span class="kw">const </span>CONTAINS_GORE_CONTENT = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+<a href=#207 id=207 data-nosnippet>207</a>        <span class="doccomment">/// This attachment was flagged as self-harm by Discord's content scanning.
+<a href=#208 id=208 data-nosnippet>208</a>        </span><span class="kw">const </span>CONTAINS_SELF_HARM_CONTENT = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+<a href=#209 id=209 data-nosnippet>209</a>    }
+<a href=#210 id=210 data-nosnippet>210</a>}
 </code></pre></div></section></main></body></html>
