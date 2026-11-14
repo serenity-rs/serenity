@@ -817,8 +817,8 @@
 <a href=#817 id=817 data-nosnippet>817</a>
 <a href=#818 id=818 data-nosnippet>818</a>    <span class="doccomment">/// Calculate a [`Member`]'s permissions in the guild.
 <a href=#819 id=819 data-nosnippet>819</a>    ///
-<a href=#820 id=820 data-nosnippet>820</a>    /// You likely want to use Guild::user_permissions_in instead as this function does not consider
-<a href=#821 id=821 data-nosnippet>821</a>    /// permission overwrites.
+<a href=#820 id=820 data-nosnippet>820</a>    /// You likely want to use [`Guild::user_permissions_in`] instead, as this function does not
+<a href=#821 id=821 data-nosnippet>821</a>    /// consider permission overwrites.
 <a href=#822 id=822 data-nosnippet>822</a>    </span><span class="attr">#[must_use]
 <a href=#823 id=823 data-nosnippet>823</a>    </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
 <a href=#824 id=824 data-nosnippet>824</a>        <span class="self">Self</span>::user_permissions_in_(
@@ -833,8 +833,8 @@
 <a href=#833 id=833 data-nosnippet>833</a>
 <a href=#834 id=834 data-nosnippet>834</a>    <span class="doccomment">/// Calculate a [`PartialMember`]'s permissions in the guild.
 <a href=#835 id=835 data-nosnippet>835</a>    ///
-<a href=#836 id=836 data-nosnippet>836</a>    /// You likely want to use Guild::partial_member_permissions_in instead as this function does
-<a href=#837 id=837 data-nosnippet>837</a>    /// not consider permission overwrites.
+<a href=#836 id=836 data-nosnippet>836</a>    /// You likely want to use [`Guild::partial_member_permissions_in`] instead, as this function
+<a href=#837 id=837 data-nosnippet>837</a>    /// does not consider permission overwrites.
 <a href=#838 id=838 data-nosnippet>838</a>    ///
 <a href=#839 id=839 data-nosnippet>839</a>    /// # Panics
 <a href=#840 id=840 data-nosnippet>840</a>    ///
@@ -864,677 +864,689 @@
 <a href=#864 id=864 data-nosnippet>864</a>    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
 <a href=#865 id=865 data-nosnippet>865</a>    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
 <a href=#866 id=866 data-nosnippet>866</a>    /// the member.
-<a href=#867 id=867 data-nosnippet>867</a>    </span><span class="attr">#[must_use]
-<a href=#868 id=868 data-nosnippet>868</a>    </span><span class="kw">pub fn </span>user_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
-<a href=#869 id=869 data-nosnippet>869</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#870 id=870 data-nosnippet>870</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
-<a href=#871 id=871 data-nosnippet>871</a>        member: <span class="kw-2">&amp;</span>Member,
-<a href=#872 id=872 data-nosnippet>872</a>    ) -&gt; Permissions {
-<a href=#873 id=873 data-nosnippet>873</a>        <span class="self">Self</span>::user_permissions_in_(
-<a href=#874 id=874 data-nosnippet>874</a>            <span class="prelude-val">Some</span>(channel.into()),
-<a href=#875 id=875 data-nosnippet>875</a>            member.user.id,
-<a href=#876 id=876 data-nosnippet>876</a>            <span class="kw-2">&amp;</span>member.roles,
-<a href=#877 id=877 data-nosnippet>877</a>            <span class="self">self</span>.id,
-<a href=#878 id=878 data-nosnippet>878</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
-<a href=#879 id=879 data-nosnippet>879</a>            <span class="self">self</span>.owner_id,
-<a href=#880 id=880 data-nosnippet>880</a>        )
-<a href=#881 id=881 data-nosnippet>881</a>    }
-<a href=#882 id=882 data-nosnippet>882</a>
-<a href=#883 id=883 data-nosnippet>883</a>    <span class="doccomment">/// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
-<a href=#884 id=884 data-nosnippet>884</a>    ///
-<a href=#885 id=885 data-nosnippet>885</a>    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
-<a href=#886 id=886 data-nosnippet>886</a>    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
-<a href=#887 id=887 data-nosnippet>887</a>    /// the member.
-<a href=#888 id=888 data-nosnippet>888</a>    ///
-<a href=#889 id=889 data-nosnippet>889</a>    /// # Panics
+<a href=#867 id=867 data-nosnippet>867</a>    ///
+<a href=#868 id=868 data-nosnippet>868</a>    /// To circumvent this limitation, apply [implicit permission masking], or calculate
+<a href=#869 id=869 data-nosnippet>869</a>    /// permissions with a [`GenericChannelId`] and [`UserId`] only, at the expense of an HTTP
+<a href=#870 id=870 data-nosnippet>870</a>    /// call, use [`GenericChannelId::member_permissions`].
+<a href=#871 id=871 data-nosnippet>871</a>    ///
+<a href=#872 id=872 data-nosnippet>872</a>    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+<a href=#873 id=873 data-nosnippet>873</a>    </span><span class="attr">#[must_use]
+<a href=#874 id=874 data-nosnippet>874</a>    </span><span class="kw">pub fn </span>user_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#875 id=875 data-nosnippet>875</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#876 id=876 data-nosnippet>876</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
+<a href=#877 id=877 data-nosnippet>877</a>        member: <span class="kw-2">&amp;</span>Member,
+<a href=#878 id=878 data-nosnippet>878</a>    ) -&gt; Permissions {
+<a href=#879 id=879 data-nosnippet>879</a>        <span class="self">Self</span>::user_permissions_in_(
+<a href=#880 id=880 data-nosnippet>880</a>            <span class="prelude-val">Some</span>(channel.into()),
+<a href=#881 id=881 data-nosnippet>881</a>            member.user.id,
+<a href=#882 id=882 data-nosnippet>882</a>            <span class="kw-2">&amp;</span>member.roles,
+<a href=#883 id=883 data-nosnippet>883</a>            <span class="self">self</span>.id,
+<a href=#884 id=884 data-nosnippet>884</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+<a href=#885 id=885 data-nosnippet>885</a>            <span class="self">self</span>.owner_id,
+<a href=#886 id=886 data-nosnippet>886</a>        )
+<a href=#887 id=887 data-nosnippet>887</a>    }
+<a href=#888 id=888 data-nosnippet>888</a>
+<a href=#889 id=889 data-nosnippet>889</a>    <span class="doccomment">/// Calculate a [`PartialMember`]'s permissions in a given channel in a guild.
 <a href=#890 id=890 data-nosnippet>890</a>    ///
-<a href=#891 id=891 data-nosnippet>891</a>    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
-<a href=#892 id=892 data-nosnippet>892</a>    </span><span class="attr">#[must_use]
-<a href=#893 id=893 data-nosnippet>893</a>    </span><span class="kw">pub fn </span>partial_member_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
-<a href=#894 id=894 data-nosnippet>894</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#895 id=895 data-nosnippet>895</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
-<a href=#896 id=896 data-nosnippet>896</a>        member_id: UserId,
-<a href=#897 id=897 data-nosnippet>897</a>        member: <span class="kw-2">&amp;</span>PartialMember,
-<a href=#898 id=898 data-nosnippet>898</a>    ) -&gt; Permissions {
-<a href=#899 id=899 data-nosnippet>899</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="kw-2">&amp;</span>member.user {
-<a href=#900 id=900 data-nosnippet>900</a>            <span class="macro">assert_eq!</span>(user.id, member_id, <span class="string">"User::id does not match provided PartialMember"</span>);
-<a href=#901 id=901 data-nosnippet>901</a>        }
-<a href=#902 id=902 data-nosnippet>902</a>
-<a href=#903 id=903 data-nosnippet>903</a>        <span class="self">Self</span>::user_permissions_in_(
-<a href=#904 id=904 data-nosnippet>904</a>            <span class="prelude-val">Some</span>(channel.into()),
-<a href=#905 id=905 data-nosnippet>905</a>            member_id,
-<a href=#906 id=906 data-nosnippet>906</a>            <span class="kw-2">&amp;</span>member.roles,
-<a href=#907 id=907 data-nosnippet>907</a>            <span class="self">self</span>.id,
-<a href=#908 id=908 data-nosnippet>908</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
-<a href=#909 id=909 data-nosnippet>909</a>            <span class="self">self</span>.owner_id,
-<a href=#910 id=910 data-nosnippet>910</a>        )
-<a href=#911 id=911 data-nosnippet>911</a>    }
-<a href=#912 id=912 data-nosnippet>912</a>
-<a href=#913 id=913 data-nosnippet>913</a>    <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].
-<a href=#914 id=914 data-nosnippet>914</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_permissions_in_(
-<a href=#915 id=915 data-nosnippet>915</a>        channel: <span class="prelude-ty">Option</span>&lt;GuildChannelRef&gt;,
-<a href=#916 id=916 data-nosnippet>916</a>        member_user_id: UserId,
-<a href=#917 id=917 data-nosnippet>917</a>        member_roles: <span class="kw-2">&amp;</span>[RoleId],
-<a href=#918 id=918 data-nosnippet>918</a>        guild_id: GuildId,
-<a href=#919 id=919 data-nosnippet>919</a>        guild_roles: <span class="kw-2">&amp;</span>ExtractMap&lt;RoleId, Role&gt;,
-<a href=#920 id=920 data-nosnippet>920</a>        guild_owner_id: UserId,
-<a href=#921 id=921 data-nosnippet>921</a>    ) -&gt; Permissions {
-<a href=#922 id=922 data-nosnippet>922</a>        <span class="kw">let </span><span class="kw-2">mut </span>everyone_allow_overwrites = Permissions::empty();
-<a href=#923 id=923 data-nosnippet>923</a>        <span class="kw">let </span><span class="kw-2">mut </span>everyone_deny_overwrites = Permissions::empty();
-<a href=#924 id=924 data-nosnippet>924</a>        <span class="kw">let </span><span class="kw-2">mut </span>roles_allow_overwrites = Vec::new();
-<a href=#925 id=925 data-nosnippet>925</a>        <span class="kw">let </span><span class="kw-2">mut </span>roles_deny_overwrites = Vec::new();
-<a href=#926 id=926 data-nosnippet>926</a>        <span class="kw">let </span><span class="kw-2">mut </span>member_allow_overwrites = Permissions::empty();
-<a href=#927 id=927 data-nosnippet>927</a>        <span class="kw">let </span><span class="kw-2">mut </span>member_deny_overwrites = Permissions::empty();
-<a href=#928 id=928 data-nosnippet>928</a>
-<a href=#929 id=929 data-nosnippet>929</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = channel {
-<a href=#930 id=930 data-nosnippet>930</a>            <span class="kw">match </span>channel {
-<a href=#931 id=931 data-nosnippet>931</a>                GuildChannelRef::Viewable(guild_channel) =&gt; {
-<a href=#932 id=932 data-nosnippet>932</a>                    <span class="kw">for </span>overwrite <span class="kw">in </span><span class="kw-2">&amp;</span>guild_channel.permission_overwrites {
-<a href=#933 id=933 data-nosnippet>933</a>                        <span class="kw">match </span>overwrite.kind {
-<a href=#934 id=934 data-nosnippet>934</a>                            PermissionOverwriteType::Member(user_id) =&gt; {
-<a href=#935 id=935 data-nosnippet>935</a>                                <span class="kw">if </span>member_user_id == user_id {
-<a href=#936 id=936 data-nosnippet>936</a>                                    member_allow_overwrites = overwrite.allow;
-<a href=#937 id=937 data-nosnippet>937</a>                                    member_deny_overwrites = overwrite.deny;
-<a href=#938 id=938 data-nosnippet>938</a>                                }
-<a href=#939 id=939 data-nosnippet>939</a>                            },
-<a href=#940 id=940 data-nosnippet>940</a>                            PermissionOverwriteType::Role(role_id) =&gt; {
-<a href=#941 id=941 data-nosnippet>941</a>                                <span class="kw">if </span>role_id.get() == guild_id.get() {
-<a href=#942 id=942 data-nosnippet>942</a>                                    everyone_allow_overwrites = overwrite.allow;
-<a href=#943 id=943 data-nosnippet>943</a>                                    everyone_deny_overwrites = overwrite.deny;
-<a href=#944 id=944 data-nosnippet>944</a>                                } <span class="kw">else if </span>member_roles.contains(<span class="kw-2">&amp;</span>role_id) {
-<a href=#945 id=945 data-nosnippet>945</a>                                    roles_allow_overwrites.push(overwrite.allow);
-<a href=#946 id=946 data-nosnippet>946</a>                                    roles_deny_overwrites.push(overwrite.deny);
-<a href=#947 id=947 data-nosnippet>947</a>                                }
-<a href=#948 id=948 data-nosnippet>948</a>                            },
-<a href=#949 id=949 data-nosnippet>949</a>                        }
-<a href=#950 id=950 data-nosnippet>950</a>                    }
-<a href=#951 id=951 data-nosnippet>951</a>                },
-<a href=#952 id=952 data-nosnippet>952</a>                GuildChannelRef::Obfuscated(<span class="kw">_</span>) =&gt; {
-<a href=#953 id=953 data-nosnippet>953</a>                    everyone_deny_overwrites = Permissions::VIEW_CHANNEL;
-<a href=#954 id=954 data-nosnippet>954</a>                },
-<a href=#955 id=955 data-nosnippet>955</a>            }
-<a href=#956 id=956 data-nosnippet>956</a>        }
-<a href=#957 id=957 data-nosnippet>957</a>
-<a href=#958 id=958 data-nosnippet>958</a>        calculate_permissions(CalculatePermissions {
-<a href=#959 id=959 data-nosnippet>959</a>            is_guild_owner: member_user_id == guild_owner_id,
-<a href=#960 id=960 data-nosnippet>960</a>            everyone_permissions: <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(<span class="kw-2">&amp;</span>RoleId::new(guild_id.get()))
-<a href=#961 id=961 data-nosnippet>961</a>            {
-<a href=#962 id=962 data-nosnippet>962</a>                role.permissions
-<a href=#963 id=963 data-nosnippet>963</a>            } <span class="kw">else </span>{
-<a href=#964 id=964 data-nosnippet>964</a>                <span class="macro">error!</span>(<span class="string">"@everyone role missing in {}"</span>, guild_id);
-<a href=#965 id=965 data-nosnippet>965</a>                Permissions::empty()
-<a href=#966 id=966 data-nosnippet>966</a>            },
-<a href=#967 id=967 data-nosnippet>967</a>            user_roles_permissions: member_roles
-<a href=#968 id=968 data-nosnippet>968</a>                .iter()
-<a href=#969 id=969 data-nosnippet>969</a>                .map(|role_id| {
-<a href=#970 id=970 data-nosnippet>970</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(role_id) {
-<a href=#971 id=971 data-nosnippet>971</a>                        role.permissions
-<a href=#972 id=972 data-nosnippet>972</a>                    } <span class="kw">else </span>{
-<a href=#973 id=973 data-nosnippet>973</a>                        <span class="macro">warn!</span>(
-<a href=#974 id=974 data-nosnippet>974</a>                            <span class="string">"{} on {} has non-existent role {:?}"</span>,
-<a href=#975 id=975 data-nosnippet>975</a>                            member_user_id, guild_id, role_id
-<a href=#976 id=976 data-nosnippet>976</a>                        );
-<a href=#977 id=977 data-nosnippet>977</a>                        Permissions::empty()
-<a href=#978 id=978 data-nosnippet>978</a>                    }
-<a href=#979 id=979 data-nosnippet>979</a>                })
-<a href=#980 id=980 data-nosnippet>980</a>                .collect(),
-<a href=#981 id=981 data-nosnippet>981</a>            everyone_allow_overwrites,
-<a href=#982 id=982 data-nosnippet>982</a>            everyone_deny_overwrites,
-<a href=#983 id=983 data-nosnippet>983</a>            roles_allow_overwrites,
-<a href=#984 id=984 data-nosnippet>984</a>            roles_deny_overwrites,
-<a href=#985 id=985 data-nosnippet>985</a>            member_allow_overwrites,
-<a href=#986 id=986 data-nosnippet>986</a>            member_deny_overwrites,
-<a href=#987 id=987 data-nosnippet>987</a>        })
-<a href=#988 id=988 data-nosnippet>988</a>    }
-<a href=#989 id=989 data-nosnippet>989</a>
-<a href=#990 id=990 data-nosnippet>990</a>    <span class="doccomment">/// Returns the formatted URL of the guild's splash image, if one exists.
-<a href=#991 id=991 data-nosnippet>991</a>    </span><span class="attr">#[must_use]
-<a href=#992 id=992 data-nosnippet>992</a>    </span><span class="kw">pub fn </span>splash_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-<a href=#993 id=993 data-nosnippet>993</a>        <span class="self">self</span>.splash.as_ref().map(|splash| <span class="macro">cdn!</span>(<span class="string">"/splashes/{}/{}.webp?size=4096"</span>, <span class="self">self</span>.id, splash))
-<a href=#994 id=994 data-nosnippet>994</a>    }
-<a href=#995 id=995 data-nosnippet>995</a>
-<a href=#996 id=996 data-nosnippet>996</a>    <span class="doccomment">/// Obtain a reference to a role by its name.
-<a href=#997 id=997 data-nosnippet>997</a>    ///
-<a href=#998 id=998 data-nosnippet>998</a>    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
-<a href=#999 id=999 data-nosnippet>999</a>    ///
-<a href=#1000 id=1000 data-nosnippet>1000</a>    /// # Examples
-<a href=#1001 id=1001 data-nosnippet>1001</a>    ///
-<a href=#1002 id=1002 data-nosnippet>1002</a>    /// Obtain a reference to a [`Role`] by its name.
-<a href=#1003 id=1003 data-nosnippet>1003</a>    ///
-<a href=#1004 id=1004 data-nosnippet>1004</a>    /// ```rust,no_run
-<a href=#1005 id=1005 data-nosnippet>1005</a>    /// # use serenity::model::prelude::*;
-<a href=#1006 id=1006 data-nosnippet>1006</a>    /// # use serenity::prelude::*;
-<a href=#1007 id=1007 data-nosnippet>1007</a>    ///
-<a href=#1008 id=1008 data-nosnippet>1008</a>    /// # #[cfg(feature = "cache")]
-<a href=#1009 id=1009 data-nosnippet>1009</a>    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-<a href=#1010 id=1010 data-nosnippet>1010</a>    /// # let cache: serenity::cache::Cache = unimplemented!();
-<a href=#1011 id=1011 data-nosnippet>1011</a>    /// # let msg: Message = unimplemented!();
-<a href=#1012 id=1012 data-nosnippet>1012</a>    ///
-<a href=#1013 id=1013 data-nosnippet>1013</a>    /// if let Some(guild_id) = msg.guild_id {
-<a href=#1014 id=1014 data-nosnippet>1014</a>    ///     if let Some(guild) = guild_id.to_guild_cached(&amp;cache) {
-<a href=#1015 id=1015 data-nosnippet>1015</a>    ///         if let Some(role) = guild.role_by_name("role_name") {
-<a href=#1016 id=1016 data-nosnippet>1016</a>    ///             println!("{:?}", role);
-<a href=#1017 id=1017 data-nosnippet>1017</a>    ///         }
-<a href=#1018 id=1018 data-nosnippet>1018</a>    ///     }
-<a href=#1019 id=1019 data-nosnippet>1019</a>    /// }
-<a href=#1020 id=1020 data-nosnippet>1020</a>    ///
-<a href=#1021 id=1021 data-nosnippet>1021</a>    /// # Ok(())
-<a href=#1022 id=1022 data-nosnippet>1022</a>    /// # }
-<a href=#1023 id=1023 data-nosnippet>1023</a>    /// ```
-<a href=#1024 id=1024 data-nosnippet>1024</a>    </span><span class="attr">#[must_use]
-<a href=#1025 id=1025 data-nosnippet>1025</a>    </span><span class="kw">pub fn </span>role_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, role_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
-<a href=#1026 id=1026 data-nosnippet>1026</a>        <span class="self">self</span>.roles.iter().find(|role| role_name == <span class="kw-2">&amp;*</span>role.name)
-<a href=#1027 id=1027 data-nosnippet>1027</a>    }
-<a href=#1028 id=1028 data-nosnippet>1028</a>}
-<a href=#1029 id=1029 data-nosnippet>1029</a>
-<a href=#1030 id=1030 data-nosnippet>1030</a><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Guild {
-<a href=#1031 id=1031 data-nosnippet>1031</a>    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
-<a href=#1032 id=1032 data-nosnippet>1032</a>        <span class="attr">#[bool_to_bitflags::bool_to_bitflags]
-<a href=#1033 id=1033 data-nosnippet>1033</a>        #[derive(serde::Deserialize)]
-<a href=#1034 id=1034 data-nosnippet>1034</a>        </span><span class="kw">struct </span>GuildRaw {
-<a href=#1035 id=1035 data-nosnippet>1035</a>            id: GuildId,
-<a href=#1036 id=1036 data-nosnippet>1036</a>            name: FixedString,
-<a href=#1037 id=1037 data-nosnippet>1037</a>            icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-<a href=#1038 id=1038 data-nosnippet>1038</a>            icon_hash: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-<a href=#1039 id=1039 data-nosnippet>1039</a>            splash: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-<a href=#1040 id=1040 data-nosnippet>1040</a>            discovery_splash: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-<a href=#1041 id=1041 data-nosnippet>1041</a>            owner_id: UserId,
-<a href=#1042 id=1042 data-nosnippet>1042</a>            <span class="attr">#[serde(flatten)]
-<a href=#1043 id=1043 data-nosnippet>1043</a>            </span>afk_metadata: <span class="prelude-ty">Option</span>&lt;AfkMetadata&gt;,
-<a href=#1044 id=1044 data-nosnippet>1044</a>            widget_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
-<a href=#1045 id=1045 data-nosnippet>1045</a>            widget_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-<a href=#1046 id=1046 data-nosnippet>1046</a>            verification_level: VerificationLevel,
-<a href=#1047 id=1047 data-nosnippet>1047</a>            default_message_notifications: DefaultMessageNotificationLevel,
-<a href=#1048 id=1048 data-nosnippet>1048</a>            explicit_content_filter: ExplicitContentFilter,
-<a href=#1049 id=1049 data-nosnippet>1049</a>            roles: ExtractMap&lt;RoleId, Role&gt;,
-<a href=#1050 id=1050 data-nosnippet>1050</a>            emojis: ExtractMap&lt;EmojiId, Emoji&gt;,
-<a href=#1051 id=1051 data-nosnippet>1051</a>            features: FixedArray&lt;FixedString&gt;,
-<a href=#1052 id=1052 data-nosnippet>1052</a>            mfa_level: MfaLevel,
-<a href=#1053 id=1053 data-nosnippet>1053</a>            application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
-<a href=#1054 id=1054 data-nosnippet>1054</a>            system_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-<a href=#1055 id=1055 data-nosnippet>1055</a>            system_channel_flags: SystemChannelFlags,
-<a href=#1056 id=1056 data-nosnippet>1056</a>            rules_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-<a href=#1057 id=1057 data-nosnippet>1057</a>            max_presences: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1058 id=1058 data-nosnippet>1058</a>            max_members: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1059 id=1059 data-nosnippet>1059</a>            vanity_url_code: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
-<a href=#1060 id=1060 data-nosnippet>1060</a>            description: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
-<a href=#1061 id=1061 data-nosnippet>1061</a>            banner: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-<a href=#1062 id=1062 data-nosnippet>1062</a>            premium_tier: PremiumTier,
-<a href=#1063 id=1063 data-nosnippet>1063</a>            premium_subscription_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1064 id=1064 data-nosnippet>1064</a>            preferred_locale: FixedString&lt;u8&gt;,
-<a href=#1065 id=1065 data-nosnippet>1065</a>            public_updates_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-<a href=#1066 id=1066 data-nosnippet>1066</a>            max_video_channel_users: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1067 id=1067 data-nosnippet>1067</a>            max_stage_video_channel_users: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1068 id=1068 data-nosnippet>1068</a>            approximate_member_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1069 id=1069 data-nosnippet>1069</a>            approximate_presence_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1070 id=1070 data-nosnippet>1070</a>            welcome_screen: <span class="prelude-ty">Option</span>&lt;GuildWelcomeScreen&gt;,
-<a href=#1071 id=1071 data-nosnippet>1071</a>            nsfw_level: NsfwLevel,
-<a href=#1072 id=1072 data-nosnippet>1072</a>            stickers: ExtractMap&lt;StickerId, Sticker&gt;,
-<a href=#1073 id=1073 data-nosnippet>1073</a>            premium_progress_bar_enabled: bool,
-<a href=#1074 id=1074 data-nosnippet>1074</a>            joined_at: Timestamp,
-<a href=#1075 id=1075 data-nosnippet>1075</a>            large: bool,
-<a href=#1076 id=1076 data-nosnippet>1076</a>            <span class="attr">#[serde(default)]
-<a href=#1077 id=1077 data-nosnippet>1077</a>            </span>unavailable: bool,
-<a href=#1078 id=1078 data-nosnippet>1078</a>            member_count: MemberCount,
-<a href=#1079 id=1079 data-nosnippet>1079</a>            voice_states: ExtractMap&lt;UserId, VoiceState&gt;,
-<a href=#1080 id=1080 data-nosnippet>1080</a>            members: ExtractMap&lt;UserId, Member&gt;,
-<a href=#1081 id=1081 data-nosnippet>1081</a>            channels: Vec&lt;GuildChannel&gt;,
-<a href=#1082 id=1082 data-nosnippet>1082</a>            threads: ExtractMap&lt;ThreadId, GuildThread&gt;,
-<a href=#1083 id=1083 data-nosnippet>1083</a>            presences: ExtractMap&lt;UserId, Presence&gt;,
-<a href=#1084 id=1084 data-nosnippet>1084</a>            stage_instances: FixedArray&lt;StageInstance&gt;,
-<a href=#1085 id=1085 data-nosnippet>1085</a>            guild_scheduled_events: ExtractMap&lt;ScheduledEventId, ScheduledEvent&gt;,
-<a href=#1086 id=1086 data-nosnippet>1086</a>            safety_alerts_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
-<a href=#1087 id=1087 data-nosnippet>1087</a>            incidents_data: <span class="prelude-ty">Option</span>&lt;Box&lt;IncidentsData&gt;&gt;,
-<a href=#1088 id=1088 data-nosnippet>1088</a>        }
-<a href=#1089 id=1089 data-nosnippet>1089</a>
-<a href=#1090 id=1090 data-nosnippet>1090</a>        <span class="kw">let </span>raw = GuildRaw::deserialize(deserializer)<span class="question-mark">?</span>;
-<a href=#1091 id=1091 data-nosnippet>1091</a>        <span class="kw">let </span>large = raw.large();
-<a href=#1092 id=1092 data-nosnippet>1092</a>        <span class="kw">let </span>premium_progress_bar_enabled = raw.premium_progress_bar_enabled();
-<a href=#1093 id=1093 data-nosnippet>1093</a>        <span class="kw">let </span>unavailable = raw.unavailable();
-<a href=#1094 id=1094 data-nosnippet>1094</a>        <span class="kw">let </span>widget_enabled = raw.widget_enabled();
-<a href=#1095 id=1095 data-nosnippet>1095</a>
-<a href=#1096 id=1096 data-nosnippet>1096</a>        <span class="kw">let </span><span class="kw-2">mut </span>guild = Guild {
-<a href=#1097 id=1097 data-nosnippet>1097</a>            id: raw.id,
-<a href=#1098 id=1098 data-nosnippet>1098</a>            name: raw.name,
-<a href=#1099 id=1099 data-nosnippet>1099</a>            icon: raw.icon,
-<a href=#1100 id=1100 data-nosnippet>1100</a>            icon_hash: raw.icon_hash,
-<a href=#1101 id=1101 data-nosnippet>1101</a>            splash: raw.splash,
-<a href=#1102 id=1102 data-nosnippet>1102</a>            discovery_splash: raw.discovery_splash,
-<a href=#1103 id=1103 data-nosnippet>1103</a>            owner_id: raw.owner_id,
-<a href=#1104 id=1104 data-nosnippet>1104</a>            afk_metadata: raw.afk_metadata,
-<a href=#1105 id=1105 data-nosnippet>1105</a>            widget_channel_id: raw.widget_channel_id,
-<a href=#1106 id=1106 data-nosnippet>1106</a>            verification_level: raw.verification_level,
-<a href=#1107 id=1107 data-nosnippet>1107</a>            default_message_notifications: raw.default_message_notifications,
-<a href=#1108 id=1108 data-nosnippet>1108</a>            explicit_content_filter: raw.explicit_content_filter,
-<a href=#1109 id=1109 data-nosnippet>1109</a>            roles: raw.roles,
-<a href=#1110 id=1110 data-nosnippet>1110</a>            emojis: raw.emojis,
-<a href=#1111 id=1111 data-nosnippet>1111</a>            features: raw.features,
-<a href=#1112 id=1112 data-nosnippet>1112</a>            mfa_level: raw.mfa_level,
-<a href=#1113 id=1113 data-nosnippet>1113</a>            application_id: raw.application_id,
-<a href=#1114 id=1114 data-nosnippet>1114</a>            system_channel_id: raw.system_channel_id,
-<a href=#1115 id=1115 data-nosnippet>1115</a>            system_channel_flags: raw.system_channel_flags,
-<a href=#1116 id=1116 data-nosnippet>1116</a>            rules_channel_id: raw.rules_channel_id,
-<a href=#1117 id=1117 data-nosnippet>1117</a>            max_presences: raw.max_presences,
-<a href=#1118 id=1118 data-nosnippet>1118</a>            max_members: raw.max_members,
-<a href=#1119 id=1119 data-nosnippet>1119</a>            vanity_url_code: raw.vanity_url_code,
-<a href=#1120 id=1120 data-nosnippet>1120</a>            description: raw.description,
-<a href=#1121 id=1121 data-nosnippet>1121</a>            banner: raw.banner,
-<a href=#1122 id=1122 data-nosnippet>1122</a>            premium_tier: raw.premium_tier,
-<a href=#1123 id=1123 data-nosnippet>1123</a>            premium_subscription_count: raw.premium_subscription_count,
-<a href=#1124 id=1124 data-nosnippet>1124</a>            preferred_locale: raw.preferred_locale,
-<a href=#1125 id=1125 data-nosnippet>1125</a>            public_updates_channel_id: raw.public_updates_channel_id,
-<a href=#1126 id=1126 data-nosnippet>1126</a>            max_video_channel_users: raw.max_video_channel_users,
-<a href=#1127 id=1127 data-nosnippet>1127</a>            max_stage_video_channel_users: raw.max_stage_video_channel_users,
-<a href=#1128 id=1128 data-nosnippet>1128</a>            approximate_member_count: raw.approximate_member_count,
-<a href=#1129 id=1129 data-nosnippet>1129</a>            approximate_presence_count: raw.approximate_presence_count,
-<a href=#1130 id=1130 data-nosnippet>1130</a>            welcome_screen: raw.welcome_screen,
-<a href=#1131 id=1131 data-nosnippet>1131</a>            nsfw_level: raw.nsfw_level,
-<a href=#1132 id=1132 data-nosnippet>1132</a>            stickers: raw.stickers,
-<a href=#1133 id=1133 data-nosnippet>1133</a>            joined_at: raw.joined_at,
-<a href=#1134 id=1134 data-nosnippet>1134</a>            member_count: raw.member_count,
-<a href=#1135 id=1135 data-nosnippet>1135</a>            voice_states: raw.voice_states,
-<a href=#1136 id=1136 data-nosnippet>1136</a>            members: raw.members,
-<a href=#1137 id=1137 data-nosnippet>1137</a>            viewable_channels: ExtractMap::new(),
-<a href=#1138 id=1138 data-nosnippet>1138</a>            obfuscated_channels: ExtractMap::new(),
-<a href=#1139 id=1139 data-nosnippet>1139</a>            threads: raw.threads,
-<a href=#1140 id=1140 data-nosnippet>1140</a>            presences: raw.presences,
-<a href=#1141 id=1141 data-nosnippet>1141</a>            stage_instances: raw.stage_instances,
-<a href=#1142 id=1142 data-nosnippet>1142</a>            scheduled_events: raw.guild_scheduled_events,
-<a href=#1143 id=1143 data-nosnippet>1143</a>            safety_alerts_channel_id: raw.safety_alerts_channel_id,
-<a href=#1144 id=1144 data-nosnippet>1144</a>            incidents_data: raw.incidents_data,
-<a href=#1145 id=1145 data-nosnippet>1145</a>            __generated_flags: GuildGeneratedFlags::empty(),
-<a href=#1146 id=1146 data-nosnippet>1146</a>        };
-<a href=#1147 id=1147 data-nosnippet>1147</a>
-<a href=#1148 id=1148 data-nosnippet>1148</a>        guild.set_large(large);
-<a href=#1149 id=1149 data-nosnippet>1149</a>        guild.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
-<a href=#1150 id=1150 data-nosnippet>1150</a>        guild.set_unavailable(unavailable);
-<a href=#1151 id=1151 data-nosnippet>1151</a>        guild.set_widget_enabled(widget_enabled);
-<a href=#1152 id=1152 data-nosnippet>1152</a>
-<a href=#1153 id=1153 data-nosnippet>1153</a>        <span class="kw">for </span>channel <span class="kw">in </span>raw.channels {
-<a href=#1154 id=1154 data-nosnippet>1154</a>            <span class="kw">if </span>channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
-<a href=#1155 id=1155 data-nosnippet>1155</a>                guild.obfuscated_channels.insert(channel.into());
-<a href=#1156 id=1156 data-nosnippet>1156</a>            } <span class="kw">else </span>{
-<a href=#1157 id=1157 data-nosnippet>1157</a>                guild.viewable_channels.insert(channel);
-<a href=#1158 id=1158 data-nosnippet>1158</a>            }
-<a href=#1159 id=1159 data-nosnippet>1159</a>        }
-<a href=#1160 id=1160 data-nosnippet>1160</a>
-<a href=#1161 id=1161 data-nosnippet>1161</a>        <span class="prelude-val">Ok</span>(guild)
-<a href=#1162 id=1162 data-nosnippet>1162</a>    }
-<a href=#1163 id=1163 data-nosnippet>1163</a>}
+<a href=#891 id=891 data-nosnippet>891</a>    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+<a href=#892 id=892 data-nosnippet>892</a>    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+<a href=#893 id=893 data-nosnippet>893</a>    /// the member.
+<a href=#894 id=894 data-nosnippet>894</a>    ///
+<a href=#895 id=895 data-nosnippet>895</a>    /// To circumvent this limitation, apply [implicit permission masking], or calculate
+<a href=#896 id=896 data-nosnippet>896</a>    /// permissions with a [`GenericChannelId`] and [`UserId`] only, at the expense of an HTTP
+<a href=#897 id=897 data-nosnippet>897</a>    /// call, use [`GenericChannelId::member_permissions`].
+<a href=#898 id=898 data-nosnippet>898</a>    ///
+<a href=#899 id=899 data-nosnippet>899</a>    /// # Panics
+<a href=#900 id=900 data-nosnippet>900</a>    ///
+<a href=#901 id=901 data-nosnippet>901</a>    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+<a href=#902 id=902 data-nosnippet>902</a>    ///
+<a href=#903 id=903 data-nosnippet>903</a>    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+<a href=#904 id=904 data-nosnippet>904</a>    </span><span class="attr">#[must_use]
+<a href=#905 id=905 data-nosnippet>905</a>    </span><span class="kw">pub fn </span>partial_member_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#906 id=906 data-nosnippet>906</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#907 id=907 data-nosnippet>907</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
+<a href=#908 id=908 data-nosnippet>908</a>        member_id: UserId,
+<a href=#909 id=909 data-nosnippet>909</a>        member: <span class="kw-2">&amp;</span>PartialMember,
+<a href=#910 id=910 data-nosnippet>910</a>    ) -&gt; Permissions {
+<a href=#911 id=911 data-nosnippet>911</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="kw-2">&amp;</span>member.user {
+<a href=#912 id=912 data-nosnippet>912</a>            <span class="macro">assert_eq!</span>(user.id, member_id, <span class="string">"User::id does not match provided PartialMember"</span>);
+<a href=#913 id=913 data-nosnippet>913</a>        }
+<a href=#914 id=914 data-nosnippet>914</a>
+<a href=#915 id=915 data-nosnippet>915</a>        <span class="self">Self</span>::user_permissions_in_(
+<a href=#916 id=916 data-nosnippet>916</a>            <span class="prelude-val">Some</span>(channel.into()),
+<a href=#917 id=917 data-nosnippet>917</a>            member_id,
+<a href=#918 id=918 data-nosnippet>918</a>            <span class="kw-2">&amp;</span>member.roles,
+<a href=#919 id=919 data-nosnippet>919</a>            <span class="self">self</span>.id,
+<a href=#920 id=920 data-nosnippet>920</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+<a href=#921 id=921 data-nosnippet>921</a>            <span class="self">self</span>.owner_id,
+<a href=#922 id=922 data-nosnippet>922</a>        )
+<a href=#923 id=923 data-nosnippet>923</a>    }
+<a href=#924 id=924 data-nosnippet>924</a>
+<a href=#925 id=925 data-nosnippet>925</a>    <span class="doccomment">/// Helper function that can also be used from [`PartialGuild`].
+<a href=#926 id=926 data-nosnippet>926</a>    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>user_permissions_in_(
+<a href=#927 id=927 data-nosnippet>927</a>        channel: <span class="prelude-ty">Option</span>&lt;GuildChannelRef&gt;,
+<a href=#928 id=928 data-nosnippet>928</a>        member_user_id: UserId,
+<a href=#929 id=929 data-nosnippet>929</a>        member_roles: <span class="kw-2">&amp;</span>[RoleId],
+<a href=#930 id=930 data-nosnippet>930</a>        guild_id: GuildId,
+<a href=#931 id=931 data-nosnippet>931</a>        guild_roles: <span class="kw-2">&amp;</span>ExtractMap&lt;RoleId, Role&gt;,
+<a href=#932 id=932 data-nosnippet>932</a>        guild_owner_id: UserId,
+<a href=#933 id=933 data-nosnippet>933</a>    ) -&gt; Permissions {
+<a href=#934 id=934 data-nosnippet>934</a>        <span class="kw">let </span><span class="kw-2">mut </span>everyone_allow_overwrites = Permissions::empty();
+<a href=#935 id=935 data-nosnippet>935</a>        <span class="kw">let </span><span class="kw-2">mut </span>everyone_deny_overwrites = Permissions::empty();
+<a href=#936 id=936 data-nosnippet>936</a>        <span class="kw">let </span><span class="kw-2">mut </span>roles_allow_overwrites = Vec::new();
+<a href=#937 id=937 data-nosnippet>937</a>        <span class="kw">let </span><span class="kw-2">mut </span>roles_deny_overwrites = Vec::new();
+<a href=#938 id=938 data-nosnippet>938</a>        <span class="kw">let </span><span class="kw-2">mut </span>member_allow_overwrites = Permissions::empty();
+<a href=#939 id=939 data-nosnippet>939</a>        <span class="kw">let </span><span class="kw-2">mut </span>member_deny_overwrites = Permissions::empty();
+<a href=#940 id=940 data-nosnippet>940</a>
+<a href=#941 id=941 data-nosnippet>941</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(channel) = channel {
+<a href=#942 id=942 data-nosnippet>942</a>            <span class="kw">match </span>channel {
+<a href=#943 id=943 data-nosnippet>943</a>                GuildChannelRef::Viewable(guild_channel) =&gt; {
+<a href=#944 id=944 data-nosnippet>944</a>                    <span class="kw">for </span>overwrite <span class="kw">in </span><span class="kw-2">&amp;</span>guild_channel.permission_overwrites {
+<a href=#945 id=945 data-nosnippet>945</a>                        <span class="kw">match </span>overwrite.kind {
+<a href=#946 id=946 data-nosnippet>946</a>                            PermissionOverwriteType::Member(user_id) =&gt; {
+<a href=#947 id=947 data-nosnippet>947</a>                                <span class="kw">if </span>member_user_id == user_id {
+<a href=#948 id=948 data-nosnippet>948</a>                                    member_allow_overwrites = overwrite.allow;
+<a href=#949 id=949 data-nosnippet>949</a>                                    member_deny_overwrites = overwrite.deny;
+<a href=#950 id=950 data-nosnippet>950</a>                                }
+<a href=#951 id=951 data-nosnippet>951</a>                            },
+<a href=#952 id=952 data-nosnippet>952</a>                            PermissionOverwriteType::Role(role_id) =&gt; {
+<a href=#953 id=953 data-nosnippet>953</a>                                <span class="kw">if </span>role_id.get() == guild_id.get() {
+<a href=#954 id=954 data-nosnippet>954</a>                                    everyone_allow_overwrites = overwrite.allow;
+<a href=#955 id=955 data-nosnippet>955</a>                                    everyone_deny_overwrites = overwrite.deny;
+<a href=#956 id=956 data-nosnippet>956</a>                                } <span class="kw">else if </span>member_roles.contains(<span class="kw-2">&amp;</span>role_id) {
+<a href=#957 id=957 data-nosnippet>957</a>                                    roles_allow_overwrites.push(overwrite.allow);
+<a href=#958 id=958 data-nosnippet>958</a>                                    roles_deny_overwrites.push(overwrite.deny);
+<a href=#959 id=959 data-nosnippet>959</a>                                }
+<a href=#960 id=960 data-nosnippet>960</a>                            },
+<a href=#961 id=961 data-nosnippet>961</a>                        }
+<a href=#962 id=962 data-nosnippet>962</a>                    }
+<a href=#963 id=963 data-nosnippet>963</a>                },
+<a href=#964 id=964 data-nosnippet>964</a>                GuildChannelRef::Obfuscated(<span class="kw">_</span>) =&gt; {
+<a href=#965 id=965 data-nosnippet>965</a>                    everyone_deny_overwrites = Permissions::VIEW_CHANNEL;
+<a href=#966 id=966 data-nosnippet>966</a>                },
+<a href=#967 id=967 data-nosnippet>967</a>            }
+<a href=#968 id=968 data-nosnippet>968</a>        }
+<a href=#969 id=969 data-nosnippet>969</a>
+<a href=#970 id=970 data-nosnippet>970</a>        calculate_permissions(CalculatePermissions {
+<a href=#971 id=971 data-nosnippet>971</a>            is_guild_owner: member_user_id == guild_owner_id,
+<a href=#972 id=972 data-nosnippet>972</a>            everyone_permissions: <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(<span class="kw-2">&amp;</span>RoleId::new(guild_id.get()))
+<a href=#973 id=973 data-nosnippet>973</a>            {
+<a href=#974 id=974 data-nosnippet>974</a>                role.permissions
+<a href=#975 id=975 data-nosnippet>975</a>            } <span class="kw">else </span>{
+<a href=#976 id=976 data-nosnippet>976</a>                <span class="macro">error!</span>(<span class="string">"@everyone role missing in {}"</span>, guild_id);
+<a href=#977 id=977 data-nosnippet>977</a>                Permissions::empty()
+<a href=#978 id=978 data-nosnippet>978</a>            },
+<a href=#979 id=979 data-nosnippet>979</a>            user_roles_permissions: member_roles
+<a href=#980 id=980 data-nosnippet>980</a>                .iter()
+<a href=#981 id=981 data-nosnippet>981</a>                .map(|role_id| {
+<a href=#982 id=982 data-nosnippet>982</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(role) = guild_roles.get(role_id) {
+<a href=#983 id=983 data-nosnippet>983</a>                        role.permissions
+<a href=#984 id=984 data-nosnippet>984</a>                    } <span class="kw">else </span>{
+<a href=#985 id=985 data-nosnippet>985</a>                        <span class="macro">warn!</span>(
+<a href=#986 id=986 data-nosnippet>986</a>                            <span class="string">"{} on {} has non-existent role {:?}"</span>,
+<a href=#987 id=987 data-nosnippet>987</a>                            member_user_id, guild_id, role_id
+<a href=#988 id=988 data-nosnippet>988</a>                        );
+<a href=#989 id=989 data-nosnippet>989</a>                        Permissions::empty()
+<a href=#990 id=990 data-nosnippet>990</a>                    }
+<a href=#991 id=991 data-nosnippet>991</a>                })
+<a href=#992 id=992 data-nosnippet>992</a>                .collect(),
+<a href=#993 id=993 data-nosnippet>993</a>            everyone_allow_overwrites,
+<a href=#994 id=994 data-nosnippet>994</a>            everyone_deny_overwrites,
+<a href=#995 id=995 data-nosnippet>995</a>            roles_allow_overwrites,
+<a href=#996 id=996 data-nosnippet>996</a>            roles_deny_overwrites,
+<a href=#997 id=997 data-nosnippet>997</a>            member_allow_overwrites,
+<a href=#998 id=998 data-nosnippet>998</a>            member_deny_overwrites,
+<a href=#999 id=999 data-nosnippet>999</a>        })
+<a href=#1000 id=1000 data-nosnippet>1000</a>    }
+<a href=#1001 id=1001 data-nosnippet>1001</a>
+<a href=#1002 id=1002 data-nosnippet>1002</a>    <span class="doccomment">/// Returns the formatted URL of the guild's splash image, if one exists.
+<a href=#1003 id=1003 data-nosnippet>1003</a>    </span><span class="attr">#[must_use]
+<a href=#1004 id=1004 data-nosnippet>1004</a>    </span><span class="kw">pub fn </span>splash_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#1005 id=1005 data-nosnippet>1005</a>        <span class="self">self</span>.splash.as_ref().map(|splash| <span class="macro">cdn!</span>(<span class="string">"/splashes/{}/{}.webp?size=4096"</span>, <span class="self">self</span>.id, splash))
+<a href=#1006 id=1006 data-nosnippet>1006</a>    }
+<a href=#1007 id=1007 data-nosnippet>1007</a>
+<a href=#1008 id=1008 data-nosnippet>1008</a>    <span class="doccomment">/// Obtain a reference to a role by its name.
+<a href=#1009 id=1009 data-nosnippet>1009</a>    ///
+<a href=#1010 id=1010 data-nosnippet>1010</a>    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
+<a href=#1011 id=1011 data-nosnippet>1011</a>    ///
+<a href=#1012 id=1012 data-nosnippet>1012</a>    /// # Examples
+<a href=#1013 id=1013 data-nosnippet>1013</a>    ///
+<a href=#1014 id=1014 data-nosnippet>1014</a>    /// Obtain a reference to a [`Role`] by its name.
+<a href=#1015 id=1015 data-nosnippet>1015</a>    ///
+<a href=#1016 id=1016 data-nosnippet>1016</a>    /// ```rust,no_run
+<a href=#1017 id=1017 data-nosnippet>1017</a>    /// # use serenity::model::prelude::*;
+<a href=#1018 id=1018 data-nosnippet>1018</a>    /// # use serenity::prelude::*;
+<a href=#1019 id=1019 data-nosnippet>1019</a>    ///
+<a href=#1020 id=1020 data-nosnippet>1020</a>    /// # #[cfg(feature = "cache")]
+<a href=#1021 id=1021 data-nosnippet>1021</a>    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+<a href=#1022 id=1022 data-nosnippet>1022</a>    /// # let cache: serenity::cache::Cache = unimplemented!();
+<a href=#1023 id=1023 data-nosnippet>1023</a>    /// # let msg: Message = unimplemented!();
+<a href=#1024 id=1024 data-nosnippet>1024</a>    ///
+<a href=#1025 id=1025 data-nosnippet>1025</a>    /// if let Some(guild_id) = msg.guild_id {
+<a href=#1026 id=1026 data-nosnippet>1026</a>    ///     if let Some(guild) = guild_id.to_guild_cached(&amp;cache) {
+<a href=#1027 id=1027 data-nosnippet>1027</a>    ///         if let Some(role) = guild.role_by_name("role_name") {
+<a href=#1028 id=1028 data-nosnippet>1028</a>    ///             println!("{:?}", role);
+<a href=#1029 id=1029 data-nosnippet>1029</a>    ///         }
+<a href=#1030 id=1030 data-nosnippet>1030</a>    ///     }
+<a href=#1031 id=1031 data-nosnippet>1031</a>    /// }
+<a href=#1032 id=1032 data-nosnippet>1032</a>    ///
+<a href=#1033 id=1033 data-nosnippet>1033</a>    /// # Ok(())
+<a href=#1034 id=1034 data-nosnippet>1034</a>    /// # }
+<a href=#1035 id=1035 data-nosnippet>1035</a>    /// ```
+<a href=#1036 id=1036 data-nosnippet>1036</a>    </span><span class="attr">#[must_use]
+<a href=#1037 id=1037 data-nosnippet>1037</a>    </span><span class="kw">pub fn </span>role_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, role_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
+<a href=#1038 id=1038 data-nosnippet>1038</a>        <span class="self">self</span>.roles.iter().find(|role| role_name == <span class="kw-2">&amp;*</span>role.name)
+<a href=#1039 id=1039 data-nosnippet>1039</a>    }
+<a href=#1040 id=1040 data-nosnippet>1040</a>}
+<a href=#1041 id=1041 data-nosnippet>1041</a>
+<a href=#1042 id=1042 data-nosnippet>1042</a><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>Guild {
+<a href=#1043 id=1043 data-nosnippet>1043</a>    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt; {
+<a href=#1044 id=1044 data-nosnippet>1044</a>        <span class="attr">#[bool_to_bitflags::bool_to_bitflags]
+<a href=#1045 id=1045 data-nosnippet>1045</a>        #[derive(serde::Deserialize)]
+<a href=#1046 id=1046 data-nosnippet>1046</a>        </span><span class="kw">struct </span>GuildRaw {
+<a href=#1047 id=1047 data-nosnippet>1047</a>            id: GuildId,
+<a href=#1048 id=1048 data-nosnippet>1048</a>            name: FixedString,
+<a href=#1049 id=1049 data-nosnippet>1049</a>            icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
+<a href=#1050 id=1050 data-nosnippet>1050</a>            icon_hash: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
+<a href=#1051 id=1051 data-nosnippet>1051</a>            splash: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
+<a href=#1052 id=1052 data-nosnippet>1052</a>            discovery_splash: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
+<a href=#1053 id=1053 data-nosnippet>1053</a>            owner_id: UserId,
+<a href=#1054 id=1054 data-nosnippet>1054</a>            <span class="attr">#[serde(flatten)]
+<a href=#1055 id=1055 data-nosnippet>1055</a>            </span>afk_metadata: <span class="prelude-ty">Option</span>&lt;AfkMetadata&gt;,
+<a href=#1056 id=1056 data-nosnippet>1056</a>            widget_enabled: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+<a href=#1057 id=1057 data-nosnippet>1057</a>            widget_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+<a href=#1058 id=1058 data-nosnippet>1058</a>            verification_level: VerificationLevel,
+<a href=#1059 id=1059 data-nosnippet>1059</a>            default_message_notifications: DefaultMessageNotificationLevel,
+<a href=#1060 id=1060 data-nosnippet>1060</a>            explicit_content_filter: ExplicitContentFilter,
+<a href=#1061 id=1061 data-nosnippet>1061</a>            roles: ExtractMap&lt;RoleId, Role&gt;,
+<a href=#1062 id=1062 data-nosnippet>1062</a>            emojis: ExtractMap&lt;EmojiId, Emoji&gt;,
+<a href=#1063 id=1063 data-nosnippet>1063</a>            features: FixedArray&lt;FixedString&gt;,
+<a href=#1064 id=1064 data-nosnippet>1064</a>            mfa_level: MfaLevel,
+<a href=#1065 id=1065 data-nosnippet>1065</a>            application_id: <span class="prelude-ty">Option</span>&lt;ApplicationId&gt;,
+<a href=#1066 id=1066 data-nosnippet>1066</a>            system_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+<a href=#1067 id=1067 data-nosnippet>1067</a>            system_channel_flags: SystemChannelFlags,
+<a href=#1068 id=1068 data-nosnippet>1068</a>            rules_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+<a href=#1069 id=1069 data-nosnippet>1069</a>            max_presences: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1070 id=1070 data-nosnippet>1070</a>            max_members: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1071 id=1071 data-nosnippet>1071</a>            vanity_url_code: <span class="prelude-ty">Option</span>&lt;FixedString&lt;u8&gt;&gt;,
+<a href=#1072 id=1072 data-nosnippet>1072</a>            description: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
+<a href=#1073 id=1073 data-nosnippet>1073</a>            banner: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
+<a href=#1074 id=1074 data-nosnippet>1074</a>            premium_tier: PremiumTier,
+<a href=#1075 id=1075 data-nosnippet>1075</a>            premium_subscription_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1076 id=1076 data-nosnippet>1076</a>            preferred_locale: FixedString&lt;u8&gt;,
+<a href=#1077 id=1077 data-nosnippet>1077</a>            public_updates_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+<a href=#1078 id=1078 data-nosnippet>1078</a>            max_video_channel_users: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1079 id=1079 data-nosnippet>1079</a>            max_stage_video_channel_users: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1080 id=1080 data-nosnippet>1080</a>            approximate_member_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1081 id=1081 data-nosnippet>1081</a>            approximate_presence_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1082 id=1082 data-nosnippet>1082</a>            welcome_screen: <span class="prelude-ty">Option</span>&lt;GuildWelcomeScreen&gt;,
+<a href=#1083 id=1083 data-nosnippet>1083</a>            nsfw_level: NsfwLevel,
+<a href=#1084 id=1084 data-nosnippet>1084</a>            stickers: ExtractMap&lt;StickerId, Sticker&gt;,
+<a href=#1085 id=1085 data-nosnippet>1085</a>            premium_progress_bar_enabled: bool,
+<a href=#1086 id=1086 data-nosnippet>1086</a>            joined_at: Timestamp,
+<a href=#1087 id=1087 data-nosnippet>1087</a>            large: bool,
+<a href=#1088 id=1088 data-nosnippet>1088</a>            <span class="attr">#[serde(default)]
+<a href=#1089 id=1089 data-nosnippet>1089</a>            </span>unavailable: bool,
+<a href=#1090 id=1090 data-nosnippet>1090</a>            member_count: MemberCount,
+<a href=#1091 id=1091 data-nosnippet>1091</a>            voice_states: ExtractMap&lt;UserId, VoiceState&gt;,
+<a href=#1092 id=1092 data-nosnippet>1092</a>            members: ExtractMap&lt;UserId, Member&gt;,
+<a href=#1093 id=1093 data-nosnippet>1093</a>            channels: Vec&lt;GuildChannel&gt;,
+<a href=#1094 id=1094 data-nosnippet>1094</a>            threads: ExtractMap&lt;ThreadId, GuildThread&gt;,
+<a href=#1095 id=1095 data-nosnippet>1095</a>            presences: ExtractMap&lt;UserId, Presence&gt;,
+<a href=#1096 id=1096 data-nosnippet>1096</a>            stage_instances: FixedArray&lt;StageInstance&gt;,
+<a href=#1097 id=1097 data-nosnippet>1097</a>            guild_scheduled_events: ExtractMap&lt;ScheduledEventId, ScheduledEvent&gt;,
+<a href=#1098 id=1098 data-nosnippet>1098</a>            safety_alerts_channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+<a href=#1099 id=1099 data-nosnippet>1099</a>            incidents_data: <span class="prelude-ty">Option</span>&lt;Box&lt;IncidentsData&gt;&gt;,
+<a href=#1100 id=1100 data-nosnippet>1100</a>        }
+<a href=#1101 id=1101 data-nosnippet>1101</a>
+<a href=#1102 id=1102 data-nosnippet>1102</a>        <span class="kw">let </span>raw = GuildRaw::deserialize(deserializer)<span class="question-mark">?</span>;
+<a href=#1103 id=1103 data-nosnippet>1103</a>        <span class="kw">let </span>large = raw.large();
+<a href=#1104 id=1104 data-nosnippet>1104</a>        <span class="kw">let </span>premium_progress_bar_enabled = raw.premium_progress_bar_enabled();
+<a href=#1105 id=1105 data-nosnippet>1105</a>        <span class="kw">let </span>unavailable = raw.unavailable();
+<a href=#1106 id=1106 data-nosnippet>1106</a>        <span class="kw">let </span>widget_enabled = raw.widget_enabled();
+<a href=#1107 id=1107 data-nosnippet>1107</a>
+<a href=#1108 id=1108 data-nosnippet>1108</a>        <span class="kw">let </span><span class="kw-2">mut </span>guild = Guild {
+<a href=#1109 id=1109 data-nosnippet>1109</a>            id: raw.id,
+<a href=#1110 id=1110 data-nosnippet>1110</a>            name: raw.name,
+<a href=#1111 id=1111 data-nosnippet>1111</a>            icon: raw.icon,
+<a href=#1112 id=1112 data-nosnippet>1112</a>            icon_hash: raw.icon_hash,
+<a href=#1113 id=1113 data-nosnippet>1113</a>            splash: raw.splash,
+<a href=#1114 id=1114 data-nosnippet>1114</a>            discovery_splash: raw.discovery_splash,
+<a href=#1115 id=1115 data-nosnippet>1115</a>            owner_id: raw.owner_id,
+<a href=#1116 id=1116 data-nosnippet>1116</a>            afk_metadata: raw.afk_metadata,
+<a href=#1117 id=1117 data-nosnippet>1117</a>            widget_channel_id: raw.widget_channel_id,
+<a href=#1118 id=1118 data-nosnippet>1118</a>            verification_level: raw.verification_level,
+<a href=#1119 id=1119 data-nosnippet>1119</a>            default_message_notifications: raw.default_message_notifications,
+<a href=#1120 id=1120 data-nosnippet>1120</a>            explicit_content_filter: raw.explicit_content_filter,
+<a href=#1121 id=1121 data-nosnippet>1121</a>            roles: raw.roles,
+<a href=#1122 id=1122 data-nosnippet>1122</a>            emojis: raw.emojis,
+<a href=#1123 id=1123 data-nosnippet>1123</a>            features: raw.features,
+<a href=#1124 id=1124 data-nosnippet>1124</a>            mfa_level: raw.mfa_level,
+<a href=#1125 id=1125 data-nosnippet>1125</a>            application_id: raw.application_id,
+<a href=#1126 id=1126 data-nosnippet>1126</a>            system_channel_id: raw.system_channel_id,
+<a href=#1127 id=1127 data-nosnippet>1127</a>            system_channel_flags: raw.system_channel_flags,
+<a href=#1128 id=1128 data-nosnippet>1128</a>            rules_channel_id: raw.rules_channel_id,
+<a href=#1129 id=1129 data-nosnippet>1129</a>            max_presences: raw.max_presences,
+<a href=#1130 id=1130 data-nosnippet>1130</a>            max_members: raw.max_members,
+<a href=#1131 id=1131 data-nosnippet>1131</a>            vanity_url_code: raw.vanity_url_code,
+<a href=#1132 id=1132 data-nosnippet>1132</a>            description: raw.description,
+<a href=#1133 id=1133 data-nosnippet>1133</a>            banner: raw.banner,
+<a href=#1134 id=1134 data-nosnippet>1134</a>            premium_tier: raw.premium_tier,
+<a href=#1135 id=1135 data-nosnippet>1135</a>            premium_subscription_count: raw.premium_subscription_count,
+<a href=#1136 id=1136 data-nosnippet>1136</a>            preferred_locale: raw.preferred_locale,
+<a href=#1137 id=1137 data-nosnippet>1137</a>            public_updates_channel_id: raw.public_updates_channel_id,
+<a href=#1138 id=1138 data-nosnippet>1138</a>            max_video_channel_users: raw.max_video_channel_users,
+<a href=#1139 id=1139 data-nosnippet>1139</a>            max_stage_video_channel_users: raw.max_stage_video_channel_users,
+<a href=#1140 id=1140 data-nosnippet>1140</a>            approximate_member_count: raw.approximate_member_count,
+<a href=#1141 id=1141 data-nosnippet>1141</a>            approximate_presence_count: raw.approximate_presence_count,
+<a href=#1142 id=1142 data-nosnippet>1142</a>            welcome_screen: raw.welcome_screen,
+<a href=#1143 id=1143 data-nosnippet>1143</a>            nsfw_level: raw.nsfw_level,
+<a href=#1144 id=1144 data-nosnippet>1144</a>            stickers: raw.stickers,
+<a href=#1145 id=1145 data-nosnippet>1145</a>            joined_at: raw.joined_at,
+<a href=#1146 id=1146 data-nosnippet>1146</a>            member_count: raw.member_count,
+<a href=#1147 id=1147 data-nosnippet>1147</a>            voice_states: raw.voice_states,
+<a href=#1148 id=1148 data-nosnippet>1148</a>            members: raw.members,
+<a href=#1149 id=1149 data-nosnippet>1149</a>            viewable_channels: ExtractMap::new(),
+<a href=#1150 id=1150 data-nosnippet>1150</a>            obfuscated_channels: ExtractMap::new(),
+<a href=#1151 id=1151 data-nosnippet>1151</a>            threads: raw.threads,
+<a href=#1152 id=1152 data-nosnippet>1152</a>            presences: raw.presences,
+<a href=#1153 id=1153 data-nosnippet>1153</a>            stage_instances: raw.stage_instances,
+<a href=#1154 id=1154 data-nosnippet>1154</a>            scheduled_events: raw.guild_scheduled_events,
+<a href=#1155 id=1155 data-nosnippet>1155</a>            safety_alerts_channel_id: raw.safety_alerts_channel_id,
+<a href=#1156 id=1156 data-nosnippet>1156</a>            incidents_data: raw.incidents_data,
+<a href=#1157 id=1157 data-nosnippet>1157</a>            __generated_flags: GuildGeneratedFlags::empty(),
+<a href=#1158 id=1158 data-nosnippet>1158</a>        };
+<a href=#1159 id=1159 data-nosnippet>1159</a>
+<a href=#1160 id=1160 data-nosnippet>1160</a>        guild.set_large(large);
+<a href=#1161 id=1161 data-nosnippet>1161</a>        guild.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
+<a href=#1162 id=1162 data-nosnippet>1162</a>        guild.set_unavailable(unavailable);
+<a href=#1163 id=1163 data-nosnippet>1163</a>        guild.set_widget_enabled(widget_enabled);
 <a href=#1164 id=1164 data-nosnippet>1164</a>
-<a href=#1165 id=1165 data-nosnippet>1165</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1166 id=1166 data-nosnippet>1166</a></span><span class="kw">struct </span>CalculatePermissions {
-<a href=#1167 id=1167 data-nosnippet>1167</a>    <span class="doccomment">/// Whether the guild member is the guild owner
-<a href=#1168 id=1168 data-nosnippet>1168</a>    </span><span class="kw">pub </span>is_guild_owner: bool,
-<a href=#1169 id=1169 data-nosnippet>1169</a>    <span class="doccomment">/// Base permissions given to @everyone (guild level)
-<a href=#1170 id=1170 data-nosnippet>1170</a>    </span><span class="kw">pub </span>everyone_permissions: Permissions,
-<a href=#1171 id=1171 data-nosnippet>1171</a>    <span class="doccomment">/// Permissions allowed to a user by their roles (guild level)
-<a href=#1172 id=1172 data-nosnippet>1172</a>    </span><span class="kw">pub </span>user_roles_permissions: Vec&lt;Permissions&gt;,
-<a href=#1173 id=1173 data-nosnippet>1173</a>    <span class="doccomment">/// Overwrites that deny permissions for @everyone (channel level)
-<a href=#1174 id=1174 data-nosnippet>1174</a>    </span><span class="kw">pub </span>everyone_allow_overwrites: Permissions,
-<a href=#1175 id=1175 data-nosnippet>1175</a>    <span class="doccomment">/// Overwrites that allow permissions for @everyone (channel level)
-<a href=#1176 id=1176 data-nosnippet>1176</a>    </span><span class="kw">pub </span>everyone_deny_overwrites: Permissions,
-<a href=#1177 id=1177 data-nosnippet>1177</a>    <span class="doccomment">/// Overwrites that deny permissions for specific roles (channel level)
-<a href=#1178 id=1178 data-nosnippet>1178</a>    </span><span class="kw">pub </span>roles_allow_overwrites: Vec&lt;Permissions&gt;,
-<a href=#1179 id=1179 data-nosnippet>1179</a>    <span class="doccomment">/// Overwrites that allow permissions for specific roles (channel level)
-<a href=#1180 id=1180 data-nosnippet>1180</a>    </span><span class="kw">pub </span>roles_deny_overwrites: Vec&lt;Permissions&gt;,
-<a href=#1181 id=1181 data-nosnippet>1181</a>    <span class="doccomment">/// Member-specific overwrites that deny permissions (channel level)
-<a href=#1182 id=1182 data-nosnippet>1182</a>    </span><span class="kw">pub </span>member_allow_overwrites: Permissions,
-<a href=#1183 id=1183 data-nosnippet>1183</a>    <span class="doccomment">/// Member-specific overwrites that allow permissions (channel level)
-<a href=#1184 id=1184 data-nosnippet>1184</a>    </span><span class="kw">pub </span>member_deny_overwrites: Permissions,
-<a href=#1185 id=1185 data-nosnippet>1185</a>}
-<a href=#1186 id=1186 data-nosnippet>1186</a>
-<a href=#1187 id=1187 data-nosnippet>1187</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1188 id=1188 data-nosnippet>1188</a></span><span class="kw">impl </span>Default <span class="kw">for </span>CalculatePermissions {
-<a href=#1189 id=1189 data-nosnippet>1189</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-<a href=#1190 id=1190 data-nosnippet>1190</a>        <span class="self">Self </span>{
-<a href=#1191 id=1191 data-nosnippet>1191</a>            is_guild_owner: <span class="bool-val">false</span>,
-<a href=#1192 id=1192 data-nosnippet>1192</a>            everyone_permissions: Permissions::empty(),
-<a href=#1193 id=1193 data-nosnippet>1193</a>            user_roles_permissions: Vec::new(),
-<a href=#1194 id=1194 data-nosnippet>1194</a>            everyone_allow_overwrites: Permissions::empty(),
-<a href=#1195 id=1195 data-nosnippet>1195</a>            everyone_deny_overwrites: Permissions::empty(),
-<a href=#1196 id=1196 data-nosnippet>1196</a>            roles_allow_overwrites: Vec::new(),
-<a href=#1197 id=1197 data-nosnippet>1197</a>            roles_deny_overwrites: Vec::new(),
-<a href=#1198 id=1198 data-nosnippet>1198</a>            member_allow_overwrites: Permissions::empty(),
-<a href=#1199 id=1199 data-nosnippet>1199</a>            member_deny_overwrites: Permissions::empty(),
-<a href=#1200 id=1200 data-nosnippet>1200</a>        }
-<a href=#1201 id=1201 data-nosnippet>1201</a>    }
-<a href=#1202 id=1202 data-nosnippet>1202</a>}
-<a href=#1203 id=1203 data-nosnippet>1203</a>
-<a href=#1204 id=1204 data-nosnippet>1204</a><span class="doccomment">/// Translated from the pseudo code at https://docs.discord.com/developers/topics/permissions#permission-overwrites
-<a href=#1205 id=1205 data-nosnippet>1205</a>///
-<a href=#1206 id=1206 data-nosnippet>1206</a>/// The comments within this file refer to the above link
-<a href=#1207 id=1207 data-nosnippet>1207</a></span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1208 id=1208 data-nosnippet>1208</a></span><span class="kw">fn </span>calculate_permissions(data: CalculatePermissions) -&gt; Permissions {
-<a href=#1209 id=1209 data-nosnippet>1209</a>    <span class="kw">if </span>data.is_guild_owner {
-<a href=#1210 id=1210 data-nosnippet>1210</a>        <span class="kw">return </span>Permissions::all();
-<a href=#1211 id=1211 data-nosnippet>1211</a>    }
-<a href=#1212 id=1212 data-nosnippet>1212</a>
-<a href=#1213 id=1213 data-nosnippet>1213</a>    <span class="comment">// 1. Base permissions given to @everyone are applied at a guild level
-<a href=#1214 id=1214 data-nosnippet>1214</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>permissions = data.everyone_permissions;
-<a href=#1215 id=1215 data-nosnippet>1215</a>    <span class="comment">// 2. Permissions allowed to a user by their roles are applied at a guild level
-<a href=#1216 id=1216 data-nosnippet>1216</a>    </span><span class="kw">for </span>role_permission <span class="kw">in </span>data.user_roles_permissions {
-<a href=#1217 id=1217 data-nosnippet>1217</a>        permissions |= role_permission;
-<a href=#1218 id=1218 data-nosnippet>1218</a>    }
-<a href=#1219 id=1219 data-nosnippet>1219</a>
-<a href=#1220 id=1220 data-nosnippet>1220</a>    <span class="kw">if </span>permissions.contains(Permissions::ADMINISTRATOR) {
-<a href=#1221 id=1221 data-nosnippet>1221</a>        <span class="kw">return </span>Permissions::all();
-<a href=#1222 id=1222 data-nosnippet>1222</a>    }
-<a href=#1223 id=1223 data-nosnippet>1223</a>
-<a href=#1224 id=1224 data-nosnippet>1224</a>    <span class="comment">// 3. Overwrites that deny permissions for @everyone are applied at a channel level
-<a href=#1225 id=1225 data-nosnippet>1225</a>    </span>permissions &amp;= !data.everyone_deny_overwrites;
-<a href=#1226 id=1226 data-nosnippet>1226</a>    <span class="comment">// 4. Overwrites that allow permissions for @everyone are applied at a channel level
-<a href=#1227 id=1227 data-nosnippet>1227</a>    </span>permissions |= data.everyone_allow_overwrites;
-<a href=#1228 id=1228 data-nosnippet>1228</a>
-<a href=#1229 id=1229 data-nosnippet>1229</a>    <span class="comment">// 5. Overwrites that deny permissions for specific roles are applied at a channel level
-<a href=#1230 id=1230 data-nosnippet>1230</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>role_deny_permissions = Permissions::empty();
-<a href=#1231 id=1231 data-nosnippet>1231</a>    <span class="kw">for </span>p <span class="kw">in </span>data.roles_deny_overwrites {
-<a href=#1232 id=1232 data-nosnippet>1232</a>        role_deny_permissions |= p;
-<a href=#1233 id=1233 data-nosnippet>1233</a>    }
-<a href=#1234 id=1234 data-nosnippet>1234</a>    permissions &amp;= !role_deny_permissions;
+<a href=#1165 id=1165 data-nosnippet>1165</a>        <span class="kw">for </span>channel <span class="kw">in </span>raw.channels {
+<a href=#1166 id=1166 data-nosnippet>1166</a>            <span class="kw">if </span>channel.flags.contains(ChannelFlags::CHANNEL_OBFUSCATED) {
+<a href=#1167 id=1167 data-nosnippet>1167</a>                guild.obfuscated_channels.insert(channel.into());
+<a href=#1168 id=1168 data-nosnippet>1168</a>            } <span class="kw">else </span>{
+<a href=#1169 id=1169 data-nosnippet>1169</a>                guild.viewable_channels.insert(channel);
+<a href=#1170 id=1170 data-nosnippet>1170</a>            }
+<a href=#1171 id=1171 data-nosnippet>1171</a>        }
+<a href=#1172 id=1172 data-nosnippet>1172</a>
+<a href=#1173 id=1173 data-nosnippet>1173</a>        <span class="prelude-val">Ok</span>(guild)
+<a href=#1174 id=1174 data-nosnippet>1174</a>    }
+<a href=#1175 id=1175 data-nosnippet>1175</a>}
+<a href=#1176 id=1176 data-nosnippet>1176</a>
+<a href=#1177 id=1177 data-nosnippet>1177</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1178 id=1178 data-nosnippet>1178</a></span><span class="kw">struct </span>CalculatePermissions {
+<a href=#1179 id=1179 data-nosnippet>1179</a>    <span class="doccomment">/// Whether the guild member is the guild owner
+<a href=#1180 id=1180 data-nosnippet>1180</a>    </span><span class="kw">pub </span>is_guild_owner: bool,
+<a href=#1181 id=1181 data-nosnippet>1181</a>    <span class="doccomment">/// Base permissions given to @everyone (guild level)
+<a href=#1182 id=1182 data-nosnippet>1182</a>    </span><span class="kw">pub </span>everyone_permissions: Permissions,
+<a href=#1183 id=1183 data-nosnippet>1183</a>    <span class="doccomment">/// Permissions allowed to a user by their roles (guild level)
+<a href=#1184 id=1184 data-nosnippet>1184</a>    </span><span class="kw">pub </span>user_roles_permissions: Vec&lt;Permissions&gt;,
+<a href=#1185 id=1185 data-nosnippet>1185</a>    <span class="doccomment">/// Overwrites that deny permissions for @everyone (channel level)
+<a href=#1186 id=1186 data-nosnippet>1186</a>    </span><span class="kw">pub </span>everyone_allow_overwrites: Permissions,
+<a href=#1187 id=1187 data-nosnippet>1187</a>    <span class="doccomment">/// Overwrites that allow permissions for @everyone (channel level)
+<a href=#1188 id=1188 data-nosnippet>1188</a>    </span><span class="kw">pub </span>everyone_deny_overwrites: Permissions,
+<a href=#1189 id=1189 data-nosnippet>1189</a>    <span class="doccomment">/// Overwrites that deny permissions for specific roles (channel level)
+<a href=#1190 id=1190 data-nosnippet>1190</a>    </span><span class="kw">pub </span>roles_allow_overwrites: Vec&lt;Permissions&gt;,
+<a href=#1191 id=1191 data-nosnippet>1191</a>    <span class="doccomment">/// Overwrites that allow permissions for specific roles (channel level)
+<a href=#1192 id=1192 data-nosnippet>1192</a>    </span><span class="kw">pub </span>roles_deny_overwrites: Vec&lt;Permissions&gt;,
+<a href=#1193 id=1193 data-nosnippet>1193</a>    <span class="doccomment">/// Member-specific overwrites that deny permissions (channel level)
+<a href=#1194 id=1194 data-nosnippet>1194</a>    </span><span class="kw">pub </span>member_allow_overwrites: Permissions,
+<a href=#1195 id=1195 data-nosnippet>1195</a>    <span class="doccomment">/// Member-specific overwrites that allow permissions (channel level)
+<a href=#1196 id=1196 data-nosnippet>1196</a>    </span><span class="kw">pub </span>member_deny_overwrites: Permissions,
+<a href=#1197 id=1197 data-nosnippet>1197</a>}
+<a href=#1198 id=1198 data-nosnippet>1198</a>
+<a href=#1199 id=1199 data-nosnippet>1199</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1200 id=1200 data-nosnippet>1200</a></span><span class="kw">impl </span>Default <span class="kw">for </span>CalculatePermissions {
+<a href=#1201 id=1201 data-nosnippet>1201</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+<a href=#1202 id=1202 data-nosnippet>1202</a>        <span class="self">Self </span>{
+<a href=#1203 id=1203 data-nosnippet>1203</a>            is_guild_owner: <span class="bool-val">false</span>,
+<a href=#1204 id=1204 data-nosnippet>1204</a>            everyone_permissions: Permissions::empty(),
+<a href=#1205 id=1205 data-nosnippet>1205</a>            user_roles_permissions: Vec::new(),
+<a href=#1206 id=1206 data-nosnippet>1206</a>            everyone_allow_overwrites: Permissions::empty(),
+<a href=#1207 id=1207 data-nosnippet>1207</a>            everyone_deny_overwrites: Permissions::empty(),
+<a href=#1208 id=1208 data-nosnippet>1208</a>            roles_allow_overwrites: Vec::new(),
+<a href=#1209 id=1209 data-nosnippet>1209</a>            roles_deny_overwrites: Vec::new(),
+<a href=#1210 id=1210 data-nosnippet>1210</a>            member_allow_overwrites: Permissions::empty(),
+<a href=#1211 id=1211 data-nosnippet>1211</a>            member_deny_overwrites: Permissions::empty(),
+<a href=#1212 id=1212 data-nosnippet>1212</a>        }
+<a href=#1213 id=1213 data-nosnippet>1213</a>    }
+<a href=#1214 id=1214 data-nosnippet>1214</a>}
+<a href=#1215 id=1215 data-nosnippet>1215</a>
+<a href=#1216 id=1216 data-nosnippet>1216</a><span class="doccomment">/// Translated from the pseudo code at https://docs.discord.com/developers/topics/permissions#permission-overwrites
+<a href=#1217 id=1217 data-nosnippet>1217</a>///
+<a href=#1218 id=1218 data-nosnippet>1218</a>/// The comments within this file refer to the above link
+<a href=#1219 id=1219 data-nosnippet>1219</a></span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1220 id=1220 data-nosnippet>1220</a></span><span class="kw">fn </span>calculate_permissions(data: CalculatePermissions) -&gt; Permissions {
+<a href=#1221 id=1221 data-nosnippet>1221</a>    <span class="kw">if </span>data.is_guild_owner {
+<a href=#1222 id=1222 data-nosnippet>1222</a>        <span class="kw">return </span>Permissions::all();
+<a href=#1223 id=1223 data-nosnippet>1223</a>    }
+<a href=#1224 id=1224 data-nosnippet>1224</a>
+<a href=#1225 id=1225 data-nosnippet>1225</a>    <span class="comment">// 1. Base permissions given to @everyone are applied at a guild level
+<a href=#1226 id=1226 data-nosnippet>1226</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>permissions = data.everyone_permissions;
+<a href=#1227 id=1227 data-nosnippet>1227</a>    <span class="comment">// 2. Permissions allowed to a user by their roles are applied at a guild level
+<a href=#1228 id=1228 data-nosnippet>1228</a>    </span><span class="kw">for </span>role_permission <span class="kw">in </span>data.user_roles_permissions {
+<a href=#1229 id=1229 data-nosnippet>1229</a>        permissions |= role_permission;
+<a href=#1230 id=1230 data-nosnippet>1230</a>    }
+<a href=#1231 id=1231 data-nosnippet>1231</a>
+<a href=#1232 id=1232 data-nosnippet>1232</a>    <span class="kw">if </span>permissions.contains(Permissions::ADMINISTRATOR) {
+<a href=#1233 id=1233 data-nosnippet>1233</a>        <span class="kw">return </span>Permissions::all();
+<a href=#1234 id=1234 data-nosnippet>1234</a>    }
 <a href=#1235 id=1235 data-nosnippet>1235</a>
-<a href=#1236 id=1236 data-nosnippet>1236</a>    <span class="comment">// 6. Overwrites that allow permissions for specific roles are applied at a channel level
-<a href=#1237 id=1237 data-nosnippet>1237</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>role_allow_permissions = Permissions::empty();
-<a href=#1238 id=1238 data-nosnippet>1238</a>    <span class="kw">for </span>p <span class="kw">in </span>data.roles_allow_overwrites {
-<a href=#1239 id=1239 data-nosnippet>1239</a>        role_allow_permissions |= p;
-<a href=#1240 id=1240 data-nosnippet>1240</a>    }
-<a href=#1241 id=1241 data-nosnippet>1241</a>    permissions |= role_allow_permissions;
-<a href=#1242 id=1242 data-nosnippet>1242</a>
-<a href=#1243 id=1243 data-nosnippet>1243</a>    <span class="comment">// 7. Member-specific overwrites that deny permissions are applied at a channel level
-<a href=#1244 id=1244 data-nosnippet>1244</a>    </span>permissions &amp;= !data.member_deny_overwrites;
-<a href=#1245 id=1245 data-nosnippet>1245</a>    <span class="comment">// 8. Member-specific overwrites that allow permissions are applied at a channel level
-<a href=#1246 id=1246 data-nosnippet>1246</a>    </span>permissions |= data.member_allow_overwrites;
+<a href=#1236 id=1236 data-nosnippet>1236</a>    <span class="comment">// 3. Overwrites that deny permissions for @everyone are applied at a channel level
+<a href=#1237 id=1237 data-nosnippet>1237</a>    </span>permissions &amp;= !data.everyone_deny_overwrites;
+<a href=#1238 id=1238 data-nosnippet>1238</a>    <span class="comment">// 4. Overwrites that allow permissions for @everyone are applied at a channel level
+<a href=#1239 id=1239 data-nosnippet>1239</a>    </span>permissions |= data.everyone_allow_overwrites;
+<a href=#1240 id=1240 data-nosnippet>1240</a>
+<a href=#1241 id=1241 data-nosnippet>1241</a>    <span class="comment">// 5. Overwrites that deny permissions for specific roles are applied at a channel level
+<a href=#1242 id=1242 data-nosnippet>1242</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>role_deny_permissions = Permissions::empty();
+<a href=#1243 id=1243 data-nosnippet>1243</a>    <span class="kw">for </span>p <span class="kw">in </span>data.roles_deny_overwrites {
+<a href=#1244 id=1244 data-nosnippet>1244</a>        role_deny_permissions |= p;
+<a href=#1245 id=1245 data-nosnippet>1245</a>    }
+<a href=#1246 id=1246 data-nosnippet>1246</a>    permissions &amp;= !role_deny_permissions;
 <a href=#1247 id=1247 data-nosnippet>1247</a>
-<a href=#1248 id=1248 data-nosnippet>1248</a>    permissions
-<a href=#1249 id=1249 data-nosnippet>1249</a>}
-<a href=#1250 id=1250 data-nosnippet>1250</a>
-<a href=#1251 id=1251 data-nosnippet>1251</a><span class="doccomment">/// Checks if a `&amp;str` contains another `&amp;str`.
-<a href=#1252 id=1252 data-nosnippet>1252</a></span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1253 id=1253 data-nosnippet>1253</a></span><span class="kw">fn </span>contains(haystack: <span class="kw-2">&amp;</span>str, needle: <span class="kw-2">&amp;</span>str, case_sensitive: bool) -&gt; bool {
-<a href=#1254 id=1254 data-nosnippet>1254</a>    <span class="kw">if </span>case_sensitive {
-<a href=#1255 id=1255 data-nosnippet>1255</a>        haystack.contains(needle)
-<a href=#1256 id=1256 data-nosnippet>1256</a>    } <span class="kw">else </span>{
-<a href=#1257 id=1257 data-nosnippet>1257</a>        haystack.to_lowercase().contains(<span class="kw-2">&amp;</span>needle.to_lowercase())
-<a href=#1258 id=1258 data-nosnippet>1258</a>    }
-<a href=#1259 id=1259 data-nosnippet>1259</a>}
-<a href=#1260 id=1260 data-nosnippet>1260</a>
-<a href=#1261 id=1261 data-nosnippet>1261</a><span class="doccomment">/// Takes a `&amp;str` as `origin` and tests if either `word_a` or `word_b` is closer.
-<a href=#1262 id=1262 data-nosnippet>1262</a>///
-<a href=#1263 id=1263 data-nosnippet>1263</a>/// **Note**: Normally `word_a` and `word_b` are expected to contain `origin` as substring. If not,
-<a href=#1264 id=1264 data-nosnippet>1264</a>/// using `closest_to_origin` would sort these the end.
-<a href=#1265 id=1265 data-nosnippet>1265</a></span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1266 id=1266 data-nosnippet>1266</a></span><span class="kw">fn </span>closest_to_origin(origin: <span class="kw-2">&amp;</span>str, word_a: <span class="kw-2">&amp;</span>str, word_b: <span class="kw-2">&amp;</span>str) -&gt; std::cmp::Ordering {
-<a href=#1267 id=1267 data-nosnippet>1267</a>    <span class="kw">let </span>value_a = <span class="kw">match </span>word_a.find(origin) {
-<a href=#1268 id=1268 data-nosnippet>1268</a>        <span class="prelude-val">Some</span>(value) =&gt; value + word_a.len(),
-<a href=#1269 id=1269 data-nosnippet>1269</a>        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>std::cmp::Ordering::Greater,
-<a href=#1270 id=1270 data-nosnippet>1270</a>    };
-<a href=#1271 id=1271 data-nosnippet>1271</a>
-<a href=#1272 id=1272 data-nosnippet>1272</a>    <span class="kw">let </span>value_b = <span class="kw">match </span>word_b.find(origin) {
-<a href=#1273 id=1273 data-nosnippet>1273</a>        <span class="prelude-val">Some</span>(value) =&gt; value + word_b.len(),
-<a href=#1274 id=1274 data-nosnippet>1274</a>        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>std::cmp::Ordering::Less,
-<a href=#1275 id=1275 data-nosnippet>1275</a>    };
-<a href=#1276 id=1276 data-nosnippet>1276</a>
-<a href=#1277 id=1277 data-nosnippet>1277</a>    value_a.cmp(<span class="kw-2">&amp;</span>value_b)
-<a href=#1278 id=1278 data-nosnippet>1278</a>}
-<a href=#1279 id=1279 data-nosnippet>1279</a>
-<a href=#1280 id=1280 data-nosnippet>1280</a><span class="doccomment">/// A [`Guild`] widget.
-<a href=#1281 id=1281 data-nosnippet>1281</a>///
-<a href=#1282 id=1282 data-nosnippet>1282</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-widget-settings-object).
-<a href=#1283 id=1283 data-nosnippet>1283</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#1284 id=1284 data-nosnippet>1284</a>#[non_exhaustive]
-<a href=#1285 id=1285 data-nosnippet>1285</a></span><span class="kw">pub struct </span>GuildWidget {
-<a href=#1286 id=1286 data-nosnippet>1286</a>    <span class="doccomment">/// Whether the widget is enabled.
-<a href=#1287 id=1287 data-nosnippet>1287</a>    </span><span class="kw">pub </span>enabled: bool,
-<a href=#1288 id=1288 data-nosnippet>1288</a>    <span class="doccomment">/// The widget channel id.
-<a href=#1289 id=1289 data-nosnippet>1289</a>    </span><span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+<a href=#1248 id=1248 data-nosnippet>1248</a>    <span class="comment">// 6. Overwrites that allow permissions for specific roles are applied at a channel level
+<a href=#1249 id=1249 data-nosnippet>1249</a>    </span><span class="kw">let </span><span class="kw-2">mut </span>role_allow_permissions = Permissions::empty();
+<a href=#1250 id=1250 data-nosnippet>1250</a>    <span class="kw">for </span>p <span class="kw">in </span>data.roles_allow_overwrites {
+<a href=#1251 id=1251 data-nosnippet>1251</a>        role_allow_permissions |= p;
+<a href=#1252 id=1252 data-nosnippet>1252</a>    }
+<a href=#1253 id=1253 data-nosnippet>1253</a>    permissions |= role_allow_permissions;
+<a href=#1254 id=1254 data-nosnippet>1254</a>
+<a href=#1255 id=1255 data-nosnippet>1255</a>    <span class="comment">// 7. Member-specific overwrites that deny permissions are applied at a channel level
+<a href=#1256 id=1256 data-nosnippet>1256</a>    </span>permissions &amp;= !data.member_deny_overwrites;
+<a href=#1257 id=1257 data-nosnippet>1257</a>    <span class="comment">// 8. Member-specific overwrites that allow permissions are applied at a channel level
+<a href=#1258 id=1258 data-nosnippet>1258</a>    </span>permissions |= data.member_allow_overwrites;
+<a href=#1259 id=1259 data-nosnippet>1259</a>
+<a href=#1260 id=1260 data-nosnippet>1260</a>    permissions
+<a href=#1261 id=1261 data-nosnippet>1261</a>}
+<a href=#1262 id=1262 data-nosnippet>1262</a>
+<a href=#1263 id=1263 data-nosnippet>1263</a><span class="doccomment">/// Checks if a `&amp;str` contains another `&amp;str`.
+<a href=#1264 id=1264 data-nosnippet>1264</a></span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1265 id=1265 data-nosnippet>1265</a></span><span class="kw">fn </span>contains(haystack: <span class="kw-2">&amp;</span>str, needle: <span class="kw-2">&amp;</span>str, case_sensitive: bool) -&gt; bool {
+<a href=#1266 id=1266 data-nosnippet>1266</a>    <span class="kw">if </span>case_sensitive {
+<a href=#1267 id=1267 data-nosnippet>1267</a>        haystack.contains(needle)
+<a href=#1268 id=1268 data-nosnippet>1268</a>    } <span class="kw">else </span>{
+<a href=#1269 id=1269 data-nosnippet>1269</a>        haystack.to_lowercase().contains(<span class="kw-2">&amp;</span>needle.to_lowercase())
+<a href=#1270 id=1270 data-nosnippet>1270</a>    }
+<a href=#1271 id=1271 data-nosnippet>1271</a>}
+<a href=#1272 id=1272 data-nosnippet>1272</a>
+<a href=#1273 id=1273 data-nosnippet>1273</a><span class="doccomment">/// Takes a `&amp;str` as `origin` and tests if either `word_a` or `word_b` is closer.
+<a href=#1274 id=1274 data-nosnippet>1274</a>///
+<a href=#1275 id=1275 data-nosnippet>1275</a>/// **Note**: Normally `word_a` and `word_b` are expected to contain `origin` as substring. If not,
+<a href=#1276 id=1276 data-nosnippet>1276</a>/// using `closest_to_origin` would sort these the end.
+<a href=#1277 id=1277 data-nosnippet>1277</a></span><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1278 id=1278 data-nosnippet>1278</a></span><span class="kw">fn </span>closest_to_origin(origin: <span class="kw-2">&amp;</span>str, word_a: <span class="kw-2">&amp;</span>str, word_b: <span class="kw-2">&amp;</span>str) -&gt; std::cmp::Ordering {
+<a href=#1279 id=1279 data-nosnippet>1279</a>    <span class="kw">let </span>value_a = <span class="kw">match </span>word_a.find(origin) {
+<a href=#1280 id=1280 data-nosnippet>1280</a>        <span class="prelude-val">Some</span>(value) =&gt; value + word_a.len(),
+<a href=#1281 id=1281 data-nosnippet>1281</a>        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>std::cmp::Ordering::Greater,
+<a href=#1282 id=1282 data-nosnippet>1282</a>    };
+<a href=#1283 id=1283 data-nosnippet>1283</a>
+<a href=#1284 id=1284 data-nosnippet>1284</a>    <span class="kw">let </span>value_b = <span class="kw">match </span>word_b.find(origin) {
+<a href=#1285 id=1285 data-nosnippet>1285</a>        <span class="prelude-val">Some</span>(value) =&gt; value + word_b.len(),
+<a href=#1286 id=1286 data-nosnippet>1286</a>        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>std::cmp::Ordering::Less,
+<a href=#1287 id=1287 data-nosnippet>1287</a>    };
+<a href=#1288 id=1288 data-nosnippet>1288</a>
+<a href=#1289 id=1289 data-nosnippet>1289</a>    value_a.cmp(<span class="kw-2">&amp;</span>value_b)
 <a href=#1290 id=1290 data-nosnippet>1290</a>}
 <a href=#1291 id=1291 data-nosnippet>1291</a>
-<a href=#1292 id=1292 data-nosnippet>1292</a><span class="doccomment">/// Representation of the number of members that would be pruned by a guild prune operation.
+<a href=#1292 id=1292 data-nosnippet>1292</a><span class="doccomment">/// A [`Guild`] widget.
 <a href=#1293 id=1293 data-nosnippet>1293</a>///
-<a href=#1294 id=1294 data-nosnippet>1294</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#get-guild-prune-count).
-<a href=#1295 id=1295 data-nosnippet>1295</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1296 id=1296 data-nosnippet>1296</a>#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-<a href=#1297 id=1297 data-nosnippet>1297</a>#[non_exhaustive]
-<a href=#1298 id=1298 data-nosnippet>1298</a></span><span class="kw">pub struct </span>GuildPrune {
-<a href=#1299 id=1299 data-nosnippet>1299</a>    <span class="doccomment">/// The number of members that would be pruned by the operation.
-<a href=#1300 id=1300 data-nosnippet>1300</a>    </span><span class="kw">pub </span>pruned: u64,
-<a href=#1301 id=1301 data-nosnippet>1301</a>}
-<a href=#1302 id=1302 data-nosnippet>1302</a>
-<a href=#1303 id=1303 data-nosnippet>1303</a><span class="doccomment">/// Variant of [`Guild`] returned from [`Http::get_guilds`].
-<a href=#1304 id=1304 data-nosnippet>1304</a>///
-<a href=#1305 id=1305 data-nosnippet>1305</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object),
-<a href=#1306 id=1306 data-nosnippet>1306</a>/// [subset example](https://docs.discord.com/developers/resources/user#get-current-user-guilds-example-partial-guild).
+<a href=#1294 id=1294 data-nosnippet>1294</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-widget-settings-object).
+<a href=#1295 id=1295 data-nosnippet>1295</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
+<a href=#1296 id=1296 data-nosnippet>1296</a>#[non_exhaustive]
+<a href=#1297 id=1297 data-nosnippet>1297</a></span><span class="kw">pub struct </span>GuildWidget {
+<a href=#1298 id=1298 data-nosnippet>1298</a>    <span class="doccomment">/// Whether the widget is enabled.
+<a href=#1299 id=1299 data-nosnippet>1299</a>    </span><span class="kw">pub </span>enabled: bool,
+<a href=#1300 id=1300 data-nosnippet>1300</a>    <span class="doccomment">/// The widget channel id.
+<a href=#1301 id=1301 data-nosnippet>1301</a>    </span><span class="kw">pub </span>channel_id: <span class="prelude-ty">Option</span>&lt;ChannelId&gt;,
+<a href=#1302 id=1302 data-nosnippet>1302</a>}
+<a href=#1303 id=1303 data-nosnippet>1303</a>
+<a href=#1304 id=1304 data-nosnippet>1304</a><span class="doccomment">/// Representation of the number of members that would be pruned by a guild prune operation.
+<a href=#1305 id=1305 data-nosnippet>1305</a>///
+<a href=#1306 id=1306 data-nosnippet>1306</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#get-guild-prune-count).
 <a href=#1307 id=1307 data-nosnippet>1307</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1308 id=1308 data-nosnippet>1308</a>#[derive(Clone, Debug, Deserialize, Serialize)]
+<a href=#1308 id=1308 data-nosnippet>1308</a>#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 <a href=#1309 id=1309 data-nosnippet>1309</a>#[non_exhaustive]
-<a href=#1310 id=1310 data-nosnippet>1310</a></span><span class="kw">pub struct </span>GuildInfo {
-<a href=#1311 id=1311 data-nosnippet>1311</a>    <span class="doccomment">/// The unique Id of the guild.
-<a href=#1312 id=1312 data-nosnippet>1312</a>    ///
-<a href=#1313 id=1313 data-nosnippet>1313</a>    /// Can be used to calculate creation date.
-<a href=#1314 id=1314 data-nosnippet>1314</a>    </span><span class="kw">pub </span>id: GuildId,
-<a href=#1315 id=1315 data-nosnippet>1315</a>    <span class="doccomment">/// The name of the guild.
-<a href=#1316 id=1316 data-nosnippet>1316</a>    </span><span class="kw">pub </span>name: FixedString,
-<a href=#1317 id=1317 data-nosnippet>1317</a>    <span class="doccomment">/// The hash of the icon of the guild.
-<a href=#1318 id=1318 data-nosnippet>1318</a>    ///
-<a href=#1319 id=1319 data-nosnippet>1319</a>    /// This can be used to generate a URL to the guild's icon image.
-<a href=#1320 id=1320 data-nosnippet>1320</a>    </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
-<a href=#1321 id=1321 data-nosnippet>1321</a>    <span class="doccomment">/// Indicator of whether the current user is the owner.
-<a href=#1322 id=1322 data-nosnippet>1322</a>    </span><span class="kw">pub </span>owner: bool,
-<a href=#1323 id=1323 data-nosnippet>1323</a>    <span class="doccomment">/// The permissions that the current user has.
-<a href=#1324 id=1324 data-nosnippet>1324</a>    </span><span class="kw">pub </span>permissions: Permissions,
-<a href=#1325 id=1325 data-nosnippet>1325</a>    <span class="doccomment">/// See [`Guild::features`].
-<a href=#1326 id=1326 data-nosnippet>1326</a>    </span><span class="kw">pub </span>features: FixedArray&lt;FixedString&gt;,
-<a href=#1327 id=1327 data-nosnippet>1327</a>    <span class="doccomment">/// Approximate number of members in this guild.
-<a href=#1328 id=1328 data-nosnippet>1328</a>    </span><span class="kw">pub </span>approximate_member_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1329 id=1329 data-nosnippet>1329</a>    <span class="doccomment">/// Approximate number of non-offline members in this guild.
-<a href=#1330 id=1330 data-nosnippet>1330</a>    </span><span class="kw">pub </span>approximate_presence_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
-<a href=#1331 id=1331 data-nosnippet>1331</a>}
-<a href=#1332 id=1332 data-nosnippet>1332</a>
-<a href=#1333 id=1333 data-nosnippet>1333</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1334 id=1334 data-nosnippet>1334</a></span><span class="kw">impl </span>GuildInfo {
-<a href=#1335 id=1335 data-nosnippet>1335</a>    <span class="doccomment">/// Returns the formatted URL of the guild's icon, if the guild has an icon.
-<a href=#1336 id=1336 data-nosnippet>1336</a>    ///
-<a href=#1337 id=1337 data-nosnippet>1337</a>    /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
-<a href=#1338 id=1338 data-nosnippet>1338</a>    </span><span class="attr">#[must_use]
-<a href=#1339 id=1339 data-nosnippet>1339</a>    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-<a href=#1340 id=1340 data-nosnippet>1340</a>        icon_url(<span class="self">self</span>.id, <span class="self">self</span>.icon.as_ref())
-<a href=#1341 id=1341 data-nosnippet>1341</a>    }
-<a href=#1342 id=1342 data-nosnippet>1342</a>}
-<a href=#1343 id=1343 data-nosnippet>1343</a>
-<a href=#1344 id=1344 data-nosnippet>1344</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1345 id=1345 data-nosnippet>1345</a></span><span class="kw">impl </span>InviteGuild {
-<a href=#1346 id=1346 data-nosnippet>1346</a>    <span class="doccomment">/// Returns the formatted URL of the guild's splash image, if one exists.
-<a href=#1347 id=1347 data-nosnippet>1347</a>    </span><span class="attr">#[must_use]
-<a href=#1348 id=1348 data-nosnippet>1348</a>    </span><span class="kw">pub fn </span>splash_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-<a href=#1349 id=1349 data-nosnippet>1349</a>        <span class="self">self</span>.splash.as_ref().map(|splash| <span class="macro">cdn!</span>(<span class="string">"/splashes/{}/{}.webp?size=4096"</span>, <span class="self">self</span>.id, splash))
-<a href=#1350 id=1350 data-nosnippet>1350</a>    }
-<a href=#1351 id=1351 data-nosnippet>1351</a>}
-<a href=#1352 id=1352 data-nosnippet>1352</a>
-<a href=#1353 id=1353 data-nosnippet>1353</a><span class="doccomment">/// Data for an unavailable guild.
-<a href=#1354 id=1354 data-nosnippet>1354</a>///
-<a href=#1355 id=1355 data-nosnippet>1355</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#unavailable-guild-object).
-<a href=#1356 id=1356 data-nosnippet>1356</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1357 id=1357 data-nosnippet>1357</a>#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-<a href=#1358 id=1358 data-nosnippet>1358</a>#[non_exhaustive]
-<a href=#1359 id=1359 data-nosnippet>1359</a></span><span class="kw">pub struct </span>UnavailableGuild {
-<a href=#1360 id=1360 data-nosnippet>1360</a>    <span class="doccomment">/// The Id of the [`Guild`] that may be unavailable.
-<a href=#1361 id=1361 data-nosnippet>1361</a>    </span><span class="kw">pub </span>id: GuildId,
-<a href=#1362 id=1362 data-nosnippet>1362</a>    <span class="doccomment">/// Indicator of whether the guild is unavailable.
-<a href=#1363 id=1363 data-nosnippet>1363</a>    </span><span class="attr">#[serde(default)]
-<a href=#1364 id=1364 data-nosnippet>1364</a>    </span><span class="kw">pub </span>unavailable: bool,
-<a href=#1365 id=1365 data-nosnippet>1365</a>}
-<a href=#1366 id=1366 data-nosnippet>1366</a>
-<a href=#1367 id=1367 data-nosnippet>1367</a><span class="macro">enum_number!</span> {
-<a href=#1368 id=1368 data-nosnippet>1368</a>    <span class="doccomment">/// Default message notification level for a guild.
-<a href=#1369 id=1369 data-nosnippet>1369</a>    ///
-<a href=#1370 id=1370 data-nosnippet>1370</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-default-message-notification-level).
-<a href=#1371 id=1371 data-nosnippet>1371</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#1372 id=1372 data-nosnippet>1372</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1373 id=1373 data-nosnippet>1373</a>    #[non_exhaustive]
-<a href=#1374 id=1374 data-nosnippet>1374</a>    </span><span class="kw">pub enum </span>DefaultMessageNotificationLevel {
-<a href=#1375 id=1375 data-nosnippet>1375</a>        <span class="doccomment">/// Receive notifications for everything.
-<a href=#1376 id=1376 data-nosnippet>1376</a>        </span>All = <span class="number">0</span>,
-<a href=#1377 id=1377 data-nosnippet>1377</a>        <span class="doccomment">/// Receive only mentions.
-<a href=#1378 id=1378 data-nosnippet>1378</a>        </span>Mentions = <span class="number">1</span>,
-<a href=#1379 id=1379 data-nosnippet>1379</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
-<a href=#1380 id=1380 data-nosnippet>1380</a>    }
-<a href=#1381 id=1381 data-nosnippet>1381</a>}
-<a href=#1382 id=1382 data-nosnippet>1382</a>
-<a href=#1383 id=1383 data-nosnippet>1383</a><span class="macro">enum_number!</span> {
-<a href=#1384 id=1384 data-nosnippet>1384</a>    <span class="doccomment">/// Setting used to filter explicit messages from members.
-<a href=#1385 id=1385 data-nosnippet>1385</a>    ///
-<a href=#1386 id=1386 data-nosnippet>1386</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-explicit-content-filter-level).
-<a href=#1387 id=1387 data-nosnippet>1387</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#1388 id=1388 data-nosnippet>1388</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1389 id=1389 data-nosnippet>1389</a>    #[non_exhaustive]
-<a href=#1390 id=1390 data-nosnippet>1390</a>    </span><span class="kw">pub enum </span>ExplicitContentFilter {
-<a href=#1391 id=1391 data-nosnippet>1391</a>        <span class="doccomment">/// Don't scan any messages.
-<a href=#1392 id=1392 data-nosnippet>1392</a>        </span><span class="prelude-val">None </span>= <span class="number">0</span>,
-<a href=#1393 id=1393 data-nosnippet>1393</a>        <span class="doccomment">/// Scan messages from members without a role.
-<a href=#1394 id=1394 data-nosnippet>1394</a>        </span>WithoutRole = <span class="number">1</span>,
-<a href=#1395 id=1395 data-nosnippet>1395</a>        <span class="doccomment">/// Scan messages sent by all members.
-<a href=#1396 id=1396 data-nosnippet>1396</a>        </span>All = <span class="number">2</span>,
-<a href=#1397 id=1397 data-nosnippet>1397</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
-<a href=#1398 id=1398 data-nosnippet>1398</a>    }
-<a href=#1399 id=1399 data-nosnippet>1399</a>}
-<a href=#1400 id=1400 data-nosnippet>1400</a>
-<a href=#1401 id=1401 data-nosnippet>1401</a><span class="macro">enum_number!</span> {
-<a href=#1402 id=1402 data-nosnippet>1402</a>    <span class="doccomment">/// Multi-Factor Authentication level for guild moderators.
-<a href=#1403 id=1403 data-nosnippet>1403</a>    ///
-<a href=#1404 id=1404 data-nosnippet>1404</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-mfa-level).
-<a href=#1405 id=1405 data-nosnippet>1405</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#1406 id=1406 data-nosnippet>1406</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1407 id=1407 data-nosnippet>1407</a>    #[non_exhaustive]
-<a href=#1408 id=1408 data-nosnippet>1408</a>    </span><span class="kw">pub enum </span>MfaLevel {
-<a href=#1409 id=1409 data-nosnippet>1409</a>        <span class="doccomment">/// MFA is disabled.
-<a href=#1410 id=1410 data-nosnippet>1410</a>        </span><span class="prelude-val">None </span>= <span class="number">0</span>,
-<a href=#1411 id=1411 data-nosnippet>1411</a>        <span class="doccomment">/// MFA is enabled.
-<a href=#1412 id=1412 data-nosnippet>1412</a>        </span>Elevated = <span class="number">1</span>,
-<a href=#1413 id=1413 data-nosnippet>1413</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
-<a href=#1414 id=1414 data-nosnippet>1414</a>    }
-<a href=#1415 id=1415 data-nosnippet>1415</a>}
-<a href=#1416 id=1416 data-nosnippet>1416</a>
-<a href=#1417 id=1417 data-nosnippet>1417</a><span class="macro">enum_number!</span> {
-<a href=#1418 id=1418 data-nosnippet>1418</a>    <span class="doccomment">/// The level to set as criteria prior to a user being able to send
-<a href=#1419 id=1419 data-nosnippet>1419</a>    /// messages in a [`Guild`].
-<a href=#1420 id=1420 data-nosnippet>1420</a>    ///
-<a href=#1421 id=1421 data-nosnippet>1421</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-verification-level).
-<a href=#1422 id=1422 data-nosnippet>1422</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#1423 id=1423 data-nosnippet>1423</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1424 id=1424 data-nosnippet>1424</a>    #[non_exhaustive]
-<a href=#1425 id=1425 data-nosnippet>1425</a>    </span><span class="kw">pub enum </span>VerificationLevel {
-<a href=#1426 id=1426 data-nosnippet>1426</a>        <span class="doccomment">/// Does not require any verification.
-<a href=#1427 id=1427 data-nosnippet>1427</a>        </span><span class="prelude-val">None </span>= <span class="number">0</span>,
-<a href=#1428 id=1428 data-nosnippet>1428</a>        <span class="doccomment">/// Must have a verified email on the user's Discord account.
-<a href=#1429 id=1429 data-nosnippet>1429</a>        </span>Low = <span class="number">1</span>,
-<a href=#1430 id=1430 data-nosnippet>1430</a>        <span class="doccomment">/// Must also be a registered user on Discord for longer than 5 minutes.
-<a href=#1431 id=1431 data-nosnippet>1431</a>        </span>Medium = <span class="number">2</span>,
-<a href=#1432 id=1432 data-nosnippet>1432</a>        <span class="doccomment">/// Must also be a member of the guild for longer than 10 minutes.
-<a href=#1433 id=1433 data-nosnippet>1433</a>        </span>High = <span class="number">3</span>,
-<a href=#1434 id=1434 data-nosnippet>1434</a>        <span class="doccomment">/// Must have a verified phone on the user's Discord account.
-<a href=#1435 id=1435 data-nosnippet>1435</a>        </span>Higher = <span class="number">4</span>,
-<a href=#1436 id=1436 data-nosnippet>1436</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
-<a href=#1437 id=1437 data-nosnippet>1437</a>    }
-<a href=#1438 id=1438 data-nosnippet>1438</a>}
-<a href=#1439 id=1439 data-nosnippet>1439</a>
-<a href=#1440 id=1440 data-nosnippet>1440</a><span class="macro">enum_number!</span> {
-<a href=#1441 id=1441 data-nosnippet>1441</a>    <span class="doccomment">/// The [`Guild`] nsfw level.
-<a href=#1442 id=1442 data-nosnippet>1442</a>    ///
-<a href=#1443 id=1443 data-nosnippet>1443</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-guild-nsfw-level).
-<a href=#1444 id=1444 data-nosnippet>1444</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#1445 id=1445 data-nosnippet>1445</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1446 id=1446 data-nosnippet>1446</a>    #[non_exhaustive]
-<a href=#1447 id=1447 data-nosnippet>1447</a>    </span><span class="kw">pub enum </span>NsfwLevel {
-<a href=#1448 id=1448 data-nosnippet>1448</a>        <span class="doccomment">/// The nsfw level is not specified.
-<a href=#1449 id=1449 data-nosnippet>1449</a>        </span>Default = <span class="number">0</span>,
-<a href=#1450 id=1450 data-nosnippet>1450</a>        <span class="doccomment">/// The guild is considered as explicit.
-<a href=#1451 id=1451 data-nosnippet>1451</a>        </span>Explicit = <span class="number">1</span>,
-<a href=#1452 id=1452 data-nosnippet>1452</a>        <span class="doccomment">/// The guild is considered as safe.
-<a href=#1453 id=1453 data-nosnippet>1453</a>        </span>Safe = <span class="number">2</span>,
-<a href=#1454 id=1454 data-nosnippet>1454</a>        <span class="doccomment">/// The guild is age restricted.
-<a href=#1455 id=1455 data-nosnippet>1455</a>        </span>AgeRestricted = <span class="number">3</span>,
-<a href=#1456 id=1456 data-nosnippet>1456</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
-<a href=#1457 id=1457 data-nosnippet>1457</a>    }
-<a href=#1458 id=1458 data-nosnippet>1458</a>}
-<a href=#1459 id=1459 data-nosnippet>1459</a>
-<a href=#1460 id=1460 data-nosnippet>1460</a><span class="macro">enum_number!</span> {
-<a href=#1461 id=1461 data-nosnippet>1461</a>    <span class="doccomment">/// The [`Guild`] AFK timeout length.
-<a href=#1462 id=1462 data-nosnippet>1462</a>    ///
-<a href=#1463 id=1463 data-nosnippet>1463</a>    /// See [AfkMetadata::afk_timeout].
-<a href=#1464 id=1464 data-nosnippet>1464</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#1465 id=1465 data-nosnippet>1465</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1466 id=1466 data-nosnippet>1466</a>    #[non_exhaustive]
-<a href=#1467 id=1467 data-nosnippet>1467</a>    </span><span class="kw">pub enum </span>AfkTimeout {
-<a href=#1468 id=1468 data-nosnippet>1468</a>        OneMinute = <span class="number">60</span>,
-<a href=#1469 id=1469 data-nosnippet>1469</a>        FiveMinutes = <span class="number">300</span>,
-<a href=#1470 id=1470 data-nosnippet>1470</a>        FifteenMinutes = <span class="number">900</span>,
-<a href=#1471 id=1471 data-nosnippet>1471</a>        ThirtyMinutes = <span class="number">1800</span>,
-<a href=#1472 id=1472 data-nosnippet>1472</a>        OneHour = <span class="number">3600</span>,
-<a href=#1473 id=1473 data-nosnippet>1473</a>        <span class="kw">_ </span>=&gt; Unknown(u16),
-<a href=#1474 id=1474 data-nosnippet>1474</a>    }
-<a href=#1475 id=1475 data-nosnippet>1475</a>}
-<a href=#1476 id=1476 data-nosnippet>1476</a>
-<a href=#1477 id=1477 data-nosnippet>1477</a><span class="doccomment">/// The [`Guild`]'s incident's data.
-<a href=#1478 id=1478 data-nosnippet>1478</a>///
-<a href=#1479 id=1479 data-nosnippet>1479</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#incidents-data-object).
-<a href=#1480 id=1480 data-nosnippet>1480</a></span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-<a href=#1481 id=1481 data-nosnippet>1481</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#1482 id=1482 data-nosnippet>1482</a>#[non_exhaustive]
-<a href=#1483 id=1483 data-nosnippet>1483</a></span><span class="kw">pub struct </span>IncidentsData {
-<a href=#1484 id=1484 data-nosnippet>1484</a>    <span class="doccomment">/// The time that invites get enabled again.
-<a href=#1485 id=1485 data-nosnippet>1485</a>    </span><span class="kw">pub </span>invites_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-<a href=#1486 id=1486 data-nosnippet>1486</a>    <span class="doccomment">/// The time that dms get enabled again.
-<a href=#1487 id=1487 data-nosnippet>1487</a>    </span><span class="kw">pub </span>dms_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-<a href=#1488 id=1488 data-nosnippet>1488</a>    <span class="doccomment">/// The time when elevated dm activity was triggered.
-<a href=#1489 id=1489 data-nosnippet>1489</a>    </span><span class="kw">pub </span>dm_spam_detected_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-<a href=#1490 id=1490 data-nosnippet>1490</a>    <span class="doccomment">/// The time when raid alerts were triggered.
-<a href=#1491 id=1491 data-nosnippet>1491</a>    </span><span class="kw">pub </span>raid_detected_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
-<a href=#1492 id=1492 data-nosnippet>1492</a>}
-<a href=#1493 id=1493 data-nosnippet>1493</a>
-<a href=#1494 id=1494 data-nosnippet>1494</a><span class="attr">#[cfg(test)]
-<a href=#1495 id=1495 data-nosnippet>1495</a></span><span class="kw">mod </span>test {
-<a href=#1496 id=1496 data-nosnippet>1496</a>    <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1497 id=1497 data-nosnippet>1497</a>    </span><span class="kw">mod </span>model {
-<a href=#1498 id=1498 data-nosnippet>1498</a>        <span class="kw">use </span>std::num::NonZeroU16;
-<a href=#1499 id=1499 data-nosnippet>1499</a>
-<a href=#1500 id=1500 data-nosnippet>1500</a>        <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
-<a href=#1501 id=1501 data-nosnippet>1501</a>
-<a href=#1502 id=1502 data-nosnippet>1502</a>        <span class="kw">fn </span>get_member() -&gt; Member {
-<a href=#1503 id=1503 data-nosnippet>1503</a>            Member {
-<a href=#1504 id=1504 data-nosnippet>1504</a>                nick: <span class="prelude-val">Some</span>(FixedString::from_static_trunc(<span class="string">"aaaa"</span>)),
-<a href=#1505 id=1505 data-nosnippet>1505</a>                user: User {
-<a href=#1506 id=1506 data-nosnippet>1506</a>                    name: FixedString::from_static_trunc(<span class="string">"test"</span>),
-<a href=#1507 id=1507 data-nosnippet>1507</a>                    discriminator: NonZeroU16::new(<span class="number">1432</span>),
-<a href=#1508 id=1508 data-nosnippet>1508</a>                    ..User::default()
-<a href=#1509 id=1509 data-nosnippet>1509</a>                },
-<a href=#1510 id=1510 data-nosnippet>1510</a>                ..Default::default()
-<a href=#1511 id=1511 data-nosnippet>1511</a>            }
-<a href=#1512 id=1512 data-nosnippet>1512</a>        }
+<a href=#1310 id=1310 data-nosnippet>1310</a></span><span class="kw">pub struct </span>GuildPrune {
+<a href=#1311 id=1311 data-nosnippet>1311</a>    <span class="doccomment">/// The number of members that would be pruned by the operation.
+<a href=#1312 id=1312 data-nosnippet>1312</a>    </span><span class="kw">pub </span>pruned: u64,
+<a href=#1313 id=1313 data-nosnippet>1313</a>}
+<a href=#1314 id=1314 data-nosnippet>1314</a>
+<a href=#1315 id=1315 data-nosnippet>1315</a><span class="doccomment">/// Variant of [`Guild`] returned from [`Http::get_guilds`].
+<a href=#1316 id=1316 data-nosnippet>1316</a>///
+<a href=#1317 id=1317 data-nosnippet>1317</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object),
+<a href=#1318 id=1318 data-nosnippet>1318</a>/// [subset example](https://docs.discord.com/developers/resources/user#get-current-user-guilds-example-partial-guild).
+<a href=#1319 id=1319 data-nosnippet>1319</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1320 id=1320 data-nosnippet>1320</a>#[derive(Clone, Debug, Deserialize, Serialize)]
+<a href=#1321 id=1321 data-nosnippet>1321</a>#[non_exhaustive]
+<a href=#1322 id=1322 data-nosnippet>1322</a></span><span class="kw">pub struct </span>GuildInfo {
+<a href=#1323 id=1323 data-nosnippet>1323</a>    <span class="doccomment">/// The unique Id of the guild.
+<a href=#1324 id=1324 data-nosnippet>1324</a>    ///
+<a href=#1325 id=1325 data-nosnippet>1325</a>    /// Can be used to calculate creation date.
+<a href=#1326 id=1326 data-nosnippet>1326</a>    </span><span class="kw">pub </span>id: GuildId,
+<a href=#1327 id=1327 data-nosnippet>1327</a>    <span class="doccomment">/// The name of the guild.
+<a href=#1328 id=1328 data-nosnippet>1328</a>    </span><span class="kw">pub </span>name: FixedString,
+<a href=#1329 id=1329 data-nosnippet>1329</a>    <span class="doccomment">/// The hash of the icon of the guild.
+<a href=#1330 id=1330 data-nosnippet>1330</a>    ///
+<a href=#1331 id=1331 data-nosnippet>1331</a>    /// This can be used to generate a URL to the guild's icon image.
+<a href=#1332 id=1332 data-nosnippet>1332</a>    </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
+<a href=#1333 id=1333 data-nosnippet>1333</a>    <span class="doccomment">/// Indicator of whether the current user is the owner.
+<a href=#1334 id=1334 data-nosnippet>1334</a>    </span><span class="kw">pub </span>owner: bool,
+<a href=#1335 id=1335 data-nosnippet>1335</a>    <span class="doccomment">/// The permissions that the current user has.
+<a href=#1336 id=1336 data-nosnippet>1336</a>    </span><span class="kw">pub </span>permissions: Permissions,
+<a href=#1337 id=1337 data-nosnippet>1337</a>    <span class="doccomment">/// See [`Guild::features`].
+<a href=#1338 id=1338 data-nosnippet>1338</a>    </span><span class="kw">pub </span>features: FixedArray&lt;FixedString&gt;,
+<a href=#1339 id=1339 data-nosnippet>1339</a>    <span class="doccomment">/// Approximate number of members in this guild.
+<a href=#1340 id=1340 data-nosnippet>1340</a>    </span><span class="kw">pub </span>approximate_member_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1341 id=1341 data-nosnippet>1341</a>    <span class="doccomment">/// Approximate number of non-offline members in this guild.
+<a href=#1342 id=1342 data-nosnippet>1342</a>    </span><span class="kw">pub </span>approximate_presence_count: <span class="prelude-ty">Option</span>&lt;MemberCount&gt;,
+<a href=#1343 id=1343 data-nosnippet>1343</a>}
+<a href=#1344 id=1344 data-nosnippet>1344</a>
+<a href=#1345 id=1345 data-nosnippet>1345</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1346 id=1346 data-nosnippet>1346</a></span><span class="kw">impl </span>GuildInfo {
+<a href=#1347 id=1347 data-nosnippet>1347</a>    <span class="doccomment">/// Returns the formatted URL of the guild's icon, if the guild has an icon.
+<a href=#1348 id=1348 data-nosnippet>1348</a>    ///
+<a href=#1349 id=1349 data-nosnippet>1349</a>    /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
+<a href=#1350 id=1350 data-nosnippet>1350</a>    </span><span class="attr">#[must_use]
+<a href=#1351 id=1351 data-nosnippet>1351</a>    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#1352 id=1352 data-nosnippet>1352</a>        icon_url(<span class="self">self</span>.id, <span class="self">self</span>.icon.as_ref())
+<a href=#1353 id=1353 data-nosnippet>1353</a>    }
+<a href=#1354 id=1354 data-nosnippet>1354</a>}
+<a href=#1355 id=1355 data-nosnippet>1355</a>
+<a href=#1356 id=1356 data-nosnippet>1356</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1357 id=1357 data-nosnippet>1357</a></span><span class="kw">impl </span>InviteGuild {
+<a href=#1358 id=1358 data-nosnippet>1358</a>    <span class="doccomment">/// Returns the formatted URL of the guild's splash image, if one exists.
+<a href=#1359 id=1359 data-nosnippet>1359</a>    </span><span class="attr">#[must_use]
+<a href=#1360 id=1360 data-nosnippet>1360</a>    </span><span class="kw">pub fn </span>splash_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#1361 id=1361 data-nosnippet>1361</a>        <span class="self">self</span>.splash.as_ref().map(|splash| <span class="macro">cdn!</span>(<span class="string">"/splashes/{}/{}.webp?size=4096"</span>, <span class="self">self</span>.id, splash))
+<a href=#1362 id=1362 data-nosnippet>1362</a>    }
+<a href=#1363 id=1363 data-nosnippet>1363</a>}
+<a href=#1364 id=1364 data-nosnippet>1364</a>
+<a href=#1365 id=1365 data-nosnippet>1365</a><span class="doccomment">/// Data for an unavailable guild.
+<a href=#1366 id=1366 data-nosnippet>1366</a>///
+<a href=#1367 id=1367 data-nosnippet>1367</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#unavailable-guild-object).
+<a href=#1368 id=1368 data-nosnippet>1368</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1369 id=1369 data-nosnippet>1369</a>#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+<a href=#1370 id=1370 data-nosnippet>1370</a>#[non_exhaustive]
+<a href=#1371 id=1371 data-nosnippet>1371</a></span><span class="kw">pub struct </span>UnavailableGuild {
+<a href=#1372 id=1372 data-nosnippet>1372</a>    <span class="doccomment">/// The Id of the [`Guild`] that may be unavailable.
+<a href=#1373 id=1373 data-nosnippet>1373</a>    </span><span class="kw">pub </span>id: GuildId,
+<a href=#1374 id=1374 data-nosnippet>1374</a>    <span class="doccomment">/// Indicator of whether the guild is unavailable.
+<a href=#1375 id=1375 data-nosnippet>1375</a>    </span><span class="attr">#[serde(default)]
+<a href=#1376 id=1376 data-nosnippet>1376</a>    </span><span class="kw">pub </span>unavailable: bool,
+<a href=#1377 id=1377 data-nosnippet>1377</a>}
+<a href=#1378 id=1378 data-nosnippet>1378</a>
+<a href=#1379 id=1379 data-nosnippet>1379</a><span class="macro">enum_number!</span> {
+<a href=#1380 id=1380 data-nosnippet>1380</a>    <span class="doccomment">/// Default message notification level for a guild.
+<a href=#1381 id=1381 data-nosnippet>1381</a>    ///
+<a href=#1382 id=1382 data-nosnippet>1382</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-default-message-notification-level).
+<a href=#1383 id=1383 data-nosnippet>1383</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<a href=#1384 id=1384 data-nosnippet>1384</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1385 id=1385 data-nosnippet>1385</a>    #[non_exhaustive]
+<a href=#1386 id=1386 data-nosnippet>1386</a>    </span><span class="kw">pub enum </span>DefaultMessageNotificationLevel {
+<a href=#1387 id=1387 data-nosnippet>1387</a>        <span class="doccomment">/// Receive notifications for everything.
+<a href=#1388 id=1388 data-nosnippet>1388</a>        </span>All = <span class="number">0</span>,
+<a href=#1389 id=1389 data-nosnippet>1389</a>        <span class="doccomment">/// Receive only mentions.
+<a href=#1390 id=1390 data-nosnippet>1390</a>        </span>Mentions = <span class="number">1</span>,
+<a href=#1391 id=1391 data-nosnippet>1391</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
+<a href=#1392 id=1392 data-nosnippet>1392</a>    }
+<a href=#1393 id=1393 data-nosnippet>1393</a>}
+<a href=#1394 id=1394 data-nosnippet>1394</a>
+<a href=#1395 id=1395 data-nosnippet>1395</a><span class="macro">enum_number!</span> {
+<a href=#1396 id=1396 data-nosnippet>1396</a>    <span class="doccomment">/// Setting used to filter explicit messages from members.
+<a href=#1397 id=1397 data-nosnippet>1397</a>    ///
+<a href=#1398 id=1398 data-nosnippet>1398</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-explicit-content-filter-level).
+<a href=#1399 id=1399 data-nosnippet>1399</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<a href=#1400 id=1400 data-nosnippet>1400</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1401 id=1401 data-nosnippet>1401</a>    #[non_exhaustive]
+<a href=#1402 id=1402 data-nosnippet>1402</a>    </span><span class="kw">pub enum </span>ExplicitContentFilter {
+<a href=#1403 id=1403 data-nosnippet>1403</a>        <span class="doccomment">/// Don't scan any messages.
+<a href=#1404 id=1404 data-nosnippet>1404</a>        </span><span class="prelude-val">None </span>= <span class="number">0</span>,
+<a href=#1405 id=1405 data-nosnippet>1405</a>        <span class="doccomment">/// Scan messages from members without a role.
+<a href=#1406 id=1406 data-nosnippet>1406</a>        </span>WithoutRole = <span class="number">1</span>,
+<a href=#1407 id=1407 data-nosnippet>1407</a>        <span class="doccomment">/// Scan messages sent by all members.
+<a href=#1408 id=1408 data-nosnippet>1408</a>        </span>All = <span class="number">2</span>,
+<a href=#1409 id=1409 data-nosnippet>1409</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
+<a href=#1410 id=1410 data-nosnippet>1410</a>    }
+<a href=#1411 id=1411 data-nosnippet>1411</a>}
+<a href=#1412 id=1412 data-nosnippet>1412</a>
+<a href=#1413 id=1413 data-nosnippet>1413</a><span class="macro">enum_number!</span> {
+<a href=#1414 id=1414 data-nosnippet>1414</a>    <span class="doccomment">/// Multi-Factor Authentication level for guild moderators.
+<a href=#1415 id=1415 data-nosnippet>1415</a>    ///
+<a href=#1416 id=1416 data-nosnippet>1416</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-mfa-level).
+<a href=#1417 id=1417 data-nosnippet>1417</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<a href=#1418 id=1418 data-nosnippet>1418</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1419 id=1419 data-nosnippet>1419</a>    #[non_exhaustive]
+<a href=#1420 id=1420 data-nosnippet>1420</a>    </span><span class="kw">pub enum </span>MfaLevel {
+<a href=#1421 id=1421 data-nosnippet>1421</a>        <span class="doccomment">/// MFA is disabled.
+<a href=#1422 id=1422 data-nosnippet>1422</a>        </span><span class="prelude-val">None </span>= <span class="number">0</span>,
+<a href=#1423 id=1423 data-nosnippet>1423</a>        <span class="doccomment">/// MFA is enabled.
+<a href=#1424 id=1424 data-nosnippet>1424</a>        </span>Elevated = <span class="number">1</span>,
+<a href=#1425 id=1425 data-nosnippet>1425</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
+<a href=#1426 id=1426 data-nosnippet>1426</a>    }
+<a href=#1427 id=1427 data-nosnippet>1427</a>}
+<a href=#1428 id=1428 data-nosnippet>1428</a>
+<a href=#1429 id=1429 data-nosnippet>1429</a><span class="macro">enum_number!</span> {
+<a href=#1430 id=1430 data-nosnippet>1430</a>    <span class="doccomment">/// The level to set as criteria prior to a user being able to send
+<a href=#1431 id=1431 data-nosnippet>1431</a>    /// messages in a [`Guild`].
+<a href=#1432 id=1432 data-nosnippet>1432</a>    ///
+<a href=#1433 id=1433 data-nosnippet>1433</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-verification-level).
+<a href=#1434 id=1434 data-nosnippet>1434</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<a href=#1435 id=1435 data-nosnippet>1435</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1436 id=1436 data-nosnippet>1436</a>    #[non_exhaustive]
+<a href=#1437 id=1437 data-nosnippet>1437</a>    </span><span class="kw">pub enum </span>VerificationLevel {
+<a href=#1438 id=1438 data-nosnippet>1438</a>        <span class="doccomment">/// Does not require any verification.
+<a href=#1439 id=1439 data-nosnippet>1439</a>        </span><span class="prelude-val">None </span>= <span class="number">0</span>,
+<a href=#1440 id=1440 data-nosnippet>1440</a>        <span class="doccomment">/// Must have a verified email on the user's Discord account.
+<a href=#1441 id=1441 data-nosnippet>1441</a>        </span>Low = <span class="number">1</span>,
+<a href=#1442 id=1442 data-nosnippet>1442</a>        <span class="doccomment">/// Must also be a registered user on Discord for longer than 5 minutes.
+<a href=#1443 id=1443 data-nosnippet>1443</a>        </span>Medium = <span class="number">2</span>,
+<a href=#1444 id=1444 data-nosnippet>1444</a>        <span class="doccomment">/// Must also be a member of the guild for longer than 10 minutes.
+<a href=#1445 id=1445 data-nosnippet>1445</a>        </span>High = <span class="number">3</span>,
+<a href=#1446 id=1446 data-nosnippet>1446</a>        <span class="doccomment">/// Must have a verified phone on the user's Discord account.
+<a href=#1447 id=1447 data-nosnippet>1447</a>        </span>Higher = <span class="number">4</span>,
+<a href=#1448 id=1448 data-nosnippet>1448</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
+<a href=#1449 id=1449 data-nosnippet>1449</a>    }
+<a href=#1450 id=1450 data-nosnippet>1450</a>}
+<a href=#1451 id=1451 data-nosnippet>1451</a>
+<a href=#1452 id=1452 data-nosnippet>1452</a><span class="macro">enum_number!</span> {
+<a href=#1453 id=1453 data-nosnippet>1453</a>    <span class="doccomment">/// The [`Guild`] nsfw level.
+<a href=#1454 id=1454 data-nosnippet>1454</a>    ///
+<a href=#1455 id=1455 data-nosnippet>1455</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#guild-object-guild-nsfw-level).
+<a href=#1456 id=1456 data-nosnippet>1456</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<a href=#1457 id=1457 data-nosnippet>1457</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1458 id=1458 data-nosnippet>1458</a>    #[non_exhaustive]
+<a href=#1459 id=1459 data-nosnippet>1459</a>    </span><span class="kw">pub enum </span>NsfwLevel {
+<a href=#1460 id=1460 data-nosnippet>1460</a>        <span class="doccomment">/// The nsfw level is not specified.
+<a href=#1461 id=1461 data-nosnippet>1461</a>        </span>Default = <span class="number">0</span>,
+<a href=#1462 id=1462 data-nosnippet>1462</a>        <span class="doccomment">/// The guild is considered as explicit.
+<a href=#1463 id=1463 data-nosnippet>1463</a>        </span>Explicit = <span class="number">1</span>,
+<a href=#1464 id=1464 data-nosnippet>1464</a>        <span class="doccomment">/// The guild is considered as safe.
+<a href=#1465 id=1465 data-nosnippet>1465</a>        </span>Safe = <span class="number">2</span>,
+<a href=#1466 id=1466 data-nosnippet>1466</a>        <span class="doccomment">/// The guild is age restricted.
+<a href=#1467 id=1467 data-nosnippet>1467</a>        </span>AgeRestricted = <span class="number">3</span>,
+<a href=#1468 id=1468 data-nosnippet>1468</a>        <span class="kw">_ </span>=&gt; Unknown(u8),
+<a href=#1469 id=1469 data-nosnippet>1469</a>    }
+<a href=#1470 id=1470 data-nosnippet>1470</a>}
+<a href=#1471 id=1471 data-nosnippet>1471</a>
+<a href=#1472 id=1472 data-nosnippet>1472</a><span class="macro">enum_number!</span> {
+<a href=#1473 id=1473 data-nosnippet>1473</a>    <span class="doccomment">/// The [`Guild`] AFK timeout length.
+<a href=#1474 id=1474 data-nosnippet>1474</a>    ///
+<a href=#1475 id=1475 data-nosnippet>1475</a>    /// See [AfkMetadata::afk_timeout].
+<a href=#1476 id=1476 data-nosnippet>1476</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
+<a href=#1477 id=1477 data-nosnippet>1477</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1478 id=1478 data-nosnippet>1478</a>    #[non_exhaustive]
+<a href=#1479 id=1479 data-nosnippet>1479</a>    </span><span class="kw">pub enum </span>AfkTimeout {
+<a href=#1480 id=1480 data-nosnippet>1480</a>        OneMinute = <span class="number">60</span>,
+<a href=#1481 id=1481 data-nosnippet>1481</a>        FiveMinutes = <span class="number">300</span>,
+<a href=#1482 id=1482 data-nosnippet>1482</a>        FifteenMinutes = <span class="number">900</span>,
+<a href=#1483 id=1483 data-nosnippet>1483</a>        ThirtyMinutes = <span class="number">1800</span>,
+<a href=#1484 id=1484 data-nosnippet>1484</a>        OneHour = <span class="number">3600</span>,
+<a href=#1485 id=1485 data-nosnippet>1485</a>        <span class="kw">_ </span>=&gt; Unknown(u16),
+<a href=#1486 id=1486 data-nosnippet>1486</a>    }
+<a href=#1487 id=1487 data-nosnippet>1487</a>}
+<a href=#1488 id=1488 data-nosnippet>1488</a>
+<a href=#1489 id=1489 data-nosnippet>1489</a><span class="doccomment">/// The [`Guild`]'s incident's data.
+<a href=#1490 id=1490 data-nosnippet>1490</a>///
+<a href=#1491 id=1491 data-nosnippet>1491</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#incidents-data-object).
+<a href=#1492 id=1492 data-nosnippet>1492</a></span><span class="attr">#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+<a href=#1493 id=1493 data-nosnippet>1493</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
+<a href=#1494 id=1494 data-nosnippet>1494</a>#[non_exhaustive]
+<a href=#1495 id=1495 data-nosnippet>1495</a></span><span class="kw">pub struct </span>IncidentsData {
+<a href=#1496 id=1496 data-nosnippet>1496</a>    <span class="doccomment">/// The time that invites get enabled again.
+<a href=#1497 id=1497 data-nosnippet>1497</a>    </span><span class="kw">pub </span>invites_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+<a href=#1498 id=1498 data-nosnippet>1498</a>    <span class="doccomment">/// The time that dms get enabled again.
+<a href=#1499 id=1499 data-nosnippet>1499</a>    </span><span class="kw">pub </span>dms_disabled_until: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+<a href=#1500 id=1500 data-nosnippet>1500</a>    <span class="doccomment">/// The time when elevated dm activity was triggered.
+<a href=#1501 id=1501 data-nosnippet>1501</a>    </span><span class="kw">pub </span>dm_spam_detected_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+<a href=#1502 id=1502 data-nosnippet>1502</a>    <span class="doccomment">/// The time when raid alerts were triggered.
+<a href=#1503 id=1503 data-nosnippet>1503</a>    </span><span class="kw">pub </span>raid_detected_at: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+<a href=#1504 id=1504 data-nosnippet>1504</a>}
+<a href=#1505 id=1505 data-nosnippet>1505</a>
+<a href=#1506 id=1506 data-nosnippet>1506</a><span class="attr">#[cfg(test)]
+<a href=#1507 id=1507 data-nosnippet>1507</a></span><span class="kw">mod </span>test {
+<a href=#1508 id=1508 data-nosnippet>1508</a>    <span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1509 id=1509 data-nosnippet>1509</a>    </span><span class="kw">mod </span>model {
+<a href=#1510 id=1510 data-nosnippet>1510</a>        <span class="kw">use </span>std::num::NonZeroU16;
+<a href=#1511 id=1511 data-nosnippet>1511</a>
+<a href=#1512 id=1512 data-nosnippet>1512</a>        <span class="kw">use </span><span class="kw">crate</span>::model::prelude::<span class="kw-2">*</span>;
 <a href=#1513 id=1513 data-nosnippet>1513</a>
-<a href=#1514 id=1514 data-nosnippet>1514</a>        <span class="kw">fn </span>get_guild() -&gt; Guild {
-<a href=#1515 id=1515 data-nosnippet>1515</a>            <span class="kw">let </span>m = get_member();
-<a href=#1516 id=1516 data-nosnippet>1516</a>
-<a href=#1517 id=1517 data-nosnippet>1517</a>            Guild {
-<a href=#1518 id=1518 data-nosnippet>1518</a>                members: ExtractMap::from_iter([m]),
-<a href=#1519 id=1519 data-nosnippet>1519</a>                ..Default::default()
-<a href=#1520 id=1520 data-nosnippet>1520</a>            }
-<a href=#1521 id=1521 data-nosnippet>1521</a>        }
-<a href=#1522 id=1522 data-nosnippet>1522</a>
-<a href=#1523 id=1523 data-nosnippet>1523</a>        <span class="attr">#[test]
-<a href=#1524 id=1524 data-nosnippet>1524</a>        </span><span class="kw">fn </span>member_named_username() {
-<a href=#1525 id=1525 data-nosnippet>1525</a>            <span class="kw">let </span>guild = get_guild();
-<a href=#1526 id=1526 data-nosnippet>1526</a>            <span class="kw">let </span>lhs = guild.member_named(<span class="string">"test#1432"</span>).unwrap().display_name();
-<a href=#1527 id=1527 data-nosnippet>1527</a>
-<a href=#1528 id=1528 data-nosnippet>1528</a>            <span class="macro">assert_eq!</span>(lhs, get_member().display_name());
-<a href=#1529 id=1529 data-nosnippet>1529</a>        }
-<a href=#1530 id=1530 data-nosnippet>1530</a>
-<a href=#1531 id=1531 data-nosnippet>1531</a>        <span class="attr">#[test]
-<a href=#1532 id=1532 data-nosnippet>1532</a>        </span><span class="kw">fn </span>member_named_nickname() {
-<a href=#1533 id=1533 data-nosnippet>1533</a>            <span class="kw">let </span>guild = get_guild();
-<a href=#1534 id=1534 data-nosnippet>1534</a>            <span class="kw">let </span>lhs = guild.member_named(<span class="string">"aaaa"</span>).unwrap().display_name();
-<a href=#1535 id=1535 data-nosnippet>1535</a>
-<a href=#1536 id=1536 data-nosnippet>1536</a>            <span class="macro">assert_eq!</span>(lhs, get_member().display_name());
-<a href=#1537 id=1537 data-nosnippet>1537</a>        }
-<a href=#1538 id=1538 data-nosnippet>1538</a>    }
-<a href=#1539 id=1539 data-nosnippet>1539</a>}
+<a href=#1514 id=1514 data-nosnippet>1514</a>        <span class="kw">fn </span>get_member() -&gt; Member {
+<a href=#1515 id=1515 data-nosnippet>1515</a>            Member {
+<a href=#1516 id=1516 data-nosnippet>1516</a>                nick: <span class="prelude-val">Some</span>(FixedString::from_static_trunc(<span class="string">"aaaa"</span>)),
+<a href=#1517 id=1517 data-nosnippet>1517</a>                user: User {
+<a href=#1518 id=1518 data-nosnippet>1518</a>                    name: FixedString::from_static_trunc(<span class="string">"test"</span>),
+<a href=#1519 id=1519 data-nosnippet>1519</a>                    discriminator: NonZeroU16::new(<span class="number">1432</span>),
+<a href=#1520 id=1520 data-nosnippet>1520</a>                    ..User::default()
+<a href=#1521 id=1521 data-nosnippet>1521</a>                },
+<a href=#1522 id=1522 data-nosnippet>1522</a>                ..Default::default()
+<a href=#1523 id=1523 data-nosnippet>1523</a>            }
+<a href=#1524 id=1524 data-nosnippet>1524</a>        }
+<a href=#1525 id=1525 data-nosnippet>1525</a>
+<a href=#1526 id=1526 data-nosnippet>1526</a>        <span class="kw">fn </span>get_guild() -&gt; Guild {
+<a href=#1527 id=1527 data-nosnippet>1527</a>            <span class="kw">let </span>m = get_member();
+<a href=#1528 id=1528 data-nosnippet>1528</a>
+<a href=#1529 id=1529 data-nosnippet>1529</a>            Guild {
+<a href=#1530 id=1530 data-nosnippet>1530</a>                members: ExtractMap::from_iter([m]),
+<a href=#1531 id=1531 data-nosnippet>1531</a>                ..Default::default()
+<a href=#1532 id=1532 data-nosnippet>1532</a>            }
+<a href=#1533 id=1533 data-nosnippet>1533</a>        }
+<a href=#1534 id=1534 data-nosnippet>1534</a>
+<a href=#1535 id=1535 data-nosnippet>1535</a>        <span class="attr">#[test]
+<a href=#1536 id=1536 data-nosnippet>1536</a>        </span><span class="kw">fn </span>member_named_username() {
+<a href=#1537 id=1537 data-nosnippet>1537</a>            <span class="kw">let </span>guild = get_guild();
+<a href=#1538 id=1538 data-nosnippet>1538</a>            <span class="kw">let </span>lhs = guild.member_named(<span class="string">"test#1432"</span>).unwrap().display_name();
+<a href=#1539 id=1539 data-nosnippet>1539</a>
+<a href=#1540 id=1540 data-nosnippet>1540</a>            <span class="macro">assert_eq!</span>(lhs, get_member().display_name());
+<a href=#1541 id=1541 data-nosnippet>1541</a>        }
+<a href=#1542 id=1542 data-nosnippet>1542</a>
+<a href=#1543 id=1543 data-nosnippet>1543</a>        <span class="attr">#[test]
+<a href=#1544 id=1544 data-nosnippet>1544</a>        </span><span class="kw">fn </span>member_named_nickname() {
+<a href=#1545 id=1545 data-nosnippet>1545</a>            <span class="kw">let </span>guild = get_guild();
+<a href=#1546 id=1546 data-nosnippet>1546</a>            <span class="kw">let </span>lhs = guild.member_named(<span class="string">"aaaa"</span>).unwrap().display_name();
+<a href=#1547 id=1547 data-nosnippet>1547</a>
+<a href=#1548 id=1548 data-nosnippet>1548</a>            <span class="macro">assert_eq!</span>(lhs, get_member().display_name());
+<a href=#1549 id=1549 data-nosnippet>1549</a>        }
+<a href=#1550 id=1550 data-nosnippet>1550</a>    }
+<a href=#1551 id=1551 data-nosnippet>1551</a>}
 </code></pre></div></section></main></body></html>

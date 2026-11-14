@@ -1762,184 +1762,217 @@
 <a href=#1762 id=1762 data-nosnippet>1762</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;MessageSearchResults&gt; {
 <a href=#1763 id=1763 data-nosnippet>1763</a>        query.execute(http, <span class="self">self</span>, should_cache).<span class="kw">await
 <a href=#1764 id=1764 data-nosnippet>1764</a>    </span>}
-<a href=#1765 id=1765 data-nosnippet>1765</a>}
-<a href=#1766 id=1766 data-nosnippet>1766</a>
-<a href=#1767 id=1767 data-nosnippet>1767</a><span class="kw">impl </span>From&lt;PartialGuild&gt; <span class="kw">for </span>GuildId {
-<a href=#1768 id=1768 data-nosnippet>1768</a>    <span class="doccomment">/// Gets the Id of a partial guild.
-<a href=#1769 id=1769 data-nosnippet>1769</a>    </span><span class="kw">fn </span>from(guild: PartialGuild) -&gt; GuildId {
-<a href=#1770 id=1770 data-nosnippet>1770</a>        guild.id
-<a href=#1771 id=1771 data-nosnippet>1771</a>    }
-<a href=#1772 id=1772 data-nosnippet>1772</a>}
-<a href=#1773 id=1773 data-nosnippet>1773</a>
-<a href=#1774 id=1774 data-nosnippet>1774</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>PartialGuild&gt; <span class="kw">for </span>GuildId {
-<a href=#1775 id=1775 data-nosnippet>1775</a>    <span class="doccomment">/// Gets the Id of a partial guild.
-<a href=#1776 id=1776 data-nosnippet>1776</a>    </span><span class="kw">fn </span>from(guild: <span class="kw-2">&amp;</span>PartialGuild) -&gt; GuildId {
-<a href=#1777 id=1777 data-nosnippet>1777</a>        guild.id
-<a href=#1778 id=1778 data-nosnippet>1778</a>    }
-<a href=#1779 id=1779 data-nosnippet>1779</a>}
-<a href=#1780 id=1780 data-nosnippet>1780</a>
-<a href=#1781 id=1781 data-nosnippet>1781</a><span class="kw">impl </span>From&lt;GuildInfo&gt; <span class="kw">for </span>GuildId {
-<a href=#1782 id=1782 data-nosnippet>1782</a>    <span class="doccomment">/// Gets the Id of Guild information struct.
-<a href=#1783 id=1783 data-nosnippet>1783</a>    </span><span class="kw">fn </span>from(guild_info: GuildInfo) -&gt; GuildId {
-<a href=#1784 id=1784 data-nosnippet>1784</a>        guild_info.id
-<a href=#1785 id=1785 data-nosnippet>1785</a>    }
-<a href=#1786 id=1786 data-nosnippet>1786</a>}
-<a href=#1787 id=1787 data-nosnippet>1787</a>
-<a href=#1788 id=1788 data-nosnippet>1788</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>GuildInfo&gt; <span class="kw">for </span>GuildId {
-<a href=#1789 id=1789 data-nosnippet>1789</a>    <span class="doccomment">/// Gets the Id of Guild information struct.
-<a href=#1790 id=1790 data-nosnippet>1790</a>    </span><span class="kw">fn </span>from(guild_info: <span class="kw-2">&amp;</span>GuildInfo) -&gt; GuildId {
-<a href=#1791 id=1791 data-nosnippet>1791</a>        guild_info.id
-<a href=#1792 id=1792 data-nosnippet>1792</a>    }
-<a href=#1793 id=1793 data-nosnippet>1793</a>}
-<a href=#1794 id=1794 data-nosnippet>1794</a>
-<a href=#1795 id=1795 data-nosnippet>1795</a><span class="kw">impl </span>From&lt;InviteGuild&gt; <span class="kw">for </span>GuildId {
-<a href=#1796 id=1796 data-nosnippet>1796</a>    <span class="doccomment">/// Gets the Id of Invite Guild struct.
-<a href=#1797 id=1797 data-nosnippet>1797</a>    </span><span class="kw">fn </span>from(invite_guild: InviteGuild) -&gt; GuildId {
-<a href=#1798 id=1798 data-nosnippet>1798</a>        invite_guild.id
-<a href=#1799 id=1799 data-nosnippet>1799</a>    }
-<a href=#1800 id=1800 data-nosnippet>1800</a>}
-<a href=#1801 id=1801 data-nosnippet>1801</a>
-<a href=#1802 id=1802 data-nosnippet>1802</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>InviteGuild&gt; <span class="kw">for </span>GuildId {
-<a href=#1803 id=1803 data-nosnippet>1803</a>    <span class="doccomment">/// Gets the Id of Invite Guild struct.
-<a href=#1804 id=1804 data-nosnippet>1804</a>    </span><span class="kw">fn </span>from(invite_guild: <span class="kw-2">&amp;</span>InviteGuild) -&gt; GuildId {
-<a href=#1805 id=1805 data-nosnippet>1805</a>        invite_guild.id
-<a href=#1806 id=1806 data-nosnippet>1806</a>    }
-<a href=#1807 id=1807 data-nosnippet>1807</a>}
-<a href=#1808 id=1808 data-nosnippet>1808</a>
-<a href=#1809 id=1809 data-nosnippet>1809</a><span class="kw">impl </span>From&lt;Guild&gt; <span class="kw">for </span>GuildId {
-<a href=#1810 id=1810 data-nosnippet>1810</a>    <span class="doccomment">/// Gets the Id of Guild.
-<a href=#1811 id=1811 data-nosnippet>1811</a>    </span><span class="kw">fn </span>from(live_guild: Guild) -&gt; GuildId {
-<a href=#1812 id=1812 data-nosnippet>1812</a>        live_guild.id
-<a href=#1813 id=1813 data-nosnippet>1813</a>    }
-<a href=#1814 id=1814 data-nosnippet>1814</a>}
-<a href=#1815 id=1815 data-nosnippet>1815</a>
-<a href=#1816 id=1816 data-nosnippet>1816</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>Guild&gt; <span class="kw">for </span>GuildId {
-<a href=#1817 id=1817 data-nosnippet>1817</a>    <span class="doccomment">/// Gets the Id of Guild.
-<a href=#1818 id=1818 data-nosnippet>1818</a>    </span><span class="kw">fn </span>from(live_guild: <span class="kw-2">&amp;</span>Guild) -&gt; GuildId {
-<a href=#1819 id=1819 data-nosnippet>1819</a>        live_guild.id
-<a href=#1820 id=1820 data-nosnippet>1820</a>    }
-<a href=#1821 id=1821 data-nosnippet>1821</a>}
-<a href=#1822 id=1822 data-nosnippet>1822</a>
-<a href=#1823 id=1823 data-nosnippet>1823</a><span class="kw">impl </span>From&lt;WebhookGuild&gt; <span class="kw">for </span>GuildId {
-<a href=#1824 id=1824 data-nosnippet>1824</a>    <span class="doccomment">/// Gets the Id of Webhook Guild struct.
-<a href=#1825 id=1825 data-nosnippet>1825</a>    </span><span class="kw">fn </span>from(webhook_guild: WebhookGuild) -&gt; GuildId {
-<a href=#1826 id=1826 data-nosnippet>1826</a>        webhook_guild.id
-<a href=#1827 id=1827 data-nosnippet>1827</a>    }
-<a href=#1828 id=1828 data-nosnippet>1828</a>}
-<a href=#1829 id=1829 data-nosnippet>1829</a>
-<a href=#1830 id=1830 data-nosnippet>1830</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>WebhookGuild&gt; <span class="kw">for </span>GuildId {
-<a href=#1831 id=1831 data-nosnippet>1831</a>    <span class="doccomment">/// Gets the Id of Webhook Guild struct.
-<a href=#1832 id=1832 data-nosnippet>1832</a>    </span><span class="kw">fn </span>from(webhook_guild: <span class="kw-2">&amp;</span>WebhookGuild) -&gt; GuildId {
-<a href=#1833 id=1833 data-nosnippet>1833</a>        webhook_guild.id
-<a href=#1834 id=1834 data-nosnippet>1834</a>    }
-<a href=#1835 id=1835 data-nosnippet>1835</a>}
-<a href=#1836 id=1836 data-nosnippet>1836</a>
-<a href=#1837 id=1837 data-nosnippet>1837</a><span class="doccomment">/// A helper class returned by [`GuildId::members_iter`]
-<a href=#1838 id=1838 data-nosnippet>1838</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#1839 id=1839 data-nosnippet>1839</a>#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1840 id=1840 data-nosnippet>1840</a></span><span class="kw">pub struct </span>MembersIter&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#1841 id=1841 data-nosnippet>1841</a>    guild_id: GuildId,
-<a href=#1842 id=1842 data-nosnippet>1842</a>    http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http,
-<a href=#1843 id=1843 data-nosnippet>1843</a>    buffer: Vec&lt;Member&gt;,
-<a href=#1844 id=1844 data-nosnippet>1844</a>    after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
-<a href=#1845 id=1845 data-nosnippet>1845</a>    tried_fetch: bool,
-<a href=#1846 id=1846 data-nosnippet>1846</a>}
-<a href=#1847 id=1847 data-nosnippet>1847</a>
-<a href=#1848 id=1848 data-nosnippet>1848</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
-<a href=#1849 id=1849 data-nosnippet>1849</a></span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; MembersIter&lt;<span class="lifetime">'a</span>&gt; {
-<a href=#1850 id=1850 data-nosnippet>1850</a>    <span class="kw">fn </span>new(guild_id: GuildId, http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http) -&gt; <span class="self">Self </span>{
-<a href=#1851 id=1851 data-nosnippet>1851</a>        <span class="self">Self </span>{
-<a href=#1852 id=1852 data-nosnippet>1852</a>            guild_id,
-<a href=#1853 id=1853 data-nosnippet>1853</a>            http,
-<a href=#1854 id=1854 data-nosnippet>1854</a>            buffer: Vec::new(),
-<a href=#1855 id=1855 data-nosnippet>1855</a>            after: <span class="prelude-val">None</span>,
-<a href=#1856 id=1856 data-nosnippet>1856</a>            tried_fetch: <span class="bool-val">false</span>,
-<a href=#1857 id=1857 data-nosnippet>1857</a>        }
-<a href=#1858 id=1858 data-nosnippet>1858</a>    }
-<a href=#1859 id=1859 data-nosnippet>1859</a>
-<a href=#1860 id=1860 data-nosnippet>1860</a>    <span class="doccomment">/// Fills the `self.buffer` cache of Members.
-<a href=#1861 id=1861 data-nosnippet>1861</a>    ///
-<a href=#1862 id=1862 data-nosnippet>1862</a>    /// This drops any members that were currently in the buffer, so it should only be called when
-<a href=#1863 id=1863 data-nosnippet>1863</a>    /// `self.buffer` is empty.  Additionally, this updates `self.after` so that the next call does
-<a href=#1864 id=1864 data-nosnippet>1864</a>    /// not return duplicate items.  If there are no more members to be fetched, then this marks
-<a href=#1865 id=1865 data-nosnippet>1865</a>    /// `self.after` as None, indicating that no more calls ought to be made.
-<a href=#1866 id=1866 data-nosnippet>1866</a>    </span><span class="kw">async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
-<a href=#1867 id=1867 data-nosnippet>1867</a>        <span class="kw">let </span>grab_size = <span class="kw">crate</span>::constants::MEMBER_FETCH_LIMIT;
-<a href=#1868 id=1868 data-nosnippet>1868</a>
-<a href=#1869 id=1869 data-nosnippet>1869</a>        <span class="comment">// Number of profiles to fetch
-<a href=#1870 id=1870 data-nosnippet>1870</a>        </span><span class="self">self</span>.buffer = <span class="self">self</span>.guild_id.members(<span class="self">self</span>.http, <span class="prelude-val">Some</span>(grab_size), <span class="self">self</span>.after).<span class="kw">await</span><span class="question-mark">?</span>;
-<a href=#1871 id=1871 data-nosnippet>1871</a>
-<a href=#1872 id=1872 data-nosnippet>1872</a>        <span class="comment">// Get the last member.  If shorter than 1000, there are no more results anyway
-<a href=#1873 id=1873 data-nosnippet>1873</a>        </span><span class="self">self</span>.after = <span class="self">self</span>.buffer.get(grab_size.get() <span class="kw">as </span>usize - <span class="number">1</span>).map(|member| member.user.id);
-<a href=#1874 id=1874 data-nosnippet>1874</a>
-<a href=#1875 id=1875 data-nosnippet>1875</a>        <span class="comment">// Reverse to optimize pop()
-<a href=#1876 id=1876 data-nosnippet>1876</a>        </span><span class="self">self</span>.buffer.reverse();
-<a href=#1877 id=1877 data-nosnippet>1877</a>
-<a href=#1878 id=1878 data-nosnippet>1878</a>        <span class="self">self</span>.tried_fetch = <span class="bool-val">true</span>;
-<a href=#1879 id=1879 data-nosnippet>1879</a>
-<a href=#1880 id=1880 data-nosnippet>1880</a>        <span class="prelude-val">Ok</span>(())
-<a href=#1881 id=1881 data-nosnippet>1881</a>    }
-<a href=#1882 id=1882 data-nosnippet>1882</a>
-<a href=#1883 id=1883 data-nosnippet>1883</a>    <span class="doccomment">/// Streams over all the members in a guild.
-<a href=#1884 id=1884 data-nosnippet>1884</a>    ///
-<a href=#1885 id=1885 data-nosnippet>1885</a>    /// This is accomplished and equivalent to repeated calls to [`GuildId::members`]. A buffer of
-<a href=#1886 id=1886 data-nosnippet>1886</a>    /// at most 1,000 members is used to reduce the number of calls necessary.
-<a href=#1887 id=1887 data-nosnippet>1887</a>    ///
-<a href=#1888 id=1888 data-nosnippet>1888</a>    /// # Examples
-<a href=#1889 id=1889 data-nosnippet>1889</a>    ///
-<a href=#1890 id=1890 data-nosnippet>1890</a>    /// ```rust,no_run
-<a href=#1891 id=1891 data-nosnippet>1891</a>    /// # use serenity::model::id::GuildId;
-<a href=#1892 id=1892 data-nosnippet>1892</a>    /// # use serenity::http::Http;
-<a href=#1893 id=1893 data-nosnippet>1893</a>    /// #
-<a href=#1894 id=1894 data-nosnippet>1894</a>    /// # async fn run() {
-<a href=#1895 id=1895 data-nosnippet>1895</a>    /// # let guild_id = GuildId::new(1);
-<a href=#1896 id=1896 data-nosnippet>1896</a>    /// # let http: Http = unimplemented!();
-<a href=#1897 id=1897 data-nosnippet>1897</a>    /// use serenity::futures::StreamExt;
-<a href=#1898 id=1898 data-nosnippet>1898</a>    /// use serenity::model::guild::MembersIter;
-<a href=#1899 id=1899 data-nosnippet>1899</a>    ///
-<a href=#1900 id=1900 data-nosnippet>1900</a>    /// let mut members = MembersIter::stream(&amp;http, guild_id).boxed();
-<a href=#1901 id=1901 data-nosnippet>1901</a>    /// while let Some(member_result) = members.next().await {
-<a href=#1902 id=1902 data-nosnippet>1902</a>    ///     match member_result {
-<a href=#1903 id=1903 data-nosnippet>1903</a>    ///         Ok(member) =&gt; println!("{} is {}", member, member.display_name(),),
-<a href=#1904 id=1904 data-nosnippet>1904</a>    ///         Err(error) =&gt; eprintln!("Uh oh!  Error: {}", error),
-<a href=#1905 id=1905 data-nosnippet>1905</a>    ///     }
-<a href=#1906 id=1906 data-nosnippet>1906</a>    /// }
-<a href=#1907 id=1907 data-nosnippet>1907</a>    /// # }
-<a href=#1908 id=1908 data-nosnippet>1908</a>    /// ```
-<a href=#1909 id=1909 data-nosnippet>1909</a>    </span><span class="kw">pub fn </span>stream(http: <span class="kw-2">&amp;</span>Http, guild_id: GuildId) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Member&gt;&gt; + <span class="lifetime">'_ </span>{
-<a href=#1910 id=1910 data-nosnippet>1910</a>        <span class="kw">let </span>init_state = MembersIter::new(guild_id, http);
-<a href=#1911 id=1911 data-nosnippet>1911</a>
-<a href=#1912 id=1912 data-nosnippet>1912</a>        futures::stream::unfold(init_state, |<span class="kw-2">mut </span>state| <span class="kw">async </span>{
-<a href=#1913 id=1913 data-nosnippet>1913</a>            <span class="kw">if </span>(state.buffer.is_empty() &amp;&amp; state.after.is_some() || !state.tried_fetch)
-<a href=#1914 id=1914 data-nosnippet>1914</a>                &amp;&amp; <span class="kw">let </span><span class="prelude-val">Err</span>(error) = state.refresh().<span class="kw">await
-<a href=#1915 id=1915 data-nosnippet>1915</a>            </span>{
-<a href=#1916 id=1916 data-nosnippet>1916</a>                <span class="kw">return </span><span class="prelude-val">Some</span>((<span class="prelude-val">Err</span>(error), state));
-<a href=#1917 id=1917 data-nosnippet>1917</a>            }
-<a href=#1918 id=1918 data-nosnippet>1918</a>
-<a href=#1919 id=1919 data-nosnippet>1919</a>            state.buffer.pop().map(|entry| (<span class="prelude-val">Ok</span>(entry), state))
-<a href=#1920 id=1920 data-nosnippet>1920</a>        })
-<a href=#1921 id=1921 data-nosnippet>1921</a>    }
-<a href=#1922 id=1922 data-nosnippet>1922</a>}
-<a href=#1923 id=1923 data-nosnippet>1923</a>
-<a href=#1924 id=1924 data-nosnippet>1924</a><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
-<a href=#1925 id=1925 data-nosnippet>1925</a>#[non_exhaustive]
-<a href=#1926 id=1926 data-nosnippet>1926</a></span><span class="kw">pub enum </span>GuildWidgetStyle {
-<a href=#1927 id=1927 data-nosnippet>1927</a>    Shield,
-<a href=#1928 id=1928 data-nosnippet>1928</a>    Banner1,
-<a href=#1929 id=1929 data-nosnippet>1929</a>    Banner2,
-<a href=#1930 id=1930 data-nosnippet>1930</a>    Banner3,
-<a href=#1931 id=1931 data-nosnippet>1931</a>    Banner4,
-<a href=#1932 id=1932 data-nosnippet>1932</a>}
-<a href=#1933 id=1933 data-nosnippet>1933</a>
-<a href=#1934 id=1934 data-nosnippet>1934</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>GuildWidgetStyle {
-<a href=#1935 id=1935 data-nosnippet>1935</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
-<a href=#1936 id=1936 data-nosnippet>1936</a>        <span class="kw">match </span><span class="self">self </span>{
-<a href=#1937 id=1937 data-nosnippet>1937</a>            <span class="self">Self</span>::Shield =&gt; f.write_str(<span class="string">"shield"</span>),
-<a href=#1938 id=1938 data-nosnippet>1938</a>            <span class="self">Self</span>::Banner1 =&gt; f.write_str(<span class="string">"banner1"</span>),
-<a href=#1939 id=1939 data-nosnippet>1939</a>            <span class="self">Self</span>::Banner2 =&gt; f.write_str(<span class="string">"banner2"</span>),
-<a href=#1940 id=1940 data-nosnippet>1940</a>            <span class="self">Self</span>::Banner3 =&gt; f.write_str(<span class="string">"banner3"</span>),
-<a href=#1941 id=1941 data-nosnippet>1941</a>            <span class="self">Self</span>::Banner4 =&gt; f.write_str(<span class="string">"banner4"</span>),
-<a href=#1942 id=1942 data-nosnippet>1942</a>        }
-<a href=#1943 id=1943 data-nosnippet>1943</a>    }
-<a href=#1944 id=1944 data-nosnippet>1944</a>}
+<a href=#1765 id=1765 data-nosnippet>1765</a>
+<a href=#1766 id=1766 data-nosnippet>1766</a>    <span class="doccomment">/// Gets a member's computed guild permissions, combining their roles with `@everyone`.
+<a href=#1767 id=1767 data-nosnippet>1767</a>    ///
+<a href=#1768 id=1768 data-nosnippet>1768</a>    /// **Note**: This does not include permission overwrites. To get a member's permissions in a
+<a href=#1769 id=1769 data-nosnippet>1769</a>    /// channel, including overwrites, use [`GenericChannelId::member_permissions`].
+<a href=#1770 id=1770 data-nosnippet>1770</a>    ///
+<a href=#1771 id=1771 data-nosnippet>1771</a>    /// To get a member's guild permissions without making an HTTP call, use
+<a href=#1772 id=1772 data-nosnippet>1772</a>    /// [`Guild::member_permissions`], [`Guild::partial_member_permissions`],
+<a href=#1773 id=1773 data-nosnippet>1773</a>    /// [`PartialGuild::member_permissions`], or [`PartialGuild::partial_member_permissions`].
+<a href=#1774 id=1774 data-nosnippet>1774</a>    ///
+<a href=#1775 id=1775 data-nosnippet>1775</a>    /// # Errors
+<a href=#1776 id=1776 data-nosnippet>1776</a>    ///
+<a href=#1777 id=1777 data-nosnippet>1777</a>    /// Returns [`Error::Http`] if invalid data is given.
+<a href=#1778 id=1778 data-nosnippet>1778</a>    ///
+<a href=#1779 id=1779 data-nosnippet>1779</a>    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+<a href=#1780 id=1780 data-nosnippet>1780</a>    </span><span class="kw">pub async fn </span>member_permissions(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, user_id: UserId) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
+<a href=#1781 id=1781 data-nosnippet>1781</a>        http.get_guild_member_permissions(<span class="self">self</span>, user_id).<span class="kw">await
+<a href=#1782 id=1782 data-nosnippet>1782</a>    </span>}
+<a href=#1783 id=1783 data-nosnippet>1783</a>
+<a href=#1784 id=1784 data-nosnippet>1784</a>    <span class="doccomment">/// Gets the combined guild permissions of the specified role and `@everyone`.
+<a href=#1785 id=1785 data-nosnippet>1785</a>    ///
+<a href=#1786 id=1786 data-nosnippet>1786</a>    /// **Note**: This calculation does not include other roles or member-specific restrictions.
+<a href=#1787 id=1787 data-nosnippet>1787</a>    /// It also does not include channel overwrites; to get the permissions in a channel, including
+<a href=#1788 id=1788 data-nosnippet>1788</a>    /// overwrites, use [`GenericChannelId::role_permissions`].
+<a href=#1789 id=1789 data-nosnippet>1789</a>    ///
+<a href=#1790 id=1790 data-nosnippet>1790</a>    /// # Errors
+<a href=#1791 id=1791 data-nosnippet>1791</a>    ///
+<a href=#1792 id=1792 data-nosnippet>1792</a>    /// Returns [`Error::Http`] if invalid data is given.
+<a href=#1793 id=1793 data-nosnippet>1793</a>    ///
+<a href=#1794 id=1794 data-nosnippet>1794</a>    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+<a href=#1795 id=1795 data-nosnippet>1795</a>    </span><span class="kw">pub async fn </span>role_permissions(<span class="self">self</span>, http: <span class="kw-2">&amp;</span>Http, role_id: RoleId) -&gt; <span class="prelude-ty">Result</span>&lt;Permissions&gt; {
+<a href=#1796 id=1796 data-nosnippet>1796</a>        http.get_guild_role_permissions(<span class="self">self</span>, role_id).<span class="kw">await
+<a href=#1797 id=1797 data-nosnippet>1797</a>    </span>}
+<a href=#1798 id=1798 data-nosnippet>1798</a>}
+<a href=#1799 id=1799 data-nosnippet>1799</a>
+<a href=#1800 id=1800 data-nosnippet>1800</a><span class="kw">impl </span>From&lt;PartialGuild&gt; <span class="kw">for </span>GuildId {
+<a href=#1801 id=1801 data-nosnippet>1801</a>    <span class="doccomment">/// Gets the Id of a partial guild.
+<a href=#1802 id=1802 data-nosnippet>1802</a>    </span><span class="kw">fn </span>from(guild: PartialGuild) -&gt; GuildId {
+<a href=#1803 id=1803 data-nosnippet>1803</a>        guild.id
+<a href=#1804 id=1804 data-nosnippet>1804</a>    }
+<a href=#1805 id=1805 data-nosnippet>1805</a>}
+<a href=#1806 id=1806 data-nosnippet>1806</a>
+<a href=#1807 id=1807 data-nosnippet>1807</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>PartialGuild&gt; <span class="kw">for </span>GuildId {
+<a href=#1808 id=1808 data-nosnippet>1808</a>    <span class="doccomment">/// Gets the Id of a partial guild.
+<a href=#1809 id=1809 data-nosnippet>1809</a>    </span><span class="kw">fn </span>from(guild: <span class="kw-2">&amp;</span>PartialGuild) -&gt; GuildId {
+<a href=#1810 id=1810 data-nosnippet>1810</a>        guild.id
+<a href=#1811 id=1811 data-nosnippet>1811</a>    }
+<a href=#1812 id=1812 data-nosnippet>1812</a>}
+<a href=#1813 id=1813 data-nosnippet>1813</a>
+<a href=#1814 id=1814 data-nosnippet>1814</a><span class="kw">impl </span>From&lt;GuildInfo&gt; <span class="kw">for </span>GuildId {
+<a href=#1815 id=1815 data-nosnippet>1815</a>    <span class="doccomment">/// Gets the Id of Guild information struct.
+<a href=#1816 id=1816 data-nosnippet>1816</a>    </span><span class="kw">fn </span>from(guild_info: GuildInfo) -&gt; GuildId {
+<a href=#1817 id=1817 data-nosnippet>1817</a>        guild_info.id
+<a href=#1818 id=1818 data-nosnippet>1818</a>    }
+<a href=#1819 id=1819 data-nosnippet>1819</a>}
+<a href=#1820 id=1820 data-nosnippet>1820</a>
+<a href=#1821 id=1821 data-nosnippet>1821</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>GuildInfo&gt; <span class="kw">for </span>GuildId {
+<a href=#1822 id=1822 data-nosnippet>1822</a>    <span class="doccomment">/// Gets the Id of Guild information struct.
+<a href=#1823 id=1823 data-nosnippet>1823</a>    </span><span class="kw">fn </span>from(guild_info: <span class="kw-2">&amp;</span>GuildInfo) -&gt; GuildId {
+<a href=#1824 id=1824 data-nosnippet>1824</a>        guild_info.id
+<a href=#1825 id=1825 data-nosnippet>1825</a>    }
+<a href=#1826 id=1826 data-nosnippet>1826</a>}
+<a href=#1827 id=1827 data-nosnippet>1827</a>
+<a href=#1828 id=1828 data-nosnippet>1828</a><span class="kw">impl </span>From&lt;InviteGuild&gt; <span class="kw">for </span>GuildId {
+<a href=#1829 id=1829 data-nosnippet>1829</a>    <span class="doccomment">/// Gets the Id of Invite Guild struct.
+<a href=#1830 id=1830 data-nosnippet>1830</a>    </span><span class="kw">fn </span>from(invite_guild: InviteGuild) -&gt; GuildId {
+<a href=#1831 id=1831 data-nosnippet>1831</a>        invite_guild.id
+<a href=#1832 id=1832 data-nosnippet>1832</a>    }
+<a href=#1833 id=1833 data-nosnippet>1833</a>}
+<a href=#1834 id=1834 data-nosnippet>1834</a>
+<a href=#1835 id=1835 data-nosnippet>1835</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>InviteGuild&gt; <span class="kw">for </span>GuildId {
+<a href=#1836 id=1836 data-nosnippet>1836</a>    <span class="doccomment">/// Gets the Id of Invite Guild struct.
+<a href=#1837 id=1837 data-nosnippet>1837</a>    </span><span class="kw">fn </span>from(invite_guild: <span class="kw-2">&amp;</span>InviteGuild) -&gt; GuildId {
+<a href=#1838 id=1838 data-nosnippet>1838</a>        invite_guild.id
+<a href=#1839 id=1839 data-nosnippet>1839</a>    }
+<a href=#1840 id=1840 data-nosnippet>1840</a>}
+<a href=#1841 id=1841 data-nosnippet>1841</a>
+<a href=#1842 id=1842 data-nosnippet>1842</a><span class="kw">impl </span>From&lt;Guild&gt; <span class="kw">for </span>GuildId {
+<a href=#1843 id=1843 data-nosnippet>1843</a>    <span class="doccomment">/// Gets the Id of Guild.
+<a href=#1844 id=1844 data-nosnippet>1844</a>    </span><span class="kw">fn </span>from(live_guild: Guild) -&gt; GuildId {
+<a href=#1845 id=1845 data-nosnippet>1845</a>        live_guild.id
+<a href=#1846 id=1846 data-nosnippet>1846</a>    }
+<a href=#1847 id=1847 data-nosnippet>1847</a>}
+<a href=#1848 id=1848 data-nosnippet>1848</a>
+<a href=#1849 id=1849 data-nosnippet>1849</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>Guild&gt; <span class="kw">for </span>GuildId {
+<a href=#1850 id=1850 data-nosnippet>1850</a>    <span class="doccomment">/// Gets the Id of Guild.
+<a href=#1851 id=1851 data-nosnippet>1851</a>    </span><span class="kw">fn </span>from(live_guild: <span class="kw-2">&amp;</span>Guild) -&gt; GuildId {
+<a href=#1852 id=1852 data-nosnippet>1852</a>        live_guild.id
+<a href=#1853 id=1853 data-nosnippet>1853</a>    }
+<a href=#1854 id=1854 data-nosnippet>1854</a>}
+<a href=#1855 id=1855 data-nosnippet>1855</a>
+<a href=#1856 id=1856 data-nosnippet>1856</a><span class="kw">impl </span>From&lt;WebhookGuild&gt; <span class="kw">for </span>GuildId {
+<a href=#1857 id=1857 data-nosnippet>1857</a>    <span class="doccomment">/// Gets the Id of Webhook Guild struct.
+<a href=#1858 id=1858 data-nosnippet>1858</a>    </span><span class="kw">fn </span>from(webhook_guild: WebhookGuild) -&gt; GuildId {
+<a href=#1859 id=1859 data-nosnippet>1859</a>        webhook_guild.id
+<a href=#1860 id=1860 data-nosnippet>1860</a>    }
+<a href=#1861 id=1861 data-nosnippet>1861</a>}
+<a href=#1862 id=1862 data-nosnippet>1862</a>
+<a href=#1863 id=1863 data-nosnippet>1863</a><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>WebhookGuild&gt; <span class="kw">for </span>GuildId {
+<a href=#1864 id=1864 data-nosnippet>1864</a>    <span class="doccomment">/// Gets the Id of Webhook Guild struct.
+<a href=#1865 id=1865 data-nosnippet>1865</a>    </span><span class="kw">fn </span>from(webhook_guild: <span class="kw-2">&amp;</span>WebhookGuild) -&gt; GuildId {
+<a href=#1866 id=1866 data-nosnippet>1866</a>        webhook_guild.id
+<a href=#1867 id=1867 data-nosnippet>1867</a>    }
+<a href=#1868 id=1868 data-nosnippet>1868</a>}
+<a href=#1869 id=1869 data-nosnippet>1869</a>
+<a href=#1870 id=1870 data-nosnippet>1870</a><span class="doccomment">/// A helper class returned by [`GuildId::members_iter`]
+<a href=#1871 id=1871 data-nosnippet>1871</a></span><span class="attr">#[derive(Clone, Debug)]
+<a href=#1872 id=1872 data-nosnippet>1872</a>#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1873 id=1873 data-nosnippet>1873</a></span><span class="kw">pub struct </span>MembersIter&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#1874 id=1874 data-nosnippet>1874</a>    guild_id: GuildId,
+<a href=#1875 id=1875 data-nosnippet>1875</a>    http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http,
+<a href=#1876 id=1876 data-nosnippet>1876</a>    buffer: Vec&lt;Member&gt;,
+<a href=#1877 id=1877 data-nosnippet>1877</a>    after: <span class="prelude-ty">Option</span>&lt;UserId&gt;,
+<a href=#1878 id=1878 data-nosnippet>1878</a>    tried_fetch: bool,
+<a href=#1879 id=1879 data-nosnippet>1879</a>}
+<a href=#1880 id=1880 data-nosnippet>1880</a>
+<a href=#1881 id=1881 data-nosnippet>1881</a><span class="attr">#[cfg(feature = <span class="string">"model"</span>)]
+<a href=#1882 id=1882 data-nosnippet>1882</a></span><span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; MembersIter&lt;<span class="lifetime">'a</span>&gt; {
+<a href=#1883 id=1883 data-nosnippet>1883</a>    <span class="kw">fn </span>new(guild_id: GuildId, http: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>Http) -&gt; <span class="self">Self </span>{
+<a href=#1884 id=1884 data-nosnippet>1884</a>        <span class="self">Self </span>{
+<a href=#1885 id=1885 data-nosnippet>1885</a>            guild_id,
+<a href=#1886 id=1886 data-nosnippet>1886</a>            http,
+<a href=#1887 id=1887 data-nosnippet>1887</a>            buffer: Vec::new(),
+<a href=#1888 id=1888 data-nosnippet>1888</a>            after: <span class="prelude-val">None</span>,
+<a href=#1889 id=1889 data-nosnippet>1889</a>            tried_fetch: <span class="bool-val">false</span>,
+<a href=#1890 id=1890 data-nosnippet>1890</a>        }
+<a href=#1891 id=1891 data-nosnippet>1891</a>    }
+<a href=#1892 id=1892 data-nosnippet>1892</a>
+<a href=#1893 id=1893 data-nosnippet>1893</a>    <span class="doccomment">/// Fills the `self.buffer` cache of Members.
+<a href=#1894 id=1894 data-nosnippet>1894</a>    ///
+<a href=#1895 id=1895 data-nosnippet>1895</a>    /// This drops any members that were currently in the buffer, so it should only be called when
+<a href=#1896 id=1896 data-nosnippet>1896</a>    /// `self.buffer` is empty.  Additionally, this updates `self.after` so that the next call does
+<a href=#1897 id=1897 data-nosnippet>1897</a>    /// not return duplicate items.  If there are no more members to be fetched, then this marks
+<a href=#1898 id=1898 data-nosnippet>1898</a>    /// `self.after` as None, indicating that no more calls ought to be made.
+<a href=#1899 id=1899 data-nosnippet>1899</a>    </span><span class="kw">async fn </span>refresh(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#1900 id=1900 data-nosnippet>1900</a>        <span class="kw">let </span>grab_size = <span class="kw">crate</span>::constants::MEMBER_FETCH_LIMIT;
+<a href=#1901 id=1901 data-nosnippet>1901</a>
+<a href=#1902 id=1902 data-nosnippet>1902</a>        <span class="comment">// Number of profiles to fetch
+<a href=#1903 id=1903 data-nosnippet>1903</a>        </span><span class="self">self</span>.buffer = <span class="self">self</span>.guild_id.members(<span class="self">self</span>.http, <span class="prelude-val">Some</span>(grab_size), <span class="self">self</span>.after).<span class="kw">await</span><span class="question-mark">?</span>;
+<a href=#1904 id=1904 data-nosnippet>1904</a>
+<a href=#1905 id=1905 data-nosnippet>1905</a>        <span class="comment">// Get the last member.  If shorter than 1000, there are no more results anyway
+<a href=#1906 id=1906 data-nosnippet>1906</a>        </span><span class="self">self</span>.after = <span class="self">self</span>.buffer.get(grab_size.get() <span class="kw">as </span>usize - <span class="number">1</span>).map(|member| member.user.id);
+<a href=#1907 id=1907 data-nosnippet>1907</a>
+<a href=#1908 id=1908 data-nosnippet>1908</a>        <span class="comment">// Reverse to optimize pop()
+<a href=#1909 id=1909 data-nosnippet>1909</a>        </span><span class="self">self</span>.buffer.reverse();
+<a href=#1910 id=1910 data-nosnippet>1910</a>
+<a href=#1911 id=1911 data-nosnippet>1911</a>        <span class="self">self</span>.tried_fetch = <span class="bool-val">true</span>;
+<a href=#1912 id=1912 data-nosnippet>1912</a>
+<a href=#1913 id=1913 data-nosnippet>1913</a>        <span class="prelude-val">Ok</span>(())
+<a href=#1914 id=1914 data-nosnippet>1914</a>    }
+<a href=#1915 id=1915 data-nosnippet>1915</a>
+<a href=#1916 id=1916 data-nosnippet>1916</a>    <span class="doccomment">/// Streams over all the members in a guild.
+<a href=#1917 id=1917 data-nosnippet>1917</a>    ///
+<a href=#1918 id=1918 data-nosnippet>1918</a>    /// This is accomplished and equivalent to repeated calls to [`GuildId::members`]. A buffer of
+<a href=#1919 id=1919 data-nosnippet>1919</a>    /// at most 1,000 members is used to reduce the number of calls necessary.
+<a href=#1920 id=1920 data-nosnippet>1920</a>    ///
+<a href=#1921 id=1921 data-nosnippet>1921</a>    /// # Examples
+<a href=#1922 id=1922 data-nosnippet>1922</a>    ///
+<a href=#1923 id=1923 data-nosnippet>1923</a>    /// ```rust,no_run
+<a href=#1924 id=1924 data-nosnippet>1924</a>    /// # use serenity::model::id::GuildId;
+<a href=#1925 id=1925 data-nosnippet>1925</a>    /// # use serenity::http::Http;
+<a href=#1926 id=1926 data-nosnippet>1926</a>    /// #
+<a href=#1927 id=1927 data-nosnippet>1927</a>    /// # async fn run() {
+<a href=#1928 id=1928 data-nosnippet>1928</a>    /// # let guild_id = GuildId::new(1);
+<a href=#1929 id=1929 data-nosnippet>1929</a>    /// # let http: Http = unimplemented!();
+<a href=#1930 id=1930 data-nosnippet>1930</a>    /// use serenity::futures::StreamExt;
+<a href=#1931 id=1931 data-nosnippet>1931</a>    /// use serenity::model::guild::MembersIter;
+<a href=#1932 id=1932 data-nosnippet>1932</a>    ///
+<a href=#1933 id=1933 data-nosnippet>1933</a>    /// let mut members = MembersIter::stream(&amp;http, guild_id).boxed();
+<a href=#1934 id=1934 data-nosnippet>1934</a>    /// while let Some(member_result) = members.next().await {
+<a href=#1935 id=1935 data-nosnippet>1935</a>    ///     match member_result {
+<a href=#1936 id=1936 data-nosnippet>1936</a>    ///         Ok(member) =&gt; println!("{} is {}", member, member.display_name(),),
+<a href=#1937 id=1937 data-nosnippet>1937</a>    ///         Err(error) =&gt; eprintln!("Uh oh!  Error: {}", error),
+<a href=#1938 id=1938 data-nosnippet>1938</a>    ///     }
+<a href=#1939 id=1939 data-nosnippet>1939</a>    /// }
+<a href=#1940 id=1940 data-nosnippet>1940</a>    /// # }
+<a href=#1941 id=1941 data-nosnippet>1941</a>    /// ```
+<a href=#1942 id=1942 data-nosnippet>1942</a>    </span><span class="kw">pub fn </span>stream(http: <span class="kw-2">&amp;</span>Http, guild_id: GuildId) -&gt; <span class="kw">impl </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;Member&gt;&gt; + <span class="lifetime">'_ </span>{
+<a href=#1943 id=1943 data-nosnippet>1943</a>        <span class="kw">let </span>init_state = MembersIter::new(guild_id, http);
+<a href=#1944 id=1944 data-nosnippet>1944</a>
+<a href=#1945 id=1945 data-nosnippet>1945</a>        futures::stream::unfold(init_state, |<span class="kw-2">mut </span>state| <span class="kw">async </span>{
+<a href=#1946 id=1946 data-nosnippet>1946</a>            <span class="kw">if </span>(state.buffer.is_empty() &amp;&amp; state.after.is_some() || !state.tried_fetch)
+<a href=#1947 id=1947 data-nosnippet>1947</a>                &amp;&amp; <span class="kw">let </span><span class="prelude-val">Err</span>(error) = state.refresh().<span class="kw">await
+<a href=#1948 id=1948 data-nosnippet>1948</a>            </span>{
+<a href=#1949 id=1949 data-nosnippet>1949</a>                <span class="kw">return </span><span class="prelude-val">Some</span>((<span class="prelude-val">Err</span>(error), state));
+<a href=#1950 id=1950 data-nosnippet>1950</a>            }
+<a href=#1951 id=1951 data-nosnippet>1951</a>
+<a href=#1952 id=1952 data-nosnippet>1952</a>            state.buffer.pop().map(|entry| (<span class="prelude-val">Ok</span>(entry), state))
+<a href=#1953 id=1953 data-nosnippet>1953</a>        })
+<a href=#1954 id=1954 data-nosnippet>1954</a>    }
+<a href=#1955 id=1955 data-nosnippet>1955</a>}
+<a href=#1956 id=1956 data-nosnippet>1956</a>
+<a href=#1957 id=1957 data-nosnippet>1957</a><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, Deserialize, Serialize)]
+<a href=#1958 id=1958 data-nosnippet>1958</a>#[non_exhaustive]
+<a href=#1959 id=1959 data-nosnippet>1959</a></span><span class="kw">pub enum </span>GuildWidgetStyle {
+<a href=#1960 id=1960 data-nosnippet>1960</a>    Shield,
+<a href=#1961 id=1961 data-nosnippet>1961</a>    Banner1,
+<a href=#1962 id=1962 data-nosnippet>1962</a>    Banner2,
+<a href=#1963 id=1963 data-nosnippet>1963</a>    Banner3,
+<a href=#1964 id=1964 data-nosnippet>1964</a>    Banner4,
+<a href=#1965 id=1965 data-nosnippet>1965</a>}
+<a href=#1966 id=1966 data-nosnippet>1966</a>
+<a href=#1967 id=1967 data-nosnippet>1967</a><span class="kw">impl </span>fmt::Display <span class="kw">for </span>GuildWidgetStyle {
+<a href=#1968 id=1968 data-nosnippet>1968</a>    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+<a href=#1969 id=1969 data-nosnippet>1969</a>        <span class="kw">match </span><span class="self">self </span>{
+<a href=#1970 id=1970 data-nosnippet>1970</a>            <span class="self">Self</span>::Shield =&gt; f.write_str(<span class="string">"shield"</span>),
+<a href=#1971 id=1971 data-nosnippet>1971</a>            <span class="self">Self</span>::Banner1 =&gt; f.write_str(<span class="string">"banner1"</span>),
+<a href=#1972 id=1972 data-nosnippet>1972</a>            <span class="self">Self</span>::Banner2 =&gt; f.write_str(<span class="string">"banner2"</span>),
+<a href=#1973 id=1973 data-nosnippet>1973</a>            <span class="self">Self</span>::Banner3 =&gt; f.write_str(<span class="string">"banner3"</span>),
+<a href=#1974 id=1974 data-nosnippet>1974</a>            <span class="self">Self</span>::Banner4 =&gt; f.write_str(<span class="string">"banner4"</span>),
+<a href=#1975 id=1975 data-nosnippet>1975</a>        }
+<a href=#1976 id=1976 data-nosnippet>1976</a>    }
+<a href=#1977 id=1977 data-nosnippet>1977</a>}
 </code></pre></div></section></main></body></html>

@@ -188,8 +188,8 @@
 <a href=#188 id=188 data-nosnippet>188</a>
 <a href=#189 id=189 data-nosnippet>189</a>    <span class="doccomment">/// Calculate a [`Member`]'s permissions in the guild.
 <a href=#190 id=190 data-nosnippet>190</a>    ///
-<a href=#191 id=191 data-nosnippet>191</a>    /// You likely want to use PartialGuild::user_permissions_in instead as this function does not
-<a href=#192 id=192 data-nosnippet>192</a>    /// consider permission overwrites.
+<a href=#191 id=191 data-nosnippet>191</a>    /// You likely want to use [`PartialGuild::user_permissions_in`] instead, as this function does
+<a href=#192 id=192 data-nosnippet>192</a>    /// not consider permission overwrites.
 <a href=#193 id=193 data-nosnippet>193</a>    </span><span class="attr">#[must_use]
 <a href=#194 id=194 data-nosnippet>194</a>    </span><span class="kw">pub fn </span>member_permissions(<span class="kw-2">&amp;</span><span class="self">self</span>, member: <span class="kw-2">&amp;</span>Member) -&gt; Permissions {
 <a href=#195 id=195 data-nosnippet>195</a>        Guild::user_permissions_in_(
@@ -204,8 +204,8 @@
 <a href=#204 id=204 data-nosnippet>204</a>
 <a href=#205 id=205 data-nosnippet>205</a>    <span class="doccomment">/// Calculate a [`PartialMember`]'s permissions in the guild.
 <a href=#206 id=206 data-nosnippet>206</a>    ///
-<a href=#207 id=207 data-nosnippet>207</a>    /// You likely want to use PartialGuild::partial_member_permissions_in instead as this function
-<a href=#208 id=208 data-nosnippet>208</a>    /// does not consider permission overwrites.
+<a href=#207 id=207 data-nosnippet>207</a>    /// You likely want to use [`PartialGuild::partial_member_permissions_in`] instead, as this
+<a href=#208 id=208 data-nosnippet>208</a>    /// function does not consider permission overwrites.
 <a href=#209 id=209 data-nosnippet>209</a>    ///
 <a href=#210 id=210 data-nosnippet>210</a>    /// # Panics
 <a href=#211 id=211 data-nosnippet>211</a>    ///
@@ -262,168 +262,180 @@
 <a href=#262 id=262 data-nosnippet>262</a>    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
 <a href=#263 id=263 data-nosnippet>263</a>    /// the member.
 <a href=#264 id=264 data-nosnippet>264</a>    ///
-<a href=#265 id=265 data-nosnippet>265</a>    /// # Panics
-<a href=#266 id=266 data-nosnippet>266</a>    ///
-<a href=#267 id=267 data-nosnippet>267</a>    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
-<a href=#268 id=268 data-nosnippet>268</a>    </span><span class="attr">#[must_use]
-<a href=#269 id=269 data-nosnippet>269</a>    </span><span class="kw">pub fn </span>partial_member_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
-<a href=#270 id=270 data-nosnippet>270</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#271 id=271 data-nosnippet>271</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
-<a href=#272 id=272 data-nosnippet>272</a>        member_id: UserId,
-<a href=#273 id=273 data-nosnippet>273</a>        member: <span class="kw-2">&amp;</span>PartialMember,
-<a href=#274 id=274 data-nosnippet>274</a>    ) -&gt; Permissions {
-<a href=#275 id=275 data-nosnippet>275</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="kw-2">&amp;</span>member.user {
-<a href=#276 id=276 data-nosnippet>276</a>            <span class="macro">assert_eq!</span>(user.id, member_id, <span class="string">"User::id does not match provided PartialMember"</span>);
-<a href=#277 id=277 data-nosnippet>277</a>        }
-<a href=#278 id=278 data-nosnippet>278</a>
-<a href=#279 id=279 data-nosnippet>279</a>        Guild::user_permissions_in_(
-<a href=#280 id=280 data-nosnippet>280</a>            <span class="prelude-val">Some</span>(channel.into()),
-<a href=#281 id=281 data-nosnippet>281</a>            member_id,
-<a href=#282 id=282 data-nosnippet>282</a>            <span class="kw-2">&amp;</span>member.roles,
-<a href=#283 id=283 data-nosnippet>283</a>            <span class="self">self</span>.id,
-<a href=#284 id=284 data-nosnippet>284</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
-<a href=#285 id=285 data-nosnippet>285</a>            <span class="self">self</span>.owner_id,
-<a href=#286 id=286 data-nosnippet>286</a>        )
-<a href=#287 id=287 data-nosnippet>287</a>    }
-<a href=#288 id=288 data-nosnippet>288</a>
-<a href=#289 id=289 data-nosnippet>289</a>    <span class="doccomment">/// Returns a formatted URL of the guild's icon, if the guild has an icon.
-<a href=#290 id=290 data-nosnippet>290</a>    </span><span class="attr">#[must_use]
-<a href=#291 id=291 data-nosnippet>291</a>    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-<a href=#292 id=292 data-nosnippet>292</a>        icon_url(<span class="self">self</span>.id, <span class="self">self</span>.icon.as_ref())
+<a href=#265 id=265 data-nosnippet>265</a>    /// To circumvent this limitation, apply [implicit permission masking], or calculate
+<a href=#266 id=266 data-nosnippet>266</a>    /// permissions with a [`GenericChannelId`] and [`UserId`] only, at the expense of an HTTP
+<a href=#267 id=267 data-nosnippet>267</a>    /// call, use [`GenericChannelId::member_permissions`].
+<a href=#268 id=268 data-nosnippet>268</a>    ///
+<a href=#269 id=269 data-nosnippet>269</a>    /// # Panics
+<a href=#270 id=270 data-nosnippet>270</a>    ///
+<a href=#271 id=271 data-nosnippet>271</a>    /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+<a href=#272 id=272 data-nosnippet>272</a>    ///
+<a href=#273 id=273 data-nosnippet>273</a>    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+<a href=#274 id=274 data-nosnippet>274</a>    </span><span class="attr">#[must_use]
+<a href=#275 id=275 data-nosnippet>275</a>    </span><span class="kw">pub fn </span>partial_member_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#276 id=276 data-nosnippet>276</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#277 id=277 data-nosnippet>277</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
+<a href=#278 id=278 data-nosnippet>278</a>        member_id: UserId,
+<a href=#279 id=279 data-nosnippet>279</a>        member: <span class="kw-2">&amp;</span>PartialMember,
+<a href=#280 id=280 data-nosnippet>280</a>    ) -&gt; Permissions {
+<a href=#281 id=281 data-nosnippet>281</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>(user) = <span class="kw-2">&amp;</span>member.user {
+<a href=#282 id=282 data-nosnippet>282</a>            <span class="macro">assert_eq!</span>(user.id, member_id, <span class="string">"User::id does not match provided PartialMember"</span>);
+<a href=#283 id=283 data-nosnippet>283</a>        }
+<a href=#284 id=284 data-nosnippet>284</a>
+<a href=#285 id=285 data-nosnippet>285</a>        Guild::user_permissions_in_(
+<a href=#286 id=286 data-nosnippet>286</a>            <span class="prelude-val">Some</span>(channel.into()),
+<a href=#287 id=287 data-nosnippet>287</a>            member_id,
+<a href=#288 id=288 data-nosnippet>288</a>            <span class="kw-2">&amp;</span>member.roles,
+<a href=#289 id=289 data-nosnippet>289</a>            <span class="self">self</span>.id,
+<a href=#290 id=290 data-nosnippet>290</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+<a href=#291 id=291 data-nosnippet>291</a>            <span class="self">self</span>.owner_id,
+<a href=#292 id=292 data-nosnippet>292</a>        )
 <a href=#293 id=293 data-nosnippet>293</a>    }
 <a href=#294 id=294 data-nosnippet>294</a>
-<a href=#295 id=295 data-nosnippet>295</a>    <span class="doccomment">/// Returns a formatted URL of the guild's banner, if the guild has a banner.
+<a href=#295 id=295 data-nosnippet>295</a>    <span class="doccomment">/// Returns a formatted URL of the guild's icon, if the guild has an icon.
 <a href=#296 id=296 data-nosnippet>296</a>    </span><span class="attr">#[must_use]
-<a href=#297 id=297 data-nosnippet>297</a>    </span><span class="kw">pub fn </span>banner_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-<a href=#298 id=298 data-nosnippet>298</a>        <span class="self">self</span>.banner.as_ref().map(|banner| <span class="macro">cdn!</span>(<span class="string">"/banners/{}/{}.webp"</span>, <span class="self">self</span>.id, banner))
+<a href=#297 id=297 data-nosnippet>297</a>    </span><span class="kw">pub fn </span>icon_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#298 id=298 data-nosnippet>298</a>        icon_url(<span class="self">self</span>.id, <span class="self">self</span>.icon.as_ref())
 <a href=#299 id=299 data-nosnippet>299</a>    }
 <a href=#300 id=300 data-nosnippet>300</a>
-<a href=#301 id=301 data-nosnippet>301</a>    <span class="doccomment">/// Calculate a [`Member`]'s permissions in a given channel in the guild.
-<a href=#302 id=302 data-nosnippet>302</a>    ///
-<a href=#303 id=303 data-nosnippet>303</a>    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
-<a href=#304 id=304 data-nosnippet>304</a>    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
-<a href=#305 id=305 data-nosnippet>305</a>    /// the member.
-<a href=#306 id=306 data-nosnippet>306</a>    </span><span class="attr">#[must_use]
-<a href=#307 id=307 data-nosnippet>307</a>    </span><span class="kw">pub fn </span>user_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
-<a href=#308 id=308 data-nosnippet>308</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
-<a href=#309 id=309 data-nosnippet>309</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
-<a href=#310 id=310 data-nosnippet>310</a>        member: <span class="kw-2">&amp;</span>Member,
-<a href=#311 id=311 data-nosnippet>311</a>    ) -&gt; Permissions {
-<a href=#312 id=312 data-nosnippet>312</a>        Guild::user_permissions_in_(
-<a href=#313 id=313 data-nosnippet>313</a>            <span class="prelude-val">Some</span>(channel.into()),
-<a href=#314 id=314 data-nosnippet>314</a>            member.user.id,
-<a href=#315 id=315 data-nosnippet>315</a>            <span class="kw-2">&amp;</span>member.roles,
-<a href=#316 id=316 data-nosnippet>316</a>            <span class="self">self</span>.id,
-<a href=#317 id=317 data-nosnippet>317</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
-<a href=#318 id=318 data-nosnippet>318</a>            <span class="self">self</span>.owner_id,
-<a href=#319 id=319 data-nosnippet>319</a>        )
-<a href=#320 id=320 data-nosnippet>320</a>    }
-<a href=#321 id=321 data-nosnippet>321</a>
-<a href=#322 id=322 data-nosnippet>322</a>    <span class="doccomment">/// Returns the formatted URL of the guild's splash image, if one exists.
-<a href=#323 id=323 data-nosnippet>323</a>    </span><span class="attr">#[must_use]
-<a href=#324 id=324 data-nosnippet>324</a>    </span><span class="kw">pub fn </span>splash_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
-<a href=#325 id=325 data-nosnippet>325</a>        <span class="self">self</span>.splash.as_ref().map(|splash| <span class="macro">cdn!</span>(<span class="string">"/splashes/{}/{}.webp?size=4096"</span>, <span class="self">self</span>.id, splash))
-<a href=#326 id=326 data-nosnippet>326</a>    }
-<a href=#327 id=327 data-nosnippet>327</a>
-<a href=#328 id=328 data-nosnippet>328</a>    <span class="doccomment">/// Obtain a reference to a role by its name.
-<a href=#329 id=329 data-nosnippet>329</a>    ///
-<a href=#330 id=330 data-nosnippet>330</a>    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
-<a href=#331 id=331 data-nosnippet>331</a>    ///
-<a href=#332 id=332 data-nosnippet>332</a>    /// # Examples
-<a href=#333 id=333 data-nosnippet>333</a>    ///
-<a href=#334 id=334 data-nosnippet>334</a>    /// Obtain a reference to a [`Role`] by its name.
-<a href=#335 id=335 data-nosnippet>335</a>    ///
-<a href=#336 id=336 data-nosnippet>336</a>    /// ```rust,no_run
-<a href=#337 id=337 data-nosnippet>337</a>    /// # use serenity::model::prelude::*;
-<a href=#338 id=338 data-nosnippet>338</a>    /// # use serenity::prelude::*;
-<a href=#339 id=339 data-nosnippet>339</a>    ///
-<a href=#340 id=340 data-nosnippet>340</a>    /// # #[cfg(feature = "cache")]
-<a href=#341 id=341 data-nosnippet>341</a>    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
-<a href=#342 id=342 data-nosnippet>342</a>    /// # let cache: serenity::cache::Cache = unimplemented!();
-<a href=#343 id=343 data-nosnippet>343</a>    /// # let msg: Message = unimplemented!();
-<a href=#344 id=344 data-nosnippet>344</a>    ///
-<a href=#345 id=345 data-nosnippet>345</a>    /// if let Some(guild_id) = msg.guild_id {
-<a href=#346 id=346 data-nosnippet>346</a>    ///     if let Some(guild) = guild_id.to_guild_cached(&amp;cache) {
-<a href=#347 id=347 data-nosnippet>347</a>    ///         if let Some(role) = guild.role_by_name("role_name") {
-<a href=#348 id=348 data-nosnippet>348</a>    ///             println!("Obtained role's reference: {:?}", role);
-<a href=#349 id=349 data-nosnippet>349</a>    ///         }
-<a href=#350 id=350 data-nosnippet>350</a>    ///     }
-<a href=#351 id=351 data-nosnippet>351</a>    /// }
-<a href=#352 id=352 data-nosnippet>352</a>    ///
-<a href=#353 id=353 data-nosnippet>353</a>    /// # Ok(())
-<a href=#354 id=354 data-nosnippet>354</a>    /// # }
-<a href=#355 id=355 data-nosnippet>355</a>    /// ```
-<a href=#356 id=356 data-nosnippet>356</a>    </span><span class="attr">#[must_use]
-<a href=#357 id=357 data-nosnippet>357</a>    </span><span class="kw">pub fn </span>role_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, role_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
-<a href=#358 id=358 data-nosnippet>358</a>        <span class="self">self</span>.roles.iter().find(|role| role_name == <span class="kw-2">&amp;*</span>role.name)
-<a href=#359 id=359 data-nosnippet>359</a>    }
-<a href=#360 id=360 data-nosnippet>360</a>}
-<a href=#361 id=361 data-nosnippet>361</a>
-<a href=#362 id=362 data-nosnippet>362</a><span class="comment">// Manual impl needed to insert guild_id into Role's
-<a href=#363 id=363 data-nosnippet>363</a></span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>PartialGuildGeneratedOriginal {
-<a href=#364 id=364 data-nosnippet>364</a>    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
-<a href=#365 id=365 data-nosnippet>365</a>        <span class="kw">let </span><span class="kw-2">mut </span>guild = <span class="self">Self</span>::deserialize(deserializer)<span class="question-mark">?</span>; <span class="comment">// calls #[serde(remote)]-generated inherent method
-<a href=#366 id=366 data-nosnippet>366</a>        </span>guild.roles.iter_mut().for_each(|r| r.guild_id = guild.id);
-<a href=#367 id=367 data-nosnippet>367</a>        <span class="prelude-val">Ok</span>(guild)
-<a href=#368 id=368 data-nosnippet>368</a>    }
-<a href=#369 id=369 data-nosnippet>369</a>}
-<a href=#370 id=370 data-nosnippet>370</a>
-<a href=#371 id=371 data-nosnippet>371</a><span class="kw">impl </span>Serialize <span class="kw">for </span>PartialGuildGeneratedOriginal {
-<a href=#372 id=372 data-nosnippet>372</a>    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
-<a href=#373 id=373 data-nosnippet>373</a>        <span class="self">Self</span>::serialize(<span class="self">self</span>, serializer) <span class="comment">// calls #[serde(remote)]-generated inherent method
-<a href=#374 id=374 data-nosnippet>374</a>    </span>}
-<a href=#375 id=375 data-nosnippet>375</a>}
-<a href=#376 id=376 data-nosnippet>376</a>
-<a href=#377 id=377 data-nosnippet>377</a><span class="kw">impl </span>From&lt;Guild&gt; <span class="kw">for </span>PartialGuild {
-<a href=#378 id=378 data-nosnippet>378</a>    <span class="doccomment">/// Converts this [`Guild`] instance into a [`PartialGuild`]
-<a href=#379 id=379 data-nosnippet>379</a>    </span><span class="kw">fn </span>from(guild: Guild) -&gt; <span class="self">Self </span>{
-<a href=#380 id=380 data-nosnippet>380</a>        <span class="kw">let </span>(premium_progress_bar_enabled, widget_enabled) =
-<a href=#381 id=381 data-nosnippet>381</a>            (guild.premium_progress_bar_enabled(), guild.widget_enabled());
+<a href=#301 id=301 data-nosnippet>301</a>    <span class="doccomment">/// Returns a formatted URL of the guild's banner, if the guild has a banner.
+<a href=#302 id=302 data-nosnippet>302</a>    </span><span class="attr">#[must_use]
+<a href=#303 id=303 data-nosnippet>303</a>    </span><span class="kw">pub fn </span>banner_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#304 id=304 data-nosnippet>304</a>        <span class="self">self</span>.banner.as_ref().map(|banner| <span class="macro">cdn!</span>(<span class="string">"/banners/{}/{}.webp"</span>, <span class="self">self</span>.id, banner))
+<a href=#305 id=305 data-nosnippet>305</a>    }
+<a href=#306 id=306 data-nosnippet>306</a>
+<a href=#307 id=307 data-nosnippet>307</a>    <span class="doccomment">/// Calculate a [`Member`]'s permissions in a given channel in the guild.
+<a href=#308 id=308 data-nosnippet>308</a>    ///
+<a href=#309 id=309 data-nosnippet>309</a>    /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
+<a href=#310 id=310 data-nosnippet>310</a>    /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
+<a href=#311 id=311 data-nosnippet>311</a>    /// the member.
+<a href=#312 id=312 data-nosnippet>312</a>    ///
+<a href=#313 id=313 data-nosnippet>313</a>    /// To circumvent this limitation, apply [implicit permission masking], or calculate
+<a href=#314 id=314 data-nosnippet>314</a>    /// permissions with a [`GenericChannelId`] and [`UserId`] only, at the expense of an HTTP
+<a href=#315 id=315 data-nosnippet>315</a>    /// call, use [`GenericChannelId::member_permissions`].
+<a href=#316 id=316 data-nosnippet>316</a>    ///
+<a href=#317 id=317 data-nosnippet>317</a>    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+<a href=#318 id=318 data-nosnippet>318</a>    </span><span class="attr">#[must_use]
+<a href=#319 id=319 data-nosnippet>319</a>    </span><span class="kw">pub fn </span>user_permissions_in&lt;<span class="lifetime">'a</span>&gt;(
+<a href=#320 id=320 data-nosnippet>320</a>        <span class="kw-2">&amp;</span><span class="self">self</span>,
+<a href=#321 id=321 data-nosnippet>321</a>        channel: <span class="kw">impl </span>Into&lt;GuildChannelRef&lt;<span class="lifetime">'a</span>&gt;&gt;,
+<a href=#322 id=322 data-nosnippet>322</a>        member: <span class="kw-2">&amp;</span>Member,
+<a href=#323 id=323 data-nosnippet>323</a>    ) -&gt; Permissions {
+<a href=#324 id=324 data-nosnippet>324</a>        Guild::user_permissions_in_(
+<a href=#325 id=325 data-nosnippet>325</a>            <span class="prelude-val">Some</span>(channel.into()),
+<a href=#326 id=326 data-nosnippet>326</a>            member.user.id,
+<a href=#327 id=327 data-nosnippet>327</a>            <span class="kw-2">&amp;</span>member.roles,
+<a href=#328 id=328 data-nosnippet>328</a>            <span class="self">self</span>.id,
+<a href=#329 id=329 data-nosnippet>329</a>            <span class="kw-2">&amp;</span><span class="self">self</span>.roles,
+<a href=#330 id=330 data-nosnippet>330</a>            <span class="self">self</span>.owner_id,
+<a href=#331 id=331 data-nosnippet>331</a>        )
+<a href=#332 id=332 data-nosnippet>332</a>    }
+<a href=#333 id=333 data-nosnippet>333</a>
+<a href=#334 id=334 data-nosnippet>334</a>    <span class="doccomment">/// Returns the formatted URL of the guild's splash image, if one exists.
+<a href=#335 id=335 data-nosnippet>335</a>    </span><span class="attr">#[must_use]
+<a href=#336 id=336 data-nosnippet>336</a>    </span><span class="kw">pub fn </span>splash_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+<a href=#337 id=337 data-nosnippet>337</a>        <span class="self">self</span>.splash.as_ref().map(|splash| <span class="macro">cdn!</span>(<span class="string">"/splashes/{}/{}.webp?size=4096"</span>, <span class="self">self</span>.id, splash))
+<a href=#338 id=338 data-nosnippet>338</a>    }
+<a href=#339 id=339 data-nosnippet>339</a>
+<a href=#340 id=340 data-nosnippet>340</a>    <span class="doccomment">/// Obtain a reference to a role by its name.
+<a href=#341 id=341 data-nosnippet>341</a>    ///
+<a href=#342 id=342 data-nosnippet>342</a>    /// **Note**: If two or more roles have the same name, obtained reference will be one of them.
+<a href=#343 id=343 data-nosnippet>343</a>    ///
+<a href=#344 id=344 data-nosnippet>344</a>    /// # Examples
+<a href=#345 id=345 data-nosnippet>345</a>    ///
+<a href=#346 id=346 data-nosnippet>346</a>    /// Obtain a reference to a [`Role`] by its name.
+<a href=#347 id=347 data-nosnippet>347</a>    ///
+<a href=#348 id=348 data-nosnippet>348</a>    /// ```rust,no_run
+<a href=#349 id=349 data-nosnippet>349</a>    /// # use serenity::model::prelude::*;
+<a href=#350 id=350 data-nosnippet>350</a>    /// # use serenity::prelude::*;
+<a href=#351 id=351 data-nosnippet>351</a>    ///
+<a href=#352 id=352 data-nosnippet>352</a>    /// # #[cfg(feature = "cache")]
+<a href=#353 id=353 data-nosnippet>353</a>    /// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+<a href=#354 id=354 data-nosnippet>354</a>    /// # let cache: serenity::cache::Cache = unimplemented!();
+<a href=#355 id=355 data-nosnippet>355</a>    /// # let msg: Message = unimplemented!();
+<a href=#356 id=356 data-nosnippet>356</a>    ///
+<a href=#357 id=357 data-nosnippet>357</a>    /// if let Some(guild_id) = msg.guild_id {
+<a href=#358 id=358 data-nosnippet>358</a>    ///     if let Some(guild) = guild_id.to_guild_cached(&amp;cache) {
+<a href=#359 id=359 data-nosnippet>359</a>    ///         if let Some(role) = guild.role_by_name("role_name") {
+<a href=#360 id=360 data-nosnippet>360</a>    ///             println!("Obtained role's reference: {:?}", role);
+<a href=#361 id=361 data-nosnippet>361</a>    ///         }
+<a href=#362 id=362 data-nosnippet>362</a>    ///     }
+<a href=#363 id=363 data-nosnippet>363</a>    /// }
+<a href=#364 id=364 data-nosnippet>364</a>    ///
+<a href=#365 id=365 data-nosnippet>365</a>    /// # Ok(())
+<a href=#366 id=366 data-nosnippet>366</a>    /// # }
+<a href=#367 id=367 data-nosnippet>367</a>    /// ```
+<a href=#368 id=368 data-nosnippet>368</a>    </span><span class="attr">#[must_use]
+<a href=#369 id=369 data-nosnippet>369</a>    </span><span class="kw">pub fn </span>role_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, role_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Role&gt; {
+<a href=#370 id=370 data-nosnippet>370</a>        <span class="self">self</span>.roles.iter().find(|role| role_name == <span class="kw-2">&amp;*</span>role.name)
+<a href=#371 id=371 data-nosnippet>371</a>    }
+<a href=#372 id=372 data-nosnippet>372</a>}
+<a href=#373 id=373 data-nosnippet>373</a>
+<a href=#374 id=374 data-nosnippet>374</a><span class="comment">// Manual impl needed to insert guild_id into Role's
+<a href=#375 id=375 data-nosnippet>375</a></span><span class="kw">impl</span>&lt;<span class="lifetime">'de</span>&gt; Deserialize&lt;<span class="lifetime">'de</span>&gt; <span class="kw">for </span>PartialGuildGeneratedOriginal {
+<a href=#376 id=376 data-nosnippet>376</a>    <span class="kw">fn </span>deserialize&lt;D: Deserializer&lt;<span class="lifetime">'de</span>&gt;&gt;(deserializer: D) -&gt; StdResult&lt;<span class="self">Self</span>, D::Error&gt; {
+<a href=#377 id=377 data-nosnippet>377</a>        <span class="kw">let </span><span class="kw-2">mut </span>guild = <span class="self">Self</span>::deserialize(deserializer)<span class="question-mark">?</span>; <span class="comment">// calls #[serde(remote)]-generated inherent method
+<a href=#378 id=378 data-nosnippet>378</a>        </span>guild.roles.iter_mut().for_each(|r| r.guild_id = guild.id);
+<a href=#379 id=379 data-nosnippet>379</a>        <span class="prelude-val">Ok</span>(guild)
+<a href=#380 id=380 data-nosnippet>380</a>    }
+<a href=#381 id=381 data-nosnippet>381</a>}
 <a href=#382 id=382 data-nosnippet>382</a>
-<a href=#383 id=383 data-nosnippet>383</a>        <span class="kw">let </span><span class="kw-2">mut </span>partial = <span class="self">Self </span>{
-<a href=#384 id=384 data-nosnippet>384</a>            __generated_flags: PartialGuildGeneratedFlags::empty(),
-<a href=#385 id=385 data-nosnippet>385</a>            application_id: guild.application_id,
-<a href=#386 id=386 data-nosnippet>386</a>            id: guild.id,
-<a href=#387 id=387 data-nosnippet>387</a>            afk_metadata: guild.afk_metadata,
-<a href=#388 id=388 data-nosnippet>388</a>            default_message_notifications: guild.default_message_notifications,
-<a href=#389 id=389 data-nosnippet>389</a>            widget_channel_id: guild.widget_channel_id,
-<a href=#390 id=390 data-nosnippet>390</a>            emojis: guild.emojis,
-<a href=#391 id=391 data-nosnippet>391</a>            features: guild.features,
-<a href=#392 id=392 data-nosnippet>392</a>            icon: guild.icon,
-<a href=#393 id=393 data-nosnippet>393</a>            mfa_level: guild.mfa_level,
-<a href=#394 id=394 data-nosnippet>394</a>            name: guild.name,
-<a href=#395 id=395 data-nosnippet>395</a>            owner_id: guild.owner_id,
-<a href=#396 id=396 data-nosnippet>396</a>            roles: guild.roles,
-<a href=#397 id=397 data-nosnippet>397</a>            splash: guild.splash,
-<a href=#398 id=398 data-nosnippet>398</a>            discovery_splash: guild.discovery_splash,
-<a href=#399 id=399 data-nosnippet>399</a>            system_channel_id: guild.system_channel_id,
-<a href=#400 id=400 data-nosnippet>400</a>            system_channel_flags: guild.system_channel_flags,
-<a href=#401 id=401 data-nosnippet>401</a>            rules_channel_id: guild.rules_channel_id,
-<a href=#402 id=402 data-nosnippet>402</a>            public_updates_channel_id: guild.public_updates_channel_id,
-<a href=#403 id=403 data-nosnippet>403</a>            verification_level: guild.verification_level,
-<a href=#404 id=404 data-nosnippet>404</a>            description: guild.description,
-<a href=#405 id=405 data-nosnippet>405</a>            premium_tier: guild.premium_tier,
-<a href=#406 id=406 data-nosnippet>406</a>            premium_subscription_count: guild.premium_subscription_count,
-<a href=#407 id=407 data-nosnippet>407</a>            banner: guild.banner,
-<a href=#408 id=408 data-nosnippet>408</a>            vanity_url_code: guild.vanity_url_code,
-<a href=#409 id=409 data-nosnippet>409</a>            welcome_screen: guild.welcome_screen,
-<a href=#410 id=410 data-nosnippet>410</a>            approximate_member_count: guild.approximate_member_count,
-<a href=#411 id=411 data-nosnippet>411</a>            approximate_presence_count: guild.approximate_presence_count,
-<a href=#412 id=412 data-nosnippet>412</a>            nsfw_level: guild.nsfw_level,
-<a href=#413 id=413 data-nosnippet>413</a>            max_video_channel_users: guild.max_video_channel_users,
-<a href=#414 id=414 data-nosnippet>414</a>            max_presences: guild.max_presences,
-<a href=#415 id=415 data-nosnippet>415</a>            max_members: guild.max_members,
-<a href=#416 id=416 data-nosnippet>416</a>            stickers: guild.stickers,
-<a href=#417 id=417 data-nosnippet>417</a>            icon_hash: guild.icon_hash,
-<a href=#418 id=418 data-nosnippet>418</a>            explicit_content_filter: guild.explicit_content_filter,
-<a href=#419 id=419 data-nosnippet>419</a>            preferred_locale: guild.preferred_locale,
-<a href=#420 id=420 data-nosnippet>420</a>            max_stage_video_channel_users: guild.max_stage_video_channel_users,
-<a href=#421 id=421 data-nosnippet>421</a>            safety_alerts_channel_id: guild.safety_alerts_channel_id,
-<a href=#422 id=422 data-nosnippet>422</a>            incidents_data: guild.incidents_data,
-<a href=#423 id=423 data-nosnippet>423</a>        };
-<a href=#424 id=424 data-nosnippet>424</a>        partial.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
-<a href=#425 id=425 data-nosnippet>425</a>        partial.set_widget_enabled(widget_enabled);
-<a href=#426 id=426 data-nosnippet>426</a>        partial
-<a href=#427 id=427 data-nosnippet>427</a>    }
-<a href=#428 id=428 data-nosnippet>428</a>}
+<a href=#383 id=383 data-nosnippet>383</a><span class="kw">impl </span>Serialize <span class="kw">for </span>PartialGuildGeneratedOriginal {
+<a href=#384 id=384 data-nosnippet>384</a>    <span class="kw">fn </span>serialize&lt;S: serde::Serializer&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; StdResult&lt;S::Ok, S::Error&gt; {
+<a href=#385 id=385 data-nosnippet>385</a>        <span class="self">Self</span>::serialize(<span class="self">self</span>, serializer) <span class="comment">// calls #[serde(remote)]-generated inherent method
+<a href=#386 id=386 data-nosnippet>386</a>    </span>}
+<a href=#387 id=387 data-nosnippet>387</a>}
+<a href=#388 id=388 data-nosnippet>388</a>
+<a href=#389 id=389 data-nosnippet>389</a><span class="kw">impl </span>From&lt;Guild&gt; <span class="kw">for </span>PartialGuild {
+<a href=#390 id=390 data-nosnippet>390</a>    <span class="doccomment">/// Converts this [`Guild`] instance into a [`PartialGuild`]
+<a href=#391 id=391 data-nosnippet>391</a>    </span><span class="kw">fn </span>from(guild: Guild) -&gt; <span class="self">Self </span>{
+<a href=#392 id=392 data-nosnippet>392</a>        <span class="kw">let </span>(premium_progress_bar_enabled, widget_enabled) =
+<a href=#393 id=393 data-nosnippet>393</a>            (guild.premium_progress_bar_enabled(), guild.widget_enabled());
+<a href=#394 id=394 data-nosnippet>394</a>
+<a href=#395 id=395 data-nosnippet>395</a>        <span class="kw">let </span><span class="kw-2">mut </span>partial = <span class="self">Self </span>{
+<a href=#396 id=396 data-nosnippet>396</a>            __generated_flags: PartialGuildGeneratedFlags::empty(),
+<a href=#397 id=397 data-nosnippet>397</a>            application_id: guild.application_id,
+<a href=#398 id=398 data-nosnippet>398</a>            id: guild.id,
+<a href=#399 id=399 data-nosnippet>399</a>            afk_metadata: guild.afk_metadata,
+<a href=#400 id=400 data-nosnippet>400</a>            default_message_notifications: guild.default_message_notifications,
+<a href=#401 id=401 data-nosnippet>401</a>            widget_channel_id: guild.widget_channel_id,
+<a href=#402 id=402 data-nosnippet>402</a>            emojis: guild.emojis,
+<a href=#403 id=403 data-nosnippet>403</a>            features: guild.features,
+<a href=#404 id=404 data-nosnippet>404</a>            icon: guild.icon,
+<a href=#405 id=405 data-nosnippet>405</a>            mfa_level: guild.mfa_level,
+<a href=#406 id=406 data-nosnippet>406</a>            name: guild.name,
+<a href=#407 id=407 data-nosnippet>407</a>            owner_id: guild.owner_id,
+<a href=#408 id=408 data-nosnippet>408</a>            roles: guild.roles,
+<a href=#409 id=409 data-nosnippet>409</a>            splash: guild.splash,
+<a href=#410 id=410 data-nosnippet>410</a>            discovery_splash: guild.discovery_splash,
+<a href=#411 id=411 data-nosnippet>411</a>            system_channel_id: guild.system_channel_id,
+<a href=#412 id=412 data-nosnippet>412</a>            system_channel_flags: guild.system_channel_flags,
+<a href=#413 id=413 data-nosnippet>413</a>            rules_channel_id: guild.rules_channel_id,
+<a href=#414 id=414 data-nosnippet>414</a>            public_updates_channel_id: guild.public_updates_channel_id,
+<a href=#415 id=415 data-nosnippet>415</a>            verification_level: guild.verification_level,
+<a href=#416 id=416 data-nosnippet>416</a>            description: guild.description,
+<a href=#417 id=417 data-nosnippet>417</a>            premium_tier: guild.premium_tier,
+<a href=#418 id=418 data-nosnippet>418</a>            premium_subscription_count: guild.premium_subscription_count,
+<a href=#419 id=419 data-nosnippet>419</a>            banner: guild.banner,
+<a href=#420 id=420 data-nosnippet>420</a>            vanity_url_code: guild.vanity_url_code,
+<a href=#421 id=421 data-nosnippet>421</a>            welcome_screen: guild.welcome_screen,
+<a href=#422 id=422 data-nosnippet>422</a>            approximate_member_count: guild.approximate_member_count,
+<a href=#423 id=423 data-nosnippet>423</a>            approximate_presence_count: guild.approximate_presence_count,
+<a href=#424 id=424 data-nosnippet>424</a>            nsfw_level: guild.nsfw_level,
+<a href=#425 id=425 data-nosnippet>425</a>            max_video_channel_users: guild.max_video_channel_users,
+<a href=#426 id=426 data-nosnippet>426</a>            max_presences: guild.max_presences,
+<a href=#427 id=427 data-nosnippet>427</a>            max_members: guild.max_members,
+<a href=#428 id=428 data-nosnippet>428</a>            stickers: guild.stickers,
+<a href=#429 id=429 data-nosnippet>429</a>            icon_hash: guild.icon_hash,
+<a href=#430 id=430 data-nosnippet>430</a>            explicit_content_filter: guild.explicit_content_filter,
+<a href=#431 id=431 data-nosnippet>431</a>            preferred_locale: guild.preferred_locale,
+<a href=#432 id=432 data-nosnippet>432</a>            max_stage_video_channel_users: guild.max_stage_video_channel_users,
+<a href=#433 id=433 data-nosnippet>433</a>            safety_alerts_channel_id: guild.safety_alerts_channel_id,
+<a href=#434 id=434 data-nosnippet>434</a>            incidents_data: guild.incidents_data,
+<a href=#435 id=435 data-nosnippet>435</a>        };
+<a href=#436 id=436 data-nosnippet>436</a>        partial.set_premium_progress_bar_enabled(premium_progress_bar_enabled);
+<a href=#437 id=437 data-nosnippet>437</a>        partial.set_widget_enabled(widget_enabled);
+<a href=#438 id=438 data-nosnippet>438</a>        partial
+<a href=#439 id=439 data-nosnippet>439</a>    }
+<a href=#440 id=440 data-nosnippet>440</a>}
 </code></pre></div></section></main></body></html>
