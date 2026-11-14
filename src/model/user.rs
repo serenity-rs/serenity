@@ -239,7 +239,6 @@ pub struct User {
     #[serde(default, skip_serializing_if = "Option::is_none", with = "discriminator")]
     pub discriminator: Option<NonZeroU16>,
     /// The account's display name, if it is set.
-    /// For bots this is the application name.
     pub global_name: Option<FixedString<u8>>,
     /// Optional avatar hash.
     pub avatar: Option<ImageHash>,
