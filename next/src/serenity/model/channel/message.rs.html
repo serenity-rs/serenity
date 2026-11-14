@@ -1314,80 +1314,79 @@
 <a href=#1314 id=1314 data-nosnippet>1314</a><span class="comment">// all tests here require cache, move if non-cache test is added
 <a href=#1315 id=1315 data-nosnippet>1315</a></span><span class="attr">#[cfg(all(test, feature = <span class="string">"cache"</span>))]
 <a href=#1316 id=1316 data-nosnippet>1316</a></span><span class="kw">mod </span>tests {
-<a href=#1317 id=1317 data-nosnippet>1317</a>    <span class="kw">use </span>extract_map::ExtractMap;
-<a href=#1318 id=1318 data-nosnippet>1318</a>    <span class="kw">use </span>small_fixed_array::FixedArray;
-<a href=#1319 id=1319 data-nosnippet>1319</a>
-<a href=#1320 id=1320 data-nosnippet>1320</a>    <span class="kw">use super</span>::{
-<a href=#1321 id=1321 data-nosnippet>1321</a>        Guild,
-<a href=#1322 id=1322 data-nosnippet>1322</a>        GuildChannel,
-<a href=#1323 id=1323 data-nosnippet>1323</a>        GuildCreateGuild,
-<a href=#1324 id=1324 data-nosnippet>1324</a>        Member,
-<a href=#1325 id=1325 data-nosnippet>1325</a>        Message,
-<a href=#1326 id=1326 data-nosnippet>1326</a>        PermissionOverwrite,
-<a href=#1327 id=1327 data-nosnippet>1327</a>        PermissionOverwriteType,
-<a href=#1328 id=1328 data-nosnippet>1328</a>        Permissions,
-<a href=#1329 id=1329 data-nosnippet>1329</a>        User,
-<a href=#1330 id=1330 data-nosnippet>1330</a>        UserId,
-<a href=#1331 id=1331 data-nosnippet>1331</a>    };
-<a href=#1332 id=1332 data-nosnippet>1332</a>    <span class="kw">use </span><span class="kw">crate</span>::cache::Cache;
-<a href=#1333 id=1333 data-nosnippet>1333</a>    <span class="kw">use </span><span class="kw">crate</span>::model::event::GuildCreateEvent;
-<a href=#1334 id=1334 data-nosnippet>1334</a>
-<a href=#1335 id=1335 data-nosnippet>1335</a>    <span class="kw">fn </span>new_extract_map&lt;K, T&gt;(val: T) -&gt; ExtractMap&lt;K, T&gt;
-<a href=#1336 id=1336 data-nosnippet>1336</a>    <span class="kw">where
-<a href=#1337 id=1337 data-nosnippet>1337</a>        </span>K: std::hash::Hash + Eq,
-<a href=#1338 id=1338 data-nosnippet>1338</a>        T: extract_map::ExtractKey&lt;K&gt;,
-<a href=#1339 id=1339 data-nosnippet>1339</a>    {
-<a href=#1340 id=1340 data-nosnippet>1340</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = ExtractMap::new();
-<a href=#1341 id=1341 data-nosnippet>1341</a>        map.insert(val);
-<a href=#1342 id=1342 data-nosnippet>1342</a>        map
-<a href=#1343 id=1343 data-nosnippet>1343</a>    }
-<a href=#1344 id=1344 data-nosnippet>1344</a>
-<a href=#1345 id=1345 data-nosnippet>1345</a>    <span class="doccomment">/// Test that author_permissions checks the permissions in a channel, not just the guild.
-<a href=#1346 id=1346 data-nosnippet>1346</a>    </span><span class="attr">#[test]
-<a href=#1347 id=1347 data-nosnippet>1347</a>    </span><span class="kw">fn </span>author_permissions_respects_overwrites() {
-<a href=#1348 id=1348 data-nosnippet>1348</a>        <span class="comment">// Author of the message, with a random ID that won't collide with defaults.
-<a href=#1349 id=1349 data-nosnippet>1349</a>        </span><span class="kw">let </span>author = User {
-<a href=#1350 id=1350 data-nosnippet>1350</a>            id: UserId::new(<span class="number">50778944701071</span>),
-<a href=#1351 id=1351 data-nosnippet>1351</a>            ..Default::default()
-<a href=#1352 id=1352 data-nosnippet>1352</a>        };
-<a href=#1353 id=1353 data-nosnippet>1353</a>
-<a href=#1354 id=1354 data-nosnippet>1354</a>        <span class="comment">// Channel with the message, with SEND_MESSAGES on.
-<a href=#1355 id=1355 data-nosnippet>1355</a>        </span><span class="kw">let </span>channel = GuildChannel {
-<a href=#1356 id=1356 data-nosnippet>1356</a>            permission_overwrites: FixedArray::from_vec_trunc(<span class="macro">vec!</span>[PermissionOverwrite {
-<a href=#1357 id=1357 data-nosnippet>1357</a>                allow: Permissions::SEND_MESSAGES,
-<a href=#1358 id=1358 data-nosnippet>1358</a>                deny: Permissions::default(),
-<a href=#1359 id=1359 data-nosnippet>1359</a>                kind: PermissionOverwriteType::Member(author.id),
-<a href=#1360 id=1360 data-nosnippet>1360</a>            }]),
-<a href=#1361 id=1361 data-nosnippet>1361</a>            ..Default::default()
-<a href=#1362 id=1362 data-nosnippet>1362</a>        };
-<a href=#1363 id=1363 data-nosnippet>1363</a>        <span class="kw">let </span>channel_id = channel.id.widen();
-<a href=#1364 id=1364 data-nosnippet>1364</a>
-<a href=#1365 id=1365 data-nosnippet>1365</a>        <span class="comment">// Guild with the author and channel cached, default (empty) permissions.
-<a href=#1366 id=1366 data-nosnippet>1366</a>        </span><span class="kw">let </span>guild = Guild {
-<a href=#1367 id=1367 data-nosnippet>1367</a>            viewable_channels: new_extract_map(channel),
-<a href=#1368 id=1368 data-nosnippet>1368</a>            members: new_extract_map(Member {
-<a href=#1369 id=1369 data-nosnippet>1369</a>                user: author.clone(),
-<a href=#1370 id=1370 data-nosnippet>1370</a>                ..Default::default()
-<a href=#1371 id=1371 data-nosnippet>1371</a>            }),
-<a href=#1372 id=1372 data-nosnippet>1372</a>            ..Default::default()
-<a href=#1373 id=1373 data-nosnippet>1373</a>        };
-<a href=#1374 id=1374 data-nosnippet>1374</a>
-<a href=#1375 id=1375 data-nosnippet>1375</a>        <span class="comment">// Message, tied to the guild and the channel.
-<a href=#1376 id=1376 data-nosnippet>1376</a>        </span><span class="kw">let </span>message = Message {
-<a href=#1377 id=1377 data-nosnippet>1377</a>            author,
-<a href=#1378 id=1378 data-nosnippet>1378</a>            channel_id,
-<a href=#1379 id=1379 data-nosnippet>1379</a>            guild_id: <span class="prelude-val">Some</span>(guild.id),
-<a href=#1380 id=1380 data-nosnippet>1380</a>            ..Default::default()
-<a href=#1381 id=1381 data-nosnippet>1381</a>        };
-<a href=#1382 id=1382 data-nosnippet>1382</a>
-<a href=#1383 id=1383 data-nosnippet>1383</a>        <span class="comment">// Cache, with the guild setup.
-<a href=#1384 id=1384 data-nosnippet>1384</a>        </span><span class="kw">let </span>cache = Cache::new();
-<a href=#1385 id=1385 data-nosnippet>1385</a>        cache.update(<span class="kw-2">&amp;mut </span>GuildCreateEvent {
-<a href=#1386 id=1386 data-nosnippet>1386</a>            guild: GuildCreateGuild::Available(guild),
-<a href=#1387 id=1387 data-nosnippet>1387</a>        });
-<a href=#1388 id=1388 data-nosnippet>1388</a>
-<a href=#1389 id=1389 data-nosnippet>1389</a>        <span class="comment">// The author should only have the one permission, SEND_MESSAGES.
-<a href=#1390 id=1390 data-nosnippet>1390</a>        </span><span class="macro">assert_eq!</span>(message.author_permissions(<span class="kw-2">&amp;</span>cache), <span class="prelude-val">Some</span>(Permissions::SEND_MESSAGES));
-<a href=#1391 id=1391 data-nosnippet>1391</a>    }
-<a href=#1392 id=1392 data-nosnippet>1392</a>}
+<a href=#1317 id=1317 data-nosnippet>1317</a>    <span class="kw">use </span>small_fixed_array::FixedArray;
+<a href=#1318 id=1318 data-nosnippet>1318</a>
+<a href=#1319 id=1319 data-nosnippet>1319</a>    <span class="kw">use super</span>::{
+<a href=#1320 id=1320 data-nosnippet>1320</a>        Guild,
+<a href=#1321 id=1321 data-nosnippet>1321</a>        GuildChannel,
+<a href=#1322 id=1322 data-nosnippet>1322</a>        GuildCreateGuild,
+<a href=#1323 id=1323 data-nosnippet>1323</a>        Member,
+<a href=#1324 id=1324 data-nosnippet>1324</a>        Message,
+<a href=#1325 id=1325 data-nosnippet>1325</a>        PermissionOverwrite,
+<a href=#1326 id=1326 data-nosnippet>1326</a>        PermissionOverwriteType,
+<a href=#1327 id=1327 data-nosnippet>1327</a>        Permissions,
+<a href=#1328 id=1328 data-nosnippet>1328</a>        User,
+<a href=#1329 id=1329 data-nosnippet>1329</a>        UserId,
+<a href=#1330 id=1330 data-nosnippet>1330</a>    };
+<a href=#1331 id=1331 data-nosnippet>1331</a>    <span class="kw">use </span><span class="kw">crate</span>::cache::{Cache, ExtractMap};
+<a href=#1332 id=1332 data-nosnippet>1332</a>    <span class="kw">use </span><span class="kw">crate</span>::model::event::GuildCreateEvent;
+<a href=#1333 id=1333 data-nosnippet>1333</a>
+<a href=#1334 id=1334 data-nosnippet>1334</a>    <span class="kw">fn </span>new_extract_map&lt;K, T&gt;(val: T) -&gt; ExtractMap&lt;K, T&gt;
+<a href=#1335 id=1335 data-nosnippet>1335</a>    <span class="kw">where
+<a href=#1336 id=1336 data-nosnippet>1336</a>        </span>K: std::hash::Hash + Eq,
+<a href=#1337 id=1337 data-nosnippet>1337</a>        T: extract_map::ExtractKey&lt;K&gt;,
+<a href=#1338 id=1338 data-nosnippet>1338</a>    {
+<a href=#1339 id=1339 data-nosnippet>1339</a>        <span class="kw">let </span><span class="kw-2">mut </span>map = ExtractMap::default();
+<a href=#1340 id=1340 data-nosnippet>1340</a>        map.insert(val);
+<a href=#1341 id=1341 data-nosnippet>1341</a>        map
+<a href=#1342 id=1342 data-nosnippet>1342</a>    }
+<a href=#1343 id=1343 data-nosnippet>1343</a>
+<a href=#1344 id=1344 data-nosnippet>1344</a>    <span class="doccomment">/// Test that author_permissions checks the permissions in a channel, not just the guild.
+<a href=#1345 id=1345 data-nosnippet>1345</a>    </span><span class="attr">#[test]
+<a href=#1346 id=1346 data-nosnippet>1346</a>    </span><span class="kw">fn </span>author_permissions_respects_overwrites() {
+<a href=#1347 id=1347 data-nosnippet>1347</a>        <span class="comment">// Author of the message, with a random ID that won't collide with defaults.
+<a href=#1348 id=1348 data-nosnippet>1348</a>        </span><span class="kw">let </span>author = User {
+<a href=#1349 id=1349 data-nosnippet>1349</a>            id: UserId::new(<span class="number">50778944701071</span>),
+<a href=#1350 id=1350 data-nosnippet>1350</a>            ..Default::default()
+<a href=#1351 id=1351 data-nosnippet>1351</a>        };
+<a href=#1352 id=1352 data-nosnippet>1352</a>
+<a href=#1353 id=1353 data-nosnippet>1353</a>        <span class="comment">// Channel with the message, with SEND_MESSAGES on.
+<a href=#1354 id=1354 data-nosnippet>1354</a>        </span><span class="kw">let </span>channel = GuildChannel {
+<a href=#1355 id=1355 data-nosnippet>1355</a>            permission_overwrites: FixedArray::from_vec_trunc(<span class="macro">vec!</span>[PermissionOverwrite {
+<a href=#1356 id=1356 data-nosnippet>1356</a>                allow: Permissions::SEND_MESSAGES,
+<a href=#1357 id=1357 data-nosnippet>1357</a>                deny: Permissions::default(),
+<a href=#1358 id=1358 data-nosnippet>1358</a>                kind: PermissionOverwriteType::Member(author.id),
+<a href=#1359 id=1359 data-nosnippet>1359</a>            }]),
+<a href=#1360 id=1360 data-nosnippet>1360</a>            ..Default::default()
+<a href=#1361 id=1361 data-nosnippet>1361</a>        };
+<a href=#1362 id=1362 data-nosnippet>1362</a>        <span class="kw">let </span>channel_id = channel.id.widen();
+<a href=#1363 id=1363 data-nosnippet>1363</a>
+<a href=#1364 id=1364 data-nosnippet>1364</a>        <span class="comment">// Guild with the author and channel cached, default (empty) permissions.
+<a href=#1365 id=1365 data-nosnippet>1365</a>        </span><span class="kw">let </span>guild = Guild {
+<a href=#1366 id=1366 data-nosnippet>1366</a>            viewable_channels: new_extract_map(channel),
+<a href=#1367 id=1367 data-nosnippet>1367</a>            members: new_extract_map(Member {
+<a href=#1368 id=1368 data-nosnippet>1368</a>                user: author.clone(),
+<a href=#1369 id=1369 data-nosnippet>1369</a>                ..Default::default()
+<a href=#1370 id=1370 data-nosnippet>1370</a>            }),
+<a href=#1371 id=1371 data-nosnippet>1371</a>            ..Default::default()
+<a href=#1372 id=1372 data-nosnippet>1372</a>        };
+<a href=#1373 id=1373 data-nosnippet>1373</a>
+<a href=#1374 id=1374 data-nosnippet>1374</a>        <span class="comment">// Message, tied to the guild and the channel.
+<a href=#1375 id=1375 data-nosnippet>1375</a>        </span><span class="kw">let </span>message = Message {
+<a href=#1376 id=1376 data-nosnippet>1376</a>            author,
+<a href=#1377 id=1377 data-nosnippet>1377</a>            channel_id,
+<a href=#1378 id=1378 data-nosnippet>1378</a>            guild_id: <span class="prelude-val">Some</span>(guild.id),
+<a href=#1379 id=1379 data-nosnippet>1379</a>            ..Default::default()
+<a href=#1380 id=1380 data-nosnippet>1380</a>        };
+<a href=#1381 id=1381 data-nosnippet>1381</a>
+<a href=#1382 id=1382 data-nosnippet>1382</a>        <span class="comment">// Cache, with the guild setup.
+<a href=#1383 id=1383 data-nosnippet>1383</a>        </span><span class="kw">let </span>cache = Cache::new();
+<a href=#1384 id=1384 data-nosnippet>1384</a>        cache.update(<span class="kw-2">&amp;mut </span>GuildCreateEvent {
+<a href=#1385 id=1385 data-nosnippet>1385</a>            guild: GuildCreateGuild::Available(guild),
+<a href=#1386 id=1386 data-nosnippet>1386</a>        });
+<a href=#1387 id=1387 data-nosnippet>1387</a>
+<a href=#1388 id=1388 data-nosnippet>1388</a>        <span class="comment">// The author should only have the one permission, SEND_MESSAGES.
+<a href=#1389 id=1389 data-nosnippet>1389</a>        </span><span class="macro">assert_eq!</span>(message.author_permissions(<span class="kw-2">&amp;</span>cache), <span class="prelude-val">Some</span>(Permissions::SEND_MESSAGES));
+<a href=#1390 id=1390 data-nosnippet>1390</a>    }
+<a href=#1391 id=1391 data-nosnippet>1391</a>}
 </code></pre></div></section></main></body></html>

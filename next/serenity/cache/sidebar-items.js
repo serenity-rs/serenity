@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Cache","CacheRef","Settings"],"trait":["CacheUpdate"],"type":["ChannelMessagesRef","CurrentUserRef","GuildRef","MessageRef","SettingsRef","UserRef"]};
+window.SIDEBAR_ITEMS = {"struct":["BuildHasher","Cache","CacheRef","Settings"],"trait":["CacheUpdate"],"type":["ChannelMessagesRef","CurrentUserRef","ExtractMap","GuildRef","MessageRef","SettingsRef","UserRef"]};
