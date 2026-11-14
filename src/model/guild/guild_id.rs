@@ -941,8 +941,8 @@ impl GuildId {
     /// Gets the default permission role (@everyone) from the guild.
     #[inline]
     #[must_use]
-    pub fn everyone_role(&self) -> RoleId {
-        RoleId::from(self.get())
+    pub const fn everyone_role(&self) -> RoleId {
+        RoleId::new(self.get())
     }
 
     /// Tries to find the [`Guild`] by its Id in the cache.
