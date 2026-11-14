@@ -259,6 +259,8 @@ generate_change! {
     "public_updates_channel_id" => PublicUpdatesChannelId(ChannelId),
     /// Rate limit per user in a text channel was changed.
     "rate_limit_per_user" => RateLimitPerUser(u16),
+    /// Recurrence rule for a scheduled event was changed.
+    "recurrence_rule" => RecurrenceRule(RecurrenceRule),
     /// Region of a guild was changed.
     "region" => Region(FixedString),
     /// Allowed words or phrases were removed from an auto moderation rule.
