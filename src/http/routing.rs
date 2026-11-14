@@ -97,6 +97,10 @@ routes! ('a, {
     api!("/channels/{}/invites", channel_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
+    ChannelMemberPermissions { channel_id: GenericChannelId, user_id: UserId },
+    api!("/channels/{}/permissions/member/{}", channel_id, user_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+
     ChannelMessage { channel_id: GenericChannelId, message_id: MessageId },
     api!("/channels/{}/messages/{}", channel_id, message_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
@@ -143,6 +147,10 @@ routes! ('a, {
 
     ChannelPins { channel_id: GenericChannelId },
     api!("/channels/{}/messages/pins", channel_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
+
+    ChannelRolePermissions { channel_id: GenericChannelId, role_id: RoleId },
+    api!("/channels/{}/permissions/role/{}", channel_id, role_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(channel_id.get())));
 
     ChannelTyping { channel_id: GenericChannelId },
@@ -277,6 +285,10 @@ routes! ('a, {
     api!("/guilds/{}/members/{}", guild_id, user_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
 
+    GuildMemberPermissions { guild_id: GuildId, user_id: UserId },
+    api!("/guilds/{}/permissions/member/{}", guild_id, user_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+
     GuildMemberRole { guild_id: GuildId, user_id: UserId, role_id: RoleId },
     api!("/guilds/{}/members/{}/roles/{}", guild_id, user_id, role_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
@@ -319,6 +331,10 @@ routes! ('a, {
 
     GuildRoleMemberCounts { guild_id: GuildId },
     api!("/guilds/{}/roles/member-counts", guild_id),
+    Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
+
+    GuildRolePermissions { guild_id: GuildId, role_id: RoleId },
+    api!("/guilds/{}/permissions/role/{}", guild_id, role_id),
     Some(RatelimitingKind::PathAndId(GenericId::new(guild_id.get())));
 
     GuildScheduledEvent { guild_id: GuildId, event_id: ScheduledEventId },

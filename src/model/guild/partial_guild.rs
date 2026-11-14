@@ -188,8 +188,8 @@ impl PartialGuild {
 
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
-    /// You likely want to use PartialGuild::user_permissions_in instead as this function does not
-    /// consider permission overwrites.
+    /// You likely want to use [`PartialGuild::user_permissions_in`] instead, as this function does
+    /// not consider permission overwrites.
     #[must_use]
     pub fn member_permissions(&self, member: &Member) -> Permissions {
         Guild::user_permissions_in_(
@@ -204,8 +204,8 @@ impl PartialGuild {
 
     /// Calculate a [`PartialMember`]'s permissions in the guild.
     ///
-    /// You likely want to use PartialGuild::partial_member_permissions_in instead as this function
-    /// does not consider permission overwrites.
+    /// You likely want to use [`PartialGuild::partial_member_permissions_in`] instead, as this
+    /// function does not consider permission overwrites.
     ///
     /// # Panics
     ///
@@ -262,9 +262,15 @@ impl PartialGuild {
     /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
     /// the member.
     ///
+    /// To circumvent this limitation, apply [implicit permission masking], or calculate
+    /// permissions with a [`GenericChannelId`] and [`UserId`] only, at the expense of an HTTP
+    /// call, use [`GenericChannelId::member_permissions`].
+    ///
     /// # Panics
     ///
     /// Panics if the passed [`UserId`] does not match the [`PartialMember`] id, if user is Some.
+    ///
+    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
     #[must_use]
     pub fn partial_member_permissions_in<'a>(
         &self,
@@ -303,6 +309,12 @@ impl PartialGuild {
     /// **Note**: Bots cannot view permission overwrites on obfuscated channels. Results may be
     /// inaccurate if the channel is an obfuscated channel with permission overwrites relevant to
     /// the member.
+    ///
+    /// To circumvent this limitation, apply [implicit permission masking], or calculate
+    /// permissions with a [`GenericChannelId`] and [`UserId`] only, at the expense of an HTTP
+    /// call, use [`GenericChannelId::member_permissions`].
+    ///
+    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
     #[must_use]
     pub fn user_permissions_in<'a>(
         &self,

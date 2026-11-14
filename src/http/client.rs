@@ -2560,6 +2560,98 @@ impl Http {
         .await
     }
 
+    /// Gets a member's computed permissions in a channel.
+    ///
+    /// Includes the member's roles and member-specific overwrites. Threads use their parent
+    /// channel's overwrites.
+    ///
+    /// Applies [implicit permission masking] unless `implicit` is set to `false`.
+    ///
+    /// **Note**: Requires the [View Channel] permission, and additionally the [Connect]
+    /// permission for voice and stage channels.
+    ///
+    /// [View Channel]: Permissions::VIEW_CHANNEL
+    /// [Connect]: Permissions::CONNECT
+    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+    pub async fn get_channel_member_permissions(
+        &self,
+        channel_id: GenericChannelId,
+        user_id: UserId,
+        implicit: Option<bool>,
+    ) -> Result<Permissions> {
+        #[derive(Deserialize)]
+        struct ChannelMemberPermissions {
+            permissions: Permissions,
+        }
+
+        let implicit_str;
+        let mut params = ArrayVec::<_, 1>::new();
+        if let Some(implicit) = implicit {
+            implicit_str = implicit.to_arraystring();
+            params.push(("implicit", implicit_str.as_str()));
+        }
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            method: LightMethod::Get,
+            headers: None,
+            route: Route::ChannelMemberPermissions {
+                channel_id,
+                user_id,
+            },
+            params: Some(&params),
+        })
+        .await
+        .map(|p: ChannelMemberPermissions| p.permissions)
+    }
+
+    /// Gets the permissions granted by a specified role together with `@everyone`.
+    ///
+    /// Channel overwrites are applied. Other roles and member-specific overwrites are not
+    /// included. Threads use their parent channel's overwrites.
+    ///
+    /// Applies [implicit permission masking] unless `implicit` is set to `false`.
+    ///
+    /// **Note**: Requires the [View Channel] permission, and additionally the [Connect]
+    /// permission for voice and stage channels.
+    ///
+    /// [View Channel]: Permissions::VIEW_CHANNEL
+    /// [Connect]: Permissions::CONNECT
+    /// [implicit permission masking]: https://docs.discord.com/developers/topics/permissions#implicit-permissions
+    pub async fn get_channel_role_permissions(
+        &self,
+        channel_id: GenericChannelId,
+        role_id: RoleId,
+        implicit: Option<bool>,
+    ) -> Result<Permissions> {
+        #[derive(Deserialize)]
+        struct ChannelRolePermissions {
+            permissions: Permissions,
+        }
+
+        let implicit_str;
+        let mut params = ArrayVec::<_, 1>::new();
+        if let Some(implicit) = implicit {
+            implicit_str = implicit.to_arraystring();
+            params.push(("implicit", implicit_str.as_str()));
+        }
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            method: LightMethod::Get,
+            headers: None,
+            route: Route::ChannelRolePermissions {
+                channel_id,
+                role_id,
+            },
+            params: Some(&params),
+        })
+        .await
+        .map(|p: ChannelRolePermissions| p.permissions)
+    }
+
     /// Gets all thread members for a thread.
     pub async fn get_channel_thread_members(
         &self,
@@ -3263,6 +3355,60 @@ impl Http {
             params: None,
         })
         .await
+    }
+
+    /// Gets a member's computed guild permissions, combining their roles with `@everyone`.
+    pub async fn get_guild_member_permissions(
+        &self,
+        guild_id: GuildId,
+        user_id: UserId,
+    ) -> Result<Permissions> {
+        #[derive(Deserialize)]
+        struct GuildMemberPermissions {
+            permissions: Permissions,
+        }
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildMemberPermissions {
+                guild_id,
+                user_id,
+            },
+            params: None,
+        })
+        .await
+        .map(|p: GuildMemberPermissions| p.permissions)
+    }
+
+    /// Gets the combined guild permissions of the specified role and `@everyone`.
+    ///
+    /// **Note**: This calculation does not include other roles or member-specific restrictions.
+    pub async fn get_guild_role_permissions(
+        &self,
+        guild_id: GuildId,
+        role_id: RoleId,
+    ) -> Result<Permissions> {
+        #[derive(Deserialize)]
+        struct GuildRolePermissions {
+            permissions: Permissions,
+        }
+
+        self.fire(Request {
+            body: None,
+            multipart: None,
+            headers: None,
+            method: LightMethod::Get,
+            route: Route::GuildRolePermissions {
+                guild_id,
+                role_id,
+            },
+            params: None,
+        })
+        .await
+        .map(|p: GuildRolePermissions| p.permissions)
     }
 
     /// Gets a guild widget information.

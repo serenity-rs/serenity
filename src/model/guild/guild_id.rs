@@ -1762,6 +1762,39 @@ impl GuildId {
     ) -> Result<MessageSearchResults> {
         query.execute(http, self, should_cache).await
     }
+
+    /// Gets a member's computed guild permissions, combining their roles with `@everyone`.
+    ///
+    /// **Note**: This does not include permission overwrites. To get a member's permissions in a
+    /// channel, including overwrites, use [`GenericChannelId::member_permissions`].
+    ///
+    /// To get a member's guild permissions without making an HTTP call, use
+    /// [`Guild::member_permissions`], [`Guild::partial_member_permissions`],
+    /// [`PartialGuild::member_permissions`], or [`PartialGuild::partial_member_permissions`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    pub async fn member_permissions(self, http: &Http, user_id: UserId) -> Result<Permissions> {
+        http.get_guild_member_permissions(self, user_id).await
+    }
+
+    /// Gets the combined guild permissions of the specified role and `@everyone`.
+    ///
+    /// **Note**: This calculation does not include other roles or member-specific restrictions.
+    /// It also does not include channel overwrites; to get the permissions in a channel, including
+    /// overwrites, use [`GenericChannelId::role_permissions`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given.
+    ///
+    /// May also return [`Error::Json`] if there is an error in deserializing the API response.
+    pub async fn role_permissions(self, http: &Http, role_id: RoleId) -> Result<Permissions> {
+        http.get_guild_role_permissions(self, role_id).await
+    }
 }
 
 impl From<PartialGuild> for GuildId {
