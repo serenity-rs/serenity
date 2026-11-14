@@ -39,7 +39,7 @@ pub struct Command {
     /// If the name is localized, either this field or [`Self::name_localized`] is set, depending
     /// on which endpoint this data was retrieved from
     /// ([source](https://docs.discord.com/developers/interactions/application-commands#retrieving-localized-commands)).
-    pub name_localizations: Option<UserHashMap<String, String>>,
+    pub name_localizations: Option<HashMap<String, String>>,
     /// The command description.
     pub description: FixedString<u16>,
     /// The localized command description of the selected locale.
@@ -53,7 +53,7 @@ pub struct Command {
     /// If the description is localized, either this field or [`Self::description_localized`] is
     /// set, depending on which endpoint this data was retrieved from
     /// ([source](https://docs.discord.com/developers/interactions/application-commands#retrieving-localized-commands)).
-    pub description_localizations: Option<UserHashMap<String, String>>,
+    pub description_localizations: Option<HashMap<String, String>>,
     /// The parameters for the command.
     #[serde(default)]
     pub options: FixedArray<CommandOption>,
@@ -254,12 +254,12 @@ pub struct CommandOption {
     pub name: FixedString<u8>,
     /// Localizations of the option name with locale as the key
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<UserHashMap<FixedString<u8>, FixedString<u8>>>,
+    pub name_localizations: Option<HashMap<FixedString<u8>, FixedString<u8>>>,
     /// The option description.
     pub description: FixedString<u16>,
     /// Localizations of the option description with locale as the key
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description_localizations: Option<UserHashMap<FixedString<u16>, FixedString<u16>>>,
+    pub description_localizations: Option<HashMap<FixedString<u16>, FixedString<u16>>>,
     /// Whether the parameter is optional or required.
     #[serde(default)]
     pub required: bool,
@@ -346,7 +346,7 @@ pub struct CommandOptionChoice {
     pub name: FixedString,
     /// Localizations of the choice name, with locale as key
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name_localizations: Option<UserHashMap<String, String>>,
+    pub name_localizations: Option<HashMap<String, String>>,
     /// The choice value.
     pub value: Value,
 }
