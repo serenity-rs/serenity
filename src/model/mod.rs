@@ -44,6 +44,7 @@ pub mod typing;
 pub mod user;
 pub mod voice;
 pub mod webhook;
+pub mod wrappers;
 
 #[cfg(feature = "http")]
 use std::sync::Arc;
@@ -151,6 +152,8 @@ pub mod prelude {
     #[cfg(feature = "model")]
     #[doc(hidden)]
     pub use super::typing::*;
+    #[doc(hidden)]
+    pub use super::wrappers::{BuildHasher, ExtractMap, HashMap, HashSet, UserProvidedHashMap};
     #[doc(hidden)]
     pub use super::{
         ModelError,

@@ -40,7 +40,6 @@ use std::fmt;
 use std::str::{self, FromStr};
 use std::time::{Duration, SystemTime};
 
-use dashmap::DashMap;
 use reqwest::header::HeaderMap;
 use reqwest::{Client, Response, StatusCode};
 use tokio::sync::Mutex;
@@ -51,6 +50,7 @@ use tracing::instrument;
 
 pub use super::routing::RatelimitingBucket;
 use super::{HttpError, LightMethod, Request};
+use crate::internal::hasher::DashMap;
 use crate::internal::prelude::*;
 
 /// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
@@ -112,7 +112,7 @@ impl Ratelimiter {
             client,
             token,
             global: Mutex::default(),
-            routes: DashMap::new(),
+            routes: DashMap::default(),
             absolute_ratelimits: false,
             ratelimit_callback: parking_lot::RwLock::new(Box::new(|_| {})),
         }

@@ -1,5 +1,4 @@
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::error::Error as StdError;
 use std::fmt;
 use std::sync::Arc;
@@ -9,6 +8,7 @@ use reqwest::{Error as ReqwestError, Method, Response, StatusCode};
 use serde::de::{Deserialize, Deserializer, Error as _};
 
 use crate::internal::prelude::*;
+use crate::model::wrappers::HashMap;
 
 enum_number! {
     #[derive(Clone, Debug, Eq, PartialEq, Deserialize, Serialize)]

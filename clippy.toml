@@ -1,1 +1,6 @@
 avoid-breaking-exported-api = false
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "use `model::wrappers::HashMap` (fast hasher) or `UserProvidedHashMap`" },
+    { path = "std::collections::HashSet", reason = "use `model::wrappers::HashSet`" },
+    { path = "dashmap::DashMap", reason = "use `internal::hasher::DashMap`" },
+]

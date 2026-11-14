@@ -24,7 +24,7 @@
 //! [`http`]: crate::http
 //! [Manage Guild]: Permissions::MANAGE_GUILD
 
-use std::collections::{HashSet, VecDeque};
+use std::collections::VecDeque;
 use std::hash::Hash;
 use std::num::NonZeroU16;
 #[cfg(feature = "temp_cache")]
@@ -32,7 +32,6 @@ use std::sync::Arc;
 #[cfg(feature = "temp_cache")]
 use std::time::Duration;
 
-use dashmap::DashMap;
 use dashmap::mapref::one::{MappedRef, Ref};
 #[cfg(feature = "temp_cache")]
 use mini_moka::sync::Cache as MokaCache;
@@ -42,6 +41,7 @@ use tracing::instrument;
 
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
+use crate::internal::hasher::DashMap;
 use crate::model::prelude::*;
 
 mod cache_update;
@@ -53,7 +53,7 @@ pub(crate) mod wrappers;
 pub(crate) use wrappers::MaybeOwnedArc;
 use wrappers::{MaybeMap, ReadOnlyMapRef};
 
-pub use crate::internal::hasher::{BuildHasher, ExtractMap};
+pub use crate::model::wrappers::{BuildHasher, ExtractMap};
 
 struct NotSend;
 
@@ -196,7 +196,7 @@ pub struct Cache {
 
     // Messages cache:
     // ---
-    messages: DashMap<GenericChannelId, VecDeque<Message>, BuildHasher>,
+    messages: DashMap<GenericChannelId, VecDeque<Message>>,
 
     // Miscellanous fixed-size data
     // ---
@@ -264,7 +264,7 @@ impl Cache {
 
             shard_data: RwLock::new(CachedShardData {
                 total: NonZeroU16::MIN,
-                connected: HashSet::new(),
+                connected: HashSet::default(),
                 has_sent_shards_ready: false,
             }),
             user: RwLock::new(CurrentUser::default()),
