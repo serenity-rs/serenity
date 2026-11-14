@@ -10,7 +10,7 @@ enum_number! {
     /// The type of a component
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum ComponentType {
         ActionRow = 1,
         Button = 2,
@@ -47,7 +47,7 @@ enum_number! {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Component {
     ActionRow(ActionRow),
     Section(Section),
@@ -100,7 +100,7 @@ impl<'de> Deserialize<'de> for Component {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#section)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Section {
     /// Always [`ComponentType::Section`]
     #[serde(rename = "type")]
@@ -117,7 +117,7 @@ pub struct Section {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum SectionComponent {
     TextDisplay(TextDisplay),
 }
@@ -151,7 +151,7 @@ impl<'de> Deserialize<'de> for SectionComponent {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum SectionAccessory {
     Button(Button),
     Thumbnail(Thumbnail),
@@ -192,7 +192,7 @@ impl<'de> Deserialize<'de> for SectionAccessory {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#thumbnail)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Thumbnail {
     /// Always [`ComponentType::Thumbnail`]
     #[serde(rename = "type")]
@@ -210,7 +210,7 @@ pub struct Thumbnail {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#unfurled-media-item)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct UnfurledMediaItem {
     /// The url of this item.
     pub url: FixedString<u16>,
@@ -230,7 +230,7 @@ pub struct UnfurledMediaItem {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#text-display)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct TextDisplay {
     /// Always [`ComponentType::TextDisplay`]
     #[serde(rename = "type")]
@@ -246,7 +246,7 @@ pub struct TextDisplay {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#media-gallery)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct MediaGallery {
     /// Always [`ComponentType::MediaGallery`]
     #[serde(rename = "type")]
@@ -262,7 +262,7 @@ pub struct MediaGallery {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#media-gallery-media-gallery-item-structure)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct MediaGalleryItem {
     /// The internal media piece that this item contains.
     pub media: UnfurledMediaItem,
@@ -277,7 +277,7 @@ pub struct MediaGalleryItem {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#separator)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Separator {
     /// Always [`ComponentType::Separator`]
     #[serde(rename = "type")]
@@ -293,7 +293,7 @@ enum_number! {
     /// The size of a separator component.
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum SeparatorSpacingSize {
         Small = 1,
         Large = 2,
@@ -306,7 +306,7 @@ enum_number! {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#file)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct FileComponent {
     /// Always [`ComponentType::File`]
     #[serde(rename = "type")]
@@ -322,7 +322,7 @@ pub struct FileComponent {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#container)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Container {
     /// Always [`ComponentType::Container`]
     #[serde(rename = "type")]
@@ -341,7 +341,7 @@ pub struct Container {
 #[derive(Clone, Debug, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum ContainerComponent {
     ActionRow(ActionRow),
     Section(Section),
@@ -400,7 +400,7 @@ impl<'de> Deserialize<'de> for ContainerComponent {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#label-label-interaction-response-structure)
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Label {
     /// Always [`ComponentType::Label`]
     #[serde(rename = "type")]
@@ -412,7 +412,7 @@ pub struct Label {
 #[derive(Clone, Debug, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum LabelComponent {
     SelectMenu(SelectMenu),
     InputText(InputText),
@@ -467,7 +467,7 @@ impl<'de> Deserialize<'de> for LabelComponent {
 /// An interactive component that allows users to upload files in modals.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct FileUpload {
     /// Always [`ComponentType::FileUpload`]
     #[serde(rename = "type")]
@@ -481,7 +481,7 @@ pub struct FileUpload {
 /// An interactive component that allows users to select a radio button in modals.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct RadioGroup {
     /// Always [`ComponentType::RadioGroup`]
     #[serde(rename = "type")]
@@ -496,7 +496,7 @@ pub struct RadioGroup {
 /// An interactive component that allows users to group together multiple checkboxes in modals.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct CheckboxGroup {
     /// Always [`ComponentType::CheckboxGroup`]
     #[serde(rename = "type")]
@@ -511,7 +511,7 @@ pub struct CheckboxGroup {
 /// An interactive component that allows users to use a checkbox in modals.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Checkbox {
     /// Always [`ComponentType::Checkbox`]
     #[serde(rename = "type")]
@@ -527,7 +527,7 @@ pub struct Checkbox {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#action-row).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActionRow {
     /// Always [`ComponentType::ActionRow`]
     #[serde(rename = "type")]
@@ -543,7 +543,7 @@ pub struct ActionRow {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum ActionRowComponent {
     Button(Button),
     SelectMenu(SelectMenu),
@@ -655,7 +655,7 @@ impl Serialize for ButtonKind {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#button).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Button {
     /// The component type, it will always be [`ComponentType::Button`].
     #[serde(rename = "type")]
@@ -678,7 +678,7 @@ enum_number! {
     /// The style of a button.
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum ButtonStyle {
         Primary = 1,
         Secondary = 2,
@@ -701,7 +701,7 @@ enum_number! {
 /// [Channel Select]: https://docs.discord.com/developers/components/reference#channel-select
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct SelectMenu {
     #[serde(flatten)]
     pub kind: SelectMenuKind,
@@ -724,7 +724,7 @@ pub struct SelectMenu {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum SelectMenuKind {
     String { options: FixedArray<SelectMenuOption> },
     User {},
@@ -845,7 +845,7 @@ impl Serialize for SelectMenuKind {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#string-select-select-option-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct SelectMenuOption {
     /// The text displayed on this option.
     pub label: FixedString,
@@ -865,7 +865,7 @@ pub struct SelectMenuOption {
 /// [Discord docs](https://docs.discord.com/developers/components/reference#text-input).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct InputText {
     /// The component type, it will always be [`ComponentType::InputText`].
     #[serde(rename = "type")]
@@ -882,7 +882,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/components/reference#text-input-text-input-styles).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum InputTextStyle {
         Short = 1,
         Paragraph = 2,
