@@ -1,4 +1,4 @@
-use nonmax::NonMaxU32;
+use nonmax::{NonMaxU8, NonMaxU32};
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 use serde_cow::CowStr;
@@ -63,9 +63,9 @@ pub struct Attachment {
     /// The [thumbhash] placeholder of the attachment (if image or video).
     ///
     /// [thumbhash]: https://evanw.github.io/thumbhash/
-    pub placeholder: Option<FixedString>,
+    pub placeholder: Option<FixedString<u8>>,
     /// The version of the placeholder (if image or video).
-    pub placeholder_version: Option<NonMaxU32>,
+    pub placeholder_version: Option<NonMaxU8>,
     /// Whether this attachment is ephemeral.
     ///
     /// Ephemeral attachments will automatically be removed after a set period of time.
@@ -183,10 +183,14 @@ impl ExtractKey<AttachmentId> for Attachment {
 bitflags! {
     /// Flags for an attachment.
     ///
+    /// **Note**: `CONTAINS_*` flags may not be present on the initial message and can be added
+    /// later in a [`MessageUpdateEvent`]. Additionally, these flags are only set once media is
+    /// sent in a message and are not included for attachments in an interaction's resolved data.
+    ///
     /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct AttachmentFlags: u8 {
+    pub struct AttachmentFlags: u16 {
         /// This attachment is a Clip from a stream.
         const IS_CLIP = 1 << 0;
         /// This attachment is the thumbnail of a thread in a media channel, displayed in the grid
@@ -194,7 +198,13 @@ bitflags! {
         const IS_THUMBNAIL = 1 << 1;
         /// This attachment was marked as a spoiler and is blurred until clicked.
         const IS_SPOILER = 1 << 3;
+        /// This attachment was flagged as explicit by Discord's content scanning.
+        const CONTAINS_EXPLICIT_CONTENT = 1 << 4;
         /// This attachment is an animated image.
         const IS_ANIMATED = 1 << 5;
+        /// This attachment was flagged as gore by Discord's content scanning.
+        const CONTAINS_GORE_CONTENT = 1 << 6;
+        /// This attachment was flagged as self-harm by Discord's content scanning.
+        const CONTAINS_SELF_HARM_CONTENT = 1 << 7;
     }
 }
