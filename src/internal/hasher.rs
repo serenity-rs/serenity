@@ -87,7 +87,12 @@ impl std::hash::BuildHasher for BuildHasher {
     }
 }
 
-pub type ExtractMap<K, V> = extract_map::ExtractMap<K, V, BuildHasher>;
-
 #[cfg(feature = "typesize")]
 impl typesize::TypeSize for BuildHasher {}
+
+/// A [`DashMap`](dashmap::DashMap) using the library's fast hasher.
+///
+/// This is the only place allowed to name the dashmap type, see `clippy.toml`.
+#[cfg(any(feature = "cache", feature = "http", feature = "gateway"))]
+#[expect(clippy::disallowed_types, reason = "this is the sanctioned alias for the dashmap type")]
+pub(crate) type DashMap<K, V> = dashmap::DashMap<K, V, BuildHasher>;

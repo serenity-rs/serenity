@@ -4,17 +4,16 @@ use std::hash::Hash;
 #[cfg(feature = "temp_cache")]
 use std::sync::Arc;
 
-use dashmap::DashMap;
 use dashmap::mapref::multiple::RefMulti;
 use dashmap::mapref::one::{Ref, RefMut};
 #[cfg(feature = "typesize")]
 use typesize::TypeSize;
 
-use crate::internal::hasher::BuildHasher;
+use crate::internal::hasher::DashMap;
 
 #[derive(Debug)]
 /// A wrapper around Option<DashMap<K, V>> to ease disabling specific cache fields.
-pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(crate) Option<DashMap<K, V, BuildHasher>>);
+pub(crate) struct MaybeMap<K: Eq + Hash, V>(pub(crate) Option<DashMap<K, V>>);
 impl<K: Eq + Hash, V> MaybeMap<K, V> {
     pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V>> {
         Option::iter(&self.0).flat_map(DashMap::iter)
@@ -67,7 +66,7 @@ impl<K: Eq + Hash + TypeSize, V: TypeSize> TypeSize for MaybeMap<K, V> {
 #[derive(Clone, Copy, Debug)]
 /// A wrapper around a reference to a MaybeMap, allowing for public inspection of the underlying
 /// map without allowing mutation of internal cache fields, which could cause issues.
-pub struct ReadOnlyMapRef<'a, K: Eq + Hash, V>(Option<&'a DashMap<K, V, BuildHasher>>);
+pub struct ReadOnlyMapRef<'a, K: Eq + Hash, V>(Option<&'a DashMap<K, V>>);
 impl<K: Eq + Hash, V> ReadOnlyMapRef<'_, K, V> {
     pub fn iter(&self) -> impl Iterator<Item = RefMulti<'_, K, V>> {
         self.0.into_iter().flat_map(DashMap::iter)
