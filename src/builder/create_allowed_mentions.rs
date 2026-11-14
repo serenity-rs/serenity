@@ -27,7 +27,7 @@ impl Serialize for Parse {
     where
         S: serde::Serializer,
     {
-        let count = self.everyone as usize + self.users as usize + self.roles as usize;
+        let count = usize::from(self.everyone) + usize::from(self.users) + usize::from(self.roles);
         let mut seq = serializer.serialize_seq(Some(count))?;
         if self.everyone {
             seq.serialize_element("everyone")?;
