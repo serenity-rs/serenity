@@ -1,4 +1,4 @@
-use nonmax::NonMaxU32;
+use nonmax::{NonMaxU8, NonMaxU32};
 
 use crate::model::prelude::*;
 
@@ -185,9 +185,9 @@ pub struct EmbedImage {
     /// The [thumbhash] placeholder of the image.
     ///
     /// [thumbhash]: https://evanw.github.io/thumbhash/
-    pub placeholder: Option<FixedString>,
+    pub placeholder: Option<FixedString<u8>>,
     /// The version of the placeholder.
-    pub placeholder_version: Option<NonMaxU32>,
+    pub placeholder_version: Option<NonMaxU8>,
     /// The description (alt text) for the image.
     pub description: Option<FixedString>,
     /// The embed media flags for the image.
@@ -229,9 +229,9 @@ pub struct EmbedVideo {
     /// The [thumbhash] placeholder of the video.
     ///
     /// [thumbhash]: https://evanw.github.io/thumbhash/
-    pub placeholder: Option<FixedString>,
+    pub placeholder: Option<FixedString<u8>>,
     /// The version of the placeholder.
-    pub placeholder_version: Option<NonMaxU32>,
+    pub placeholder_version: Option<NonMaxU8>,
     /// The description (alt text) for the video.
     pub description: Option<FixedString>,
     /// The embed media flags for the video.

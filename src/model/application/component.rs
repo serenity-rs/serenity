@@ -1,4 +1,4 @@
-use nonmax::NonMaxU32;
+use nonmax::{NonMaxU8, NonMaxU32};
 use serde::de::Error as DeError;
 use serde::ser::{Serialize, Serializer};
 use serde_json::value::RawValue;
@@ -223,9 +223,9 @@ pub struct UnfurledMediaItem {
     /// The [thumbhash] placeholder of the media item (if image or video).
     ///
     /// [thumbhash]: https://evanw.github.io/thumbhash/
-    pub placeholder: Option<FixedString>,
+    pub placeholder: Option<FixedString<u8>>,
     /// The version of the placeholder (if image or video).
-    pub placeholder_version: Option<NonMaxU32>,
+    pub placeholder_version: Option<NonMaxU8>,
     /// The content type of the media item.
     pub content_type: Option<FixedString>,
     /// The flags for the media item.
