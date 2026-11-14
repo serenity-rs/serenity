@@ -1,6 +1,9 @@
-use crate::model::prelude::*;
-use serde::{Serialize, ser::SerializeSeq};
 use std::borrow::Cow;
+
+use serde::Serialize;
+use serde::ser::SerializeSeq;
+
+use crate::model::prelude::*;
 
 #[derive(Clone, Debug, Default, PartialEq)]
 struct Parse {
@@ -11,7 +14,11 @@ struct Parse {
 
 impl Parse {
     const fn new() -> Self {
-        Self { everyone: false, users: false, roles: false }
+        Self {
+            everyone: false,
+            users: false,
+            roles: false,
+        }
     }
 }
 
