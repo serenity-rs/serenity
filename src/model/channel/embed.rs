@@ -256,7 +256,7 @@ bitflags! {
     /// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-flags).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq)]
-    pub struct EmbedFlags: u8 {
+    pub struct EmbedFlags: u16 {
         /// This embed's media was flagged as explicit by Discord's content scanning.
         const CONTAINS_EXPLICIT_CONTENT	= 1 << 4;
         /// This embed is a fallback for a reply to an activity card.
