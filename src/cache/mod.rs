@@ -108,14 +108,12 @@ impl<K: Eq + Hash, V, T> std::ops::Deref for CacheRef<'_, K, V, T> {
     }
 }
 
-type Never = std::convert::Infallible;
-
-pub type UserRef<'a> = CacheRef<'a, UserId, User, Never>;
-pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild, Never>;
-pub type SettingsRef<'a> = CacheRef<'a, Never, Settings, Never>;
-pub type CurrentUserRef<'a> = CacheRef<'a, Never, CurrentUser, Never>;
+pub type UserRef<'a> = CacheRef<'a, UserId, User, !>;
+pub type GuildRef<'a> = CacheRef<'a, GuildId, Guild, !>;
+pub type SettingsRef<'a> = CacheRef<'a, !, Settings, !>;
+pub type CurrentUserRef<'a> = CacheRef<'a, !, CurrentUser, !>;
 pub type MessageRef<'a> = CacheRef<'a, GenericChannelId, Message, VecDeque<Message>>;
-pub type ChannelMessagesRef<'a> = CacheRef<'a, GenericChannelId, VecDeque<Message>, Never>;
+pub type ChannelMessagesRef<'a> = CacheRef<'a, GenericChannelId, VecDeque<Message>, !>;
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Debug)]

@@ -213,6 +213,8 @@ impl From<&Timestamp> for Timestamp {
 
 #[cfg(test)]
 mod tests {
+    use std::assert_matches;
+
     use super::{DISCORD_EPOCH, MAX_DISCORD_ID_MILLIS, Timestamp, TimestampOutOfRange};
 
     #[test]
@@ -231,11 +233,11 @@ mod tests {
 
         let too_early = Timestamp::from_millis((DISCORD_EPOCH - 1) as i64).unwrap();
         let result = too_early.try_as_discord_id();
-        assert!(matches!(result, Err(TimestampOutOfRange)));
+        assert_matches!(result, Err(TimestampOutOfRange));
 
         let too_late = Timestamp::from_millis((MAX_DISCORD_ID_MILLIS + 1) as i64).unwrap();
         let result = too_late.try_as_discord_id();
-        assert!(matches!(result, Err(TimestampOutOfRange)));
+        assert_matches!(result, Err(TimestampOutOfRange));
 
         // The Discord epoch itself should be a valid conversion, and should produce an id of 0.
         let just_right = Timestamp::from_millis(DISCORD_EPOCH as i64).unwrap();

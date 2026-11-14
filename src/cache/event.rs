@@ -88,7 +88,7 @@ impl CacheUpdate for ChannelInfoEvent {
 }
 
 impl CacheUpdate for ChannelPinsUpdateEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(guild_id) = self.guild_id
@@ -153,7 +153,7 @@ impl CacheUpdate for GuildDeleteEvent {
 }
 
 impl CacheUpdate for GuildEmojisUpdateEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
@@ -165,7 +165,7 @@ impl CacheUpdate for GuildEmojisUpdateEvent {
 }
 
 impl CacheUpdate for GuildMemberAddEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.member.guild_id) {
@@ -260,7 +260,7 @@ fn obfuscate_no_longer_viewable_channels(
 }
 
 impl CacheUpdate for GuildMembersChunkEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut g) = cache.guilds.get_mut(&self.guild_id) {
@@ -272,7 +272,7 @@ impl CacheUpdate for GuildMembersChunkEvent {
 }
 
 impl CacheUpdate for GuildRoleCreateEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         cache.guilds.get_mut(&self.role.guild_id).map(|mut g| g.roles.insert(self.role.clone()));
@@ -316,7 +316,7 @@ impl CacheUpdate for GuildRoleUpdateEvent {
 }
 
 impl CacheUpdate for GuildStickersUpdateEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild_id) {
@@ -328,7 +328,7 @@ impl CacheUpdate for GuildStickersUpdateEvent {
 }
 
 impl CacheUpdate for GuildUpdateEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         if let Some(mut guild) = cache.guilds.get_mut(&self.guild.id) {
@@ -561,7 +561,7 @@ impl CacheUpdate for ThreadDeleteEvent {
 }
 
 impl CacheUpdate for ThreadListSyncEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         let mut guild = cache.guilds.get_mut(&self.guild_id)?;
@@ -683,7 +683,7 @@ fn update_guild_event(cache: &Cache, event: &ScheduledEvent) -> Option<Scheduled
 }
 
 impl CacheUpdate for GuildScheduledEventCreateEvent {
-    type Output = std::convert::Infallible;
+    type Output = !;
 
     fn update(&self, cache: &Cache) -> Option<Self::Output> {
         update_guild_event(cache, &self.event);

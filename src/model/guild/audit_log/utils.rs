@@ -19,7 +19,7 @@ pub mod optional_string {
     }
 
     impl TryFromU64 for u64 {
-        type Err = std::convert::Infallible;
+        type Err = !;
         fn try_from_u64(value: u64) -> Result<Self, Self::Err> {
             Ok(value)
         }
