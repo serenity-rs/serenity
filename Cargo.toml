@@ -80,8 +80,6 @@ default_native_tls = ["default_no_backend", "native_tls_backend"]
 default_no_backend = [
     "cache",
     "framework",
-    "transport_compression_zlib",
-    "transport_compression_zstd",
 ]
 
 # Enables builder structs to configure Discord HTTP requests. Without this feature, you have to
@@ -122,7 +120,7 @@ interactions_endpoint = ["ed25519-dalek"]
 # (Note: all feature-gated APIs to be documented should have their features listed here!)
 #
 # Unstable functionality should be gated under the `unstable` feature.
-full = ["default", "collector", "voice", "interactions_endpoint"]
+full = ["default", "collector", "voice", "interactions_endpoint", "transport_compression_zlib", "transport_compression_zstd"]
 
 # Enables temporary caching in functions that retrieve data via the HTTP API.
 temp_cache = ["cache", "mini-moka", "typesize?/mini_moka", "typesize?/dashmap"]
