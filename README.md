@@ -173,6 +173,7 @@ instead of `rustls_backend`.
 - **default_no_backend**: Default features, but does not enable any backend.
 - **tokio_task_builder**: Enables tokio's `tracing` feature and uses `tokio::task::Builder` to spawn tasks with names if `RUSTFLAGS="--cfg tokio_unstable"` is set.
 - **unstable**: Enables features of the Serenity and Discord API that do not have a stable interface. The features might not have official documentation and are subject to change without a breaking version bump.
+- **unstable_exhaustive_types**: Disables all `#[non_exhaustive]` macros, to ensure that all enum variants or struct fields are required when pattern matching.
 - **temp_cache**: Enables temporary caching in functions that retrieve data via the HTTP API.
 - **interactions_endpoint**: Enables tools related to Discord's Interactions Endpoint URL feature
 

@@ -26,6 +26,7 @@ Thanks to the following for their contributions:
 - [@cheesycod]
 - [@DPlayer234]
 - [@Dramex]
+- [@Dueen]
 - [@Erk-]
 - [@fgardt]
 - [@Freyja-moth]
@@ -39,6 +40,7 @@ Thanks to the following for their contributions:
 - [@kshitijanurag]
 - [@lucascompython]
 - [@meditationmind]
+- [@mibac138]
 - [@Milo123459]
 - [@mkrasnitski]
 - [@NateDiamond13]
@@ -384,6 +386,8 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3611](https://github.com/serenity-rs/serenity/pull/3611) Add `Interaction::user` helper function
 - [#3636](https://github.com/serenity-rs/serenity/pull/3636) Add calculated permissions endpoints
 - [#3634](https://github.com/serenity-rs/serenity/pull/3634) Add content scanning flags
+- [#3644](https://github.com/serenity-rs/serenity/pull/3644) Add `unstable_exhaustive_types` feature to disable all uses of `#[non_exhaustive]`
+- [#3646](https://github.com/serenity-rs/serenity/pull/3646) Add support for `components` type embeds
 
 ### Changes
 
@@ -609,7 +613,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#2687](https://github.com/serenity-rs/serenity/pull/2687) Clean up `Ratelimiter`
 - [#2697](https://github.com/serenity-rs/serenity/pull/2697) Clean up codebase by moving overflow checks into `ModelError` variants
 - [#2700](https://github.com/serenity-rs/serenity/pull/2700) Clean up `Error` and shrink its size
-- [#2685](https://github.com/serenity-rs/serenity/pull/2685), [#2711](https://github.com/serenity-rs/serenity/pull/2711), [#2755](https://github.com/serenity-rs/serenity/pull/2755), [#2826](https://github.com/serenity-rs/serenity/pull/2826), [#2961](https://github.com/serenity-rs/serenity/pull/2961), [#3048](https://github.com/serenity-rs/serenity/pull/3048), [f560770](https://github.com/serenity-rs/serenity/commit/f560770a603b41eeb8a64a36f271d81102515e5d), [#3117](https://github.com/serenity-rs/serenity/pull/3117), [#3349](https://github.com/serenity-rs/serenity/pull/3349), [#3463](https://github.com/serenity-rs/serenity/pull/3463), [#3623](https://github.com/serenity-rs/serenity/pull/3623), [#3643](https://github.com/serenity-rs/serenity/pull/3643) Update dependencies
+- [#2685](https://github.com/serenity-rs/serenity/pull/2685), [#2711](https://github.com/serenity-rs/serenity/pull/2711), [#2755](https://github.com/serenity-rs/serenity/pull/2755), [#2826](https://github.com/serenity-rs/serenity/pull/2826), [#2961](https://github.com/serenity-rs/serenity/pull/2961), [#3048](https://github.com/serenity-rs/serenity/pull/3048), [f560770](https://github.com/serenity-rs/serenity/commit/f560770a603b41eeb8a64a36f271d81102515e5d), [#3117](https://github.com/serenity-rs/serenity/pull/3117), [#3349](https://github.com/serenity-rs/serenity/pull/3349), [#3463](https://github.com/serenity-rs/serenity/pull/3463), [#3623](https://github.com/serenity-rs/serenity/pull/3623), [#3643](https://github.com/serenity-rs/serenity/pull/3643), [#3647](https://github.com/serenity-rs/serenity/pull/3647) Update dependencies
 - [#2740](https://github.com/serenity-rs/serenity/pull/2740) Avoid cloning `FullEvent` in dispatch code
 - [#2744](https://github.com/serenity-rs/serenity/pull/2744) Use `Serializer::collect_seq` in `Serialize` implementations
 - [#2746](https://github.com/serenity-rs/serenity/pull/2746) Convert `enum_number!` to wrapper struct to reduce type sizes
@@ -6370,6 +6374,7 @@ Initial commit.
 [@DoumanAsh]: https://github.com/DoumanAsh
 [@Dramex]: https://github.com/Dramex
 [@DrBluefall]: https://github.com/DrBluefall
+[@Dueen]: https://github.com/Dueen
 [@Elinvynia]: https://github.com/Elinvynia
 [@Erk-]: https://github.com/Erk-
 [@FabseGP]: https://github.com/FabseGP
@@ -6578,6 +6583,7 @@ Initial commit.
 [@megumisonoda]: https://github.com/megumisonoda
 [@mendess]: https://github.com/mendess
 [@merlleu]: https://github.com/merlleu
+[@mibac138]: https://github.com/mibac138
 [@miqbalrr]: https://github.com/miqbalrr
 [@mjsir911]: https://github.com/mjsir911
 [@mkrasnitski]: https://github.com/mkrasnitski
