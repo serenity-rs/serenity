@@ -269,10 +269,13 @@ to have disappeared, check the relevant Id. This is particularly true for method
 | `GuildChannel::messages` | `GenericChannelId::messages` |
 | `User::dm` | `UserId::dm` |
 
-### Simplify, simplify, simplify!
+### Avoiding Unnecessary `impl Trait`
 
-Many builders and methods have been changed to take the type they need directly, rather than
-accepting impl traits. Of particular note are `impl CacheHttp` and `impl Into<*Id>`.
+Many builders and methods now take the type they need instead of `impl Trait`, which desugars to a
+generic and requires rustc to compile the method while compiling the calling crate, instead of only
+once while compiling Serenity. This should reduce compile times and be less confusing to users.
+
+Of particular note are `impl CacheHttp` and `impl Into<*Id>`:
 
 - `impl CacheHttp` --> `&Http`
 
@@ -321,7 +324,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3028](https://github.com/serenity-rs/serenity/pull/3028) Add `EditCommand` builder
 - [#3031](https://github.com/serenity-rs/serenity/pull/3031) Add `wait_time_between_shard_start` to `ShardQueuer`, configurable via `ClientBuilder::wait_time_between_shard_start`
 - [#3050](https://github.com/serenity-rs/serenity/pull/3050) Add `AutoModRule` and `AuditLogEntryOptions`
-- [#3036](https://github.com/serenity-rs/serenity/pull/3036), [#3067](https://github.com/serenity-rs/serenity/pull/3067), [#3462](https://github.com/serenity-rs/serenity/pull/3462) Add support for transport compression via `transport_compression_zlib` and `transport_compression_zstd` features
+- [#3036](https://github.com/serenity-rs/serenity/pull/3036), [#3067](https://github.com/serenity-rs/serenity/pull/3067), [#3462](https://github.com/serenity-rs/serenity/pull/3462), [#3637](https://github.com/serenity-rs/serenity/pull/3637) Add support for transport compression via `transport_compression_zlib` and `transport_compression_zstd` features
 - [#3052](https://github.com/serenity-rs/serenity/pull/3052), [#3054](https://github.com/serenity-rs/serenity/pull/3054), [2d918be](https://github.com/serenity-rs/serenity/commit/2d918bed2f818b2455306a184af34c3a2f3d1313) Add `Token` type that can partially validate token strings; clean up `gateway` feature gates
   - Pass token to `ClientBuilder` using `Token::from_env`, `Token::from_str`, or `str::parse::<Token>()`.
 - [#3058](https://github.com/serenity-rs/serenity/pull/3058) Add `guild_id` to `ReactionRemoveAll` event
@@ -378,6 +381,9 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
   - `Channel::Guild` has been split into `Channel::GuildViewable` and `Channel::GuildObfuscated`; `Channel::guild()` returns the former and `Channel::obfuscated()` returns the latter.
   - `GuildChannel` is now `MaybeObfuscated` in events, `Cache::guild_categories`, `Channel::category` and `Member::default_channel`.
   - `Cache::temp_obfuscated_channels` has been added.
+- [#3611](https://github.com/serenity-rs/serenity/pull/3611) Add `Interaction::user` helper function
+- [#3636](https://github.com/serenity-rs/serenity/pull/3636) Add calculated permissions endpoints
+- [#3634](https://github.com/serenity-rs/serenity/pull/3634) Add content scanning flags
 
 ### Changes
 
@@ -462,6 +468,10 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3601](https://github.com/serenity-rs/serenity/pull/3601) Change larger `Error` variants to be boxed
 - [#3607](https://github.com/serenity-rs/serenity/pull/3607) Change logging level to `info` for normal gateway closure codes (1000, 1001, and 1012)
 - [#3605](https://github.com/serenity-rs/serenity/pull/3605) Change `Request::build` to ensure URL parameters are encoded safely
+- [#3544](https://github.com/serenity-rs/serenity/pull/3544) Change `CreateAllowedMentions` to allow `const` methods
+- [#3556](https://github.com/serenity-rs/serenity/pull/3556) Change `GuildCreate` event to properly handle unavailable guilds
+  - Instead of `Guild`, `FullEvent::GuildCreate` now returns `GuildCreateGuild::Available(Guild)` or `GuildCreateGuild::Unavailable(UnavailableGuild)`.
+  - `GuildCreateGuild` has `id()` and `unavailable()` convenience methods for accessing shared fields.
 
 ### Removals
 
@@ -599,7 +609,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#2687](https://github.com/serenity-rs/serenity/pull/2687) Clean up `Ratelimiter`
 - [#2697](https://github.com/serenity-rs/serenity/pull/2697) Clean up codebase by moving overflow checks into `ModelError` variants
 - [#2700](https://github.com/serenity-rs/serenity/pull/2700) Clean up `Error` and shrink its size
-- [#2685](https://github.com/serenity-rs/serenity/pull/2685), [#2711](https://github.com/serenity-rs/serenity/pull/2711), [#2755](https://github.com/serenity-rs/serenity/pull/2755), [#2826](https://github.com/serenity-rs/serenity/pull/2826), [#2961](https://github.com/serenity-rs/serenity/pull/2961), [#3048](https://github.com/serenity-rs/serenity/pull/3048), [f560770](https://github.com/serenity-rs/serenity/commit/f560770a603b41eeb8a64a36f271d81102515e5d), [#3117](https://github.com/serenity-rs/serenity/pull/3117), [#3349](https://github.com/serenity-rs/serenity/pull/3349), [#3463](https://github.com/serenity-rs/serenity/pull/3463), [#3623](https://github.com/serenity-rs/serenity/pull/3623) Update dependencies
+- [#2685](https://github.com/serenity-rs/serenity/pull/2685), [#2711](https://github.com/serenity-rs/serenity/pull/2711), [#2755](https://github.com/serenity-rs/serenity/pull/2755), [#2826](https://github.com/serenity-rs/serenity/pull/2826), [#2961](https://github.com/serenity-rs/serenity/pull/2961), [#3048](https://github.com/serenity-rs/serenity/pull/3048), [f560770](https://github.com/serenity-rs/serenity/commit/f560770a603b41eeb8a64a36f271d81102515e5d), [#3117](https://github.com/serenity-rs/serenity/pull/3117), [#3349](https://github.com/serenity-rs/serenity/pull/3349), [#3463](https://github.com/serenity-rs/serenity/pull/3463), [#3623](https://github.com/serenity-rs/serenity/pull/3623), [#3643](https://github.com/serenity-rs/serenity/pull/3643) Update dependencies
 - [#2740](https://github.com/serenity-rs/serenity/pull/2740) Avoid cloning `FullEvent` in dispatch code
 - [#2744](https://github.com/serenity-rs/serenity/pull/2744) Use `Serializer::collect_seq` in `Serialize` implementations
 - [#2746](https://github.com/serenity-rs/serenity/pull/2746) Convert `enum_number!` to wrapper struct to reduce type sizes
@@ -622,6 +632,7 @@ Serenity now uses Rust edition 2024, with an MSRV of Rust 1.95.
 - [#3628](https://github.com/serenity-rs/serenity/pull/3628) Make `tokio-tungstenite` optional for HTTP-only
 - [#3627](https://github.com/serenity-rs/serenity/pull/3627) Re-export `reqwest`
 - [#3626](https://github.com/serenity-rs/serenity/pull/3626) Hide `tungstenite` from public API
+- [#3360](https://github.com/serenity-rs/serenity/pull/3360) Specialize `BuildHasher` and use it in models
 
 ## [0.12.5] - 2025-12-20
 

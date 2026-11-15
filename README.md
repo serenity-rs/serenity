@@ -135,8 +135,7 @@ features = ["pick", "your", "feature", "names", "here"]
 version = "0.13"
 ```
 
-The default features are: `cache`, `framework`, `transport_compression_zlib`,
-`transport_compression_zstd`, and `rustls_backend`. Enabling `framework` also enables `gateway`,
+The default features are: `cache`, `framework`, and `rustls_backend`. Enabling `framework` also enables `gateway`,
 `model`, `builder`, `http`, and `utils`.
 
 The following enable default features with alternative backends. To use these, you must set
@@ -199,8 +198,6 @@ list all but that:
 default-features = false
 features = [
     "framework",
-    "transport_compression_zlib",
-    "transport_compression_zstd",
     "rustls_backend",
 ]
 version = "0.13"
