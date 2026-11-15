@@ -72,7 +72,7 @@ impl StdError for UrlError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Self::Parsing(inner) => Some(inner),
-            _ => None,
+            Self::InvalidDataURI => None,
         }
     }
 }
