@@ -10,7 +10,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://docs.discord.com/developers/resources/voice#voice-region-object).
 #[bool_to_bitflags::bool_to_bitflags]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct VoiceRegion {
     /// Whether it is a custom voice region, which is used for events.
     pub custom: bool,
@@ -31,7 +31,7 @@ pub struct VoiceRegion {
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(remote = "Self")]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct VoiceState {
     pub channel_id: Option<ChannelId>,
     pub deaf: bool,
@@ -82,7 +82,7 @@ impl Serialize for VoiceStateGeneratedOriginal {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#voice-channel-effect-send).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct VoiceChannelEffect {
     /// The Id of the channel the effect was sent in.
     pub channel_id: ChannelId,
@@ -106,7 +106,7 @@ enum_number! {
     /// The type of emoji animation, for emoji reaction and soundboard effects.
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum AnimationType {
         Premium = 0,
         Basic = 1,

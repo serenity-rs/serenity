@@ -140,7 +140,7 @@ impl fmt::Display for FormattedTimestampStyle {
 
 /// An error that can occur when parsing a [`FormattedTimestamp`] from a string.
 #[derive(Debug, Clone)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct FormattedTimestampParseError {
     string: String,
 }

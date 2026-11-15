@@ -23,7 +23,7 @@ use crate::model::prelude::*;
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct CommandInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
@@ -234,7 +234,7 @@ impl Serialize for CommandInteraction {
 /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-application-command-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct CommandData {
     /// The Id of the invoked command.
     pub id: CommandId,
@@ -388,7 +388,7 @@ impl CommandData {
 
 /// The focused option for autocomplete interactions return by [`CommandData::autocomplete`].
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct AutocompleteOption<'a> {
     pub name: &'a str,
     pub kind: CommandOptionType,
@@ -396,7 +396,7 @@ pub struct AutocompleteOption<'a> {
 }
 
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ResolvedOption<'a> {
     pub name: &'a str,
     pub value: ResolvedValue<'a>,
@@ -404,7 +404,7 @@ pub struct ResolvedOption<'a> {
 
 /// The resolved value of a [`CommandDataOption`].
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum ResolvedValue<'a> {
     Autocomplete { kind: CommandOptionType, value: &'a str },
     Boolean(bool),
@@ -422,7 +422,7 @@ pub enum ResolvedValue<'a> {
 
 /// Option value variants that couldn't be resolved by `CommandData::options()`.
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Unresolved {
     Attachment(AttachmentId),
     Channel(GenericChannelId),
@@ -435,7 +435,7 @@ pub enum Unresolved {
 
 /// The resolved value of a [`CommandData::target_id`].
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum ResolvedTarget<'a> {
     User(&'a User, Option<&'a PartialMember>),
     Message(&'a Message),
@@ -447,7 +447,7 @@ pub enum ResolvedTarget<'a> {
 /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct CommandDataResolved {
     /// The resolved users.
     #[serde(
@@ -501,7 +501,7 @@ pub struct CommandDataResolved {
 /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct CommandDataOption {
     /// The name of the parameter.
     pub name: FixedString,
@@ -624,7 +624,7 @@ impl Serialize for CommandDataOption {
 /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-type).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum CommandDataOptionValue {
     Autocomplete { kind: CommandOptionType, value: FixedString },
     Boolean(bool),

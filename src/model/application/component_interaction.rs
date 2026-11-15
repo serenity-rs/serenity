@@ -19,7 +19,7 @@ use crate::model::prelude::*;
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(remote = "Self")]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ComponentInteraction {
     /// Id of the interaction.
     pub id: InteractionId,
@@ -310,7 +310,7 @@ impl Serialize for ComponentInteractionDataKind {
 /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ComponentInteractionData {
     /// The custom id of the component.
     pub custom_id: FixedString,

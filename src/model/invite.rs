@@ -12,7 +12,7 @@ use crate::http::Http;
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Invite {
     /// The type of invite.
     #[serde(rename = "type")]
@@ -195,7 +195,7 @@ impl Invite {
 /// A minimal amount of information about the channel an invite points to.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-example-invite-object).
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
     pub id: ChannelId,
@@ -208,7 +208,7 @@ pub struct InviteChannel {
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-example-invite-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct InviteGuild {
     pub id: GuildId,
     pub name: FixedString,
@@ -226,7 +226,7 @@ pub struct InviteGuild {
 /// A minimal amount of information about a role assigned to a user upon accepting an invite.
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-invite-structure).
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteRole {
     pub id: RoleId,
@@ -250,7 +250,7 @@ pub struct InviteRole {
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-metadata-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct InviteMetadata {
     /// The number of times the invite has been used.
     pub uses: u64,
@@ -274,7 +274,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-invite-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum InviteType {
         Guild = 0,
         GroupDm = 1,
@@ -289,7 +289,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/resources/invite#invite-object-invite-target-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum InviteTargetType {
         Stream = 1,
         EmbeddedApplication = 2,

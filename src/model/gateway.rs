@@ -18,7 +18,7 @@ use super::utils::*;
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway#get-gateway-bot-json-response).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct BotGateway {
     /// The gateway to connect to.
     pub url: FixedString,
@@ -34,7 +34,7 @@ pub struct BotGateway {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Activity {
     /// The ID of the application for the activity.
     #[serde(default)]
@@ -84,7 +84,7 @@ pub struct Activity {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-buttons).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActivityButton {
     /// The text shown on the button.
     pub label: FixedString,
@@ -100,7 +100,7 @@ pub struct ActivityButton {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-assets).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActivityAssets {
     /// The ID for a large asset of the activity, usually a snowflake.
     pub large_image: Option<FixedString>,
@@ -145,7 +145,7 @@ bitflags! {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-party).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActivityParty {
     /// The ID of the party.
     pub id: Option<FixedString>,
@@ -158,7 +158,7 @@ pub struct ActivityParty {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-secrets).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActivitySecrets {
     /// The secret for joining a party.
     pub join: Option<FixedString>,
@@ -174,7 +174,7 @@ pub struct ActivitySecrets {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-emoji).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActivityEmoji {
     /// The name of the emoji.
     pub name: FixedString,
@@ -188,7 +188,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum ActivityType {
         /// An indicator that the user is playing a game.
         Playing = 0,
@@ -212,7 +212,7 @@ enum_number! {
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway#get-gateway-example-response).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Gateway {
     /// The gateway to connect to.
     pub url: FixedString,
@@ -223,7 +223,7 @@ pub struct Gateway {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#client-status-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ClientStatus {
     pub desktop: Option<OnlineStatus>,
     pub mobile: Option<OnlineStatus>,
@@ -241,7 +241,7 @@ pub struct ClientStatus {
 #[bool_to_bitflags::bool_to_bitflags]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct PresenceUser {
     pub id: UserId,
     #[serde(rename = "username")]
@@ -328,7 +328,7 @@ impl PresenceUser {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#presence-update-presence-update-event-fields).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Presence {
     /// Data about the associated user.
     pub user: PresenceUser,
@@ -354,7 +354,7 @@ impl ExtractKey<UserId> for Presence {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#ready).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Ready {
     /// API version
     #[serde(rename = "v")]
@@ -377,7 +377,7 @@ pub struct Ready {
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway#session-start-limit-object-session-start-limit-structure).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct SessionStartLimit {
     /// The number of sessions that you can still initiate within the current ratelimit period.
     pub remaining: u64,
@@ -431,7 +431,7 @@ impl serde::Serialize for ShardInfo {
 /// This can be useful for knowing which shards are currently "down"/"up".
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum ConnectionStage {
     /// Indicator that the shard is normally connected and is not in, e.g., a resume phase.
     Connected,
@@ -500,7 +500,7 @@ impl fmt::Display for ConnectionStage {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-timestamps).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActivityTimestamps {
     pub end: Option<NonZeroU64>,
     pub start: Option<NonZeroU64>,

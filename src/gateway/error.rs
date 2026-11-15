@@ -10,7 +10,7 @@ use super::CloseFrame;
 /// Note that - from a user standpoint - there should be no situation in which you manually handle
 /// these.
 #[derive(Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Error {
     /// There was an error building a URL.
     BuildingUrl,

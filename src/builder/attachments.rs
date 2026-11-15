@@ -29,7 +29,7 @@ pub enum AttachmentDataKind<'a> {
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-structure).
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 #[must_use]
 pub struct CreateAttachment<'a> {
     description: Option<Cow<'a, str>>,
@@ -214,7 +214,7 @@ impl<'a> DataUri<'a> {
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-request-structure).
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 #[must_use]
 pub struct EditAttachment<'a> {
     id: AttachmentId,

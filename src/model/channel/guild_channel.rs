@@ -22,7 +22,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://docs.discord.com/developers/topics/threads#thread-fields)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct BaseGuildChannel {
     /// The Id of the guild the channel is located in.
     #[serde(default)]
@@ -71,7 +71,7 @@ impl From<&ObfuscatedChannel> for BaseGuildChannel {
 /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct GuildChannel {
     /// The shared fields between [`GuildChannel`] and [`GuildThread`].
     #[serde(flatten)]
@@ -167,7 +167,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-forum-layout-types).
     #[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum ForumLayoutType {
         /// No default has been set for forum channel.
         NotSet = 0,
@@ -533,7 +533,7 @@ impl From<ObfuscatedChannel> for GuildChannel {
 /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Copy, Clone, Debug, Default, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ObfuscatedChannel {
     /// The Id of the guild the channel is located in.
     #[serde(default)]

@@ -12,7 +12,7 @@
 /// ```
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Settings {
     /// How long temporarily-cached data should be stored before being thrown out.
     ///

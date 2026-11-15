@@ -4,7 +4,7 @@ use super::{ChannelId, WebhookId};
 ///
 /// [Discord docs](https://docs.discord.com/developers/resources/channel#followed-channel-object).
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct FollowedChannel {
     /// The source news channel
     pub channel_id: ChannelId,

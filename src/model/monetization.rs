@@ -43,7 +43,7 @@ enum_number! {
     ///
     /// [Discord docs](https://docs.discord.com/developers/resources/sku#sku-object-sku-types).
     #[derive(Clone, Debug, Serialize, Deserialize)]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum SkuKind {
         /// A durable one-time purchase.
         Durable = 2,
@@ -148,7 +148,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/resources/entitlement#entitlement-object-entitlement-types).
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
     #[derive(Clone, Debug, Serialize, Deserialize)]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum EntitlementKind {
         /// Entitlement was purchased by a user.
         Purchase = 1,

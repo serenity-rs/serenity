@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 /// [Discord docs](https://docs.discord.com/developers/topics/oauth2#shared-resources-oauth2-scopes).
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Scope {
     /// For oauth2 bots, this puts the bot in the user's selected guild by default.
     #[serde(rename = "bot")]

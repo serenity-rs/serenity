@@ -161,7 +161,7 @@ impl std::str::FromStr for ImageHash {
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-emoji).
 #[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct EmojiIdentifier {
     /// Whether the emoji is animated
     pub animated: bool,
@@ -233,7 +233,7 @@ impl FromStr for EmojiIdentifier {
 ///
 /// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Incident {
     pub created_at: FixedString,
     pub id: FixedString,
@@ -254,7 +254,7 @@ pub struct Incident {
 ///
 /// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct IncidentUpdate {
     pub body: FixedString,
     pub created_at: FixedString,
@@ -270,7 +270,7 @@ pub struct IncidentUpdate {
 ///
 /// [Discord docs](https://discordstatus.com/api) (see "scheduled maintenances" examples)
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct Maintenance {
     pub created_at: FixedString,
     pub id: FixedString,

@@ -15,7 +15,7 @@ use crate::model::prelude::*;
 /// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct AutoModRule {
     /// ID of the rule.
     pub id: RuleId,
@@ -50,7 +50,7 @@ pub struct AutoModRule {
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum EventType {
     MessageSend,
     Unknown(u8),
@@ -81,7 +81,7 @@ impl From<EventType> for u8 {
 /// [metadata](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Trigger {
     Keyword {
         /// Substrings which will be searched for in content (Maximum of 1000)
@@ -221,7 +221,7 @@ impl Trigger {
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum TriggerType {
     Keyword,
     Spam,
@@ -264,7 +264,7 @@ impl From<TriggerType> for u8 {
 /// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct TriggerMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub keyword_filter: Option<Vec<String>>,
@@ -284,7 +284,7 @@ pub struct TriggerMetadata {
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[serde(from = "u8", into = "u8")]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum KeywordPresetType {
     /// Words that may be considered forms of swearing or cursing
     Profanity,
@@ -322,7 +322,7 @@ impl From<KeywordPresetType> for u8 {
 /// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-action-object).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, PartialEq, Eq)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Action {
     /// Blocks the content of a message according to the rule.
     BlockMessage {
@@ -352,7 +352,7 @@ pub enum Action {
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#auto-moderation-action-execution).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct ActionExecution {
     /// ID of the guild in which the action was executed.
     pub guild_id: GuildId,
@@ -495,7 +495,7 @@ enum_number! {
     ///
     /// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-action-object-action-types).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum ActionType {
         BlockMessage = 1,
         Alert = 2,

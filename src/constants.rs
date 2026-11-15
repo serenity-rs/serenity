@@ -49,7 +49,7 @@ enum_number! {
     ///
     /// [Discord docs](https://docs.discord.com/developers/topics/opcodes-and-status-codes#gateway-gateway-opcodes).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum Opcode {
         /// Dispatches an event.
         Dispatch = 0,
@@ -88,7 +88,7 @@ enum_number! {
     ///
     /// [Discord docs](https://docs.discord.com/developers/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes)
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum CloseCode {
         /// Unknown error; try reconnecting.
         UnknownError = 4000,

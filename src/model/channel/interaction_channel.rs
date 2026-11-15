@@ -5,7 +5,7 @@ use crate::model::prelude::*;
 /// Represents the shared fields between a [`InteractionChannel`] and a [`InteractionGuildThread`].
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct BaseInteractionChannel {
     /// The channel type.
     #[serde(rename = "type")]
@@ -44,7 +44,7 @@ pub struct BaseInteractionChannel {
 /// [subset specification](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct InteractionChannel {
     /// The shared fields between [`InteractionChannel`] and [`InteractionGuildThread`].
     #[serde(flatten)]
@@ -73,7 +73,7 @@ pub struct InteractionChannel {
 /// [subset specification](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct InteractionGuildThread {
     /// The shared fields between [`InteractionChannel`] and [`InteractionGuildThread`].
     #[serde(flatten)]

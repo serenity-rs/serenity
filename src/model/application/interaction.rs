@@ -21,7 +21,7 @@ use crate::model::utils::StrOrInt;
 /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum Interaction {
     Ping(PingInteraction),
     Command(CommandInteraction),
@@ -299,7 +299,7 @@ enum_number! {
     /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-type).
     #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
     #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-    #[non_exhaustive]
+    #[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
     pub enum InteractionType {
         Ping = 1,
         Command = 2,
@@ -315,7 +315,7 @@ enum_number! {
 /// [Discord Docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object)
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum AuthorizingIntegrationOwner {
     /// The [`Application`] was installed to a guild, containing the id if invoked in said guild.
     ///
@@ -415,7 +415,7 @@ impl serde::Serialize for AuthorizingIntegrationOwners {
 #[cfg(not(feature = "unstable"))]
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct MessageInteraction {
     /// The id of the interaction.
     pub id: InteractionId,
@@ -435,7 +435,7 @@ pub struct MessageInteraction {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct MessageCommandInteractionMetadata {
     /// The ID of the interaction
     pub id: InteractionId,
@@ -454,7 +454,7 @@ pub struct MessageCommandInteractionMetadata {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct MessageComponentInteractionMetadata {
     /// The ID of the interaction
     pub id: InteractionId,
@@ -470,7 +470,7 @@ pub struct MessageComponentInteractionMetadata {
 
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub struct MessageModalSubmitInteractionMetadata {
     /// The ID of the interaction
     pub id: InteractionId,
@@ -488,7 +488,7 @@ pub struct MessageModalSubmitInteractionMetadata {
 /// user IDs.
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
 #[derive(Clone, Debug)]
-#[non_exhaustive]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
 pub enum MessageInteractionMetadata {
     Command(MessageCommandInteractionMetadata),
     Component(MessageComponentInteractionMetadata),
