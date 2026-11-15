@@ -69,6 +69,9 @@ pub struct Embed {
     #[serde(default)]
     #[serde(skip_serializing_if = "FixedArray::is_empty")]
     pub fields: FixedArray<EmbedField, u8>,
+    /// The components that make up the embed, only present on `components` type embeds.
+    #[serde(default)]
+    pub components: FixedArray<Component>,
     /// The flags for the embed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<EmbedFlags>,
