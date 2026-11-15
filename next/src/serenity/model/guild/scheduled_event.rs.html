@@ -7,7 +7,7 @@
 <a href=#7 id=7 data-nosnippet>7</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-object).
 <a href=#8 id=8 data-nosnippet>8</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#9 id=9 data-nosnippet>9</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#10 id=10 data-nosnippet>10</a>#[non_exhaustive]
+<a href=#10 id=10 data-nosnippet>10</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#11 id=11 data-nosnippet>11</a></span><span class="kw">pub struct </span>ScheduledEvent {
 <a href=#12 id=12 data-nosnippet>12</a>    <span class="doccomment">/// The Id of the scheduled event.
 <a href=#13 id=13 data-nosnippet>13</a>    </span><span class="kw">pub </span>id: ScheduledEventId,
@@ -65,7 +65,7 @@
 <a href=#65 id=65 data-nosnippet>65</a>    <span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status).
 <a href=#66 id=66 data-nosnippet>66</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#67 id=67 data-nosnippet>67</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#68 id=68 data-nosnippet>68</a>    #[non_exhaustive]
+<a href=#68 id=68 data-nosnippet>68</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#69 id=69 data-nosnippet>69</a>    </span><span class="kw">pub enum </span>ScheduledEventStatus {
 <a href=#70 id=70 data-nosnippet>70</a>        Scheduled = <span class="number">1</span>,
 <a href=#71 id=71 data-nosnippet>71</a>        Active = <span class="number">2</span>,
@@ -79,7 +79,7 @@
 <a href=#79 id=79 data-nosnippet>79</a>    <span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types).
 <a href=#80 id=80 data-nosnippet>80</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#81 id=81 data-nosnippet>81</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#82 id=82 data-nosnippet>82</a>    #[non_exhaustive]
+<a href=#82 id=82 data-nosnippet>82</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#83 id=83 data-nosnippet>83</a>    </span><span class="kw">pub enum </span>ScheduledEventType {
 <a href=#84 id=84 data-nosnippet>84</a>        StageInstance = <span class="number">1</span>,
 <a href=#85 id=85 data-nosnippet>85</a>        Voice = <span class="number">2</span>,
@@ -91,7 +91,7 @@
 <a href=#91 id=91 data-nosnippet>91</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata).
 <a href=#92 id=92 data-nosnippet>92</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#93 id=93 data-nosnippet>93</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#94 id=94 data-nosnippet>94</a>#[non_exhaustive]
+<a href=#94 id=94 data-nosnippet>94</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#95 id=95 data-nosnippet>95</a></span><span class="kw">pub struct </span>ScheduledEventMetadata {
 <a href=#96 id=96 data-nosnippet>96</a>    <span class="attr">#[serde(default)]
 <a href=#97 id=97 data-nosnippet>97</a>    </span><span class="kw">pub </span>location: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
@@ -100,7 +100,7 @@
 <a href=#100 id=100 data-nosnippet>100</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-user-object).
 <a href=#101 id=101 data-nosnippet>101</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#102 id=102 data-nosnippet>102</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#103 id=103 data-nosnippet>103</a>#[non_exhaustive]
+<a href=#103 id=103 data-nosnippet>103</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#104 id=104 data-nosnippet>104</a></span><span class="kw">pub struct </span>ScheduledEventUser {
 <a href=#105 id=105 data-nosnippet>105</a>    <span class="attr">#[serde(rename = <span class="string">"guild_scheduled_event_id"</span>)]
 <a href=#106 id=106 data-nosnippet>106</a>    </span><span class="kw">pub </span>event_id: ScheduledEventId,
@@ -114,7 +114,7 @@
 <a href=#114 id=114 data-nosnippet>114</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level).
 <a href=#115 id=115 data-nosnippet>115</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#116 id=116 data-nosnippet>116</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#117 id=117 data-nosnippet>117</a>    #[non_exhaustive]
+<a href=#117 id=117 data-nosnippet>117</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#118 id=118 data-nosnippet>118</a>    </span><span class="kw">pub enum </span>ScheduledEventPrivacyLevel {
 <a href=#119 id=119 data-nosnippet>119</a>        GuildOnly = <span class="number">2</span>,
 <a href=#120 id=120 data-nosnippet>120</a>        <span class="kw">_ </span>=&gt; Unknown(u8),

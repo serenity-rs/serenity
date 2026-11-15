@@ -941,7 +941,7 @@
 <a href=#941 id=941 data-nosnippet>941</a>/// use serenity::utils::ContentModifier::{Bold, Italic};
 <a href=#942 id=942 data-nosnippet>942</a>/// let content: Content = "text" + Bold + Italic;
 <a href=#943 id=943 data-nosnippet>943</a>/// ```
-<a href=#944 id=944 data-nosnippet>944</a></span><span class="attr">#[non_exhaustive]
+<a href=#944 id=944 data-nosnippet>944</a></span><span class="attr">#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#945 id=945 data-nosnippet>945</a>#[derive(Clone, Copy)]
 <a href=#946 id=946 data-nosnippet>946</a></span><span class="kw">pub enum </span>ContentModifier {
 <a href=#947 id=947 data-nosnippet>947</a>    Italic,

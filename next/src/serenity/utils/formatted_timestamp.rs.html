@@ -140,7 +140,7 @@
 <a href=#140 id=140 data-nosnippet>140</a>
 <a href=#141 id=141 data-nosnippet>141</a><span class="doccomment">/// An error that can occur when parsing a [`FormattedTimestamp`] from a string.
 <a href=#142 id=142 data-nosnippet>142</a></span><span class="attr">#[derive(Debug, Clone)]
-<a href=#143 id=143 data-nosnippet>143</a>#[non_exhaustive]
+<a href=#143 id=143 data-nosnippet>143</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#144 id=144 data-nosnippet>144</a></span><span class="kw">pub struct </span>FormattedTimestampParseError {
 <a href=#145 id=145 data-nosnippet>145</a>    string: String,
 <a href=#146 id=146 data-nosnippet>146</a>}

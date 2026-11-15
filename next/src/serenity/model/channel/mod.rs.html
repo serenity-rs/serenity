@@ -197,7 +197,7 @@
 <a href=#197 id=197 data-nosnippet>197</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#198 id=198 data-nosnippet>198</a>#[derive(Clone, Debug, Serialize)]
 <a href=#199 id=199 data-nosnippet>199</a>#[serde(untagged)]
-<a href=#200 id=200 data-nosnippet>200</a>#[non_exhaustive]
+<a href=#200 id=200 data-nosnippet>200</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#201 id=201 data-nosnippet>201</a></span><span class="kw">pub enum </span>Channel {
 <a href=#202 id=202 data-nosnippet>202</a>    <span class="doccomment">/// A viewable channel within a [`Guild`].
 <a href=#203 id=203 data-nosnippet>203</a>    </span>GuildViewable(GuildChannel),
@@ -373,7 +373,7 @@
 <a href=#373 id=373 data-nosnippet>373</a>    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-channel-types).
 <a href=#374 id=374 data-nosnippet>374</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#375 id=375 data-nosnippet>375</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#376 id=376 data-nosnippet>376</a>    #[non_exhaustive]
+<a href=#376 id=376 data-nosnippet>376</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#377 id=377 data-nosnippet>377</a>    </span><span class="kw">pub enum </span>ChannelType {
 <a href=#378 id=378 data-nosnippet>378</a>        <span class="doccomment">/// An indicator that the channel is a text [`GuildChannel`].
 <a href=#379 id=379 data-nosnippet>379</a>        </span>Text = <span class="number">0</span>,
@@ -502,7 +502,7 @@
 <a href=#502 id=502 data-nosnippet>502</a>/// [Discord docs](https://docs.discord.com/developers/resources/channel#overwrite-object-overwrite-structure) (field `type`).
 <a href=#503 id=503 data-nosnippet>503</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#504 id=504 data-nosnippet>504</a>#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-<a href=#505 id=505 data-nosnippet>505</a>#[non_exhaustive]
+<a href=#505 id=505 data-nosnippet>505</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#506 id=506 data-nosnippet>506</a></span><span class="kw">pub enum </span>PermissionOverwriteType {
 <a href=#507 id=507 data-nosnippet>507</a>    <span class="doccomment">/// A member which is having its permission overwrites edited.
 <a href=#508 id=508 data-nosnippet>508</a>    </span>Member(UserId),
@@ -516,7 +516,7 @@
 <a href=#516 id=516 data-nosnippet>516</a>    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-video-quality-modes).
 <a href=#517 id=517 data-nosnippet>517</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#518 id=518 data-nosnippet>518</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#519 id=519 data-nosnippet>519</a>    #[non_exhaustive]
+<a href=#519 id=519 data-nosnippet>519</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#520 id=520 data-nosnippet>520</a>    </span><span class="kw">pub enum </span>VideoQualityMode {
 <a href=#521 id=521 data-nosnippet>521</a>        <span class="doccomment">/// An indicator that the video quality is chosen by Discord for optimal
 <a href=#522 id=522 data-nosnippet>522</a>        /// performance.
@@ -533,7 +533,7 @@
 <a href=#533 id=533 data-nosnippet>533</a>    /// [Discord docs](https://docs.discord.com/developers/resources/stage-instance#stage-instance-object-privacy-level).
 <a href=#534 id=534 data-nosnippet>534</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 <a href=#535 id=535 data-nosnippet>535</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#536 id=536 data-nosnippet>536</a>    #[non_exhaustive]
+<a href=#536 id=536 data-nosnippet>536</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#537 id=537 data-nosnippet>537</a>    #[&lt;default&gt; = <span class="number">2</span>]
 <a href=#538 id=538 data-nosnippet>538</a>    </span><span class="kw">pub enum </span>StageInstancePrivacyLevel {
 <a href=#539 id=539 data-nosnippet>539</a>        <span class="doccomment">/// The Stage instance is visible publicly. (deprecated)
@@ -550,7 +550,7 @@
 <a href=#550 id=550 data-nosnippet>550</a>    /// [Discord docs](https://docs.discord.com/developers/resources/channel#thread-metadata-object)
 <a href=#551 id=551 data-nosnippet>551</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
 <a href=#552 id=552 data-nosnippet>552</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#553 id=553 data-nosnippet>553</a>    #[non_exhaustive]
+<a href=#553 id=553 data-nosnippet>553</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#554 id=554 data-nosnippet>554</a>    </span><span class="kw">pub enum </span>AutoArchiveDuration {
 <a href=#555 id=555 data-nosnippet>555</a>        <span class="prelude-val">None </span>= <span class="number">0</span>,
 <a href=#556 id=556 data-nosnippet>556</a>        OneHour = <span class="number">60</span>,
@@ -564,7 +564,7 @@
 <a href=#564 id=564 data-nosnippet>564</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/resources/stage-instance#stage-instance-object).
 <a href=#565 id=565 data-nosnippet>565</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#566 id=566 data-nosnippet>566</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#567 id=567 data-nosnippet>567</a>#[non_exhaustive]
+<a href=#567 id=567 data-nosnippet>567</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#568 id=568 data-nosnippet>568</a></span><span class="kw">pub struct </span>StageInstance {
 <a href=#569 id=569 data-nosnippet>569</a>    <span class="doccomment">/// The Id of the stage instance.
 <a href=#570 id=570 data-nosnippet>570</a>    </span><span class="kw">pub </span>id: StageInstanceId,
@@ -591,7 +591,7 @@
 <a href=#591 id=591 data-nosnippet>591</a>/// [4](https://docs.discord.com/developers/resources/channel#list-joined-private-archived-threads-response-body)
 <a href=#592 id=592 data-nosnippet>592</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#593 id=593 data-nosnippet>593</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#594 id=594 data-nosnippet>594</a>#[non_exhaustive]
+<a href=#594 id=594 data-nosnippet>594</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#595 id=595 data-nosnippet>595</a></span><span class="kw">pub struct </span>ThreadsData {
 <a href=#596 id=596 data-nosnippet>596</a>    <span class="doccomment">/// The threads channels.
 <a href=#597 id=597 data-nosnippet>597</a>    </span><span class="kw">pub </span>threads: FixedArray&lt;GuildThread&gt;,
@@ -608,7 +608,7 @@
 <a href=#608 id=608 data-nosnippet>608</a>/// [docs]()
 <a href=#609 id=609 data-nosnippet>609</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#610 id=610 data-nosnippet>610</a>#[derive(Debug, Clone, PartialEq)]
-<a href=#611 id=611 data-nosnippet>611</a>#[non_exhaustive]
+<a href=#611 id=611 data-nosnippet>611</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#612 id=612 data-nosnippet>612</a></span><span class="kw">pub enum </span>ForumEmoji {
 <a href=#613 id=613 data-nosnippet>613</a>    <span class="doccomment">/// The id of a guild's custom emoji.
 <a href=#614 id=614 data-nosnippet>614</a>    </span>Id(EmojiId),
@@ -661,7 +661,7 @@
 <a href=#661 id=661 data-nosnippet>661</a>/// See [Discord docs](https://docs.discord.com/developers/resources/channel#forum-tag-object)
 <a href=#662 id=662 data-nosnippet>662</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#663 id=663 data-nosnippet>663</a>#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-<a href=#664 id=664 data-nosnippet>664</a>#[non_exhaustive]
+<a href=#664 id=664 data-nosnippet>664</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#665 id=665 data-nosnippet>665</a></span><span class="kw">pub struct </span>ForumTag {
 <a href=#666 id=666 data-nosnippet>666</a>    <span class="doccomment">/// The id of the tag.
 <a href=#667 id=667 data-nosnippet>667</a>    </span><span class="kw">pub </span>id: ForumTagId,
@@ -681,7 +681,7 @@
 <a href=#681 id=681 data-nosnippet>681</a>    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-sort-order-types).
 <a href=#682 id=682 data-nosnippet>682</a>    </span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#683 id=683 data-nosnippet>683</a>    #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Deserialize, Serialize)]
-<a href=#684 id=684 data-nosnippet>684</a>    #[non_exhaustive]
+<a href=#684 id=684 data-nosnippet>684</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#685 id=685 data-nosnippet>685</a>    </span><span class="kw">pub enum </span>SortOrder {
 <a href=#686 id=686 data-nosnippet>686</a>        <span class="doccomment">/// Sort forum posts by activity.
 <a href=#687 id=687 data-nosnippet>687</a>        </span>LatestActivity = <span class="number">0</span>,

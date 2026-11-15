@@ -15,7 +15,7 @@
 <a href=#15 id=15 data-nosnippet>15</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#16 id=16 data-nosnippet>16</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#17 id=17 data-nosnippet>17</a>#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-<a href=#18 id=18 data-nosnippet>18</a>#[non_exhaustive]
+<a href=#18 id=18 data-nosnippet>18</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#19 id=19 data-nosnippet>19</a></span><span class="kw">pub struct </span>Command {
 <a href=#20 id=20 data-nosnippet>20</a>    <span class="doccomment">/// The command Id.
 <a href=#21 id=21 data-nosnippet>21</a>    </span><span class="kw">pub </span>id: CommandId,
@@ -216,7 +216,7 @@
 <a href=#216 id=216 data-nosnippet>216</a>    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-types).
 <a href=#217 id=217 data-nosnippet>217</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#218 id=218 data-nosnippet>218</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#219 id=219 data-nosnippet>219</a>    #[non_exhaustive]
+<a href=#219 id=219 data-nosnippet>219</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#220 id=220 data-nosnippet>220</a>    </span><span class="kw">pub enum </span>CommandType {
 <a href=#221 id=221 data-nosnippet>221</a>        ChatInput = <span class="number">1</span>,
 <a href=#222 id=222 data-nosnippet>222</a>        User = <span class="number">2</span>,
@@ -233,7 +233,7 @@
 <a href=#233 id=233 data-nosnippet>233</a>    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-entry-point-command-handler-types)
 <a href=#234 id=234 data-nosnippet>234</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#235 id=235 data-nosnippet>235</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#236 id=236 data-nosnippet>236</a>    #[non_exhaustive]
+<a href=#236 id=236 data-nosnippet>236</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#237 id=237 data-nosnippet>237</a>    </span><span class="kw">pub enum </span>EntryPointHandlerType {
 <a href=#238 id=238 data-nosnippet>238</a>        AppHandler = <span class="number">1</span>,
 <a href=#239 id=239 data-nosnippet>239</a>        DiscordLaunchActivity = <span class="number">2</span>,
@@ -247,7 +247,7 @@
 <a href=#247 id=247 data-nosnippet>247</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#248 id=248 data-nosnippet>248</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#249 id=249 data-nosnippet>249</a>#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-<a href=#250 id=250 data-nosnippet>250</a>#[non_exhaustive]
+<a href=#250 id=250 data-nosnippet>250</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#251 id=251 data-nosnippet>251</a></span><span class="kw">pub struct </span>CommandOption {
 <a href=#252 id=252 data-nosnippet>252</a>    <span class="doccomment">/// The option type.
 <a href=#253 id=253 data-nosnippet>253</a>    </span><span class="attr">#[serde(rename = <span class="string">"type"</span>)]
@@ -320,7 +320,7 @@
 <a href=#320 id=320 data-nosnippet>320</a>    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-type).
 <a href=#321 id=321 data-nosnippet>321</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#322 id=322 data-nosnippet>322</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#323 id=323 data-nosnippet>323</a>    #[non_exhaustive]
+<a href=#323 id=323 data-nosnippet>323</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#324 id=324 data-nosnippet>324</a>    </span><span class="kw">pub enum </span>CommandOptionType {
 <a href=#325 id=325 data-nosnippet>325</a>        SubCommand = <span class="number">1</span>,
 <a href=#326 id=326 data-nosnippet>326</a>        SubCommandGroup = <span class="number">2</span>,
@@ -342,7 +342,7 @@
 <a href=#342 id=342 data-nosnippet>342</a>/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-choice-structure).
 <a href=#343 id=343 data-nosnippet>343</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#344 id=344 data-nosnippet>344</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#345 id=345 data-nosnippet>345</a>#[non_exhaustive]
+<a href=#345 id=345 data-nosnippet>345</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#346 id=346 data-nosnippet>346</a></span><span class="kw">pub struct </span>CommandOptionChoice {
 <a href=#347 id=347 data-nosnippet>347</a>    <span class="doccomment">/// The choice name.
 <a href=#348 id=348 data-nosnippet>348</a>    </span><span class="kw">pub </span>name: FixedString,
@@ -358,7 +358,7 @@
 <a href=#358 id=358 data-nosnippet>358</a>/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-guild-application-command-permissions-structure).
 <a href=#359 id=359 data-nosnippet>359</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#360 id=360 data-nosnippet>360</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#361 id=361 data-nosnippet>361</a>#[non_exhaustive]
+<a href=#361 id=361 data-nosnippet>361</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#362 id=362 data-nosnippet>362</a></span><span class="kw">pub struct </span>CommandPermissions {
 <a href=#363 id=363 data-nosnippet>363</a>    <span class="doccomment">/// The id of the command.
 <a href=#364 id=364 data-nosnippet>364</a>    </span><span class="kw">pub </span>id: CommandId,
@@ -375,7 +375,7 @@
 <a href=#375 id=375 data-nosnippet>375</a>/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-application-command-permissions-structure).
 <a href=#376 id=376 data-nosnippet>376</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#377 id=377 data-nosnippet>377</a>#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-<a href=#378 id=378 data-nosnippet>378</a>#[non_exhaustive]
+<a href=#378 id=378 data-nosnippet>378</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#379 id=379 data-nosnippet>379</a></span><span class="kw">pub struct </span>CommandPermission {
 <a href=#380 id=380 data-nosnippet>380</a>    <span class="doccomment">/// The [`RoleId`] or [`UserId`], depends on `kind` value.
 <a href=#381 id=381 data-nosnippet>381</a>    </span><span class="kw">pub </span>id: CommandPermissionId,
@@ -392,7 +392,7 @@
 <a href=#392 id=392 data-nosnippet>392</a>    /// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-permissions-object-application-command-permission-type).
 <a href=#393 id=393 data-nosnippet>393</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#394 id=394 data-nosnippet>394</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#395 id=395 data-nosnippet>395</a>    #[non_exhaustive]
+<a href=#395 id=395 data-nosnippet>395</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#396 id=396 data-nosnippet>396</a>    </span><span class="kw">pub enum </span>CommandPermissionType {
 <a href=#397 id=397 data-nosnippet>397</a>        Role = <span class="number">1</span>,
 <a href=#398 id=398 data-nosnippet>398</a>        User = <span class="number">2</span>,

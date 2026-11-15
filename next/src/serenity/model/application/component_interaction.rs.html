@@ -19,7 +19,7 @@
 <a href=#19 id=19 data-nosnippet>19</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#20 id=20 data-nosnippet>20</a>#[derive(Clone, Debug, Deserialize, Serialize)]
 <a href=#21 id=21 data-nosnippet>21</a>#[serde(remote = <span class="string">"Self"</span>)]
-<a href=#22 id=22 data-nosnippet>22</a>#[non_exhaustive]
+<a href=#22 id=22 data-nosnippet>22</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#23 id=23 data-nosnippet>23</a></span><span class="kw">pub struct </span>ComponentInteraction {
 <a href=#24 id=24 data-nosnippet>24</a>    <span class="doccomment">/// Id of the interaction.
 <a href=#25 id=25 data-nosnippet>25</a>    </span><span class="kw">pub </span>id: InteractionId,
@@ -310,7 +310,7 @@
 <a href=#310 id=310 data-nosnippet>310</a>/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-message-component-data-structure).
 <a href=#311 id=311 data-nosnippet>311</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#312 id=312 data-nosnippet>312</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#313 id=313 data-nosnippet>313</a>#[non_exhaustive]
+<a href=#313 id=313 data-nosnippet>313</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#314 id=314 data-nosnippet>314</a></span><span class="kw">pub struct </span>ComponentInteractionData {
 <a href=#315 id=315 data-nosnippet>315</a>    <span class="doccomment">/// The custom id of the component.
 <a href=#316 id=316 data-nosnippet>316</a>    </span><span class="kw">pub </span>custom_id: FixedString,

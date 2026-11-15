@@ -23,7 +23,7 @@
 <a href=#23 id=23 data-nosnippet>23</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#24 id=24 data-nosnippet>24</a>#[derive(Clone, Debug, Deserialize, Serialize)]
 <a href=#25 id=25 data-nosnippet>25</a>#[serde(remote = <span class="string">"Self"</span>)]
-<a href=#26 id=26 data-nosnippet>26</a>#[non_exhaustive]
+<a href=#26 id=26 data-nosnippet>26</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#27 id=27 data-nosnippet>27</a></span><span class="kw">pub struct </span>CommandInteraction {
 <a href=#28 id=28 data-nosnippet>28</a>    <span class="doccomment">/// Id of the interaction.
 <a href=#29 id=29 data-nosnippet>29</a>    </span><span class="kw">pub </span>id: InteractionId,
@@ -234,7 +234,7 @@
 <a href=#234 id=234 data-nosnippet>234</a>/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-application-command-data-structure).
 <a href=#235 id=235 data-nosnippet>235</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#236 id=236 data-nosnippet>236</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#237 id=237 data-nosnippet>237</a>#[non_exhaustive]
+<a href=#237 id=237 data-nosnippet>237</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#238 id=238 data-nosnippet>238</a></span><span class="kw">pub struct </span>CommandData {
 <a href=#239 id=239 data-nosnippet>239</a>    <span class="doccomment">/// The Id of the invoked command.
 <a href=#240 id=240 data-nosnippet>240</a>    </span><span class="kw">pub </span>id: CommandId,
@@ -388,7 +388,7 @@
 <a href=#388 id=388 data-nosnippet>388</a>
 <a href=#389 id=389 data-nosnippet>389</a><span class="doccomment">/// The focused option for autocomplete interactions return by [`CommandData::autocomplete`].
 <a href=#390 id=390 data-nosnippet>390</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#391 id=391 data-nosnippet>391</a>#[non_exhaustive]
+<a href=#391 id=391 data-nosnippet>391</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#392 id=392 data-nosnippet>392</a></span><span class="kw">pub struct </span>AutocompleteOption&lt;<span class="lifetime">'a</span>&gt; {
 <a href=#393 id=393 data-nosnippet>393</a>    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
 <a href=#394 id=394 data-nosnippet>394</a>    <span class="kw">pub </span>kind: CommandOptionType,
@@ -396,7 +396,7 @@
 <a href=#396 id=396 data-nosnippet>396</a>}
 <a href=#397 id=397 data-nosnippet>397</a>
 <a href=#398 id=398 data-nosnippet>398</a><span class="attr">#[derive(Clone, Debug)]
-<a href=#399 id=399 data-nosnippet>399</a>#[non_exhaustive]
+<a href=#399 id=399 data-nosnippet>399</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#400 id=400 data-nosnippet>400</a></span><span class="kw">pub struct </span>ResolvedOption&lt;<span class="lifetime">'a</span>&gt; {
 <a href=#401 id=401 data-nosnippet>401</a>    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str,
 <a href=#402 id=402 data-nosnippet>402</a>    <span class="kw">pub </span>value: ResolvedValue&lt;<span class="lifetime">'a</span>&gt;,
@@ -404,7 +404,7 @@
 <a href=#404 id=404 data-nosnippet>404</a>
 <a href=#405 id=405 data-nosnippet>405</a><span class="doccomment">/// The resolved value of a [`CommandDataOption`].
 <a href=#406 id=406 data-nosnippet>406</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#407 id=407 data-nosnippet>407</a>#[non_exhaustive]
+<a href=#407 id=407 data-nosnippet>407</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#408 id=408 data-nosnippet>408</a></span><span class="kw">pub enum </span>ResolvedValue&lt;<span class="lifetime">'a</span>&gt; {
 <a href=#409 id=409 data-nosnippet>409</a>    Autocomplete { kind: CommandOptionType, value: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str },
 <a href=#410 id=410 data-nosnippet>410</a>    Boolean(bool),
@@ -422,7 +422,7 @@
 <a href=#422 id=422 data-nosnippet>422</a>
 <a href=#423 id=423 data-nosnippet>423</a><span class="doccomment">/// Option value variants that couldn't be resolved by `CommandData::options()`.
 <a href=#424 id=424 data-nosnippet>424</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#425 id=425 data-nosnippet>425</a>#[non_exhaustive]
+<a href=#425 id=425 data-nosnippet>425</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#426 id=426 data-nosnippet>426</a></span><span class="kw">pub enum </span>Unresolved {
 <a href=#427 id=427 data-nosnippet>427</a>    Attachment(AttachmentId),
 <a href=#428 id=428 data-nosnippet>428</a>    Channel(GenericChannelId),
@@ -435,7 +435,7 @@
 <a href=#435 id=435 data-nosnippet>435</a>
 <a href=#436 id=436 data-nosnippet>436</a><span class="doccomment">/// The resolved value of a [`CommandData::target_id`].
 <a href=#437 id=437 data-nosnippet>437</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#438 id=438 data-nosnippet>438</a>#[non_exhaustive]
+<a href=#438 id=438 data-nosnippet>438</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#439 id=439 data-nosnippet>439</a></span><span class="kw">pub enum </span>ResolvedTarget&lt;<span class="lifetime">'a</span>&gt; {
 <a href=#440 id=440 data-nosnippet>440</a>    User(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>User, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>PartialMember&gt;),
 <a href=#441 id=441 data-nosnippet>441</a>    Message(<span class="kw-2">&amp;</span><span class="lifetime">'a </span>Message),
@@ -447,7 +447,7 @@
 <a href=#447 id=447 data-nosnippet>447</a>/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-resolved-data-structure).
 <a href=#448 id=448 data-nosnippet>448</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#449 id=449 data-nosnippet>449</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-<a href=#450 id=450 data-nosnippet>450</a>#[non_exhaustive]
+<a href=#450 id=450 data-nosnippet>450</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#451 id=451 data-nosnippet>451</a></span><span class="kw">pub struct </span>CommandDataResolved {
 <a href=#452 id=452 data-nosnippet>452</a>    <span class="doccomment">/// The resolved users.
 <a href=#453 id=453 data-nosnippet>453</a>    </span><span class="attr">#[serde(
@@ -501,7 +501,7 @@
 <a href=#501 id=501 data-nosnippet>501</a>/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure).
 <a href=#502 id=502 data-nosnippet>502</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#503 id=503 data-nosnippet>503</a>#[derive(Clone, Debug, PartialEq)]
-<a href=#504 id=504 data-nosnippet>504</a>#[non_exhaustive]
+<a href=#504 id=504 data-nosnippet>504</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#505 id=505 data-nosnippet>505</a></span><span class="kw">pub struct </span>CommandDataOption {
 <a href=#506 id=506 data-nosnippet>506</a>    <span class="doccomment">/// The name of the parameter.
 <a href=#507 id=507 data-nosnippet>507</a>    </span><span class="kw">pub </span>name: FixedString,
@@ -624,7 +624,7 @@
 <a href=#624 id=624 data-nosnippet>624</a>/// [Discord docs](https://docs.discord.com/developers/interactions/application-commands#application-command-object-application-command-option-type).
 <a href=#625 id=625 data-nosnippet>625</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#626 id=626 data-nosnippet>626</a>#[derive(Clone, Debug, PartialEq)]
-<a href=#627 id=627 data-nosnippet>627</a>#[non_exhaustive]
+<a href=#627 id=627 data-nosnippet>627</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#628 id=628 data-nosnippet>628</a></span><span class="kw">pub enum </span>CommandDataOptionValue {
 <a href=#629 id=629 data-nosnippet>629</a>    Autocomplete { kind: CommandOptionType, value: FixedString },
 <a href=#630 id=630 data-nosnippet>630</a>    Boolean(bool),

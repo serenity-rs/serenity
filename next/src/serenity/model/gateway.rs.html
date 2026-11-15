@@ -18,7 +18,7 @@
 <a href=#18 id=18 data-nosnippet>18</a>///
 <a href=#19 id=19 data-nosnippet>19</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway#get-gateway-bot-json-response).
 <a href=#20 id=20 data-nosnippet>20</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#21 id=21 data-nosnippet>21</a>#[non_exhaustive]
+<a href=#21 id=21 data-nosnippet>21</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#22 id=22 data-nosnippet>22</a></span><span class="kw">pub struct </span>BotGateway {
 <a href=#23 id=23 data-nosnippet>23</a>    <span class="doccomment">/// The gateway to connect to.
 <a href=#24 id=24 data-nosnippet>24</a>    </span><span class="kw">pub </span>url: FixedString,
@@ -34,7 +34,7 @@
 <a href=#34 id=34 data-nosnippet>34</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-structure).
 <a href=#35 id=35 data-nosnippet>35</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#36 id=36 data-nosnippet>36</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#37 id=37 data-nosnippet>37</a>#[non_exhaustive]
+<a href=#37 id=37 data-nosnippet>37</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#38 id=38 data-nosnippet>38</a></span><span class="kw">pub struct </span>Activity {
 <a href=#39 id=39 data-nosnippet>39</a>    <span class="doccomment">/// The ID of the application for the activity.
 <a href=#40 id=40 data-nosnippet>40</a>    </span><span class="attr">#[serde(default)]
@@ -84,7 +84,7 @@
 <a href=#84 id=84 data-nosnippet>84</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-buttons).
 <a href=#85 id=85 data-nosnippet>85</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#86 id=86 data-nosnippet>86</a>#[derive(Clone, Debug, Serialize, Deserialize)]
-<a href=#87 id=87 data-nosnippet>87</a>#[non_exhaustive]
+<a href=#87 id=87 data-nosnippet>87</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#88 id=88 data-nosnippet>88</a></span><span class="kw">pub struct </span>ActivityButton {
 <a href=#89 id=89 data-nosnippet>89</a>    <span class="doccomment">/// The text shown on the button.
 <a href=#90 id=90 data-nosnippet>90</a>    </span><span class="kw">pub </span>label: FixedString,
@@ -100,7 +100,7 @@
 <a href=#100 id=100 data-nosnippet>100</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-assets).
 <a href=#101 id=101 data-nosnippet>101</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#102 id=102 data-nosnippet>102</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#103 id=103 data-nosnippet>103</a>#[non_exhaustive]
+<a href=#103 id=103 data-nosnippet>103</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#104 id=104 data-nosnippet>104</a></span><span class="kw">pub struct </span>ActivityAssets {
 <a href=#105 id=105 data-nosnippet>105</a>    <span class="doccomment">/// The ID for a large asset of the activity, usually a snowflake.
 <a href=#106 id=106 data-nosnippet>106</a>    </span><span class="kw">pub </span>large_image: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
@@ -145,7 +145,7 @@
 <a href=#145 id=145 data-nosnippet>145</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-party).
 <a href=#146 id=146 data-nosnippet>146</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#147 id=147 data-nosnippet>147</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#148 id=148 data-nosnippet>148</a>#[non_exhaustive]
+<a href=#148 id=148 data-nosnippet>148</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#149 id=149 data-nosnippet>149</a></span><span class="kw">pub struct </span>ActivityParty {
 <a href=#150 id=150 data-nosnippet>150</a>    <span class="doccomment">/// The ID of the party.
 <a href=#151 id=151 data-nosnippet>151</a>    </span><span class="kw">pub </span>id: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
@@ -158,7 +158,7 @@
 <a href=#158 id=158 data-nosnippet>158</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-secrets).
 <a href=#159 id=159 data-nosnippet>159</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#160 id=160 data-nosnippet>160</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#161 id=161 data-nosnippet>161</a>#[non_exhaustive]
+<a href=#161 id=161 data-nosnippet>161</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#162 id=162 data-nosnippet>162</a></span><span class="kw">pub struct </span>ActivitySecrets {
 <a href=#163 id=163 data-nosnippet>163</a>    <span class="doccomment">/// The secret for joining a party.
 <a href=#164 id=164 data-nosnippet>164</a>    </span><span class="kw">pub </span>join: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
@@ -174,7 +174,7 @@
 <a href=#174 id=174 data-nosnippet>174</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-emoji).
 <a href=#175 id=175 data-nosnippet>175</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#176 id=176 data-nosnippet>176</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#177 id=177 data-nosnippet>177</a>#[non_exhaustive]
+<a href=#177 id=177 data-nosnippet>177</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#178 id=178 data-nosnippet>178</a></span><span class="kw">pub struct </span>ActivityEmoji {
 <a href=#179 id=179 data-nosnippet>179</a>    <span class="doccomment">/// The name of the emoji.
 <a href=#180 id=180 data-nosnippet>180</a>    </span><span class="kw">pub </span>name: FixedString,
@@ -188,7 +188,7 @@
 <a href=#188 id=188 data-nosnippet>188</a>    <span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-types).
 <a href=#189 id=189 data-nosnippet>189</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#190 id=190 data-nosnippet>190</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#191 id=191 data-nosnippet>191</a>    #[non_exhaustive]
+<a href=#191 id=191 data-nosnippet>191</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#192 id=192 data-nosnippet>192</a>    </span><span class="kw">pub enum </span>ActivityType {
 <a href=#193 id=193 data-nosnippet>193</a>        <span class="doccomment">/// An indicator that the user is playing a game.
 <a href=#194 id=194 data-nosnippet>194</a>        </span>Playing = <span class="number">0</span>,
@@ -212,7 +212,7 @@
 <a href=#212 id=212 data-nosnippet>212</a>///
 <a href=#213 id=213 data-nosnippet>213</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway#get-gateway-example-response).
 <a href=#214 id=214 data-nosnippet>214</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#215 id=215 data-nosnippet>215</a>#[non_exhaustive]
+<a href=#215 id=215 data-nosnippet>215</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#216 id=216 data-nosnippet>216</a></span><span class="kw">pub struct </span>Gateway {
 <a href=#217 id=217 data-nosnippet>217</a>    <span class="doccomment">/// The gateway to connect to.
 <a href=#218 id=218 data-nosnippet>218</a>    </span><span class="kw">pub </span>url: FixedString,
@@ -223,7 +223,7 @@
 <a href=#223 id=223 data-nosnippet>223</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#client-status-object).
 <a href=#224 id=224 data-nosnippet>224</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#225 id=225 data-nosnippet>225</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#226 id=226 data-nosnippet>226</a>#[non_exhaustive]
+<a href=#226 id=226 data-nosnippet>226</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#227 id=227 data-nosnippet>227</a></span><span class="kw">pub struct </span>ClientStatus {
 <a href=#228 id=228 data-nosnippet>228</a>    <span class="kw">pub </span>desktop: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
 <a href=#229 id=229 data-nosnippet>229</a>    <span class="kw">pub </span>mobile: <span class="prelude-ty">Option</span>&lt;OnlineStatus&gt;,
@@ -241,7 +241,7 @@
 <a href=#241 id=241 data-nosnippet>241</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#242 id=242 data-nosnippet>242</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#243 id=243 data-nosnippet>243</a>#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
-<a href=#244 id=244 data-nosnippet>244</a>#[non_exhaustive]
+<a href=#244 id=244 data-nosnippet>244</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#245 id=245 data-nosnippet>245</a></span><span class="kw">pub struct </span>PresenceUser {
 <a href=#246 id=246 data-nosnippet>246</a>    <span class="kw">pub </span>id: UserId,
 <a href=#247 id=247 data-nosnippet>247</a>    <span class="attr">#[serde(rename = <span class="string">"username"</span>)]
@@ -328,7 +328,7 @@
 <a href=#328 id=328 data-nosnippet>328</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#presence-update-presence-update-event-fields).
 <a href=#329 id=329 data-nosnippet>329</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#330 id=330 data-nosnippet>330</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#331 id=331 data-nosnippet>331</a>#[non_exhaustive]
+<a href=#331 id=331 data-nosnippet>331</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#332 id=332 data-nosnippet>332</a></span><span class="kw">pub struct </span>Presence {
 <a href=#333 id=333 data-nosnippet>333</a>    <span class="doccomment">/// Data about the associated user.
 <a href=#334 id=334 data-nosnippet>334</a>    </span><span class="kw">pub </span>user: PresenceUser,
@@ -354,7 +354,7 @@
 <a href=#354 id=354 data-nosnippet>354</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#ready).
 <a href=#355 id=355 data-nosnippet>355</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#356 id=356 data-nosnippet>356</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#357 id=357 data-nosnippet>357</a>#[non_exhaustive]
+<a href=#357 id=357 data-nosnippet>357</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#358 id=358 data-nosnippet>358</a></span><span class="kw">pub struct </span>Ready {
 <a href=#359 id=359 data-nosnippet>359</a>    <span class="doccomment">/// API version
 <a href=#360 id=360 data-nosnippet>360</a>    </span><span class="attr">#[serde(rename = <span class="string">"v"</span>)]
@@ -377,7 +377,7 @@
 <a href=#377 id=377 data-nosnippet>377</a>///
 <a href=#378 id=378 data-nosnippet>378</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway#session-start-limit-object-session-start-limit-structure).
 <a href=#379 id=379 data-nosnippet>379</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#380 id=380 data-nosnippet>380</a>#[non_exhaustive]
+<a href=#380 id=380 data-nosnippet>380</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#381 id=381 data-nosnippet>381</a></span><span class="kw">pub struct </span>SessionStartLimit {
 <a href=#382 id=382 data-nosnippet>382</a>    <span class="doccomment">/// The number of sessions that you can still initiate within the current ratelimit period.
 <a href=#383 id=383 data-nosnippet>383</a>    </span><span class="kw">pub </span>remaining: u64,
@@ -431,7 +431,7 @@
 <a href=#431 id=431 data-nosnippet>431</a>/// This can be useful for knowing which shards are currently "down"/"up".
 <a href=#432 id=432 data-nosnippet>432</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#433 id=433 data-nosnippet>433</a>#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#434 id=434 data-nosnippet>434</a>#[non_exhaustive]
+<a href=#434 id=434 data-nosnippet>434</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#435 id=435 data-nosnippet>435</a></span><span class="kw">pub enum </span>ConnectionStage {
 <a href=#436 id=436 data-nosnippet>436</a>    <span class="doccomment">/// Indicator that the shard is normally connected and is not in, e.g., a resume phase.
 <a href=#437 id=437 data-nosnippet>437</a>    </span>Connected,
@@ -500,7 +500,7 @@
 <a href=#500 id=500 data-nosnippet>500</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-timestamps).
 <a href=#501 id=501 data-nosnippet>501</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#502 id=502 data-nosnippet>502</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#503 id=503 data-nosnippet>503</a>#[non_exhaustive]
+<a href=#503 id=503 data-nosnippet>503</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#504 id=504 data-nosnippet>504</a></span><span class="kw">pub struct </span>ActivityTimestamps {
 <a href=#505 id=505 data-nosnippet>505</a>    <span class="kw">pub </span>end: <span class="prelude-ty">Option</span>&lt;NonZeroU64&gt;,
 <a href=#506 id=506 data-nosnippet>506</a>    <span class="kw">pub </span>start: <span class="prelude-ty">Option</span>&lt;NonZeroU64&gt;,

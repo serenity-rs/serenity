@@ -22,7 +22,7 @@
 <a href=#22 id=22 data-nosnippet>22</a>/// [Discord docs](https://docs.discord.com/developers/topics/threads#thread-fields)
 <a href=#23 id=23 data-nosnippet>23</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#24 id=24 data-nosnippet>24</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-<a href=#25 id=25 data-nosnippet>25</a>#[non_exhaustive]
+<a href=#25 id=25 data-nosnippet>25</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#26 id=26 data-nosnippet>26</a></span><span class="kw">pub struct </span>BaseGuildChannel {
 <a href=#27 id=27 data-nosnippet>27</a>    <span class="doccomment">/// The Id of the guild the channel is located in.
 <a href=#28 id=28 data-nosnippet>28</a>    </span><span class="attr">#[serde(default)]
@@ -71,7 +71,7 @@
 <a href=#71 id=71 data-nosnippet>71</a>/// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object).
 <a href=#72 id=72 data-nosnippet>72</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#73 id=73 data-nosnippet>73</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-<a href=#74 id=74 data-nosnippet>74</a>#[non_exhaustive]
+<a href=#74 id=74 data-nosnippet>74</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#75 id=75 data-nosnippet>75</a></span><span class="kw">pub struct </span>GuildChannel {
 <a href=#76 id=76 data-nosnippet>76</a>    <span class="doccomment">/// The shared fields between [`GuildChannel`] and [`GuildThread`].
 <a href=#77 id=77 data-nosnippet>77</a>    </span><span class="attr">#[serde(flatten)]
@@ -167,7 +167,7 @@
 <a href=#167 id=167 data-nosnippet>167</a>    /// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-forum-layout-types).
 <a href=#168 id=168 data-nosnippet>168</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#169 id=169 data-nosnippet>169</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#170 id=170 data-nosnippet>170</a>    #[non_exhaustive]
+<a href=#170 id=170 data-nosnippet>170</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#171 id=171 data-nosnippet>171</a>    </span><span class="kw">pub enum </span>ForumLayoutType {
 <a href=#172 id=172 data-nosnippet>172</a>        <span class="doccomment">/// No default has been set for forum channel.
 <a href=#173 id=173 data-nosnippet>173</a>        </span>NotSet = <span class="number">0</span>,
@@ -533,7 +533,7 @@
 <a href=#533 id=533 data-nosnippet>533</a>/// [Discord docs](https://docs.discord.com/developers/resources/channel#channel-object-obfuscated-channels).
 <a href=#534 id=534 data-nosnippet>534</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#535 id=535 data-nosnippet>535</a>#[derive(Copy, Clone, Debug, Default, Deserialize, Serialize)]
-<a href=#536 id=536 data-nosnippet>536</a>#[non_exhaustive]
+<a href=#536 id=536 data-nosnippet>536</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#537 id=537 data-nosnippet>537</a></span><span class="kw">pub struct </span>ObfuscatedChannel {
 <a href=#538 id=538 data-nosnippet>538</a>    <span class="doccomment">/// The Id of the guild the channel is located in.
 <a href=#539 id=539 data-nosnippet>539</a>    </span><span class="attr">#[serde(default)]

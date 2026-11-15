@@ -24,7 +24,7 @@
 <a href=#24 id=24 data-nosnippet>24</a>
 <a href=#25 id=25 data-nosnippet>25</a><span class="doccomment">/// A common error enum returned by most of the library's functionality within a custom [`Result`].
 <a href=#26 id=26 data-nosnippet>26</a></span><span class="attr">#[derive(Debug)]
-<a href=#27 id=27 data-nosnippet>27</a>#[non_exhaustive]
+<a href=#27 id=27 data-nosnippet>27</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#28 id=28 data-nosnippet>28</a></span><span class="kw">pub enum </span>Error {
 <a href=#29 id=29 data-nosnippet>29</a>    <span class="doccomment">/// An [`std::io`] error.
 <a href=#30 id=30 data-nosnippet>30</a>    </span>Io(IoError),
@@ -53,7 +53,7 @@
 <a href=#53 id=53 data-nosnippet>53</a>}
 <a href=#54 id=54 data-nosnippet>54</a>
 <a href=#55 id=55 data-nosnippet>55</a><span class="attr">#[derive(Debug)]
-<a href=#56 id=56 data-nosnippet>56</a>#[non_exhaustive]
+<a href=#56 id=56 data-nosnippet>56</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#57 id=57 data-nosnippet>57</a></span><span class="kw">pub enum </span>UrlError {
 <a href=#58 id=58 data-nosnippet>58</a>    Parsing(url::ParseError),
 <a href=#59 id=59 data-nosnippet>59</a>    InvalidDataURI,
@@ -72,7 +72,7 @@
 <a href=#72 id=72 data-nosnippet>72</a>    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>StdError + <span class="lifetime">'static</span>)&gt; {
 <a href=#73 id=73 data-nosnippet>73</a>        <span class="kw">match </span><span class="self">self </span>{
 <a href=#74 id=74 data-nosnippet>74</a>            <span class="self">Self</span>::Parsing(inner) =&gt; <span class="prelude-val">Some</span>(inner),
-<a href=#75 id=75 data-nosnippet>75</a>            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+<a href=#75 id=75 data-nosnippet>75</a>            <span class="self">Self</span>::InvalidDataURI =&gt; <span class="prelude-val">None</span>,
 <a href=#76 id=76 data-nosnippet>76</a>        }
 <a href=#77 id=77 data-nosnippet>77</a>    }
 <a href=#78 id=78 data-nosnippet>78</a>}

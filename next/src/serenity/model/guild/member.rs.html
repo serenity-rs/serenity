@@ -20,7 +20,7 @@
 <a href=#20 id=20 data-nosnippet>20</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#21 id=21 data-nosnippet>21</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#22 id=22 data-nosnippet>22</a>#[derive(Clone, Debug, Default, serde::Deserialize, serde::Serialize)]
-<a href=#23 id=23 data-nosnippet>23</a>#[non_exhaustive]
+<a href=#23 id=23 data-nosnippet>23</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#24 id=24 data-nosnippet>24</a></span><span class="kw">pub struct </span>Member {
 <a href=#25 id=25 data-nosnippet>25</a>    <span class="doccomment">/// Attached User struct.
 <a href=#26 id=26 data-nosnippet>26</a>    </span><span class="kw">pub </span>user: User,
@@ -464,7 +464,7 @@
 <a href=#464 id=464 data-nosnippet>464</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#465 id=465 data-nosnippet>465</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#466 id=466 data-nosnippet>466</a>#[derive(Clone, Debug, Hash, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-<a href=#467 id=467 data-nosnippet>467</a>#[non_exhaustive]
+<a href=#467 id=467 data-nosnippet>467</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#468 id=468 data-nosnippet>468</a></span><span class="kw">pub struct </span>PartialMember {
 <a href=#469 id=469 data-nosnippet>469</a>    <span class="doccomment">/// Indicator of whether the member can hear in voice channels.
 <a href=#470 id=470 data-nosnippet>470</a>    </span><span class="attr">#[serde(default)]

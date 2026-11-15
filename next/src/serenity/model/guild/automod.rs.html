@@ -15,7 +15,7 @@
 <a href=#15 id=15 data-nosnippet>15</a>/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object).
 <a href=#16 id=16 data-nosnippet>16</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#17 id=17 data-nosnippet>17</a>#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-<a href=#18 id=18 data-nosnippet>18</a>#[non_exhaustive]
+<a href=#18 id=18 data-nosnippet>18</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#19 id=19 data-nosnippet>19</a></span><span class="kw">pub struct </span>AutoModRule {
 <a href=#20 id=20 data-nosnippet>20</a>    <span class="doccomment">/// ID of the rule.
 <a href=#21 id=21 data-nosnippet>21</a>    </span><span class="kw">pub </span>id: RuleId,
@@ -50,7 +50,7 @@
 <a href=#50 id=50 data-nosnippet>50</a></span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#51 id=51 data-nosnippet>51</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#52 id=52 data-nosnippet>52</a>#[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
-<a href=#53 id=53 data-nosnippet>53</a>#[non_exhaustive]
+<a href=#53 id=53 data-nosnippet>53</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#54 id=54 data-nosnippet>54</a></span><span class="kw">pub enum </span>EventType {
 <a href=#55 id=55 data-nosnippet>55</a>    MessageSend,
 <a href=#56 id=56 data-nosnippet>56</a>    Unknown(u8),
@@ -81,7 +81,7 @@
 <a href=#81 id=81 data-nosnippet>81</a>/// [metadata](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata)
 <a href=#82 id=82 data-nosnippet>82</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#83 id=83 data-nosnippet>83</a>#[derive(Clone, Debug, PartialEq, Eq)]
-<a href=#84 id=84 data-nosnippet>84</a>#[non_exhaustive]
+<a href=#84 id=84 data-nosnippet>84</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#85 id=85 data-nosnippet>85</a></span><span class="kw">pub enum </span>Trigger {
 <a href=#86 id=86 data-nosnippet>86</a>    Keyword {
 <a href=#87 id=87 data-nosnippet>87</a>        <span class="doccomment">/// Substrings which will be searched for in content (Maximum of 1000)
@@ -221,7 +221,7 @@
 <a href=#221 id=221 data-nosnippet>221</a></span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#222 id=222 data-nosnippet>222</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#223 id=223 data-nosnippet>223</a>#[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
-<a href=#224 id=224 data-nosnippet>224</a>#[non_exhaustive]
+<a href=#224 id=224 data-nosnippet>224</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#225 id=225 data-nosnippet>225</a></span><span class="kw">pub enum </span>TriggerType {
 <a href=#226 id=226 data-nosnippet>226</a>    Keyword,
 <a href=#227 id=227 data-nosnippet>227</a>    Spam,
@@ -264,7 +264,7 @@
 <a href=#264 id=264 data-nosnippet>264</a>/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-rule-object-trigger-metadata).
 <a href=#265 id=265 data-nosnippet>265</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#266 id=266 data-nosnippet>266</a>#[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
-<a href=#267 id=267 data-nosnippet>267</a>#[non_exhaustive]
+<a href=#267 id=267 data-nosnippet>267</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#268 id=268 data-nosnippet>268</a></span><span class="kw">pub struct </span>TriggerMetadata {
 <a href=#269 id=269 data-nosnippet>269</a>    <span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
 <a href=#270 id=270 data-nosnippet>270</a>    </span><span class="kw">pub </span>keyword_filter: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
@@ -284,7 +284,7 @@
 <a href=#284 id=284 data-nosnippet>284</a></span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#285 id=285 data-nosnippet>285</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#286 id=286 data-nosnippet>286</a>#[serde(from = <span class="string">"u8"</span>, into = <span class="string">"u8"</span>)]
-<a href=#287 id=287 data-nosnippet>287</a>#[non_exhaustive]
+<a href=#287 id=287 data-nosnippet>287</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#288 id=288 data-nosnippet>288</a></span><span class="kw">pub enum </span>KeywordPresetType {
 <a href=#289 id=289 data-nosnippet>289</a>    <span class="doccomment">/// Words that may be considered forms of swearing or cursing
 <a href=#290 id=290 data-nosnippet>290</a>    </span>Profanity,
@@ -322,7 +322,7 @@
 <a href=#322 id=322 data-nosnippet>322</a>/// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-action-object).
 <a href=#323 id=323 data-nosnippet>323</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#324 id=324 data-nosnippet>324</a>#[derive(Clone, Debug, PartialEq, Eq)]
-<a href=#325 id=325 data-nosnippet>325</a>#[non_exhaustive]
+<a href=#325 id=325 data-nosnippet>325</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#326 id=326 data-nosnippet>326</a></span><span class="kw">pub enum </span>Action {
 <a href=#327 id=327 data-nosnippet>327</a>    <span class="doccomment">/// Blocks the content of a message according to the rule.
 <a href=#328 id=328 data-nosnippet>328</a>    </span>BlockMessage {
@@ -352,7 +352,7 @@
 <a href=#352 id=352 data-nosnippet>352</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#auto-moderation-action-execution).
 <a href=#353 id=353 data-nosnippet>353</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#354 id=354 data-nosnippet>354</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#355 id=355 data-nosnippet>355</a>#[non_exhaustive]
+<a href=#355 id=355 data-nosnippet>355</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#356 id=356 data-nosnippet>356</a></span><span class="kw">pub struct </span>ActionExecution {
 <a href=#357 id=357 data-nosnippet>357</a>    <span class="doccomment">/// ID of the guild in which the action was executed.
 <a href=#358 id=358 data-nosnippet>358</a>    </span><span class="kw">pub </span>guild_id: GuildId,
@@ -495,7 +495,7 @@
 <a href=#495 id=495 data-nosnippet>495</a>    ///
 <a href=#496 id=496 data-nosnippet>496</a>    /// [Discord docs](https://docs.discord.com/developers/resources/auto-moderation#auto-moderation-action-object-action-types).
 <a href=#497 id=497 data-nosnippet>497</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#498 id=498 data-nosnippet>498</a>    #[non_exhaustive]
+<a href=#498 id=498 data-nosnippet>498</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#499 id=499 data-nosnippet>499</a>    </span><span class="kw">pub enum </span>ActionType {
 <a href=#500 id=500 data-nosnippet>500</a>        BlockMessage = <span class="number">1</span>,
 <a href=#501 id=501 data-nosnippet>501</a>        Alert = <span class="number">2</span>,

@@ -29,7 +29,7 @@
 <a href=#29 id=29 data-nosnippet>29</a>///
 <a href=#30 id=30 data-nosnippet>30</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-structure).
 <a href=#31 id=31 data-nosnippet>31</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#32 id=32 data-nosnippet>32</a>#[non_exhaustive]
+<a href=#32 id=32 data-nosnippet>32</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#33 id=33 data-nosnippet>33</a>#[must_use]
 <a href=#34 id=34 data-nosnippet>34</a></span><span class="kw">pub struct </span>CreateAttachment&lt;<span class="lifetime">'a</span>&gt; {
 <a href=#35 id=35 data-nosnippet>35</a>    description: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">'a</span>, str&gt;&gt;,
@@ -214,7 +214,7 @@
 <a href=#214 id=214 data-nosnippet>214</a>///
 <a href=#215 id=215 data-nosnippet>215</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#attachment-object-attachment-request-structure).
 <a href=#216 id=216 data-nosnippet>216</a></span><span class="attr">#[derive(Clone, Debug)]
-<a href=#217 id=217 data-nosnippet>217</a>#[non_exhaustive]
+<a href=#217 id=217 data-nosnippet>217</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#218 id=218 data-nosnippet>218</a>#[must_use]
 <a href=#219 id=219 data-nosnippet>219</a></span><span class="kw">pub struct </span>EditAttachment&lt;<span class="lifetime">'a</span>&gt; {
 <a href=#220 id=220 data-nosnippet>220</a>    id: AttachmentId,

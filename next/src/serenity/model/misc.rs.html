@@ -161,7 +161,7 @@
 <a href=#161 id=161 data-nosnippet>161</a>///
 <a href=#162 id=162 data-nosnippet>162</a>/// [Discord docs](https://docs.discord.com/developers/events/gateway-events#activity-object-activity-emoji).
 <a href=#163 id=163 data-nosnippet>163</a></span><span class="attr">#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
-<a href=#164 id=164 data-nosnippet>164</a>#[non_exhaustive]
+<a href=#164 id=164 data-nosnippet>164</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#165 id=165 data-nosnippet>165</a></span><span class="kw">pub struct </span>EmojiIdentifier {
 <a href=#166 id=166 data-nosnippet>166</a>    <span class="doccomment">/// Whether the emoji is animated
 <a href=#167 id=167 data-nosnippet>167</a>    </span><span class="kw">pub </span>animated: bool,
@@ -233,7 +233,7 @@
 <a href=#233 id=233 data-nosnippet>233</a>///
 <a href=#234 id=234 data-nosnippet>234</a>/// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 <a href=#235 id=235 data-nosnippet>235</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#236 id=236 data-nosnippet>236</a>#[non_exhaustive]
+<a href=#236 id=236 data-nosnippet>236</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#237 id=237 data-nosnippet>237</a></span><span class="kw">pub struct </span>Incident {
 <a href=#238 id=238 data-nosnippet>238</a>    <span class="kw">pub </span>created_at: FixedString,
 <a href=#239 id=239 data-nosnippet>239</a>    <span class="kw">pub </span>id: FixedString,
@@ -254,7 +254,7 @@
 <a href=#254 id=254 data-nosnippet>254</a>///
 <a href=#255 id=255 data-nosnippet>255</a>/// [Discord docs](https://discordstatus.com/api) (see "Unresolved incident" example)
 <a href=#256 id=256 data-nosnippet>256</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#257 id=257 data-nosnippet>257</a>#[non_exhaustive]
+<a href=#257 id=257 data-nosnippet>257</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#258 id=258 data-nosnippet>258</a></span><span class="kw">pub struct </span>IncidentUpdate {
 <a href=#259 id=259 data-nosnippet>259</a>    <span class="kw">pub </span>body: FixedString,
 <a href=#260 id=260 data-nosnippet>260</a>    <span class="kw">pub </span>created_at: FixedString,
@@ -270,7 +270,7 @@
 <a href=#270 id=270 data-nosnippet>270</a>///
 <a href=#271 id=271 data-nosnippet>271</a>/// [Discord docs](https://discordstatus.com/api) (see "scheduled maintenances" examples)
 <a href=#272 id=272 data-nosnippet>272</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#273 id=273 data-nosnippet>273</a>#[non_exhaustive]
+<a href=#273 id=273 data-nosnippet>273</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#274 id=274 data-nosnippet>274</a></span><span class="kw">pub struct </span>Maintenance {
 <a href=#275 id=275 data-nosnippet>275</a>    <span class="kw">pub </span>created_at: FixedString,
 <a href=#276 id=276 data-nosnippet>276</a>    <span class="kw">pub </span>id: FixedString,

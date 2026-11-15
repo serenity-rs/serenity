@@ -7,7 +7,7 @@
 <a href=#7 id=7 data-nosnippet>7</a>/// [Discord docs](https://docs.discord.com/developers/topics/oauth2#shared-resources-oauth2-scopes).
 <a href=#8 id=8 data-nosnippet>8</a></span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#9 id=9 data-nosnippet>9</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#10 id=10 data-nosnippet>10</a>#[non_exhaustive]
+<a href=#10 id=10 data-nosnippet>10</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#11 id=11 data-nosnippet>11</a></span><span class="kw">pub enum </span>Scope {
 <a href=#12 id=12 data-nosnippet>12</a>    <span class="doccomment">/// For oauth2 bots, this puts the bot in the user's selected guild by default.
 <a href=#13 id=13 data-nosnippet>13</a>    </span><span class="attr">#[serde(rename = <span class="string">"bot"</span>)]

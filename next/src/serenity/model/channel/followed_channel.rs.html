@@ -4,7 +4,7 @@
 <a href=#4 id=4 data-nosnippet>4</a>///
 <a href=#5 id=5 data-nosnippet>5</a>/// [Discord docs](https://docs.discord.com/developers/resources/channel#followed-channel-object).
 <a href=#6 id=6 data-nosnippet>6</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#7 id=7 data-nosnippet>7</a>#[non_exhaustive]
+<a href=#7 id=7 data-nosnippet>7</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#8 id=8 data-nosnippet>8</a></span><span class="kw">pub struct </span>FollowedChannel {
 <a href=#9 id=9 data-nosnippet>9</a>    <span class="doccomment">/// The source news channel
 <a href=#10 id=10 data-nosnippet>10</a>    </span><span class="kw">pub </span>channel_id: ChannelId,

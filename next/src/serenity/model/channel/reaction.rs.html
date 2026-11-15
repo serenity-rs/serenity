@@ -22,7 +22,7 @@
 <a href=#22 id=22 data-nosnippet>22</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#23 id=23 data-nosnippet>23</a>#[derive(Clone, Debug, Deserialize, Serialize)]
 <a href=#24 id=24 data-nosnippet>24</a>#[serde(remote = <span class="string">"Self"</span>)]
-<a href=#25 id=25 data-nosnippet>25</a>#[non_exhaustive]
+<a href=#25 id=25 data-nosnippet>25</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#26 id=26 data-nosnippet>26</a></span><span class="kw">pub struct </span>Reaction {
 <a href=#27 id=27 data-nosnippet>27</a>    <span class="doccomment">/// The Id of the [`User`] that sent the reaction.
 <a href=#28 id=28 data-nosnippet>28</a>    ///
@@ -61,7 +61,7 @@
 <a href=#61 id=61 data-nosnippet>61</a>    <span class="doccomment">/// A list of types a reaction can be.
 <a href=#62 id=62 data-nosnippet>62</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#63 id=63 data-nosnippet>63</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#64 id=64 data-nosnippet>64</a>    #[non_exhaustive]
+<a href=#64 id=64 data-nosnippet>64</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#65 id=65 data-nosnippet>65</a>    </span><span class="kw">pub enum </span>ReactionTypes {
 <a href=#66 id=66 data-nosnippet>66</a>        Normal = <span class="number">0</span>,
 <a href=#67 id=67 data-nosnippet>67</a>        Burst = <span class="number">1</span>,
@@ -217,7 +217,7 @@
 <a href=#217 id=217 data-nosnippet>217</a><span class="doccomment">/// The type of a [`Reaction`] sent.
 <a href=#218 id=218 data-nosnippet>218</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#219 id=219 data-nosnippet>219</a>#[derive(Clone, Debug, Eq, PartialEq, Hash)]
-<a href=#220 id=220 data-nosnippet>220</a>#[non_exhaustive]
+<a href=#220 id=220 data-nosnippet>220</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#221 id=221 data-nosnippet>221</a></span><span class="kw">pub enum </span>ReactionType {
 <a href=#222 id=222 data-nosnippet>222</a>    <span class="doccomment">/// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the guild.
 <a href=#223 id=223 data-nosnippet>223</a>    </span>Custom {

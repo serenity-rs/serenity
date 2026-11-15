@@ -142,7 +142,7 @@
 <a href=#142 id=142 data-nosnippet>142</a>
 <a href=#143 id=143 data-nosnippet>143</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#144 id=144 data-nosnippet>144</a>#[derive(Clone, Debug, Default, Deserialize, Serialize)]
-<a href=#145 id=145 data-nosnippet>145</a>#[non_exhaustive]
+<a href=#145 id=145 data-nosnippet>145</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#146 id=146 data-nosnippet>146</a></span><span class="kw">pub struct </span>GuildThread {
 <a href=#147 id=147 data-nosnippet>147</a>    <span class="doccomment">/// The shared fields between [`GuildChannel`] and [`GuildThread`].
 <a href=#148 id=148 data-nosnippet>148</a>    </span><span class="attr">#[serde(flatten)]
@@ -227,7 +227,7 @@
 <a href=#227 id=227 data-nosnippet>227</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#228 id=228 data-nosnippet>228</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#229 id=229 data-nosnippet>229</a>#[derive(Clone, Copy, Debug, Default, serde::Deserialize, serde::Serialize)]
-<a href=#230 id=230 data-nosnippet>230</a>#[non_exhaustive]
+<a href=#230 id=230 data-nosnippet>230</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#231 id=231 data-nosnippet>231</a></span><span class="kw">pub struct </span>ThreadMetadata {
 <a href=#232 id=232 data-nosnippet>232</a>    <span class="doccomment">/// Whether the thread is archived.
 <a href=#233 id=233 data-nosnippet>233</a>    </span><span class="kw">pub </span>archived: bool,
@@ -256,7 +256,7 @@
 <a href=#256 id=256 data-nosnippet>256</a>/// [subset description](https://docs.discord.com/developers/events/gateway-events#thread-delete)
 <a href=#257 id=257 data-nosnippet>257</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#258 id=258 data-nosnippet>258</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#259 id=259 data-nosnippet>259</a>#[non_exhaustive]
+<a href=#259 id=259 data-nosnippet>259</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#260 id=260 data-nosnippet>260</a></span><span class="kw">pub struct </span>PartialGuildThread {
 <a href=#261 id=261 data-nosnippet>261</a>    <span class="doccomment">/// The thread Id.
 <a href=#262 id=262 data-nosnippet>262</a>    </span><span class="kw">pub </span>id: ThreadId,
@@ -271,7 +271,7 @@
 <a href=#271 id=271 data-nosnippet>271</a>
 <a href=#272 id=272 data-nosnippet>272</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#273 id=273 data-nosnippet>273</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#274 id=274 data-nosnippet>274</a>#[non_exhaustive]
+<a href=#274 id=274 data-nosnippet>274</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#275 id=275 data-nosnippet>275</a></span><span class="kw">pub struct </span>PartialThreadMember {
 <a href=#276 id=276 data-nosnippet>276</a>    <span class="doccomment">/// The time the current user last joined the thread.
 <a href=#277 id=277 data-nosnippet>277</a>    </span><span class="kw">pub </span>join_timestamp: Timestamp,
@@ -287,7 +287,7 @@
 <a href=#287 id=287 data-nosnippet>287</a>/// [extra fields]: https://docs.discord.com/developers/events/gateway-events#thread-member-update-thread-member-update-event-extra-fields
 <a href=#288 id=288 data-nosnippet>288</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#289 id=289 data-nosnippet>289</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#290 id=290 data-nosnippet>290</a>#[non_exhaustive]
+<a href=#290 id=290 data-nosnippet>290</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#291 id=291 data-nosnippet>291</a></span><span class="kw">pub struct </span>ThreadMember {
 <a href=#292 id=292 data-nosnippet>292</a>    <span class="attr">#[serde(flatten)]
 <a href=#293 id=293 data-nosnippet>293</a>    </span><span class="kw">pub </span>inner: PartialThreadMember,

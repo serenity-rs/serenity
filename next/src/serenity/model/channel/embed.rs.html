@@ -15,7 +15,7 @@
 <a href=#15 id=15 data-nosnippet>15</a>/// [slack's attachments]: https://api.slack.com/docs/message-attachments
 <a href=#16 id=16 data-nosnippet>16</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#17 id=17 data-nosnippet>17</a>#[derive(Clone, Default, Debug, Deserialize, Serialize)]
-<a href=#18 id=18 data-nosnippet>18</a>#[non_exhaustive]
+<a href=#18 id=18 data-nosnippet>18</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#19 id=19 data-nosnippet>19</a></span><span class="kw">pub struct </span>Embed {
 <a href=#20 id=20 data-nosnippet>20</a>    <span class="doccomment">/// The title of the embed.
 <a href=#21 id=21 data-nosnippet>21</a>    </span><span class="attr">#[serde(skip_serializing_if = <span class="string">"Option::is_none"</span>)]
@@ -79,7 +79,7 @@
 <a href=#79 id=79 data-nosnippet>79</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-author-structure).
 <a href=#80 id=80 data-nosnippet>80</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#81 id=81 data-nosnippet>81</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#82 id=82 data-nosnippet>82</a>#[non_exhaustive]
+<a href=#82 id=82 data-nosnippet>82</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#83 id=83 data-nosnippet>83</a></span><span class="kw">pub struct </span>EmbedAuthor {
 <a href=#84 id=84 data-nosnippet>84</a>    <span class="doccomment">/// The name of the author.
 <a href=#85 id=85 data-nosnippet>85</a>    </span><span class="kw">pub </span>name: FixedString&lt;u16&gt;,
@@ -101,7 +101,7 @@
 <a href=#101 id=101 data-nosnippet>101</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-field-structure).
 <a href=#102 id=102 data-nosnippet>102</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#103 id=103 data-nosnippet>103</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#104 id=104 data-nosnippet>104</a>#[non_exhaustive]
+<a href=#104 id=104 data-nosnippet>104</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#105 id=105 data-nosnippet>105</a></span><span class="kw">pub struct </span>EmbedField {
 <a href=#106 id=106 data-nosnippet>106</a>    <span class="doccomment">/// The name of the field.
 <a href=#107 id=107 data-nosnippet>107</a>    ///
@@ -147,7 +147,7 @@
 <a href=#147 id=147 data-nosnippet>147</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-footer-structure).
 <a href=#148 id=148 data-nosnippet>148</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#149 id=149 data-nosnippet>149</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#150 id=150 data-nosnippet>150</a>#[non_exhaustive]
+<a href=#150 id=150 data-nosnippet>150</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#151 id=151 data-nosnippet>151</a></span><span class="kw">pub struct </span>EmbedFooter {
 <a href=#152 id=152 data-nosnippet>152</a>    <span class="doccomment">/// The associated text with the footer.
 <a href=#153 id=153 data-nosnippet>153</a>    </span><span class="kw">pub </span>text: FixedString&lt;u16&gt;,
@@ -166,7 +166,7 @@
 <a href=#166 id=166 data-nosnippet>166</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-image-structure).
 <a href=#167 id=167 data-nosnippet>167</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#168 id=168 data-nosnippet>168</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#169 id=169 data-nosnippet>169</a>#[non_exhaustive]
+<a href=#169 id=169 data-nosnippet>169</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#170 id=170 data-nosnippet>170</a></span><span class="kw">pub struct </span>EmbedImage {
 <a href=#171 id=171 data-nosnippet>171</a>    <span class="doccomment">/// Source URL of the image.
 <a href=#172 id=172 data-nosnippet>172</a>    ///
@@ -199,7 +199,7 @@
 <a href=#199 id=199 data-nosnippet>199</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-provider-structure).
 <a href=#200 id=200 data-nosnippet>200</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#201 id=201 data-nosnippet>201</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#202 id=202 data-nosnippet>202</a>#[non_exhaustive]
+<a href=#202 id=202 data-nosnippet>202</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#203 id=203 data-nosnippet>203</a></span><span class="kw">pub struct </span>EmbedProvider {
 <a href=#204 id=204 data-nosnippet>204</a>    <span class="doccomment">/// The name of the provider.
 <a href=#205 id=205 data-nosnippet>205</a>    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;FixedString&gt;,
@@ -212,7 +212,7 @@
 <a href=#212 id=212 data-nosnippet>212</a>/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-video-structure).
 <a href=#213 id=213 data-nosnippet>213</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#214 id=214 data-nosnippet>214</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#215 id=215 data-nosnippet>215</a>#[non_exhaustive]
+<a href=#215 id=215 data-nosnippet>215</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#216 id=216 data-nosnippet>216</a></span><span class="kw">pub struct </span>EmbedVideo {
 <a href=#217 id=217 data-nosnippet>217</a>    <span class="doccomment">/// The source URL of the video.
 <a href=#218 id=218 data-nosnippet>218</a>    </span><span class="kw">pub </span>url: FixedString,

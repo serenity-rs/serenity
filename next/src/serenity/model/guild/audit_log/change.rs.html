@@ -5,7 +5,7 @@
 <a href=#5 id=5 data-nosnippet>5</a>
 <a href=#6 id=6 data-nosnippet>6</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#7 id=7 data-nosnippet>7</a>#[derive(Debug, PartialEq, Eq, Deserialize, Serialize, Clone)]
-<a href=#8 id=8 data-nosnippet>8</a>#[non_exhaustive]
+<a href=#8 id=8 data-nosnippet>8</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#9 id=9 data-nosnippet>9</a></span><span class="kw">pub struct </span>AffectedRole {
 <a href=#10 id=10 data-nosnippet>10</a>    <span class="kw">pub </span>id: RoleId,
 <a href=#11 id=11 data-nosnippet>11</a>    <span class="kw">pub </span>name: FixedString,
@@ -14,7 +14,7 @@
 <a href=#14 id=14 data-nosnippet>14</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#15 id=15 data-nosnippet>15</a>#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
 <a href=#16 id=16 data-nosnippet>16</a>#[serde(untagged)]
-<a href=#17 id=17 data-nosnippet>17</a>#[non_exhaustive]
+<a href=#17 id=17 data-nosnippet>17</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#18 id=18 data-nosnippet>18</a></span><span class="kw">pub enum </span>EntityType {
 <a href=#19 id=19 data-nosnippet>19</a>    Int(u64),
 <a href=#20 id=20 data-nosnippet>20</a>    Str(FixedString),
@@ -34,7 +34,7 @@
 <a href=#34 id=34 data-nosnippet>34</a>    )* ) =&gt; {
 <a href=#35 id=35 data-nosnippet>35</a>        <span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#36 id=36 data-nosnippet>36</a>        #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
-<a href=#37 id=37 data-nosnippet>37</a>        #[non_exhaustive]
+<a href=#37 id=37 data-nosnippet>37</a>        #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#38 id=38 data-nosnippet>38</a>        #[serde(tag = <span class="string">"key"</span>)]
 <a href=#39 id=39 data-nosnippet>39</a>        #[serde(rename_all = <span class="string">"snake_case"</span>)]
 <a href=#40 id=40 data-nosnippet>40</a>        </span><span class="kw">pub enum </span>Change {

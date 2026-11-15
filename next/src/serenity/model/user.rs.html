@@ -188,7 +188,7 @@
 <a href=#188 id=188 data-nosnippet>188</a>#[derive(
 <a href=#189 id=189 data-nosnippet>189</a>    Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize,
 <a href=#190 id=190 data-nosnippet>190</a>)]
-<a href=#191 id=191 data-nosnippet>191</a>#[non_exhaustive]
+<a href=#191 id=191 data-nosnippet>191</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#192 id=192 data-nosnippet>192</a></span><span class="kw">pub enum </span>OnlineStatus {
 <a href=#193 id=193 data-nosnippet>193</a>    <span class="attr">#[serde(rename = <span class="string">"dnd"</span>)]
 <a href=#194 id=194 data-nosnippet>194</a>    </span>DoNotDisturb,
@@ -223,7 +223,7 @@
 <a href=#223 id=223 data-nosnippet>223</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#224 id=224 data-nosnippet>224</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#225 id=225 data-nosnippet>225</a>#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
-<a href=#226 id=226 data-nosnippet>226</a>#[non_exhaustive]
+<a href=#226 id=226 data-nosnippet>226</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#227 id=227 data-nosnippet>227</a></span><span class="kw">pub struct </span>User {
 <a href=#228 id=228 data-nosnippet>228</a>    <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account's creation date.
 <a href=#229 id=229 data-nosnippet>229</a>    </span><span class="kw">pub </span>id: UserId,
@@ -316,7 +316,7 @@
 <a href=#316 id=316 data-nosnippet>316</a>    /// [Discord docs](https://docs.discord.com/developers/resources/user#user-object-premium-types).
 <a href=#317 id=317 data-nosnippet>317</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#318 id=318 data-nosnippet>318</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#319 id=319 data-nosnippet>319</a>    #[non_exhaustive]
+<a href=#319 id=319 data-nosnippet>319</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#320 id=320 data-nosnippet>320</a>    </span><span class="kw">pub enum </span>PremiumType {
 <a href=#321 id=321 data-nosnippet>321</a>        <span class="prelude-val">None </span>= <span class="number">0</span>,
 <a href=#322 id=322 data-nosnippet>322</a>        NitroClassic = <span class="number">1</span>,
@@ -374,7 +374,7 @@
 <a href=#374 id=374 data-nosnippet>374</a>/// [Discord docs](https://docs.discord.com/developers/resources/user#user-object-user-primary-guild)
 <a href=#375 id=375 data-nosnippet>375</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#376 id=376 data-nosnippet>376</a>#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, Deserialize, Serialize)]
-<a href=#377 id=377 data-nosnippet>377</a>#[non_exhaustive]
+<a href=#377 id=377 data-nosnippet>377</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#378 id=378 data-nosnippet>378</a></span><span class="kw">pub struct </span>PrimaryGuild {
 <a href=#379 id=379 data-nosnippet>379</a>    <span class="doccomment">/// The id of the user's primary guild.
 <a href=#380 id=380 data-nosnippet>380</a>    </span><span class="kw">pub </span>identity_guild_id: <span class="prelude-ty">Option</span>&lt;GuildId&gt;,
@@ -398,7 +398,7 @@
 <a href=#398 id=398 data-nosnippet>398</a>
 <a href=#399 id=399 data-nosnippet>399</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#400 id=400 data-nosnippet>400</a>#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-<a href=#401 id=401 data-nosnippet>401</a>#[non_exhaustive]
+<a href=#401 id=401 data-nosnippet>401</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#402 id=402 data-nosnippet>402</a></span><span class="doccomment">/// The data for a [`User`]'s avatar decoration.
 <a href=#403 id=403 data-nosnippet>403</a>///
 <a href=#404 id=404 data-nosnippet>404</a>/// [Discord docs](https://docs.discord.com/developers/resources/user#avatar-decoration-data-object).
@@ -423,7 +423,7 @@
 <a href=#423 id=423 data-nosnippet>423</a>/// [Discord docs](https://docs.discord.com/developers/resources/user#collectibles).
 <a href=#424 id=424 data-nosnippet>424</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#425 id=425 data-nosnippet>425</a>#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, Deserialize, Serialize)]
-<a href=#426 id=426 data-nosnippet>426</a>#[non_exhaustive]
+<a href=#426 id=426 data-nosnippet>426</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#427 id=427 data-nosnippet>427</a></span><span class="kw">pub struct </span>Collectibles {
 <a href=#428 id=428 data-nosnippet>428</a>    <span class="doccomment">/// The [`User`]'s nameplate, if they have one.
 <a href=#429 id=429 data-nosnippet>429</a>    </span><span class="kw">pub </span>nameplate: <span class="prelude-ty">Option</span>&lt;Box&lt;Nameplate&gt;&gt;,
@@ -434,7 +434,7 @@
 <a href=#434 id=434 data-nosnippet>434</a>/// [Discord docs](https://docs.discord.com/developers/resources/user#nameplate-nameplate-structure).
 <a href=#435 id=435 data-nosnippet>435</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#436 id=436 data-nosnippet>436</a>#[derive(Clone, Debug, PartialEq, Eq, Hash, Deserialize, Serialize)]
-<a href=#437 id=437 data-nosnippet>437</a>#[non_exhaustive]
+<a href=#437 id=437 data-nosnippet>437</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#438 id=438 data-nosnippet>438</a></span><span class="kw">pub struct </span>Nameplate {
 <a href=#439 id=439 data-nosnippet>439</a>    <span class="doccomment">/// Id of the nameplate SKU
 <a href=#440 id=440 data-nosnippet>440</a>    </span><span class="kw">pub </span>sku_id: SkuId,

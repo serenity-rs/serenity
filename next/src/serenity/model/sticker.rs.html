@@ -36,7 +36,7 @@
 <a href=#36 id=36 data-nosnippet>36</a>/// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-item-object).
 <a href=#37 id=37 data-nosnippet>37</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#38 id=38 data-nosnippet>38</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#39 id=39 data-nosnippet>39</a>#[non_exhaustive]
+<a href=#39 id=39 data-nosnippet>39</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#40 id=40 data-nosnippet>40</a></span><span class="kw">pub struct </span>StickerItem {
 <a href=#41 id=41 data-nosnippet>41</a>    <span class="doccomment">/// The unique ID given to this sticker.
 <a href=#42 id=42 data-nosnippet>42</a>    </span><span class="kw">pub </span>id: StickerId,
@@ -63,7 +63,7 @@
 <a href=#63 id=63 data-nosnippet>63</a>///
 <a href=#64 id=64 data-nosnippet>64</a>/// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-pack-object).
 <a href=#65 id=65 data-nosnippet>65</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#66 id=66 data-nosnippet>66</a>#[non_exhaustive]
+<a href=#66 id=66 data-nosnippet>66</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#67 id=67 data-nosnippet>67</a></span><span class="kw">pub struct </span>StickerPack {
 <a href=#68 id=68 data-nosnippet>68</a>    <span class="doccomment">/// The unique ID given to this sticker sticker pack.
 <a href=#69 id=69 data-nosnippet>69</a>    </span><span class="kw">pub </span>id: StickerPackId,
@@ -105,7 +105,7 @@
 <a href=#105 id=105 data-nosnippet>105</a>/// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-object).
 <a href=#106 id=106 data-nosnippet>106</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#107 id=107 data-nosnippet>107</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#108 id=108 data-nosnippet>108</a>#[non_exhaustive]
+<a href=#108 id=108 data-nosnippet>108</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#109 id=109 data-nosnippet>109</a></span><span class="kw">pub struct </span>Sticker {
 <a href=#110 id=110 data-nosnippet>110</a>    <span class="doccomment">/// The unique ID given to this sticker.
 <a href=#111 id=111 data-nosnippet>111</a>    </span><span class="kw">pub </span>id: StickerId,
@@ -222,7 +222,7 @@
 <a href=#222 id=222 data-nosnippet>222</a>    /// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-object-sticker-types).
 <a href=#223 id=223 data-nosnippet>223</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#224 id=224 data-nosnippet>224</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#225 id=225 data-nosnippet>225</a>    #[non_exhaustive]
+<a href=#225 id=225 data-nosnippet>225</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#226 id=226 data-nosnippet>226</a>    </span><span class="kw">pub enum </span>StickerType {
 <a href=#227 id=227 data-nosnippet>227</a>        <span class="doccomment">/// An official sticker in a pack, part of Nitro or in a removed purchasable pack.
 <a href=#228 id=228 data-nosnippet>228</a>        </span>Standard = <span class="number">1</span>,
@@ -238,7 +238,7 @@
 <a href=#238 id=238 data-nosnippet>238</a>    /// [Discord docs](https://docs.discord.com/developers/resources/sticker#sticker-object-sticker-format-types).
 <a href=#239 id=239 data-nosnippet>239</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#240 id=240 data-nosnippet>240</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#241 id=241 data-nosnippet>241</a>    #[non_exhaustive]
+<a href=#241 id=241 data-nosnippet>241</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#242 id=242 data-nosnippet>242</a>    </span><span class="kw">pub enum </span>StickerFormatType {
 <a href=#243 id=243 data-nosnippet>243</a>        <span class="doccomment">/// A PNG format sticker.
 <a href=#244 id=244 data-nosnippet>244</a>        </span>Png = <span class="number">1</span>,

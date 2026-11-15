@@ -10,7 +10,7 @@
 <a href=#10 id=10 data-nosnippet>10</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#11 id=11 data-nosnippet>11</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#12 id=12 data-nosnippet>12</a>#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-<a href=#13 id=13 data-nosnippet>13</a>#[non_exhaustive]
+<a href=#13 id=13 data-nosnippet>13</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#14 id=14 data-nosnippet>14</a></span><span class="kw">pub struct </span>Integration {
 <a href=#15 id=15 data-nosnippet>15</a>    <span class="kw">pub </span>id: IntegrationId,
 <a href=#16 id=16 data-nosnippet>16</a>    <span class="kw">pub </span>name: FixedString,
@@ -40,7 +40,7 @@
 <a href=#40 id=40 data-nosnippet>40</a>    /// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-object-integration-expire-behaviors).
 <a href=#41 id=41 data-nosnippet>41</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#42 id=42 data-nosnippet>42</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#43 id=43 data-nosnippet>43</a>    #[non_exhaustive]
+<a href=#43 id=43 data-nosnippet>43</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#44 id=44 data-nosnippet>44</a>    </span><span class="kw">pub enum </span>IntegrationExpireBehaviour {
 <a href=#45 id=45 data-nosnippet>45</a>        RemoveRole = <span class="number">0</span>,
 <a href=#46 id=46 data-nosnippet>46</a>        Kick = <span class="number">1</span>,
@@ -60,7 +60,7 @@
 <a href=#60 id=60 data-nosnippet>60</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-account-object).
 <a href=#61 id=61 data-nosnippet>61</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#62 id=62 data-nosnippet>62</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#63 id=63 data-nosnippet>63</a>#[non_exhaustive]
+<a href=#63 id=63 data-nosnippet>63</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#64 id=64 data-nosnippet>64</a></span><span class="kw">pub struct </span>IntegrationAccount {
 <a href=#65 id=65 data-nosnippet>65</a>    <span class="kw">pub </span>id: FixedString,
 <a href=#66 id=66 data-nosnippet>66</a>    <span class="kw">pub </span>name: FixedString,
@@ -71,7 +71,7 @@
 <a href=#71 id=71 data-nosnippet>71</a>/// [Discord docs](https://docs.discord.com/developers/resources/guild#integration-application-object).
 <a href=#72 id=72 data-nosnippet>72</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#73 id=73 data-nosnippet>73</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#74 id=74 data-nosnippet>74</a>#[non_exhaustive]
+<a href=#74 id=74 data-nosnippet>74</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#75 id=75 data-nosnippet>75</a></span><span class="kw">pub struct </span>IntegrationApplication {
 <a href=#76 id=76 data-nosnippet>76</a>    <span class="kw">pub </span>id: ApplicationId,
 <a href=#77 id=77 data-nosnippet>77</a>    <span class="kw">pub </span>name: FixedString,

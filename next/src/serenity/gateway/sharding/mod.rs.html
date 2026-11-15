@@ -754,7 +754,7 @@
 <a href=#754 id=754 data-nosnippet>754</a>}
 <a href=#755 id=755 data-nosnippet>755</a>
 <a href=#756 id=756 data-nosnippet>756</a><span class="attr">#[derive(Debug)]
-<a href=#757 id=757 data-nosnippet>757</a>#[non_exhaustive]
+<a href=#757 id=757 data-nosnippet>757</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#758 id=758 data-nosnippet>758</a></span><span class="kw">pub enum </span>ShardAction {
 <a href=#759 id=759 data-nosnippet>759</a>    Heartbeat,
 <a href=#760 id=760 data-nosnippet>760</a>    Identify,
@@ -783,7 +783,7 @@
 <a href=#783 id=783 data-nosnippet>783</a>
 <a href=#784 id=784 data-nosnippet>784</a><span class="doccomment">/// The transport compression method to use.
 <a href=#785 id=785 data-nosnippet>785</a></span><span class="attr">#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-<a href=#786 id=786 data-nosnippet>786</a>#[non_exhaustive]
+<a href=#786 id=786 data-nosnippet>786</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#787 id=787 data-nosnippet>787</a></span><span class="kw">pub enum </span>TransportCompression {
 <a href=#788 id=788 data-nosnippet>788</a>    <span class="doccomment">/// No transport compression. Payload compression will be used instead.
 <a href=#789 id=789 data-nosnippet>789</a>    </span><span class="prelude-val">None</span>,

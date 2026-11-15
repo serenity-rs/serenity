@@ -19,7 +19,7 @@
 <a href=#19 id=19 data-nosnippet>19</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#20 id=20 data-nosnippet>20</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#21 id=21 data-nosnippet>21</a>#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
-<a href=#22 id=22 data-nosnippet>22</a>#[non_exhaustive]
+<a href=#22 id=22 data-nosnippet>22</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#23 id=23 data-nosnippet>23</a></span><span class="kw">pub struct </span>Role {
 <a href=#24 id=24 data-nosnippet>24</a>    <span class="doccomment">/// The Id of the role. Can be used to calculate the role's creation date.
 <a href=#25 id=25 data-nosnippet>25</a>    </span><span class="kw">pub </span>id: RoleId,
@@ -74,7 +74,7 @@
 <a href=#74 id=74 data-nosnippet>74</a>/// the [Guild] has the `ENHANCED_ROLE_COLORS` feature.
 <a href=#75 id=75 data-nosnippet>75</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#76 id=76 data-nosnippet>76</a>#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Deserialize, Serialize)]
-<a href=#77 id=77 data-nosnippet>77</a>#[non_exhaustive]
+<a href=#77 id=77 data-nosnippet>77</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#78 id=78 data-nosnippet>78</a></span><span class="kw">pub struct </span>RoleColours {
 <a href=#79 id=79 data-nosnippet>79</a>    <span class="doccomment">/// the primary color for the role
 <a href=#80 id=80 data-nosnippet>80</a>    </span><span class="attr">#[serde(rename = <span class="string">"primary_color"</span>)]
@@ -203,7 +203,7 @@
 <a href=#203 id=203 data-nosnippet>203</a></span><span class="attr">#[bool_to_bitflags::bool_to_bitflags]
 <a href=#204 id=204 data-nosnippet>204</a>#[derive(Clone, Debug, Default, Eq, PartialEq, serde::Deserialize, serde::Serialize)]
 <a href=#205 id=205 data-nosnippet>205</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#206 id=206 data-nosnippet>206</a>#[non_exhaustive]
+<a href=#206 id=206 data-nosnippet>206</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#207 id=207 data-nosnippet>207</a></span><span class="kw">pub struct </span>RoleTags {
 <a href=#208 id=208 data-nosnippet>208</a>    <span class="doccomment">/// The Id of the bot the [`Role`] belongs to.
 <a href=#209 id=209 data-nosnippet>209</a>    </span><span class="kw">pub </span>bot_id: <span class="prelude-ty">Option</span>&lt;UserId&gt;,

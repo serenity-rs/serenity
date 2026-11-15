@@ -4,7 +4,7 @@
 <a href=#4 id=4 data-nosnippet>4</a><span class="kw">use </span>std::fmt;
 <a href=#5 id=5 data-nosnippet>5</a>
 <a href=#6 id=6 data-nosnippet>6</a><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-<a href=#7 id=7 data-nosnippet>7</a>#[non_exhaustive]
+<a href=#7 id=7 data-nosnippet>7</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#8 id=8 data-nosnippet>8</a></span><span class="kw">pub enum </span>Maximum {
 <a href=#9 id=9 data-nosnippet>9</a>    EmbedLength,
 <a href=#10 id=10 data-nosnippet>10</a>    EmbedCount,
@@ -77,7 +77,7 @@
 <a href=#77 id=77 data-nosnippet>77</a>}
 <a href=#78 id=78 data-nosnippet>78</a>
 <a href=#79 id=79 data-nosnippet>79</a><span class="attr">#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-<a href=#80 id=80 data-nosnippet>80</a>#[non_exhaustive]
+<a href=#80 id=80 data-nosnippet>80</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#81 id=81 data-nosnippet>81</a></span><span class="kw">pub enum </span>Minimum {
 <a href=#82 id=82 data-nosnippet>82</a>    WebhookName,
 <a href=#83 id=83 data-nosnippet>83</a>    BulkDeleteAmount,
@@ -121,7 +121,7 @@
 <a href=#121 id=121 data-nosnippet>121</a>/// [`Error::Model`]: crate::Error::Model
 <a href=#122 id=122 data-nosnippet>122</a>/// [`model`]: crate::model
 <a href=#123 id=123 data-nosnippet>123</a></span><span class="attr">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-<a href=#124 id=124 data-nosnippet>124</a>#[non_exhaustive]
+<a href=#124 id=124 data-nosnippet>124</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#125 id=125 data-nosnippet>125</a></span><span class="kw">pub enum </span>Error {
 <a href=#126 id=126 data-nosnippet>126</a>    <span class="doccomment">/// Indicates that the `minimum` has been missed by the `value`.
 <a href=#127 id=127 data-nosnippet>127</a>    </span>TooSmall { minimum: Minimum, value: usize },

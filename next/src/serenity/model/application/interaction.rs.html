@@ -21,7 +21,7 @@
 <a href=#21 id=21 data-nosnippet>21</a><span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object)
 <a href=#22 id=22 data-nosnippet>22</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#23 id=23 data-nosnippet>23</a>#[derive(Clone, Debug)]
-<a href=#24 id=24 data-nosnippet>24</a>#[non_exhaustive]
+<a href=#24 id=24 data-nosnippet>24</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#25 id=25 data-nosnippet>25</a></span><span class="kw">pub enum </span>Interaction {
 <a href=#26 id=26 data-nosnippet>26</a>    Ping(PingInteraction),
 <a href=#27 id=27 data-nosnippet>27</a>    Command(CommandInteraction),
@@ -299,7 +299,7 @@
 <a href=#299 id=299 data-nosnippet>299</a>    /// [Discord docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-type).
 <a href=#300 id=300 data-nosnippet>300</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#301 id=301 data-nosnippet>301</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#302 id=302 data-nosnippet>302</a>    #[non_exhaustive]
+<a href=#302 id=302 data-nosnippet>302</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#303 id=303 data-nosnippet>303</a>    </span><span class="kw">pub enum </span>InteractionType {
 <a href=#304 id=304 data-nosnippet>304</a>        Ping = <span class="number">1</span>,
 <a href=#305 id=305 data-nosnippet>305</a>        Command = <span class="number">2</span>,
@@ -315,7 +315,7 @@
 <a href=#315 id=315 data-nosnippet>315</a>/// [Discord Docs](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-authorizing-integration-owners-object)
 <a href=#316 id=316 data-nosnippet>316</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#317 id=317 data-nosnippet>317</a>#[derive(Clone, Debug)]
-<a href=#318 id=318 data-nosnippet>318</a>#[non_exhaustive]
+<a href=#318 id=318 data-nosnippet>318</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#319 id=319 data-nosnippet>319</a></span><span class="kw">pub enum </span>AuthorizingIntegrationOwner {
 <a href=#320 id=320 data-nosnippet>320</a>    <span class="doccomment">/// The [`Application`] was installed to a guild, containing the id if invoked in said guild.
 <a href=#321 id=321 data-nosnippet>321</a>    ///
@@ -415,7 +415,7 @@
 <a href=#415 id=415 data-nosnippet>415</a></span><span class="attr">#[cfg(not(feature = <span class="string">"unstable"</span>))]
 <a href=#416 id=416 data-nosnippet>416</a>#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#417 id=417 data-nosnippet>417</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#418 id=418 data-nosnippet>418</a>#[non_exhaustive]
+<a href=#418 id=418 data-nosnippet>418</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#419 id=419 data-nosnippet>419</a></span><span class="kw">pub struct </span>MessageInteraction {
 <a href=#420 id=420 data-nosnippet>420</a>    <span class="doccomment">/// The id of the interaction.
 <a href=#421 id=421 data-nosnippet>421</a>    </span><span class="kw">pub </span>id: InteractionId,
@@ -435,7 +435,7 @@
 <a href=#435 id=435 data-nosnippet>435</a>
 <a href=#436 id=436 data-nosnippet>436</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#437 id=437 data-nosnippet>437</a>#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-<a href=#438 id=438 data-nosnippet>438</a>#[non_exhaustive]
+<a href=#438 id=438 data-nosnippet>438</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#439 id=439 data-nosnippet>439</a></span><span class="kw">pub struct </span>MessageCommandInteractionMetadata {
 <a href=#440 id=440 data-nosnippet>440</a>    <span class="doccomment">/// The ID of the interaction
 <a href=#441 id=441 data-nosnippet>441</a>    </span><span class="kw">pub </span>id: InteractionId,
@@ -454,7 +454,7 @@
 <a href=#454 id=454 data-nosnippet>454</a>
 <a href=#455 id=455 data-nosnippet>455</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#456 id=456 data-nosnippet>456</a>#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-<a href=#457 id=457 data-nosnippet>457</a>#[non_exhaustive]
+<a href=#457 id=457 data-nosnippet>457</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#458 id=458 data-nosnippet>458</a></span><span class="kw">pub struct </span>MessageComponentInteractionMetadata {
 <a href=#459 id=459 data-nosnippet>459</a>    <span class="doccomment">/// The ID of the interaction
 <a href=#460 id=460 data-nosnippet>460</a>    </span><span class="kw">pub </span>id: InteractionId,
@@ -470,7 +470,7 @@
 <a href=#470 id=470 data-nosnippet>470</a>
 <a href=#471 id=471 data-nosnippet>471</a><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#472 id=472 data-nosnippet>472</a>#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
-<a href=#473 id=473 data-nosnippet>473</a>#[non_exhaustive]
+<a href=#473 id=473 data-nosnippet>473</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#474 id=474 data-nosnippet>474</a></span><span class="kw">pub struct </span>MessageModalSubmitInteractionMetadata {
 <a href=#475 id=475 data-nosnippet>475</a>    <span class="doccomment">/// The ID of the interaction
 <a href=#476 id=476 data-nosnippet>476</a>    </span><span class="kw">pub </span>id: InteractionId,
@@ -488,7 +488,7 @@
 <a href=#488 id=488 data-nosnippet>488</a>/// user IDs.
 <a href=#489 id=489 data-nosnippet>489</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#490 id=490 data-nosnippet>490</a>#[derive(Clone, Debug)]
-<a href=#491 id=491 data-nosnippet>491</a>#[non_exhaustive]
+<a href=#491 id=491 data-nosnippet>491</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#492 id=492 data-nosnippet>492</a></span><span class="kw">pub enum </span>MessageInteractionMetadata {
 <a href=#493 id=493 data-nosnippet>493</a>    Command(MessageCommandInteractionMetadata),
 <a href=#494 id=494 data-nosnippet>494</a>    Component(MessageComponentInteractionMetadata),

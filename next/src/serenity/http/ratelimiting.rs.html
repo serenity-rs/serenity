@@ -56,7 +56,7 @@
 <a href=#56 id=56 data-nosnippet>56</a><span class="doccomment">/// Passed to the [`Ratelimiter::set_ratelimit_callback`] callback. If using Client, that callback
 <a href=#57 id=57 data-nosnippet>57</a>/// is initialized to call the `EventHandler::ratelimit()` method.
 <a href=#58 id=58 data-nosnippet>58</a></span><span class="attr">#[derive(Clone, Debug, Serialize)]
-<a href=#59 id=59 data-nosnippet>59</a>#[non_exhaustive]
+<a href=#59 id=59 data-nosnippet>59</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#60 id=60 data-nosnippet>60</a></span><span class="kw">pub struct </span>RatelimitInfo {
 <a href=#61 id=61 data-nosnippet>61</a>    <span class="kw">pub </span>timeout: std::time::Duration,
 <a href=#62 id=62 data-nosnippet>62</a>    <span class="kw">pub </span>limit: i64,

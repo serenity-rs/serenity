@@ -147,7 +147,7 @@
 <a href=#147 id=147 data-nosnippet>147</a>/// [`http`]: crate::http
 <a href=#148 id=148 data-nosnippet>148</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#149 id=149 data-nosnippet>149</a>#[derive(Debug)]
-<a href=#150 id=150 data-nosnippet>150</a>#[non_exhaustive]
+<a href=#150 id=150 data-nosnippet>150</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#151 id=151 data-nosnippet>151</a></span><span class="kw">pub struct </span>Cache {
 <a href=#152 id=152 data-nosnippet>152</a>    <span class="comment">// Temp cache:
 <a href=#153 id=153 data-nosnippet>153</a>    // ---

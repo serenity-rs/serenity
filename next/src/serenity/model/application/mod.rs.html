@@ -27,7 +27,7 @@
 <a href=#27 id=27 data-nosnippet>27</a>/// Discord docs: [application field of Ready](https://docs.discord.com/developers/events/gateway-events#ready-ready-event-fields)
 <a href=#28 id=28 data-nosnippet>28</a></span><span class="attr">#[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
 <a href=#29 id=29 data-nosnippet>29</a>#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#30 id=30 data-nosnippet>30</a>#[non_exhaustive]
+<a href=#30 id=30 data-nosnippet>30</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#31 id=31 data-nosnippet>31</a></span><span class="kw">pub struct </span>PartialCurrentApplicationInfo {
 <a href=#32 id=32 data-nosnippet>32</a>    <span class="doccomment">/// The unique Id of the user.
 <a href=#33 id=33 data-nosnippet>33</a>    </span><span class="kw">pub </span>id: ApplicationId,
@@ -39,7 +39,7 @@
 <a href=#39 id=39 data-nosnippet>39</a>///
 <a href=#40 id=40 data-nosnippet>40</a>/// [Discord docs](https://docs.discord.com/developers/resources/application#application-object-application-structure).
 <a href=#41 id=41 data-nosnippet>41</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#42 id=42 data-nosnippet>42</a>#[non_exhaustive]
+<a href=#42 id=42 data-nosnippet>42</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#43 id=43 data-nosnippet>43</a></span><span class="kw">pub struct </span>CurrentApplicationInfo {
 <a href=#44 id=44 data-nosnippet>44</a>    <span class="kw">pub </span>id: ApplicationId,
 <a href=#45 id=45 data-nosnippet>45</a>    <span class="kw">pub </span>name: FixedString,
@@ -104,7 +104,7 @@
 <a href=#104 id=104 data-nosnippet>104</a>    /// [interaction contexts](https://docs.discord.com/developers/resources/application#application-object-application-integration-types).
 <a href=#105 id=105 data-nosnippet>105</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#106 id=106 data-nosnippet>106</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#107 id=107 data-nosnippet>107</a>    #[non_exhaustive]
+<a href=#107 id=107 data-nosnippet>107</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#108 id=108 data-nosnippet>108</a>    </span><span class="kw">pub enum </span>InstallationContext {
 <a href=#109 id=109 data-nosnippet>109</a>        Guild = <span class="number">0</span>,
 <a href=#110 id=110 data-nosnippet>110</a>        User = <span class="number">1</span>,
@@ -118,7 +118,7 @@
 <a href=#118 id=118 data-nosnippet>118</a>    /// [interaction contexts](https://docs.discord.com/developers/interactions/receiving-and-responding#interaction-object-interaction-context-types).
 <a href=#119 id=119 data-nosnippet>119</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
 <a href=#120 id=120 data-nosnippet>120</a>    #[cfg_attr(feature = <span class="string">"typesize"</span>, derive(typesize::derive::TypeSize))]
-<a href=#121 id=121 data-nosnippet>121</a>    #[non_exhaustive]
+<a href=#121 id=121 data-nosnippet>121</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#122 id=122 data-nosnippet>122</a>    </span><span class="kw">pub enum </span>InteractionContext {
 <a href=#123 id=123 data-nosnippet>123</a>        <span class="doccomment">/// Interaction can be used within servers
 <a href=#124 id=124 data-nosnippet>124</a>        </span>Guild = <span class="number">0</span>,
@@ -142,7 +142,7 @@
 <a href=#142 id=142 data-nosnippet>142</a>///
 <a href=#143 id=143 data-nosnippet>143</a>/// [Discord docs](https://docs.discord.com/developers/topics/teams#data-models-team-object).
 <a href=#144 id=144 data-nosnippet>144</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#145 id=145 data-nosnippet>145</a>#[non_exhaustive]
+<a href=#145 id=145 data-nosnippet>145</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#146 id=146 data-nosnippet>146</a></span><span class="kw">pub struct </span>Team {
 <a href=#147 id=147 data-nosnippet>147</a>    <span class="doccomment">/// The icon of the team.
 <a href=#148 id=148 data-nosnippet>148</a>    </span><span class="kw">pub </span>icon: <span class="prelude-ty">Option</span>&lt;ImageHash&gt;,
@@ -160,7 +160,7 @@
 <a href=#160 id=160 data-nosnippet>160</a>///
 <a href=#161 id=161 data-nosnippet>161</a>/// [Discord docs](https://docs.discord.com/developers/topics/teams#data-models-team-member-object).
 <a href=#162 id=162 data-nosnippet>162</a></span><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
-<a href=#163 id=163 data-nosnippet>163</a>#[non_exhaustive]
+<a href=#163 id=163 data-nosnippet>163</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#164 id=164 data-nosnippet>164</a></span><span class="kw">pub struct </span>TeamMember {
 <a href=#165 id=165 data-nosnippet>165</a>    <span class="doccomment">/// The member's membership state.
 <a href=#166 id=166 data-nosnippet>166</a>    </span><span class="kw">pub </span>membership_state: MembershipState,
@@ -175,7 +175,7 @@
 <a href=#175 id=175 data-nosnippet>175</a><span class="macro">enum_number!</span> {
 <a href=#176 id=176 data-nosnippet>176</a>    <span class="doccomment">/// [Discord docs](https://docs.discord.com/developers/topics/teams#data-models-membership-state-enum).
 <a href=#177 id=177 data-nosnippet>177</a>    </span><span class="attr">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Deserialize, Serialize)]
-<a href=#178 id=178 data-nosnippet>178</a>    #[non_exhaustive]
+<a href=#178 id=178 data-nosnippet>178</a>    #[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#179 id=179 data-nosnippet>179</a>    </span><span class="kw">pub enum </span>MembershipState {
 <a href=#180 id=180 data-nosnippet>180</a>        Invited = <span class="number">1</span>,
 <a href=#181 id=181 data-nosnippet>181</a>        Accepted = <span class="number">2</span>,
@@ -185,7 +185,7 @@
 <a href=#185 id=185 data-nosnippet>185</a>
 <a href=#186 id=186 data-nosnippet>186</a><span class="attr">#[derive(Clone, Debug, Deserialize, Serialize)]
 <a href=#187 id=187 data-nosnippet>187</a>#[serde(rename_all = <span class="string">"snake_case"</span>)]
-<a href=#188 id=188 data-nosnippet>188</a>#[non_exhaustive]
+<a href=#188 id=188 data-nosnippet>188</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#189 id=189 data-nosnippet>189</a></span><span class="kw">pub enum </span>TeamMemberRole {
 <a href=#190 id=190 data-nosnippet>190</a>    Admin,
 <a href=#191 id=191 data-nosnippet>191</a>    Developer,
@@ -265,7 +265,7 @@
 <a href=#265 id=265 data-nosnippet>265</a>///
 <a href=#266 id=266 data-nosnippet>266</a>/// [Discord docs](https://docs.discord.com/developers/resources/application#install-params-object-install-params-structure).
 <a href=#267 id=267 data-nosnippet>267</a></span><span class="attr">#[derive(Debug, Clone, Serialize, Deserialize)]
-<a href=#268 id=268 data-nosnippet>268</a>#[non_exhaustive]
+<a href=#268 id=268 data-nosnippet>268</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#269 id=269 data-nosnippet>269</a></span><span class="kw">pub struct </span>InstallParams {
 <a href=#270 id=270 data-nosnippet>270</a>    <span class="kw">pub </span>scopes: FixedArray&lt;Scope&gt;,
 <a href=#271 id=271 data-nosnippet>271</a>    <span class="kw">pub </span>permissions: Permissions,

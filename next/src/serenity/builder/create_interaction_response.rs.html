@@ -293,7 +293,7 @@
 <a href=#293 id=293 data-nosnippet>293</a>
 <a href=#294 id=294 data-nosnippet>294</a><span class="attr">#[derive(Clone, Debug, Serialize)]
 <a href=#295 id=295 data-nosnippet>295</a>#[serde(untagged)]
-<a href=#296 id=296 data-nosnippet>296</a>#[non_exhaustive]
+<a href=#296 id=296 data-nosnippet>296</a>#[cfg_attr(not(feature = <span class="string">"unstable_exhaustive_types"</span>), non_exhaustive)]
 <a href=#297 id=297 data-nosnippet>297</a>#[must_use]
 <a href=#298 id=298 data-nosnippet>298</a></span><span class="kw">pub enum </span>AutocompleteValue&lt;<span class="lifetime">'a</span>&gt; {
 <a href=#299 id=299 data-nosnippet>299</a>    String(Cow&lt;<span class="lifetime">'a</span>, str&gt;),
