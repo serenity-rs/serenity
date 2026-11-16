@@ -104,7 +104,7 @@ async fn log_system_load(ctx: &Context) {
 }
 
 fn set_activity_to_current_time(ctx: &Context) {
-    let current_time = Timestamp::now().to_zoned(TimeZone::UTC);
+    let current_time = Timestamp::now().to_zoned_datetime(TimeZone::UTC);
     let formatted_time = rfc2822::to_string(&current_time).unwrap();
 
     ctx.set_activity(Some(ActivityData::playing(formatted_time)));
