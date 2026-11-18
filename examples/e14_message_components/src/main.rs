@@ -148,7 +148,7 @@ impl EventHandler for Handler {
                 // Delete the orig message or there will be dangling components (components that
                 // still exist, but no collector is running so any user who presses
                 // them sees an error)
-                m.delete(&ctx.http, None).await.unwrap()
+                m.delete(&ctx.http).await.unwrap()
             },
             FullEvent::Ready {
                 data_about_bot, ..

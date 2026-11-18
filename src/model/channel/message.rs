@@ -298,8 +298,8 @@ impl Message {
     /// Returns [`Error::Http`] if the current user lacks permission or if invalid data is given.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete(&self, http: &Http, reason: Option<&str>) -> Result<()> {
-        self.channel_id.delete_message(http, self.id, reason).await
+    pub async fn delete(&self, http: &Http) -> Result<()> {
+        self.channel_id.delete_message(http, self.id).await
     }
 
     /// Deletes all of the [`Reaction`]s associated with the message.

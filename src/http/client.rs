@@ -1080,12 +1080,11 @@ impl Http {
         &self,
         channel_id: GenericChannelId,
         message_id: MessageId,
-        audit_log_reason: Option<&str>,
     ) -> Result<()> {
         self.wind(Request {
             body: None,
             multipart: None,
-            headers: audit_log_reason.map(reason_into_header),
+            headers: None,
             method: LightMethod::Delete,
             route: Route::ChannelMessage {
                 channel_id,
