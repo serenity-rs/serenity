@@ -1,11 +1,12 @@
 use std::env::consts;
-use std::io::Read;
+use std::io::{self, ErrorKind, Read};
 use std::time::{Duration, SystemTime};
 
 use flate2::read::ZlibDecoder;
 #[cfg(feature = "transport_compression_zlib")]
 use flate2::write::ZlibDecoder as ZlibWriter;
 use futures::{SinkExt, StreamExt};
+use percent_encoding::percent_decode_str;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message;
@@ -14,7 +15,12 @@ use tokio_tungstenite::tungstenite::protocol::{
     CloseFrame as TungsteniteCloseFrame,
     WebSocketConfig,
 };
-use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async_with_config};
+use tokio_tungstenite::{
+    MaybeTlsStream,
+    WebSocketStream,
+    client_async_tls_with_config,
+    connect_async_with_config,
+};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, trace, warn};
@@ -226,7 +232,11 @@ fn transport_err_to_lib(err: TungsteniteError) -> Error {
 }
 
 impl WsClient {
-    pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
+    pub(crate) async fn connect(
+        url: Url,
+        proxy: Option<&Url>,
+        compression: TransportCompression,
+    ) -> Result<Self> {
         let config = {
             let mut config = WebSocketConfig::default();
             config.max_message_size = None;
@@ -235,14 +245,55 @@ impl WsClient {
             config
         };
 
-        let (stream, _) = connect_async_with_config(url, Some(config), false)
-            .await
-            .map_err(transport_err_to_lib)?;
+        let (stream, _) = match proxy {
+            Some(proxy) => {
+                let tunnel = Self::connect_through_proxy(&url, proxy).await?;
+                client_async_tls_with_config(url, tunnel, Some(config), None).await
+            },
+            None => connect_async_with_config(url, Some(config), false).await,
+        }
+        .map_err(transport_err_to_lib)?;
 
         Ok(Self {
             stream,
             compression: compression.into(),
         })
+    }
+
+    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<TcpStream> {
+        if proxy.scheme() != "http" {
+            let why = io::Error::new(ErrorKind::Unsupported, "only http proxies are supported");
+            return Err(Error::Io(why));
+        }
+
+        let (Some(target_host), Some(target_port), Some(proxy_host), Some(proxy_port)) = (
+            target.host_str(),
+            target.port_or_known_default(),
+            proxy.host_str(),
+            proxy.port_or_known_default(),
+        ) else {
+            return Err(Error::Gateway(GatewayError::BuildingUrl));
+        };
+
+        let mut stream = TcpStream::connect(format!("{proxy_host}:{proxy_port}")).await?;
+
+        let username = percent_decode_str(proxy.username()).decode_utf8_lossy();
+        let handshake = if username.is_empty() {
+            async_http_proxy::http_connect_tokio(&mut stream, target_host, target_port).await
+        } else {
+            let password = percent_decode_str(proxy.password().unwrap_or_default());
+            async_http_proxy::http_connect_tokio_with_basic_auth(
+                &mut stream,
+                target_host,
+                target_port,
+                &username,
+                &password.decode_utf8_lossy(),
+            )
+            .await
+        };
+        handshake.map_err(io::Error::other)?;
+
+        Ok(stream)
     }
 
     pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
