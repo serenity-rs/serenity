@@ -1407,8 +1407,8 @@ impl GuildCreateGuild {
     /// Whether this [`GuildCreateGuild`] is unavailable due to an outage.
     ///
     /// **Note:** Both [`Guild`] and [`UnavailableGuild`] will be marked as unavailable when
-    /// offline due to an outage. When an [`UnavailableGuild`] is ___not___ marked as unavailable,
-    /// this indicates that the current user has been removed from that guild.
+    /// offline due to an outage. It is also possible for an [`UnavailableGuild`] to ___not___ be
+    /// marked as unavailable, e.g., when the current user has been removed from that guild.
     #[must_use]
     pub fn unavailable(&self) -> bool {
         match self {
