@@ -229,6 +229,8 @@ id_u64! {
     RuleId: "An identifier for an auto moderation rule";
     ForumTagId: "An identifier for a forum tag.";
     EntitlementId: "An identifier for an entitlement.";
+    PromptId: "An identifier for an onboarding prompt.";
+    PromptOptionId: "An identifier for an onboarding prompt option.";
 }
 
 /// An identifier for a Shard.
