@@ -504,13 +504,8 @@ impl GenericChannelId {
     /// Returns [`Error::Http`] if the current user lacks permission to delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
-    pub async fn delete_message(
-        self,
-        http: &Http,
-        message_id: MessageId,
-        reason: Option<&str>,
-    ) -> Result<()> {
-        http.delete_message(self, message_id, reason).await
+    pub async fn delete_message(self, http: &Http, message_id: MessageId) -> Result<()> {
+        http.delete_message(self, message_id).await
     }
 
     /// Deletes messages by Ids from the given vector in the given channel.
@@ -547,7 +542,7 @@ impl GenericChannelId {
         Maximum::BulkDeleteAmount.check_overflow(message_ids.len())?;
 
         if message_ids.len() == 1 {
-            self.delete_message(http, message_ids[0], reason).await
+            self.delete_message(http, message_ids[0]).await
         } else {
             let req = DeleteMessages {
                 messages: message_ids,
