@@ -1,7 +1,6 @@
 use nonmax::{NonMaxU8, NonMaxU32};
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
-use serde_cow::CowStr;
 
 use crate::model::prelude::*;
 use crate::model::utils::is_false;
@@ -13,14 +12,12 @@ where
     use base64::Engine as _;
     use serde::de::Error;
 
-    let base64 = <Option<CowStr<'de>>>::deserialize(deserializer)?;
-    let bytes = match base64 {
-        Some(CowStr(base64)) => {
-            Some(base64::prelude::BASE64_STANDARD.decode(&*base64).map_err(D::Error::custom)?)
-        },
-        None => None,
-    };
-    Ok(bytes)
+    <Option<CowStr<'de>>>::deserialize(deserializer).and_then(|bytes| {
+        bytes
+            .map(|base64| base64::prelude::BASE64_STANDARD.decode(&*base64.0))
+            .transpose()
+            .map_err(D::Error::custom)
+    })
 }
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.

@@ -349,7 +349,7 @@ impl<'de> serde::Deserialize<'de> for AuthorizingIntegrationOwners {
                 A: serde::de::MapAccess<'de>,
             {
                 let mut out = Vec::new();
-                while let Some(key_str) = map.next_key::<serde_cow::CowStr<'_>>()? {
+                while let Some(key_str) = map.next_key::<CowStr<'_>>()? {
                     let key_int = key_str.0.parse::<u8>().map_err(serde::de::Error::custom)?;
                     let value = match InstallationContext(key_int) {
                         InstallationContext::Guild => {
