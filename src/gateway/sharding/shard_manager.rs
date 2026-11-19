@@ -12,6 +12,7 @@ use tokio::time::{sleep, timeout};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, info, warn};
+use url::Url;
 
 use super::{
     Shard,
@@ -74,6 +75,8 @@ pub struct ShardManager {
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// A copy of the URL to use to connect to the gateway.
     pub ws_url: Arc<str>,
+    /// The HTTP proxy to tunnel gateway connections through.
+    pub ws_proxy: Option<Arc<Url>>,
     /// The compression method to use for the WebSocket connection.
     pub compression: TransportCompression,
     /// The total amount of shards to start.
@@ -109,6 +112,7 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
+            ws_proxy: opt.ws_proxy,
             compression: opt.compression,
             shard_total: opt.shard_total,
             #[cfg(feature = "cache")]
@@ -237,6 +241,7 @@ impl ShardManager {
         };
         let mut shard = Shard::new(
             Arc::clone(&self.ws_url),
+            self.ws_proxy.clone(),
             self.token.clone(),
             shard_info,
             self.intents,
@@ -328,6 +333,7 @@ pub struct ShardManagerOptions {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager>>,
     pub ws_url: Arc<str>,
+    pub ws_proxy: Option<Arc<Url>>,
     pub compression: TransportCompression,
     pub shard_total: NonZeroU16,
     pub max_concurrency: NonZeroU16,

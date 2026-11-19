@@ -1,11 +1,18 @@
 use std::env::consts;
-use std::io::Read;
+use std::io::{self, ErrorKind, Read};
 use std::time::{Duration, SystemTime};
 
+use base64::Engine as _;
+use base64::prelude::BASE64_STANDARD;
 use flate2::read::ZlibDecoder;
 #[cfg(feature = "transport_compression_zlib")]
 use flate2::write::ZlibDecoder as ZlibWriter;
 use futures::{SinkExt, StreamExt};
+use hyper::Request;
+use hyper::client::conn::http1;
+use hyper::header::{HOST, PROXY_AUTHORIZATION};
+use hyper_util::rt::TokioIo;
+use percent_encoding::percent_decode_str;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message;
@@ -14,7 +21,12 @@ use tokio_tungstenite::tungstenite::protocol::{
     CloseFrame as TungsteniteCloseFrame,
     WebSocketConfig,
 };
-use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async_with_config};
+use tokio_tungstenite::{
+    MaybeTlsStream,
+    WebSocketStream,
+    client_async_tls_with_config,
+    connect_async_with_config,
+};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, trace, warn};
@@ -226,7 +238,11 @@ fn transport_err_to_lib(err: TungsteniteError) -> Error {
 }
 
 impl WsClient {
-    pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
+    pub(crate) async fn connect(
+        url: Url,
+        proxy: Option<&Url>,
+        compression: TransportCompression,
+    ) -> Result<Self> {
         let config = {
             let mut config = WebSocketConfig::default();
             config.max_message_size = None;
@@ -235,14 +251,73 @@ impl WsClient {
             config
         };
 
-        let (stream, _) = connect_async_with_config(url, Some(config), false)
-            .await
-            .map_err(transport_err_to_lib)?;
+        let (stream, _) = match proxy {
+            Some(proxy) => {
+                let tunnel = Self::connect_through_proxy(&url, proxy).await?;
+                client_async_tls_with_config(url, tunnel, Some(config), None).await
+            },
+            None => connect_async_with_config(url, Some(config), false).await,
+        }
+        .map_err(transport_err_to_lib)?;
 
         Ok(Self {
             stream,
             compression: compression.into(),
         })
+    }
+
+    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<TcpStream> {
+        if proxy.scheme() != "http" {
+            let why = io::Error::new(ErrorKind::Unsupported, "only http proxies are supported");
+            return Err(Error::Io(why));
+        }
+
+        let (Some(target_host), Some(target_port), Some(proxy_host), Some(proxy_port)) = (
+            target.host_str(),
+            target.port_or_known_default(),
+            proxy.host_str(),
+            proxy.port_or_known_default(),
+        ) else {
+            return Err(Error::Gateway(GatewayError::BuildingUrl));
+        };
+
+        let authority = format!("{target_host}:{target_port}");
+        let mut request = Request::connect(&authority).header(HOST, &authority);
+
+        let username = percent_decode_str(proxy.username()).decode_utf8_lossy();
+        if !username.is_empty() {
+            let password = percent_decode_str(proxy.password().unwrap_or_default());
+            let credentials = format!("{username}:{}", password.decode_utf8_lossy());
+            let basic_auth = format!("Basic {}", BASE64_STANDARD.encode(credentials));
+            request = request.header(PROXY_AUTHORIZATION, basic_auth);
+        }
+        let request = request.body(String::new()).map_err(io::Error::other)?;
+
+        let stream = TcpStream::connect(format!("{proxy_host}:{proxy_port}")).await?;
+        let (mut sender, conn) =
+            http1::handshake(TokioIo::new(stream)).await.map_err(io::Error::other)?;
+
+        let response = sender.send_request(request);
+        // Without a live sender the connection finishes once the response is read
+        drop(sender);
+        let (response, conn) = tokio::join!(response, conn.with_upgrades());
+        let response = response.map_err(io::Error::other)?;
+        conn.map_err(io::Error::other)?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            return Err(Error::Io(io::Error::other(format!("proxy refused to tunnel: {status}"))));
+        }
+
+        let upgraded = hyper::upgrade::on(response).await.map_err(io::Error::other)?;
+        let parts = upgraded
+            .downcast::<TokioIo<TcpStream>>()
+            .map_err(|_| io::Error::other("unexpected stream type after proxy upgrade"))?;
+        if !parts.read_buf.is_empty() {
+            return Err(Error::Io(io::Error::other("proxy sent data before the tunnel was used")));
+        }
+
+        Ok(parts.io.into_inner())
     }
 
     pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
