@@ -1,24 +1,27 @@
 ci:
-  - .github/**/*
+- changed-files:
+  - any-glob-to-any-file: .github/**
 examples:
-  - examples/**/*
+- changed-files:
+  - any-glob-to-any-file: examples/**
 builder: 
-  - src/builder/**/*
+- changed-files:
+  - any-glob-to-any-file: src/builder/**
 cache:
-  - src/cache/**/*
-client:
-  - src/client/**/*
+- changed-files:
+  - any-glob-to-any-file: src/cache/**
 collector:
-  - src/collector/**/*
-framework:
-  - src/framework/**/*
+- changed-files:
+  - any-glob-to-any-file: src/collector/**
 gateway:
-  - src/gateway/**/*
+- changed-files:
+  - any-glob-to-any-file: src/gateway/**
 http:
-  - src/http/**/*
+- changed-files:
+  - any-glob-to-any-file: src/http/**
 model:
-  - src/model/**/*
+- changed-files:
+  - any-glob-to-any-file: src/model/**
 utils:
-  - src/utils/**/*
-voice:
-  - voice-model/**/*
+- changed-files:
+  - any-glob-to-any-file: src/utils/**
