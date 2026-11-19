@@ -497,13 +497,13 @@ mod tests {
     fn test_parse_header_errors() {
         let headers = headers();
 
-        assert!(matches!(
+        assert_matches!(
             parse_header::<i64>(&headers, "x-bad-num").unwrap_err(),
             Error::Http(HttpError::RateLimitI64F64)
-        ));
-        assert!(matches!(
+        );
+        assert_matches!(
             parse_header::<i64>(&headers, "x-bad-unicode").unwrap_err(),
             Error::Http(HttpError::RateLimitUtf8)
-        ));
+        );
     }
 }

@@ -967,6 +967,8 @@ fn is_guild_new(cache: &Cache, guild_id: GuildId) -> bool {
 
 #[cfg(all(test, feature = "cache"))]
 mod tests {
+    use std::assert_matches;
+
     use small_fixed_array::{FixedArray, FixedString};
 
     use super::is_guild_new;
@@ -1092,10 +1094,10 @@ mod tests {
 
         let full_event = FullEvent::from_event(event, &mut extra_event, &cache);
 
-        assert!(matches!(full_event, FullEvent::GuildCreate {
+        assert_matches!(full_event, FullEvent::GuildCreate {
             is_new: Some(false),
             ..
-        }));
+        });
 
         assert_eq!(cache.unavailable_guilds().len(), 0);
 
@@ -1161,10 +1163,10 @@ mod tests {
 
         let full_event = FullEvent::from_event(event, &mut extra_event, &cache);
 
-        assert!(matches!(full_event, FullEvent::GuildCreate {
+        assert_matches!(full_event, FullEvent::GuildCreate {
             is_new: Some(true),
             ..
-        }));
+        });
 
         assert_eq!(cache.unavailable_guilds().len(), 0);
 

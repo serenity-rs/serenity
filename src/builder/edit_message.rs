@@ -222,7 +222,7 @@ impl<'a> EditMessage<'a> {
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [`From<Embed>`]: CreateEmbed#impl-From<Embed>
     #[cfg(feature = "http")]
-    #[cfg_attr(not(feature = "cache"), allow(unused_variables))]
+    #[cfg_attr(not(feature = "cache"), expect(unused_variables))]
     pub async fn execute(
         mut self,
         cache_http: impl CacheHttp,
