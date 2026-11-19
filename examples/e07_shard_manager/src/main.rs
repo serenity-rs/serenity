@@ -1,24 +1,24 @@
-//! This is an example showing how to interact with the client's `ShardManager`, which is a struct
-//! that can be used to interact with shards. This allows an easy method of retrieving shards'
-//! current status, restarting them, or shutting them down.
+//! This example shows how to interact with the client's `ShardManager`, which is a struct that can
+//! be used to interact with shards. This allows an easy method of retrieving shards' current
+//! status, restarting them, or shutting them down.
 //!
 //! In this example, we run two shards; this means that there will be two WebSocket connections to
-//! Discord, and each will receive events for _approximately_ 1/2 of all guilds that the bot is on.
+//! Discord, and each will receive events for _approximately_ 1/2 of all guilds that the bot is in.
 //!
 //! This isn't particularly useful for small bots, but is useful for large bots that may need to
 //! split load on separate VPSs or dedicated servers. Additionally, Discord requires that there be
-//! at least one shard for every 2500 guilds that a bot is on.
+//! at least one shard for every 2500 guilds that a bot is in.
 //!
 //! For the purposes of this example, we'll print the current statuses of the two shards to the
-//! terminal every 30 seconds. This includes the ID of the shard, the current connection stage,
-//! (e.g. "Connecting" or "Connected"), and the approximate WebSocket latency (time between when a
+//! terminal every 30 seconds. This includes the ID of the shard, the current connection stage
+//! (e.g., "Connecting" or "Connected"), and the approximate WebSocket latency (time between when a
 //! heartbeat is sent to Discord and when a heartbeat acknowledgement is received).
 //!
 //! # Notes
 //!
 //! Note that it may take a minute or more for a latency to be recorded or to update, depending on
 //! how often Discord tells the client to send a heartbeat.
-#![expect(clippy::collapsible_if)]
+#![expect(clippy::single_match)]
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -32,26 +32,26 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn dispatch(&self, _: &Context, event: &FullEvent) {
-        if let FullEvent::Ready {
-            data_about_bot, ..
-        } = event
-        {
-            if let Some(shard) = data_about_bot.shard {
-                println!(
-                    "{} is connected on shard {}/{}!",
-                    data_about_bot.user.name, shard.id, shard.total
-                );
-            }
+        match event {
+            FullEvent::Ready {
+                data_about_bot, ..
+            } => {
+                if let Some(shard) = data_about_bot.shard {
+                    println!(
+                        "{} is connected on shard {}/{}!",
+                        data_about_bot.user.name, shard.id, shard.total
+                    );
+                }
+            },
+            _ => {},
         }
     }
 }
 
 #[tokio::main]
 async fn main() {
-    // Configure the client with your Discord bot token in the environment.
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
-
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
@@ -70,13 +70,12 @@ async fn main() {
             for entry in runners.iter() {
                 let (id, runner) = entry.pair();
                 let info = runner.info.read();
-                println!("Shard ID {} is {} with a latency of {:?}", id, info.stage, info.latency,);
+                println!("Shard ID {id} is {} with a latency of {:?}", info.stage, info.latency,);
             }
         }
     });
 
-    // Start two shards. Note that there is an ~5 second ratelimit period between when one shard
-    // can start after another.
+    // Start two shards. Note that there is an ~5 second ratelimit period between shard starts.
     if let Err(why) = client.start_shards(2).await {
         println!("Client error: {why:?}");
     }

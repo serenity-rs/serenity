@@ -1,5 +1,5 @@
 [package]
-name = "e03_struct_utilities"
+name = "e03_model_methods"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition.workspace = true

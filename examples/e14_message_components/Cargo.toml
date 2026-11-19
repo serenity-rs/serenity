@@ -7,4 +7,3 @@ edition.workspace = true
 [dependencies]
 serenity = { path = "../../", default-features = false, features = ["gateway", "model", "collector", "rustls_backend"] }
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
-dotenv = { version = "0.15.0" }

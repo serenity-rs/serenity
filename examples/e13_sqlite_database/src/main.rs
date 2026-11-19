@@ -1,20 +1,23 @@
-// It is recommended that you read the README file, it is very important to this example.
-// This example will help us to use a sqlite database with our bot.
+//! This example will help us use an SQLite database with our bot.
+//!
+//! It is recommended that you read the README file first, as it contains important information
+//! about this example.
 use std::fmt::Write as _;
 use std::sync::Arc;
 
 use serenity::async_trait;
+use serenity::model::event::FullEvent;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
-struct Bot {
+// Like in the previous parallel loops example, we place data we will want to access from the
+// event handler in our Handler struct. In this example, it is our database connection pool.
+struct Handler {
     database: sqlx::SqlitePool,
 }
 
-use serenity::model::event::FullEvent;
-
 #[async_trait]
-impl EventHandler for Bot {
+impl EventHandler for Handler {
     async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
         match event {
             FullEvent::Message {
@@ -24,36 +27,40 @@ impl EventHandler for Bot {
 
                 if let Some(task_description) = new_message.content.strip_prefix("~todo add") {
                     let task_description = task_description.trim();
-                    // That's how we are going to use a sqlite command.
-                    // We are inserting into the todo table, our task_description in task column and
-                    // our user_id in user_Id column.
+                    // We perform our SQLite queries using the `sqlx::query!` macro.
+                    //
+                    // Here, we are inserting `task_description` into the `task` column and
+                    // `user_id` into the `user_id` column of the `todo` table.
                     sqlx::query!(
                         "INSERT INTO todo (task, user_id) VALUES (?, ?)",
                         task_description,
                         user_id,
                     )
-                    .execute(&self.database) // < Where the command will be executed
+                    .execute(&self.database) // The query is executed here.
                     .await
                     .unwrap();
 
                     let response =
-                        format!("Successfully added `{task_description}` to your todo list");
+                        format!("Successfully added `{task_description}` to your todo list.");
                     new_message.channel_id.say(&ctx.http, response).await.unwrap();
                 } else if let Some(task_index) = new_message.content.strip_prefix("~todo remove") {
                     let task_index = task_index.trim().parse::<i64>().unwrap() - 1;
 
-                    // "SELECT" will return the rowid of the todo rows where the user_Id column =
-                    // user_id.
+                    // This SELECT query will select the `rowid` and `task` of the rows in the
+                    // `todo` table where the value in the `user_id` column equals `user_id`, order
+                    // the rows by `rowid`, skip the number of rows equal to `task_index`, and then
+                    // return the next row.
                     let entry = sqlx::query!(
                         "SELECT rowid, task FROM todo WHERE user_id = ? ORDER BY rowid LIMIT 1 OFFSET ?",
                         user_id,
                         task_index,
                     )
-                    .fetch_one(&self.database) // < Just one data will be sent to entry
+                    .fetch_one(&self.database) // Only one row will be fetched.
                     .await
                     .unwrap();
 
-                    // Every todo row with rowid column = entry.rowid will be deleted.
+                    // Delete every row in `todo` with a `rowid` that matches `entry.rowid`. This
+                    // will only be one (the removed task) since `rowid` is a unique identifier.
                     sqlx::query!("DELETE FROM todo WHERE rowid = ?", entry.rowid)
                         .execute(&self.database)
                         .await
@@ -62,13 +69,14 @@ impl EventHandler for Bot {
                     let response = format!("Successfully completed `{}`!", entry.task);
                     new_message.channel_id.say(&ctx.http, response).await.unwrap();
                 } else if new_message.content.trim() == "~todo list" {
-                    // "SELECT" will return the task of all rows where user_Id column = user_id in
-                    // todo.
+                    // This SELECT query will select the `task` of the rows in the `todo` table
+                    // where the value in the `user_id` column equals `user_id`, and then order the
+                    // results by `rowid`.
                     let todos = sqlx::query!(
                         "SELECT task FROM todo WHERE user_id = ? ORDER BY rowid",
                         user_id
                     )
-                    .fetch_all(&self.database) // < All matched data will be sent to todos
+                    .fetch_all(&self.database) // All selected rows will be returned.
                     .await
                     .unwrap();
 
@@ -92,11 +100,11 @@ impl EventHandler for Bot {
 
 #[tokio::main]
 async fn main() {
-    // Configure the client with your Discord bot token in the environment.
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
-    // Initiate a connection to the database file, creating the file if required.
+    // Create a connection pool and immediately open a connection to the database, creating the
+    // database file if necessary.
     let database = sqlx::sqlite::SqlitePoolOptions::new()
         .max_connections(5)
         .connect_with(
@@ -110,7 +118,9 @@ async fn main() {
     // Run migrations, which updates the database's schema to the latest version.
     sqlx::migrate!("./migrations").run(&database).await.expect("Couldn't run database migrations");
 
-    let bot = Arc::new(Bot {
+    // Insert the connection pool into the event handler so that our bot can access the database
+    // when events are dispatched.
+    let handler = Arc::new(Handler {
         database,
     });
 
@@ -118,6 +128,9 @@ async fn main() {
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client =
-        Client::builder(token, intents).event_handler(bot).await.expect("Err creating client");
-    client.start().await.unwrap();
+        Client::builder(token, intents).event_handler(handler).await.expect("Err creating client");
+
+    if let Err(why) = client.start().await {
+        println!("Client error: {why:?}");
+    }
 }

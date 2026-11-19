@@ -431,14 +431,14 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    if let Some(arg) = std::env::args().nth(1) {
-        if arg == "--print-sizes" {
-            model_type_sizes::print_ranking();
-            return;
-        }
+    if let Some(arg) = std::env::args().nth(1)
+        && arg == "--print-sizes"
+    {
+        model_type_sizes::print_ranking();
+        return;
     }
 
-    env_logger::init();
+    tracing_subscriber::fmt::init();
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
     let intents = GatewayIntents::non_privileged() | GatewayIntents::MESSAGE_CONTENT;
