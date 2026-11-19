@@ -1,5 +1,4 @@
 use std::borrow::Cow;
-use std::collections::HashMap;
 
 use crate::builder::CreateCommandOption;
 #[cfg(feature = "http")]
@@ -17,10 +16,10 @@ use crate::model::prelude::*;
 #[must_use]
 pub struct EditCommand<'a> {
     name: Option<Cow<'a, str>>,
-    name_localizations: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    name_localizations: UserHashMap<Cow<'a, str>, Cow<'a, str>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     description: Option<Cow<'a, str>>,
-    description_localizations: HashMap<Cow<'a, str>, Cow<'a, str>>,
+    description_localizations: UserHashMap<Cow<'a, str>, Cow<'a, str>>,
     options: Cow<'a, [CreateCommandOption<'a>]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     default_member_permissions: Option<Permissions>,

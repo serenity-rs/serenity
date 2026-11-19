@@ -1,6 +1,4 @@
 use std::borrow::Cow;
-#[cfg(all(feature = "http", feature = "cache"))]
-use std::collections::HashMap;
 use std::ops::Not;
 #[cfg(feature = "http")]
 use std::time::Duration;
@@ -448,7 +446,7 @@ impl<'a> MessageQuery<'a> {
             && should_cache == ShouldCache::Yes
         {
             let by_channel: HashMap<GenericChannelId, Vec<Message>> =
-                results.messages.iter().cloned().fold(HashMap::new(), |mut map, message| {
+                results.messages.iter().cloned().fold(HashMap::default(), |mut map, message| {
                     map.entry(message.channel_id).or_default().push(message);
                     map
                 });

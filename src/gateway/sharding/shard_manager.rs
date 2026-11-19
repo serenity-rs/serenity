@@ -4,7 +4,6 @@ use std::sync::Arc;
 use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 
-use dashmap::DashMap;
 use futures::StreamExt;
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use parking_lot::RwLock;
@@ -32,6 +31,7 @@ use crate::gateway::client::dispatch::EventDispatcher;
 use crate::gateway::client::{Context, EventHandler, RawEventHandler};
 use crate::gateway::{GatewayError, PresenceData, TransportCompression};
 use crate::http::Http;
+use crate::internal::hasher::DashMap;
 use crate::internal::prelude::*;
 use crate::internal::tokio::spawn_named;
 use crate::model::gateway::{ConnectionStage, GatewayCapabilities, GatewayIntents};
@@ -105,7 +105,7 @@ impl ShardManager {
             framework: opt.framework,
             last_start: None,
             queue: ShardQueue::new(opt.max_concurrency),
-            runners: Arc::new(DashMap::new()),
+            runners: Arc::new(DashMap::default()),
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             ws_url: opt.ws_url,
