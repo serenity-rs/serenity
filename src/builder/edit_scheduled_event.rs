@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use super::{CreateScheduledEventMetadata, DataUri};
+use super::{CreateRecurrenceRule, CreateScheduledEventMetadata, DataUri};
 #[cfg(feature = "http")]
 use crate::http::Http;
 use crate::model::prelude::*;
@@ -29,6 +29,8 @@ pub struct EditScheduledEvent<'a> {
     status: Option<ScheduledEventStatus>,
     #[serde(skip_serializing_if = "Option::is_none")]
     image: Option<DataUri<'a>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    recurrence_rule: Option<CreateRecurrenceRule<'a>>,
 
     #[serde(skip)]
     audit_log_reason: Option<Cow<'a, str>>,
@@ -155,6 +157,12 @@ impl<'a> EditScheduledEvent<'a> {
         self
     }
 
+    /// Sets the recurrence rule for the scheduled event.
+    pub fn recurrence_rule(mut self, rule: CreateRecurrenceRule<'a>) -> Self {
+        self.recurrence_rule = Some(rule);
+        self
+    }
+
     /// Sets the request's audit log reason.
     pub fn audit_log_reason(mut self, reason: impl Into<Cow<'a, str>>) -> Self {
         self.audit_log_reason = Some(reason.into());
@@ -173,6 +181,7 @@ impl<'a> EditScheduledEvent<'a> {
             entity_type,
             status,
             image,
+            recurrence_rule,
             audit_log_reason,
         } = self;
         EditScheduledEvent {
@@ -187,6 +196,7 @@ impl<'a> EditScheduledEvent<'a> {
             entity_type,
             status,
             image: image.map(DataUri::into_owned),
+            recurrence_rule: recurrence_rule.map(CreateRecurrenceRule::into_owned),
             audit_log_reason: audit_log_reason.map(|r| r.into_owned().into()),
         }
     }
