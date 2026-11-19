@@ -38,7 +38,6 @@ tokio = { version = "1.48.0", features = ["macros", "rt", "sync", "time", "io-ut
 futures = { version = "0.3.32", default-features = false, features = ["std"] }
 base64 = { version = "0.23.1" }
 arrayvec = { version = "0.7.6", features = ["serde"] }
-serde_cow = { version = "0.1.2" }
 small-fixed-array = { version = "0.4.10", features = ["serde"] }
 bool_to_bitflags = { version = "0.2.0" }
 nonmax = { version = "0.5.5", features = ["serde"] }

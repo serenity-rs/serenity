@@ -2,7 +2,6 @@ use std::fmt;
 
 use arrayvec::ArrayVec;
 use serde::de::Error as DeError;
-use serde_cow::CowStr;
 use small_fixed_array::FixedString;
 
 use super::prelude::*;
@@ -162,7 +161,6 @@ pub fn deserialize_buttons<'de, D: Deserializer<'de>>(
 /// Used with `#[serde(with = "comma_separated_string")]`
 pub mod comma_separated_string {
     use serde::{Deserialize, Deserializer, Serializer};
-    use serde_cow::CowStr;
 
     use crate::internal::prelude::*;
 

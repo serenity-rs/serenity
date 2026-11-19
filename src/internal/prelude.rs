@@ -9,7 +9,7 @@ pub use serde_json::Value;
 pub use small_fixed_array::{FixedArray, FixedString, TruncatingInto};
 
 pub use super::hasher::ExtractMap;
-pub use super::utils::join_to_string;
+pub use super::utils::{CowStr, join_to_string};
 #[cfg(feature = "http")]
 pub use crate::error::Error;
 pub use crate::error::Result;
