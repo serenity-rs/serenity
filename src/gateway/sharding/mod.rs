@@ -140,7 +140,7 @@ impl Shard {
     /// };
     ///
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = Arc::from(http.get_gateway().await?.url);
+    /// let gateway = Arc::new(http.get_gateway().await?.url.parse()?);
     /// let shard = Shard::new(
     ///     gateway,
     ///     token,
