@@ -12,7 +12,7 @@ pub const EMBED_MAX_COUNT: usize = 10;
 pub const STICKER_MAX_COUNT: usize = 3;
 
 /// The gateway version used by the library. The gateway URL is retrieved via the REST API.
-pub const GATEWAY_VERSION: u8 = 10;
+pub const GATEWAY_VERSION: &'static str = stringify!(10);
 
 /// The large threshold to send on identify.
 pub const LARGE_THRESHOLD: u8 = 250;

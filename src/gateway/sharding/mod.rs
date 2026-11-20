@@ -35,9 +35,6 @@ mod shard_runner;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-#[cfg(any(feature = "transport_compression_zlib", feature = "transport_compression_zstd"))]
-use aformat::aformat_into;
-use aformat::{ArrayString, CapStr, aformat};
 use tokio_tungstenite::tungstenite::error::Error as TungsteniteError;
 use tokio_tungstenite::tungstenite::protocol::frame::coding::CloseCode as TungsteniteCloseCode;
 #[cfg(feature = "tracing_instrument")]
@@ -54,8 +51,16 @@ pub use self::shard_manager::{
 };
 pub use self::shard_queue::ShardQueue;
 pub use self::shard_runner::{ShardRunner, ShardRunnerMessage};
-use super::{ActivityData, ChunkGuildFilter, CloseFrame, GatewayError, PresenceData, WsClient};
-use crate::constants::{self, CloseCode};
+use super::{
+    ActivityData,
+    ChunkGuildFilter,
+    CloseFrame,
+    GatewayError,
+    PresenceData,
+    WsClient,
+    build_gateway_url,
+};
+use crate::constants::CloseCode;
 use crate::internal::prelude::*;
 use crate::model::event::{DeserializedEvent, Event, GatewayEvent};
 use crate::model::gateway::{ConnectionStage, GatewayCapabilities, GatewayIntents, ShardInfo};
@@ -97,7 +102,7 @@ pub struct Shard {
     info: ShardInfo,
     stage: ConnectionStage,
     token: Token,
-    ws_url: Arc<str>,
+    ws_url: Arc<Url>,
     heartbeater: HeartbeatMetadata,
     resume_metadata: Option<ResumeMetadata>,
     compression: TransportCompression,
@@ -157,7 +162,7 @@ impl Shard {
     ///
     /// On Error, will return either [`Error::Gateway`] or a Rustls/native TLS error.
     pub async fn new(
-        ws_url: Arc<str>,
+        ws_url: Arc<Url>,
         token: Token,
         info: ShardInfo,
         intents: GatewayIntents,
@@ -165,7 +170,7 @@ impl Shard {
         presence: Option<PresenceData>,
         compression: TransportCompression,
     ) -> Result<Shard> {
-        let client = connect(&ws_url, compression).await?;
+        let client = WsClient::connect(&ws_url, compression).await?;
 
         let presence = presence.unwrap_or_default();
         let seq = 0;
@@ -292,7 +297,11 @@ impl Shard {
 
                 self.resume_metadata = Some(ResumeMetadata {
                     session_id: ready.ready.session_id.clone(),
-                    resume_ws_url: ready.ready.resume_gateway_url.clone(),
+                    resume_ws_url: build_gateway_url(
+                        &ready.ready.resume_gateway_url,
+                        self.compression,
+                    )
+                    .ok()?,
                 });
                 self.stage = ConnectionStage::Connected;
 
@@ -606,12 +615,6 @@ impl Shard {
     pub async fn reinitialize(&mut self) -> Result<WsClient> {
         debug!("[{:?}] Initializing.", self.info);
 
-        // Reconnect to the resume URL if possible, otherwise use the generic URL.
-        let ws_url = self
-            .resume_metadata
-            .as_ref()
-            .map_or(self.ws_url.as_ref(), |m| m.resume_ws_url.as_ref());
-
         // We need to do two, sort of three things here:
         // - set the stage of the shard as opening the websocket connection
         // - open the websocket connection
@@ -621,7 +624,12 @@ impl Shard {
         // Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.heartbeater.start();
-        let client = connect(ws_url, self.compression).await?;
+
+        // Reconnect to the resume URL if possible, otherwise use the generic URL.
+        let ws_url =
+            self.resume_metadata.as_ref().map_or(self.ws_url.as_ref(), |m| &m.resume_ws_url);
+        let client = WsClient::connect(ws_url, self.compression).await?;
+
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)
@@ -653,21 +661,6 @@ impl Shard {
     pub async fn update_presence(&mut self) -> Result<()> {
         self.client.send_presence_update(&self.info, &self.presence).await
     }
-}
-
-async fn connect(base_url: &str, compression: TransportCompression) -> Result<WsClient> {
-    let url = Url::parse(&aformat!(
-        "{}?v={}{}",
-        CapStr::<64>(base_url),
-        constants::GATEWAY_VERSION,
-        compression.query_param()
-    ))
-    .map_err(|why| {
-        warn!("Error building gateway URL with base `{base_url}`: {why:?}");
-        Error::Gateway(GatewayError::BuildingUrl)
-    })?;
-
-    WsClient::connect(url, compression).await
 }
 
 struct HeartbeatMetadata {
@@ -750,7 +743,7 @@ impl Default for HeartbeatMetadata {
 
 struct ResumeMetadata {
     session_id: FixedString,
-    resume_ws_url: FixedString,
+    resume_ws_url: Url,
 }
 
 #[derive(Debug)]
@@ -798,23 +791,13 @@ pub enum TransportCompression {
 }
 
 impl TransportCompression {
-    fn query_param(self) -> ArrayString<21> {
-        #[cfg_attr(
-            not(any(
-                feature = "transport_compression_zlib",
-                feature = "transport_compression_zstd"
-            )),
-            expect(unused_mut)
-        )]
-        let mut res = ArrayString::new();
+    pub(crate) const fn query_param(self) -> Option<(&'static str, &'static str)> {
         match self {
-            Self::None => {},
+            Self::None => None,
             #[cfg(feature = "transport_compression_zlib")]
-            Self::Zlib => aformat_into!(res, "&compress=zlib-stream"),
+            Self::Zlib => Some(("compress", "zlib-stream")),
             #[cfg(feature = "transport_compression_zstd")]
-            Self::Zstd => aformat_into!(res, "&compress=zstd-stream"),
+            Self::Zstd => Some(("compress", "zstd-stream")),
         }
-
-        res
     }
 }
