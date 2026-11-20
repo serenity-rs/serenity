@@ -39,7 +39,6 @@ use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use crate::http::Http;
 use crate::model::prelude::*;
-use crate::model::utils::deserialize_available_guild;
 #[cfg(feature = "model")]
 use crate::model::utils::*;
 
@@ -1382,14 +1381,12 @@ pub struct UnavailableGuild {
 ///
 /// [Discord docs](https://docs.discord.com/developers/events/gateway-events#guild-create).
 #[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[serde(untagged)]
+#[derive(Clone, Debug, Serialize)]
 #[expect(
     clippy::large_enum_variant,
-    reason = "Almost always Present so boxing would be counter-productive"
+    reason = "Almost always Available so boxing would be counter-productive"
 )]
 pub enum GuildCreateGuild {
-    #[serde(deserialize_with = "deserialize_available_guild")]
     Available(Guild),
     Unavailable(UnavailableGuild),
 }
@@ -1414,6 +1411,38 @@ impl GuildCreateGuild {
         match self {
             GuildCreateGuild::Available(guild) => guild.unavailable(),
             GuildCreateGuild::Unavailable(unavailable_guild) => unavailable_guild.unavailable,
+        }
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for GuildCreateGuild {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        use serde::de::Error as DeError;
+        use serde_json::value::RawValue;
+
+        // `joined_at` is a required field for Guild objects in the GuildCreate event, so we can
+        // use its presence to determine the correct variant to deserialize to.
+        #[derive(Deserialize)]
+        struct GuildCreateGuildRaw {
+            joined_at: Option<Timestamp>,
+        }
+
+        let raw_data = <&RawValue>::deserialize(deserializer)?;
+        let raw = GuildCreateGuildRaw::deserialize(raw_data).map_err(DeError::custom)?;
+
+        if raw.joined_at.is_some() {
+            // Insert guild_id fields in GuildChannel/ObfuscatedChannel, GuildThread, Member, and
+            // Role when deserializing a `GuildCreateGuild::Available` guild.
+            let mut guild: Guild = Guild::deserialize(raw_data).map_err(DeError::custom)?;
+            guild.viewable_channels.iter_mut().for_each(|x| x.base.guild_id = guild.id);
+            guild.obfuscated_channels.iter_mut().for_each(|x| x.guild_id = guild.id);
+            guild.threads.iter_mut().for_each(|x| x.base.guild_id = guild.id);
+            guild.members.iter_mut().for_each(|x| x.guild_id = guild.id);
+            guild.roles.iter_mut().for_each(|x| x.guild_id = guild.id);
+            Ok(GuildCreateGuild::Available(guild))
+        } else {
+            let guild = UnavailableGuild::deserialize(raw_data).map_err(DeError::custom)?;
+            Ok(GuildCreateGuild::Unavailable(guild))
         }
     }
 }
@@ -1589,5 +1618,44 @@ mod test {
 
             assert_eq!(lhs, get_member().display_name());
         }
+    }
+
+    #[test]
+    fn test_guildcreateguild_deserialization() {
+        use std::assert_matches;
+
+        use super::GuildCreateGuild;
+
+        // If `joined_at` is missing, the object is deserialized as an UnavailableGuild as long
+        // as there is a GuildId.
+        let unavailable_valid = r#"
+                {
+                    "id": "41771983423143937",
+                    "unavailable": true
+                }
+            "#;
+        let res = serde_json::from_str::<GuildCreateGuild>(unavailable_valid).unwrap();
+        assert_matches!(res, GuildCreateGuild::Unavailable(_));
+
+        // If `id` is missing, deserialization should fail.
+        let unavailable_invalid = r#"
+                {
+                    "unavailable": true
+                }
+            "#;
+        let res = serde_json::from_str::<GuildCreateGuild>(unavailable_invalid);
+        assert!(res.is_err());
+
+        // If `joined_at` is present, this is a Guild object and should have correct fields or
+        // deserialization should fail.
+        let available_invalid = r#"
+                {
+                    "id": "41771983423143937",
+                    "unavailable": false,
+                    "joined_at": "2026-11-01T01:00:00Z"
+                }
+            "#;
+        let res = serde_json::from_str::<GuildCreateGuild>(available_invalid);
+        assert!(res.is_err());
     }
 }
