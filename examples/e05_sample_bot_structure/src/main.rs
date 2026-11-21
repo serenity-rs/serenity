@@ -1,3 +1,17 @@
+//! This example shows the recommended structure for a basic bot, while also demonstrating
+//! how to use Serenity's low-level slash command functions.
+//!
+//! Individual commands introduce different features or concepts:
+//! - `attachmentinput`: Accepting an `Attachment` as input
+//! - `id`: Accepting a `User` as input
+//! - `modal`: Using the `QuickModal` trait to respond with a modal
+//! - `numberinput`: Accepting different types of numbers and restricting input
+//! - `welcome`: Localizing commands
+//!
+//! Note that while it is possible to create and use slash commands with Serenity alone, we
+//! recommend using Poise, a command framework with advanced features like edit tracking, single
+//! function slash and prefix commands, and flexible argument parsing.
+#![expect(clippy::collapsible_match)]
 mod commands;
 
 use std::env;
@@ -15,16 +29,15 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
-        // clippy can't decide between if it wants it collapsed, or if it wants you to use if let
-        // because its a single pattern.
-        #[expect(clippy::collapsible_match)]
         match event {
             FullEvent::InteractionCreate {
                 interaction, ..
             } => {
+                // Check if the interaction is a (slash) command interaction.
                 if let Interaction::Command(command) = interaction {
                     println!("Received command interaction: {command:#?}");
 
+                    // Match the command name and execute its `run()` function, if one exists.
                     let content = match command.data.name.as_str() {
                         "ping" => Some(commands::ping::run(&command.data.options())),
                         "id" => Some(commands::id::run(&command.data.options())),
@@ -38,6 +51,11 @@ impl EventHandler for Handler {
                         _ => Some("not implemented :(".to_string()),
                     };
 
+                    // Respond to the command, if it was a valid command with a `run()` function
+                    // that returns a String.
+                    //
+                    // Note that the `modal` command creates its own interaction response within
+                    // its `run()` function, which is why it is not handled here.
                     if let Some(content) = content {
                         let data = CreateInteractionResponseMessage::new().content(content);
                         let builder = CreateInteractionResponse::Message(data);
@@ -59,6 +77,11 @@ impl EventHandler for Handler {
                         .expect("GUILD_ID must be an integer"),
                 );
 
+                // For simplicity, we register the commands here in this example, but the
+                // recommended method is to use a prefix command. You only need to re-register when
+                // commands change, which is not necessarily on startup, and the `Ready` event can
+                // also fire multiple times. If you choose to keep this pattern, consider using an
+                // AtomicBool, etc. to ensure registration only happens once.
                 let commands = guild_id
                     .set_commands(&ctx.http, &[
                         commands::ping::register(),
@@ -79,8 +102,6 @@ impl EventHandler for Handler {
                 .await;
 
                 println!("I created the following global slash command: {global_command:#?}");
-
-                println!("{} is connected!", data_about_bot.user.name);
             },
             _ => {},
         }
@@ -93,16 +114,16 @@ async fn main() {
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
-    // Build our client.
+    // Build the client.
     let mut client = Client::builder(token, GatewayIntents::empty())
         .event_handler(Arc::new(Handler))
         .await
-        .expect("Error creating client");
+        .expect("Err creating client");
 
-    // Finally, start a single shard, and start listening to events.
+    // Finally, start a single shard and begin listening to events.
     //
-    // Shards will automatically attempt to reconnect, and will perform exponential backoff until
-    // it reconnects.
+    // Shards will automatically attempt to reconnect, performing exponential backoff until
+    // successful.
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");
     }

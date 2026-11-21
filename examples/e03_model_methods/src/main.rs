@@ -1,3 +1,7 @@
+//! If the `model` feature is enabled, many model types will have useful wrapper methods
+//! implemented, allowing you to avoid using low-level HTTP requests.
+//!
+//! This example is a simple demonstration of this functionality.
 use std::sync::Arc;
 
 use serenity::async_trait;
@@ -15,13 +19,8 @@ impl EventHandler for Handler {
                 new_message, ..
             } => {
                 if new_message.content == "!messageme" {
-                    // If the `utils`-feature is enabled, then model structs will have a lot of
-                    // useful methods implemented, to avoid using an often
-                    // otherwise bulky Context, or even much lower-level `rest`
-                    // method.
-                    //
-                    // In this case, you can direct message a User directly by simply calling a
-                    // method on its instance, with the content of the message.
+                    // Here, we send a direct message to a user by simply calling the `dm()` method
+                    // on the `UserId` model type.
                     let builder = CreateMessage::new().content("Hello!");
                     let dm = new_message.author.id.dm(&ctx.http, builder).await;
 
@@ -43,7 +42,6 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    // Configure the client with your Discord bot token in the environment.
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
     let intents = GatewayIntents::GUILD_MESSAGES

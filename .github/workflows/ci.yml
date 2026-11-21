@@ -218,7 +218,7 @@ jobs:
       - name: 'Check example 2'
         run: cargo check -p e02_transparent_guild_sharding
       - name: 'Check example 3'
-        run: cargo check -p e03_struct_utilities
+        run: cargo check -p e03_model_methods
       - name: 'Check example 4'
         run: cargo check -p e04_message_builder
       - name: 'Check example 5'

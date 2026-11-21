@@ -1,8 +1,8 @@
+//! This example demonstrates how to use message components.
 use std::borrow::Cow;
 use std::sync::Arc;
 use std::time::Duration;
 
-use dotenv::dotenv;
 use serenity::async_trait;
 use serenity::builder::{
     CreateButton,
@@ -15,19 +15,19 @@ use serenity::builder::{
 };
 use serenity::collector::CollectComponentInteractions;
 use serenity::futures::StreamExt;
+use serenity::model::event::FullEvent;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
+// This is a helper function to reduce boilerplate when creating buttons.
 fn sound_button(name: &str, emoji: ReactionType) -> CreateButton<'_> {
-    // To add an emoji to buttons, use .emoji(). The method accepts anything ReactionType or
-    // anything that can be converted to it. For a list of that, search Trait Implementations in
-    // the docs for From<...>.
+    // To add an emoji to a button, use `.emoji()`. The method accepts a `ReactionType` or any
+    // other type that can be converted to it. For a list of such types, go to the `ReactionType`
+    // documentation and look for `From<...>` under "Trait Implementations".
     CreateButton::new(name).emoji(emoji)
 }
 
 struct Handler;
-
-use serenity::model::event::FullEvent;
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -40,13 +40,16 @@ impl EventHandler for Handler {
                     return;
                 }
 
-                // Ask the user for its favorite animal
+                // We want to ask the user for their favorite animal. We use the `CreateMessage`
+                // builder to create a message with a select menu and then we send the message.
                 let m = new_message
                     .channel_id
                     .send_message(
                         &ctx.http,
                         CreateMessage::new()
-                            .content("Please select your favorite animal")
+                            .content("Please select your favorite animal.")
+                            // The `select_menu()` convenience method allows us to attach a select
+                            // menu without needing to manually create an action row component.
                             .select_menu(
                                 CreateSelectMenu::new(
                                     "animal_select",
@@ -67,13 +70,12 @@ impl EventHandler for Handler {
                     .await
                     .unwrap();
 
-                // Wait for the user to make a selection
-                // This uses a collector to wait for an incoming event without needing to listen for
-                // it manually in the EventHandler.
+                // Wait for the user to make a selection. This uses a collector to wait for an
+                // interaction without needing to listen for it manually in the event handler.
                 let interaction = match m
                     .id
                     .collect_component_interactions(ctx)
-                    .timeout(Duration::from_secs(60 * 3))
+                    .timeout(Duration::from_mins(3))
                     .await
                 {
                     Some(x) => x,
@@ -83,8 +85,8 @@ impl EventHandler for Handler {
                     },
                 };
 
-                // data.values contains the selected value from each select menus. We only have one
-                // menu, so we retrieve the first
+                // `data.values` contains the text of the selected options. Only one selection is
+                // allowed by default, so take the first (and only) value.
                 let animal = match &interaction.data.kind {
                     ComponentInteractionDataKind::StringSelect {
                         values,
@@ -92,7 +94,7 @@ impl EventHandler for Handler {
                     _ => panic!("unexpected interaction data kind"),
                 };
 
-                // Acknowledge the interaction and edit the message
+                // Acknowledge the interaction and edit the message.
                 interaction
                     .create_response(
                         &ctx.http,
@@ -106,13 +108,12 @@ impl EventHandler for Handler {
                                 .button(sound_button(
                                     "crab rave",
                                     // Custom emojis in Discord are represented with
-                                    // `<:EMOJI_NAME:EMOJI_ID>`. You can see this by posting an
-                                    // emoji in your server and
-                                    // putting a backslash before the emoji.
+                                    // `<:EMOJI_NAME:EMOJI_ID>`. You can verify this by selecting
+                                    // a custom emoji in Discord and putting a backslash before it
+                                    // in the chat box.
                                     //
                                     // Because ReactionType implements FromStr, we can use .parse()
-                                    // to convert the textual
-                                    // emoji representation to ReactionType
+                                    // to convert the textual emoji representation to ReactionType.
                                     "<:ferris:381919740114763787>".parse().unwrap(),
                                 )),
                         ),
@@ -120,22 +121,24 @@ impl EventHandler for Handler {
                     .await
                     .unwrap();
 
-                // Wait for multiple interactions
+                // Wait for multiple interactions.
                 let mut interaction_stream =
                     m.id.collect_component_interactions(ctx)
-                        .timeout(Duration::from_secs(60 * 3))
+                        .timeout(Duration::from_mins(3))
                         .stream();
 
                 while let Some(interaction) = interaction_stream.next().await {
+                    // The `custom_id` is the `name` that we defined for our sounds using the
+                    // `sound_button()` helper function.
                     let sound = &interaction.data.custom_id;
-                    // Acknowledge the interaction and send a reply
+                    // Acknowledge the interaction and send a reply.
                     interaction
                         .create_response(
                             &ctx.http,
-                            // This time we dont edit the message but reply to it
+                            // This time we reply instead of editing our message.
                             CreateInteractionResponse::Message(
                                 CreateInteractionResponseMessage::default()
-                                    // Make the message hidden for other users by setting
+                                    // Hide the message from other users by setting
                                     // `ephemeral(true)`.
                                     .ephemeral(true)
                                     .content(format!("The **{animal}** says __{sound}__")),
@@ -145,9 +148,9 @@ impl EventHandler for Handler {
                         .unwrap();
                 }
 
-                // Delete the orig message or there will be dangling components (components that
-                // still exist, but no collector is running so any user who presses
-                // them sees an error)
+                // Delete the original message or there will be dangling components, i.e., the
+                // components are still visible, but since no collector is running, any user who
+                // interacts with them will see an error.
                 m.delete(&ctx.http, None).await.unwrap()
             },
             FullEvent::Ready {
@@ -162,23 +165,16 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    dotenv().ok();
-    // Configure the client with your Discord bot token in the environment.
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
-
-    // Build our client.
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
     let mut client = Client::builder(token, intents)
         .event_handler(Arc::new(Handler))
         .await
-        .expect("Error creating client");
+        .expect("Err creating client");
 
-    // Finally, start a single shard, and start listening to events.
-    // Shards will automatically attempt to reconnect, and will perform exponential backoff until
-    // it reconnects.
     if let Err(why) = client.start().await {
         println!("Client error: {why:?}");
     }

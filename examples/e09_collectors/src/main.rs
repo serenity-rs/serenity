@@ -1,19 +1,24 @@
-//! This example will showcase the beauty of collectors. They allow to await messages or reactions
-//! from a user in the middle of a control flow, one being a command.
+//! This example showcases the beauty of collectors.
+//!
+//! Collectors make it possible to await messages or reactions from a user in the middle of a
+//! control flow, e.g., inside a command. They can also be used to await modal and component
+//! interactions, or other events.
+//!
+//! In this example, we use the `CollectMessages` and `CollectReactions` traits, as well as
+//! the fundamental `collect()` function that the specific collector types wrap.
 use std::collections::HashSet;
 use std::sync::Arc;
 use std::time::Duration;
 
 use serenity::async_trait;
 use serenity::collector::{CollectMessages, CollectReactions, MessageCollector};
-// Collectors are streams, that means we can use `StreamExt` and `TryStreamExt`.
+// Collectors are streams, which means we can use `StreamExt` and `TryStreamExt`.
 use serenity::futures::stream::StreamExt;
+use serenity::model::event::FullEvent;
 use serenity::model::prelude::*;
 use serenity::prelude::*;
 
 struct Handler;
-
-use serenity::model::event::FullEvent;
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -24,14 +29,16 @@ impl EventHandler for Handler {
             } => {
                 let mut score = 0u32;
                 let _ = new_message
-                    .reply(&ctx.http, "How was that crusty crab called again? 10 seconds time!")
+                    .reply(&ctx.http, "What was that crusty crab called again? 10 seconds, go!")
                     .await;
 
-                // There is a method implemented for some models to conveniently collect replies.
-                // They return a builder that can be turned into a Stream, or here,
-                // where we can await a single reply
+                // `CollectMessages` is a trait, so the `collect_messages()` method is available
+                // for any type that implements the trait. Here, we use it from the `UserId` of the
+                // message author.
                 let collector =
                     new_message.author.id.collect_messages(ctx).timeout(Duration::from_secs(10));
+                // The returned `MessageCollector` builder can also be turned into a stream, but
+                // here we await a single reply.
                 if let Some(answer) = collector.await {
                     if answer.content.to_lowercase() == "ferris" {
                         let _ = answer.reply(&ctx.http, "That's correct!").await;
@@ -44,11 +51,12 @@ impl EventHandler for Handler {
                 };
 
                 let react_msg = new_message
-                    .reply(&ctx.http, "React with the reaction representing 1, you got 10 seconds!")
+                    .reply(&ctx.http, "React with the reaction representing 1 within 10 seconds!")
                     .await
                     .unwrap();
 
-                // The message model can also be turned into a Collector to collect reactions on it.
+                // The `MessageId` model can also be turned into a reaction collector since it
+                // implements the `CollectReactions` trait.
                 let collector = react_msg
                     .id
                     .collect_reactions(ctx)
@@ -68,9 +76,9 @@ impl EventHandler for Handler {
 
                 let _ = new_message.reply(&ctx.http, "Write 5 messages in 10 seconds").await;
 
-                // We can create a collector from scratch too using this builder future.
+                // We can also create a collector from scratch using this builder future.
                 let collector = MessageCollector::new(ctx)
-                    // Only collect messages by this user.
+                    // Only collect messages from the user being replied to.
                     .author_id(new_message.author.id)
                     .channel_id(new_message.channel_id)
                     .timeout(Duration::from_secs(10))
@@ -78,15 +86,14 @@ impl EventHandler for Handler {
                     .stream()
                     .take(5);
 
-                // Let's acquire borrow HTTP to send a message inside the `async move`.
+                // Acquire a reference to `Http` to send a message inside the `async move`.
                 let http = &ctx.http;
 
-                // We want to process each message and get the length. There are a couple of ways to
-                // do this. Folding the stream with `fold` is one way.
+                // We want to process each message and get the length. There are several ways to
+                // do this, such as folding the stream with `fold`.
                 //
-                // Using `then` to first reply and then create a new stream with all messages is
-                // another way to do it, which can be nice if you want to further
-                // process the messages.
+                // Using `then` to reply first and then create a new stream with all messages is
+                // another way that can be nice if you want to further process the messages.
                 //
                 // If you don't want to collect the stream, `for_each` may be sufficient.
                 let collected: Vec<_> = collector
@@ -102,11 +109,11 @@ impl EventHandler for Handler {
                     score += 1;
                 }
 
-                // We can also collect arbitrary events using the collect() function. For example,
-                // here we collect updates to the messages that the user sent above
-                // and check for them updating all 5 of them.
+                // We can also collect arbitrary events using the `collect()` function. For
+                // example, here we collect updates to the messages that the user sent above.
                 let mut collector = serenity::collector::collect(ctx, move |event| match event {
-                    // Only collect MessageUpdate events for the 5 MessageIds we're interested in.
+                    // Only collect `MessageUpdate` events for the five `MessageId`s we're
+                    // interested in.
                     Event::MessageUpdate(event)
                         if collected.iter().any(|msg| event.message.id == msg.id) =>
                     {
@@ -117,7 +124,7 @@ impl EventHandler for Handler {
                 .take_until(Box::pin(tokio::time::sleep(Duration::from_secs(20))));
 
                 let _ = new_message
-                    .reply(&ctx.http, "Edit each of those 5 messages in 20 seconds")
+                    .reply(&ctx.http, "Edit each of those 5 messages within 20 seconds.")
                     .await;
                 let mut edited = HashSet::new();
                 while let Some(edited_message_id) = collector.next().await {
@@ -129,10 +136,10 @@ impl EventHandler for Handler {
 
                 if edited.len() >= 5 {
                     score += 1;
-                    let _ = new_message.reply(&ctx.http, "Great! You edited 5 out of 5").await;
+                    let _ = new_message.reply(&ctx.http, "Great! You edited 5 out of 5.").await;
                 } else {
                     let _ = new_message
-                        .reply(&ctx.http, format!("You only edited {} out of 5", edited.len()))
+                        .reply(&ctx.http, format!("You only edited {} out of 5.", edited.len()))
                         .await;
                 }
 
@@ -155,10 +162,11 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    // Configure the client with your Discord bot token in the environment.
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
 
+    // Notice we have added the `GUILD_MESSAGE_REACTIONS` intent. Without this, we would not be
+    // able to collect reactions. You will learn more about intents in the next example.
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT

@@ -1,9 +1,9 @@
 //! Contains tools related to Discord's Interactions Endpoint URL feature.
 //!
-//! "You can optionally configure an interactions endpoint to receive interactions via HTTP POSTs
-//! rather than over Gateway with a bot user."
+//! "By default your app will receive interactions via a Gateway connection, but you can opt-in to
+//! HTTP-based interactions by adding a Interactions Endpoint URL to your app’s settings."
 //!
-//! <https://docs.discord.com/developers/tutorials/upgrading-to-application-commands#adding-an-interactions-endpoint-url>
+//! <https://docs.discord.com/developers/interactions/overview#configuring-an-interactions-endpoint-url>
 //!
 //! See [`Verifier`] for example usage.
 

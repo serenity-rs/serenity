@@ -1,3 +1,8 @@
+//! This example demonstrates use of the message builder.
+//!
+//! The message builder is an ergonomic utility used to build messages safely by pushing "safe"
+//! versions of content and dynamically mentioning mentionable structs, such as users, channels,
+//! or roles.
 use std::sync::Arc;
 
 use serenity::async_trait;
@@ -15,23 +20,13 @@ impl EventHandler for Handler {
                 new_message, ..
             } => {
                 if new_message.content == "!ping" {
-                    let channel = match new_message.channel(ctx).await {
-                        Ok(channel) => channel,
-                        Err(why) => {
-                            println!("Error getting channel: {why:?}");
-
-                            return;
-                        },
-                    };
-
-                    // The message builder allows for creating a message by mentioning users
-                    // dynamically, pushing "safe" versions of content (such as
-                    // bolding normalized content), displaying emojis, and more.
+                    // Here we use the message builder to push normalized bold content and include
+                    // a channel mention.
                     let response = MessageBuilder::new()
                         .push("User ")
                         .push_bold_safe(new_message.author.name.as_str())
                         .push(" used the 'ping' command in the ")
-                        .mention(&channel)
+                        .channel(new_message.channel_id)
                         .push(" channel")
                         .build();
 
@@ -52,7 +47,6 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
-    // Configure the client with your Discord bot token in the environment.
     let token =
         Token::from_env("DISCORD_TOKEN").expect("Expected a valid token in the environment");
     let intents = GatewayIntents::GUILD_MESSAGES

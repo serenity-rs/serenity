@@ -6,12 +6,24 @@
       {
         "name": "rowid",
         "ordinal": 0,
-        "type_info": "Int64"
+        "type_info": "Integer",
+        "origin": {
+          "Table": {
+            "table": "todo",
+            "name": "rowid"
+          }
+        }
       },
       {
         "name": "task",
         "ordinal": 1,
-        "type_info": "Text"
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "todo",
+            "name": "task"
+          }
+        }
       }
     ],
     "parameters": {
