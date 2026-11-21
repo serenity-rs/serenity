@@ -27,7 +27,7 @@ pub use self::sharding::*;
 #[cfg(feature = "voice")]
 pub use self::voice::VoiceGatewayManager;
 pub use self::ws::WsClient;
-use crate::constants::CloseCode;
+use crate::constants::{self, CloseCode};
 use crate::internal::prelude::*;
 use crate::model::gateway::{Activity, ActivityType};
 use crate::model::id::UserId;
@@ -182,4 +182,12 @@ impl CloseFrame {
     pub fn as_tungstenite_frame(&self) -> &TungsteniteCloseFrame {
         &self.0
     }
+}
+
+fn build_gateway_url(base_url: &str, compression: TransportCompression) -> Result<Url> {
+    let params = [Some(("v", constants::GATEWAY_VERSION)), compression.query_param()];
+    Url::parse_with_params(base_url, params.iter().flatten()).map_err(|why| {
+        tracing::warn!("Error building gateway URL with base `{base_url}`: {why:?}");
+        Error::Gateway(GatewayError::BuildingUrl)
+    })
 }

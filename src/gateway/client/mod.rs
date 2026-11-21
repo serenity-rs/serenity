@@ -27,6 +27,7 @@ mod context;
 pub(crate) mod dispatch;
 mod event_handler;
 
+use std::borrow::Cow;
 use std::num::NonZeroU16;
 use std::ops::Range;
 use std::sync::Arc;
@@ -38,6 +39,7 @@ use futures::future::BoxFuture;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, warn};
+use url::Url;
 
 pub use self::context::Context;
 pub use self::event_handler::{EventHandler, RawEventHandler};
@@ -50,6 +52,7 @@ use super::{
     ShardManager,
     ShardManagerOptions,
     TransportCompression,
+    build_gateway_url,
 };
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
@@ -318,17 +321,19 @@ impl IntoFuture for ClientBuilder {
         let cache = Arc::new(Cache::new_with_settings(self.cache_settings));
 
         Box::pin(async move {
-            let (ws_url, shard_total, max_concurrency) = match http.get_bot_gateway().await {
+            let (base_url, shard_total, max_concurrency) = match http.get_bot_gateway().await {
                 Ok(response) => (
-                    Arc::from(response.url),
+                    Cow::from(response.url),
                     response.shards,
                     response.session_start_limit.max_concurrency,
                 ),
                 Err(err) => {
                     tracing::warn!("HTTP request to get gateway URL failed: {err}");
-                    (Arc::from("wss://gateway.discord.gg"), NonZeroU16::MIN, NonZeroU16::MIN)
+                    (Cow::from("wss://gateway.discord.gg"), NonZeroU16::MIN, NonZeroU16::MIN)
                 },
             };
+
+            let ws_url = Arc::new(build_gateway_url(&base_url, self.compression)?);
 
             #[cfg(feature = "framework")]
             let framework_cell = Arc::new(OnceLock::new());
@@ -406,7 +411,7 @@ pub struct Client {
     #[cfg(feature = "voice")]
     pub voice_manager: Option<Arc<dyn VoiceGatewayManager + 'static>>,
     /// URL that the client's shards will use to connect to the gateway.
-    pub ws_url: Arc<str>,
+    pub ws_url: Arc<Url>,
     /// The cache for the client.
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,

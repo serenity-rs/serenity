@@ -226,7 +226,7 @@ fn transport_err_to_lib(err: TungsteniteError) -> Error {
 }
 
 impl WsClient {
-    pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
+    pub(crate) async fn connect(url: &Url, compression: TransportCompression) -> Result<Self> {
         let config = {
             let mut config = WebSocketConfig::default();
             config.max_message_size = None;
