@@ -1083,6 +1083,7 @@ mod tests {
                 stage_instances: FixedArray::new(),
                 threads: ExtractMap::default(),
                 voice_states: ExtractMap::default(),
+                soundboard_sounds: FixedArray::new(),
             }),
         }));
 
@@ -1154,6 +1155,7 @@ mod tests {
                 stage_instances: FixedArray::new(),
                 threads: ExtractMap::default(),
                 voice_states: ExtractMap::default(),
+                soundboard_sounds: FixedArray::new(),
             }),
         }));
 
