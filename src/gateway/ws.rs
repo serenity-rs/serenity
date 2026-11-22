@@ -1,5 +1,5 @@
 use std::env::consts;
-use std::io::{self, ErrorKind, Read};
+use std::io::{Error as IoError, ErrorKind, Read};
 use std::time::{Duration, SystemTime};
 
 use base64::Engine as _;
@@ -30,7 +30,7 @@ use tokio_tungstenite::{
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, trace, warn};
-use url::Url;
+use url::{Host, Url};
 #[cfg(feature = "transport_compression_zstd")]
 use zstd::stream::write::Decoder as ZstdWriter;
 
@@ -268,7 +268,7 @@ impl WsClient {
 
     async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<TcpStream> {
         if proxy.scheme() != "http" {
-            let why = io::Error::new(ErrorKind::Unsupported, "only http proxies are supported");
+            let why = IoError::new(ErrorKind::Unsupported, "only http proxies are supported");
             return Err(Error::Io(why));
         }
 
@@ -291,30 +291,34 @@ impl WsClient {
             let basic_auth = format!("Basic {}", BASE64_STANDARD.encode(credentials));
             request = request.header(PROXY_AUTHORIZATION, basic_auth);
         }
-        let request = request.body(String::new()).map_err(io::Error::other)?;
+        let request = request.body(String::new()).map_err(IoError::other)?;
 
-        let stream = TcpStream::connect(format!("{proxy_host}:{proxy_port}")).await?;
+        // The bracketed form `host_str` gives for an IPv6 literal does not resolve
+        let stream = match proxy.host() {
+            Some(Host::Ipv6(ip)) => TcpStream::connect((ip, proxy_port)).await?,
+            _ => TcpStream::connect((proxy_host, proxy_port)).await?,
+        };
         let (mut sender, conn) =
-            http1::handshake(TokioIo::new(stream)).await.map_err(io::Error::other)?;
+            http1::handshake(TokioIo::new(stream)).await.map_err(IoError::other)?;
 
-        let response = sender.send_request(request);
-        // Without a live sender the connection finishes once the response is read
-        drop(sender);
-        let (response, conn) = tokio::join!(response, conn.with_upgrades());
-        let response = response.map_err(io::Error::other)?;
-        conn.map_err(io::Error::other)?;
+        // `sender` drops with its block once the response is read, so `conn` stops waiting
+        let (response, ()) = tokio::try_join!(
+            async move { sender.send_request(request).await },
+            conn.with_upgrades()
+        )
+        .map_err(IoError::other)?;
 
         if !response.status().is_success() {
             let status = response.status();
-            return Err(Error::Io(io::Error::other(format!("proxy refused to tunnel: {status}"))));
+            return Err(Error::Io(IoError::other(format!("proxy refused to tunnel: {status}"))));
         }
 
-        let upgraded = hyper::upgrade::on(response).await.map_err(io::Error::other)?;
+        let upgraded = hyper::upgrade::on(response).await.map_err(IoError::other)?;
         let parts = upgraded
             .downcast::<TokioIo<TcpStream>>()
-            .map_err(|_| io::Error::other("unexpected stream type after proxy upgrade"))?;
+            .map_err(|_| IoError::other("unexpected stream type after proxy upgrade"))?;
         if !parts.read_buf.is_empty() {
-            return Err(Error::Io(io::Error::other("proxy sent data before the tunnel was used")));
+            return Err(Error::Io(IoError::other("proxy sent data before the tunnel was used")));
         }
 
         Ok(parts.io.into_inner())
