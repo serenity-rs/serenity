@@ -1628,58 +1628,10 @@ mod test {
 
         #[derive(Default, Serialize, Deserialize)]
         struct ValidGuild {
-            id: GuildId,
-            name: FixedString,
-            icon: Option<ImageHash>,
-            icon_hash: Option<ImageHash>,
-            splash: Option<ImageHash>,
-            discovery_splash: Option<ImageHash>,
-            owner_id: UserId,
             #[serde(flatten)]
-            afk_metadata: Option<AfkMetadata>,
-            widget_enabled: Option<bool>,
-            widget_channel_id: Option<ChannelId>,
-            verification_level: VerificationLevel,
-            default_message_notifications: DefaultMessageNotificationLevel,
-            explicit_content_filter: ExplicitContentFilter,
-            roles: ExtractMap<RoleId, Role>,
-            emojis: ExtractMap<EmojiId, Emoji>,
-            features: FixedArray<FixedString>,
-            mfa_level: MfaLevel,
-            application_id: Option<ApplicationId>,
-            system_channel_id: Option<ChannelId>,
-            system_channel_flags: SystemChannelFlags,
-            rules_channel_id: Option<ChannelId>,
-            max_presences: Option<MemberCount>,
-            max_members: Option<MemberCount>,
-            vanity_url_code: Option<FixedString<u8>>,
-            description: Option<FixedString>,
-            banner: Option<ImageHash>,
-            premium_tier: PremiumTier,
-            premium_subscription_count: Option<MemberCount>,
-            preferred_locale: FixedString<u8>,
-            public_updates_channel_id: Option<ChannelId>,
-            max_video_channel_users: Option<MemberCount>,
-            max_stage_video_channel_users: Option<MemberCount>,
-            approximate_member_count: Option<MemberCount>,
-            approximate_presence_count: Option<MemberCount>,
-            welcome_screen: Option<GuildWelcomeScreen>,
-            nsfw_level: NsfwLevel,
-            stickers: ExtractMap<StickerId, Sticker>,
-            premium_progress_bar_enabled: bool,
-            joined_at: Timestamp,
-            large: bool,
-            unavailable: bool,
-            member_count: MemberCount,
-            voice_states: ExtractMap<UserId, VoiceState>,
-            members: ExtractMap<UserId, Member>,
+            guild: Guild,
             channels: Vec<GuildChannel>,
-            threads: ExtractMap<ThreadId, GuildThread>,
-            presences: ExtractMap<UserId, Presence>,
-            stage_instances: FixedArray<StageInstance>,
             guild_scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
-            safety_alerts_channel_id: Option<ChannelId>,
-            incidents_data: Option<Box<IncidentsData>>,
         }
 
         // If `joined_at` is missing, the object is deserialized as an UnavailableGuild as long
@@ -1716,9 +1668,13 @@ mod test {
 
         // If this is a Guild object with correct fields, it should successfully deserialize as an
         // Available guild even when `unavailable` is `true` (e.g., due to an outage).
-        let available_valid_marked_unavailable = ValidGuild {
-            unavailable: true,
-            ..Default::default()
+        let available_valid_marked_unavailable = {
+            let mut guild = Guild::default();
+            guild.set_unavailable(true);
+            ValidGuild {
+                guild,
+                ..Default::default()
+            }
         };
         let json = serde_json::to_string(&available_valid_marked_unavailable).unwrap();
         let res = serde_json::from_str::<GuildCreateGuild>(&json).unwrap();
