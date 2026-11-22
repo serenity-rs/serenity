@@ -973,14 +973,7 @@ mod tests {
     use crate::cache::{Cache, ExtractMap};
     use crate::model::Timestamp;
     use crate::model::application::{ApplicationFlags, PartialCurrentApplicationInfo};
-    use crate::model::event::{
-        DeserializedEvent,
-        Event,
-        FullEvent,
-        GatewayEvent,
-        GuildCreateEvent,
-        ReadyEvent,
-    };
+    use crate::model::event::{Event, FullEvent, GuildCreateEvent, ReadyEvent};
     use crate::model::gateway::Ready;
     use crate::model::guild::{
         DefaultMessageNotificationLevel,
@@ -1199,27 +1192,12 @@ mod tests {
         let mut extra_event = None;
 
         let guild_id = GuildId::new(1);
-
-        let payload = r#"
-            {
-                "op": 0,
-                "d": {
-                    "id": "1",
-                    "unavailable": true
-                },
-                "s": 42,
-                "t": "GUILD_CREATE"
-            }
-        "#;
-
-        let gateway_event = serde_json::from_str::<GatewayEvent>(payload).unwrap();
-
-        let GatewayEvent::Dispatch {
-            event: DeserializedEvent::Success(event), ..
-        } = gateway_event
-        else {
-            panic!("Event deserialization failed");
-        };
+        let event = Box::new(Event::GuildCreate(GuildCreateEvent {
+            guild: GuildCreateGuild::Unavailable(UnavailableGuild {
+                id: guild_id,
+                unavailable: true,
+            }),
+        }));
 
         assert_eq!(cache.guild_count(), 0);
         assert_eq!(cache.unavailable_guilds().len(), 0);
