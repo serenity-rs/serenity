@@ -271,6 +271,13 @@ impl WsClient {
             let why = IoError::new(ErrorKind::Unsupported, "only http proxies are supported");
             return Err(Error::Io(why));
         }
+        if proxy.password().is_some() {
+            let why = IoError::new(
+                ErrorKind::Unsupported,
+                "http proxy passwords are refused, they would be sent in cleartext",
+            );
+            return Err(Error::Io(why));
+        }
 
         let (Some(target_host), Some(target_port), Some(proxy_host), Some(proxy_port)) = (
             target.host_str(),
@@ -286,9 +293,7 @@ impl WsClient {
 
         let username = percent_decode_str(proxy.username()).decode_utf8_lossy();
         if !username.is_empty() {
-            let password = percent_decode_str(proxy.password().unwrap_or_default());
-            let credentials = format!("{username}:{}", password.decode_utf8_lossy());
-            let basic_auth = format!("Basic {}", BASE64_STANDARD.encode(credentials));
+            let basic_auth = format!("Basic {}", BASE64_STANDARD.encode(format!("{username}:")));
             request = request.header(PROXY_AUTHORIZATION, basic_auth);
         }
         let request = request.body(String::new()).map_err(IoError::other)?;
