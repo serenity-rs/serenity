@@ -191,8 +191,8 @@ impl ClientBuilder {
 
     /// Sets an HTTP proxy to tunnel gateway connections through with the `CONNECT` method.
     ///
-    /// A username in the URL is sent to the proxy with basic auth. A password is refused, since
-    /// the proxy is reached over plain HTTP and it would be sent in cleartext.
+    /// If the URL contains a username, it will be used to authenticate to the proxy. Password
+    /// authentication is not supported over HTTP for security reasons.
     pub fn ws_proxy(mut self, proxy: Url) -> Self {
         self.ws_proxy = Some(proxy);
         self

@@ -1,9 +1,10 @@
+use std::borrow::Cow;
 use std::env::consts;
 use std::io::{Error as IoError, ErrorKind, Read};
 use std::time::{Duration, SystemTime};
 
-use base64::Engine as _;
 use base64::prelude::BASE64_STANDARD;
+use base64::write::EncoderWriter;
 use flate2::read::ZlibDecoder;
 #[cfg(feature = "transport_compression_zlib")]
 use flate2::write::ZlibDecoder as ZlibWriter;
@@ -268,15 +269,16 @@ impl WsClient {
 
     async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<TcpStream> {
         if proxy.scheme() != "http" {
-            let why = IoError::new(ErrorKind::Unsupported, "only http proxies are supported");
-            return Err(Error::Io(why));
+            return Err(Error::Io(IoError::new(
+                ErrorKind::Unsupported,
+                "only HTTP proxies are supported",
+            )));
         }
         if proxy.password().is_some() {
-            let why = IoError::new(
+            return Err(Error::Io(IoError::new(
                 ErrorKind::Unsupported,
-                "http proxy passwords are refused, they would be sent in cleartext",
-            );
-            return Err(Error::Io(why));
+                "password authentication over HTTP is unsupported",
+            )));
         }
 
         let (Some(target_host), Some(target_port), Some(proxy_host), Some(proxy_port)) = (
@@ -291,10 +293,19 @@ impl WsClient {
         let authority = format!("{target_host}:{target_port}");
         let mut request = Request::connect(&authority).header(HOST, &authority);
 
-        let username = percent_decode_str(proxy.username()).decode_utf8_lossy();
+        let username = proxy.username();
         if !username.is_empty() {
-            let basic_auth = format!("Basic {}", BASE64_STANDARD.encode(format!("{username}:")));
-            request = request.header(PROXY_AUTHORIZATION, basic_auth);
+            use std::io::Write;
+
+            let mut header = "Basic ".as_bytes().to_vec();
+            let username_bytes = Cow::from(percent_decode_str(username));
+            {
+                let mut encoder = EncoderWriter::new(&mut header, &BASE64_STANDARD);
+                encoder.write_all(&username_bytes)?;
+                encoder.write_all(b":")?;
+                encoder.finish()?;
+            }
+            request = request.header(PROXY_AUTHORIZATION, header);
         }
         let request = request.body(String::new()).map_err(IoError::other)?;
 
