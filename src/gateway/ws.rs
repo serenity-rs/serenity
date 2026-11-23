@@ -14,6 +14,7 @@ use hyper::client::conn::http1;
 use hyper::header::{HOST, PROXY_AUTHORIZATION};
 use hyper_util::rt::TokioIo;
 use percent_encoding::percent_decode_str;
+use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message;
@@ -22,12 +23,7 @@ use tokio_tungstenite::tungstenite::protocol::{
     CloseFrame as TungsteniteCloseFrame,
     WebSocketConfig,
 };
-use tokio_tungstenite::{
-    MaybeTlsStream,
-    WebSocketStream,
-    client_async_tls_with_config,
-    connect_async_with_config,
-};
+use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, client_async_tls_with_config};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, trace, warn};
@@ -227,8 +223,14 @@ impl From<TransportCompression> for Compression {
     }
 }
 
+trait Socket: AsyncRead + AsyncWrite + Send + Sync + Unpin {}
+
+impl<T: AsyncRead + AsyncWrite + Send + Sync + Unpin> Socket for T {}
+
+type BoxedSocket = Box<dyn Socket>;
+
 pub struct WsClient {
-    stream: WebSocketStream<MaybeTlsStream<TcpStream>>,
+    stream: WebSocketStream<MaybeTlsStream<BoxedSocket>>,
     compression: Compression,
 }
 
@@ -252,14 +254,13 @@ impl WsClient {
             config
         };
 
-        let (stream, _) = match proxy {
-            Some(proxy) => {
-                let tunnel = Self::connect_through_proxy(&url, proxy).await?;
-                client_async_tls_with_config(url, tunnel, Some(config), None).await
-            },
-            None => connect_async_with_config(url, Some(config), false).await,
-        }
-        .map_err(transport_err_to_lib)?;
+        let socket: BoxedSocket = match proxy {
+            Some(proxy) => Self::connect_through_proxy(&url, proxy).await?,
+            None => Box::new(Self::connect_tcp(&url).await?),
+        };
+        let (stream, _) = client_async_tls_with_config(url, socket, Some(config), None)
+            .await
+            .map_err(transport_err_to_lib)?;
 
         Ok(Self {
             stream,
@@ -267,26 +268,27 @@ impl WsClient {
         })
     }
 
-    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<TcpStream> {
-        if proxy.scheme() != "http" {
-            return Err(Error::Io(IoError::new(
-                ErrorKind::Unsupported,
-                "only HTTP proxies are supported",
-            )));
-        }
-        if proxy.password().is_some() {
+    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<BoxedSocket> {
+        let tls = match proxy.scheme() {
+            "http" => false,
+            "https" => true,
+            _ => {
+                return Err(Error::Io(IoError::new(
+                    ErrorKind::Unsupported,
+                    "only HTTP and HTTPS proxies are supported",
+                )));
+            },
+        };
+        if !tls && proxy.password().is_some() {
             return Err(Error::Io(IoError::new(
                 ErrorKind::Unsupported,
                 "password authentication over HTTP is unsupported",
             )));
         }
 
-        let (Some(target_host), Some(target_port), Some(proxy_host), Some(proxy_port)) = (
-            target.host(),
-            target.port_or_known_default(),
-            proxy.host(),
-            proxy.port_or_known_default(),
-        ) else {
+        let (Some(target_host), Some(target_port)) =
+            (target.host(), target.port_or_known_default())
+        else {
             return Err(Error::Gateway(GatewayError::BuildingUrl));
         };
 
@@ -294,28 +296,42 @@ impl WsClient {
         let mut request = Request::connect(&authority).header(HOST, &authority);
 
         let username = proxy.username();
-        if !username.is_empty() {
+        let password = proxy.password();
+        if !username.is_empty() || password.is_some() {
             use std::io::Write;
 
             let mut header = "Basic ".as_bytes().to_vec();
             let username_bytes = Cow::from(percent_decode_str(username));
+            let password_bytes = Cow::from(percent_decode_str(password.unwrap_or_default()));
             {
                 let mut encoder = EncoderWriter::new(&mut header, &BASE64_STANDARD);
                 encoder.write_all(&username_bytes)?;
                 encoder.write_all(b":")?;
+                encoder.write_all(&password_bytes)?;
                 encoder.finish()?;
             }
             request = request.header(PROXY_AUTHORIZATION, header);
         }
         let request = request.body(String::new()).map_err(IoError::other)?;
 
-        let stream = match proxy_host {
-            Host::Domain(domain) => TcpStream::connect((domain, proxy_port)).await?,
-            Host::Ipv4(ip) => TcpStream::connect((ip, proxy_port)).await?,
-            Host::Ipv6(ip) => TcpStream::connect((ip, proxy_port)).await?,
-        };
+        let tcp = Self::connect_tcp(proxy).await?;
+        if tls {
+            // TLS wants an IPv6 literal without the brackets around it
+            let server_name = match proxy.host() {
+                Some(Host::Ipv6(ip)) => ip.to_string(),
+                host => host.map(|host| host.to_string()).unwrap_or_default(),
+            };
+            let tls = Self::connect_tls(tcp, &server_name).await?;
+            Ok(Box::new(Self::open_tunnel(tls, request).await?))
+        } else {
+            Ok(Box::new(Self::open_tunnel(tcp, request).await?))
+        }
+    }
+
+    // Generic over the socket: hyper's futures over a `dyn` socket fail the `Send` check
+    async fn open_tunnel<S: Socket + 'static>(socket: S, request: Request<String>) -> Result<S> {
         let (mut sender, conn) =
-            http1::handshake(TokioIo::new(stream)).await.map_err(IoError::other)?;
+            http1::handshake(TokioIo::new(socket)).await.map_err(IoError::other)?;
 
         // `sender` drops with its block once the response is read, so `conn` stops waiting
         let (response, ()) = tokio::try_join!(
@@ -331,13 +347,62 @@ impl WsClient {
 
         let upgraded = hyper::upgrade::on(response).await.map_err(IoError::other)?;
         let parts = upgraded
-            .downcast::<TokioIo<TcpStream>>()
+            .downcast::<TokioIo<S>>()
             .map_err(|_| IoError::other("unexpected stream type after proxy upgrade"))?;
         if !parts.read_buf.is_empty() {
             return Err(Error::Io(IoError::other("proxy sent data before the tunnel was used")));
         }
 
         Ok(parts.io.into_inner())
+    }
+
+    async fn connect_tcp(url: &Url) -> Result<TcpStream> {
+        let Some(port) = url.port_or_known_default() else {
+            return Err(Error::Gateway(GatewayError::BuildingUrl));
+        };
+        let stream = match url.host() {
+            Some(Host::Domain(domain)) => TcpStream::connect((domain, port)).await?,
+            Some(Host::Ipv4(ip)) => TcpStream::connect((ip, port)).await?,
+            Some(Host::Ipv6(ip)) => TcpStream::connect((ip, port)).await?,
+            None => return Err(Error::Gateway(GatewayError::BuildingUrl)),
+        };
+
+        Ok(stream)
+    }
+
+    #[cfg(feature = "native_tls_backend")]
+    async fn connect_tls(
+        tcp: TcpStream,
+        server_name: &str,
+    ) -> Result<tokio_native_tls::TlsStream<TcpStream>> {
+        use tokio_native_tls::{TlsConnector, native_tls};
+
+        let connector = native_tls::TlsConnector::new().map_err(IoError::other)?;
+        let tls = TlsConnector::from(connector)
+            .connect(server_name, tcp)
+            .await
+            .map_err(IoError::other)?;
+
+        Ok(tls)
+    }
+
+    #[cfg(not(feature = "native_tls_backend"))]
+    async fn connect_tls(
+        tcp: TcpStream,
+        server_name: &str,
+    ) -> Result<tokio_rustls::client::TlsStream<TcpStream>> {
+        use std::sync::Arc;
+
+        use rustls_platform_verifier::ConfigVerifierExt as _;
+        use tokio_rustls::TlsConnector;
+        use tokio_rustls::rustls::ClientConfig;
+        use tokio_rustls::rustls::pki_types::ServerName;
+
+        let config = ClientConfig::with_platform_verifier().map_err(IoError::other)?;
+        let server_name = ServerName::try_from(server_name.to_owned()).map_err(IoError::other)?;
+        let tls = TlsConnector::from(Arc::new(config)).connect(server_name, tcp).await?;
+
+        Ok(tls)
     }
 
     pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
