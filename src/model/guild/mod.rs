@@ -203,6 +203,10 @@ pub struct Guild {
     pub stickers: ExtractMap<StickerId, Sticker>,
     /// Whether the guild has the boost progress bar enabled
     pub premium_progress_bar_enabled: bool,
+    /// The id of the channel where this guild will recieve safety alerts.
+    pub safety_alerts_channel_id: Option<ChannelId>,
+    /// The incidents data for this guild, if any.
+    pub incidents_data: Option<Box<IncidentsData>>,
 
     // =======
     // From here on, all fields are from Guild Create Event's extra fields (see Discord docs)
@@ -250,10 +254,8 @@ pub struct Guild {
     pub stage_instances: FixedArray<StageInstance>,
     /// The scheduled events in this guild.
     pub scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
-    /// The id of the channel where this guild will recieve safety alerts.
-    pub safety_alerts_channel_id: Option<ChannelId>,
-    /// The incidents data for this guild, if any.
-    pub incidents_data: Option<Box<IncidentsData>>,
+    /// The soundboard sounds in this guild.
+    pub soundboard_sounds: FixedArray<Soundboard>,
 }
 
 #[cfg(feature = "model")]
@@ -1084,6 +1086,8 @@ impl<'de> Deserialize<'de> for Guild {
             nsfw_level: NsfwLevel,
             stickers: ExtractMap<StickerId, Sticker>,
             premium_progress_bar_enabled: bool,
+            safety_alerts_channel_id: Option<ChannelId>,
+            incidents_data: Option<Box<IncidentsData>>,
             joined_at: Timestamp,
             large: bool,
             #[serde(default)]
@@ -1096,8 +1100,7 @@ impl<'de> Deserialize<'de> for Guild {
             presences: ExtractMap<UserId, Presence>,
             stage_instances: FixedArray<StageInstance>,
             guild_scheduled_events: ExtractMap<ScheduledEventId, ScheduledEvent>,
-            safety_alerts_channel_id: Option<ChannelId>,
-            incidents_data: Option<Box<IncidentsData>>,
+            soundboard_sounds: FixedArray<Soundboard>,
         }
 
         let raw = GuildRaw::deserialize(deserializer)?;
@@ -1143,6 +1146,8 @@ impl<'de> Deserialize<'de> for Guild {
             welcome_screen: raw.welcome_screen,
             nsfw_level: raw.nsfw_level,
             stickers: raw.stickers,
+            safety_alerts_channel_id: raw.safety_alerts_channel_id,
+            incidents_data: raw.incidents_data,
             joined_at: raw.joined_at,
             member_count: raw.member_count,
             voice_states: raw.voice_states,
@@ -1153,8 +1158,7 @@ impl<'de> Deserialize<'de> for Guild {
             presences: raw.presences,
             stage_instances: raw.stage_instances,
             scheduled_events: raw.guild_scheduled_events,
-            safety_alerts_channel_id: raw.safety_alerts_channel_id,
-            incidents_data: raw.incidents_data,
+            soundboard_sounds: raw.soundboard_sounds,
             __generated_flags: GuildGeneratedFlags::empty(),
         };
 
@@ -1407,8 +1411,8 @@ impl GuildCreateGuild {
     /// Whether this [`GuildCreateGuild`] is unavailable due to an outage.
     ///
     /// **Note:** Both [`Guild`] and [`UnavailableGuild`] will be marked as unavailable when
-    /// offline due to an outage. When an [`UnavailableGuild`] is ___not___ marked as unavailable,
-    /// this indicates that the current user has been removed from that guild.
+    /// offline due to an outage. It is also possible for an [`UnavailableGuild`] to ___not___ be
+    /// marked as unavailable, e.g., when the current user has been removed from that guild.
     #[must_use]
     pub fn unavailable(&self) -> bool {
         match self {

@@ -212,6 +212,7 @@ enum_number! {
         CannotSendVoiceMessagesInChannel = 50173,
         UserAccountMustBeVerified = 50178,
         InvalidFileDuration = 50192,
+        ExpiredInvite = 50270,
         CannotSendMessagesToUserDueToHavingNoMutualGuilds = 50278,
         NoPermissionForSticker = 50600,
 

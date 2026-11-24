@@ -121,7 +121,7 @@ pub struct Message {
     ///
     /// This is only returned for messages with a type of [`InlineReply`],
     /// [`ThreadStarterMessage`], or [`ContextMenuCommand`]. If it is not present for one of
-    /// these, the referenced message was deleted or its state is unknown.
+    /// these, the referenced message was deleted or is unavailable to the requester.
     ///
     /// [`InlineReply`]: MessageType::InlineReply
     /// [`ThreadStarterMessage`]: MessageType::ThreadStarterMessage

@@ -54,6 +54,11 @@ pub struct Embed {
     /// This is present if the [`Self::kind`] is `"video"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub video: Option<EmbedVideo>,
+    /// The embed's audio information.
+    ///
+    /// This is present if the [`Self::kind`] is `"audio"`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub audio: Option<EmbedAudio>,
     /// Provider information for the embed.
     ///
     /// For example, if the embed [`Self::kind`] is `"video"`, the provider might contain
@@ -239,6 +244,25 @@ pub struct EmbedVideo {
     pub description: Option<FixedString>,
     /// The embed media flags for the video.
     pub flags: Option<EmbedMediaFlags>,
+}
+
+/// Audio information for an embed.
+///
+/// [Discord docs](https://docs.discord.com/developers/resources/message#embed-object-embed-audio-structure).
+#[cfg_attr(feature = "typesize", derive(typesize::derive::TypeSize))]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(not(feature = "unstable_exhaustive_types"), non_exhaustive)]
+pub struct EmbedAudio {
+    /// The source URL of the audio.
+    pub url: Option<FixedString>,
+    /// A proxied URL of the audio.
+    pub proxy_url: Option<FixedString>,
+    /// The audio's [media type].
+    ///
+    /// [media type]: https://en.wikipedia.org/wiki/Media_type
+    pub content_type: Option<FixedString>,
+    /// The description for the audio.
+    pub description: Option<FixedString>,
 }
 
 bitflags! {
