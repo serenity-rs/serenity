@@ -14,7 +14,6 @@ use hyper::client::conn::http1;
 use hyper::header::{HOST, PROXY_AUTHORIZATION};
 use hyper_util::rt::TokioIo;
 use percent_encoding::percent_decode_str;
-use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message;
@@ -223,14 +222,8 @@ impl From<TransportCompression> for Compression {
     }
 }
 
-trait Socket: AsyncRead + AsyncWrite + Send + Sync + Unpin {}
-
-impl<T: AsyncRead + AsyncWrite + Send + Sync + Unpin> Socket for T {}
-
-type BoxedSocket = Box<dyn Socket>;
-
 pub struct WsClient {
-    stream: WebSocketStream<MaybeTlsStream<BoxedSocket>>,
+    stream: WebSocketStream<MaybeTlsStream<MaybeTlsStream<TcpStream>>>,
     compression: Compression,
 }
 
@@ -254,11 +247,11 @@ impl WsClient {
             config
         };
 
-        let socket: BoxedSocket = match proxy {
+        let stream = match proxy {
             Some(proxy) => Self::connect_through_proxy(&url, proxy).await?,
-            None => Box::new(Self::connect_tcp(&url).await?),
+            None => MaybeTlsStream::Plain(Self::connect_tcp(&url).await?),
         };
-        let (stream, _) = client_async_tls_with_config(url, socket, Some(config), None)
+        let (stream, _) = client_async_tls_with_config(url, stream, Some(config), None)
             .await
             .map_err(transport_err_to_lib)?;
 
@@ -268,7 +261,7 @@ impl WsClient {
         })
     }
 
-    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<BoxedSocket> {
+    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<MaybeTlsStream<TcpStream>> {
         let tls = match proxy.scheme() {
             "http" => false,
             "https" => true,
@@ -315,23 +308,18 @@ impl WsClient {
         let request = request.body(String::new()).map_err(IoError::other)?;
 
         let tcp = Self::connect_tcp(proxy).await?;
-        if tls {
+        let stream = if tls {
             // TLS wants an IPv6 literal without the brackets around it
             let server_name = match proxy.host() {
                 Some(Host::Ipv6(ip)) => ip.to_string(),
                 host => host.map(|host| host.to_string()).unwrap_or_default(),
             };
-            let tls = Self::connect_tls(tcp, &server_name).await?;
-            Ok(Box::new(Self::open_tunnel(tls, request).await?))
+            Self::connect_tls(tcp, &server_name).await?
         } else {
-            Ok(Box::new(Self::open_tunnel(tcp, request).await?))
-        }
-    }
-
-    // Generic over the socket: hyper's futures over a `dyn` socket fail the `Send` check
-    async fn open_tunnel<S: Socket + 'static>(socket: S, request: Request<String>) -> Result<S> {
+            MaybeTlsStream::Plain(tcp)
+        };
         let (mut sender, conn) =
-            http1::handshake(TokioIo::new(socket)).await.map_err(IoError::other)?;
+            http1::handshake(TokioIo::new(stream)).await.map_err(IoError::other)?;
 
         // `sender` drops with its block once the response is read, so `conn` stops waiting
         let (response, ()) = tokio::try_join!(
@@ -347,7 +335,7 @@ impl WsClient {
 
         let upgraded = hyper::upgrade::on(response).await.map_err(IoError::other)?;
         let parts = upgraded
-            .downcast::<TokioIo<S>>()
+            .downcast::<TokioIo<MaybeTlsStream<TcpStream>>>()
             .map_err(|_| IoError::other("unexpected stream type after proxy upgrade"))?;
         if !parts.read_buf.is_empty() {
             return Err(Error::Io(IoError::other("proxy sent data before the tunnel was used")));
@@ -357,24 +345,20 @@ impl WsClient {
     }
 
     async fn connect_tcp(url: &Url) -> Result<TcpStream> {
-        let Some(port) = url.port_or_known_default() else {
+        let (Some(host), Some(port)) = (url.host(), url.port_or_known_default()) else {
             return Err(Error::Gateway(GatewayError::BuildingUrl));
         };
-        let stream = match url.host() {
-            Some(Host::Domain(domain)) => TcpStream::connect((domain, port)).await?,
-            Some(Host::Ipv4(ip)) => TcpStream::connect((ip, port)).await?,
-            Some(Host::Ipv6(ip)) => TcpStream::connect((ip, port)).await?,
-            None => return Err(Error::Gateway(GatewayError::BuildingUrl)),
+        let stream = match host {
+            Host::Domain(domain) => TcpStream::connect((domain, port)).await?,
+            Host::Ipv4(ip) => TcpStream::connect((ip, port)).await?,
+            Host::Ipv6(ip) => TcpStream::connect((ip, port)).await?,
         };
 
         Ok(stream)
     }
 
     #[cfg(feature = "native_tls_backend")]
-    async fn connect_tls(
-        tcp: TcpStream,
-        server_name: &str,
-    ) -> Result<tokio_native_tls::TlsStream<TcpStream>> {
+    async fn connect_tls(tcp: TcpStream, server_name: &str) -> Result<MaybeTlsStream<TcpStream>> {
         use tokio_native_tls::{TlsConnector, native_tls};
 
         let connector = native_tls::TlsConnector::new().map_err(IoError::other)?;
@@ -383,14 +367,11 @@ impl WsClient {
             .await
             .map_err(IoError::other)?;
 
-        Ok(tls)
+        Ok(MaybeTlsStream::NativeTls(tls))
     }
 
     #[cfg(not(feature = "native_tls_backend"))]
-    async fn connect_tls(
-        tcp: TcpStream,
-        server_name: &str,
-    ) -> Result<tokio_rustls::client::TlsStream<TcpStream>> {
+    async fn connect_tls(tcp: TcpStream, server_name: &str) -> Result<MaybeTlsStream<TcpStream>> {
         use std::sync::Arc;
 
         use rustls_platform_verifier::ConfigVerifierExt as _;
@@ -402,7 +383,7 @@ impl WsClient {
         let server_name = ServerName::try_from(server_name.to_owned()).map_err(IoError::other)?;
         let tls = TlsConnector::from(Arc::new(config)).connect(server_name, tcp).await?;
 
-        Ok(tls)
+        Ok(MaybeTlsStream::Rustls(tls))
     }
 
     pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
