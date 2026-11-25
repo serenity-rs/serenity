@@ -247,9 +247,12 @@ impl WsClient {
             config
         };
 
+        let (Some(host), Some(port)) = (url.host(), url.port_or_known_default()) else {
+            return Err(Error::Gateway(GatewayError::BuildingUrl));
+        };
         let stream = match proxy {
-            Some(proxy) => Self::connect_through_proxy(&url, proxy).await?,
-            None => MaybeTlsStream::Plain(Self::connect_tcp(&url).await?),
+            Some(proxy) => Self::connect_through_proxy(host, port, proxy).await?,
+            None => MaybeTlsStream::Plain(Self::connect_tcp(host, port).await?),
         };
         let (stream, _) = client_async_tls_with_config(url, stream, Some(config), None)
             .await
@@ -261,7 +264,11 @@ impl WsClient {
         })
     }
 
-    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<MaybeTlsStream<TcpStream>> {
+    async fn connect_through_proxy(
+        target_host: Host<&str>,
+        target_port: u16,
+        proxy: &Url,
+    ) -> Result<MaybeTlsStream<TcpStream>> {
         let tls = match proxy.scheme() {
             "http" => false,
             "https" => true,
@@ -279,8 +286,7 @@ impl WsClient {
             )));
         }
 
-        let (Some(target_host), Some(target_port)) =
-            (target.host(), target.port_or_known_default())
+        let (Some(proxy_host), Some(proxy_port)) = (proxy.host(), proxy.port_or_known_default())
         else {
             return Err(Error::Gateway(GatewayError::BuildingUrl));
         };
@@ -307,16 +313,10 @@ impl WsClient {
         }
         let request = request.body(String::new()).map_err(IoError::other)?;
 
-        let tcp = Self::connect_tcp(proxy).await?;
         let stream = if tls {
-            // TLS wants an IPv6 literal without the brackets around it
-            let server_name = match proxy.host() {
-                Some(Host::Ipv6(ip)) => ip.to_string(),
-                host => host.map(|host| host.to_string()).unwrap_or_default(),
-            };
-            Self::connect_tls(tcp, &server_name).await?
+            Self::connect_tls(proxy_host, proxy_port).await?
         } else {
-            MaybeTlsStream::Plain(tcp)
+            MaybeTlsStream::Plain(Self::connect_tcp(proxy_host, proxy_port).await?)
         };
         let (mut sender, conn) =
             http1::handshake(TokioIo::new(stream)).await.map_err(IoError::other)?;
@@ -344,10 +344,7 @@ impl WsClient {
         Ok(parts.io.into_inner())
     }
 
-    async fn connect_tcp(url: &Url) -> Result<TcpStream> {
-        let (Some(host), Some(port)) = (url.host(), url.port_or_known_default()) else {
-            return Err(Error::Gateway(GatewayError::BuildingUrl));
-        };
+    async fn connect_tcp(host: Host<&str>, port: u16) -> Result<TcpStream> {
         let stream = match host {
             Host::Domain(domain) => TcpStream::connect((domain, port)).await?,
             Host::Ipv4(ip) => TcpStream::connect((ip, port)).await?,
@@ -358,12 +355,19 @@ impl WsClient {
     }
 
     #[cfg(feature = "native_tls_backend")]
-    async fn connect_tls(tcp: TcpStream, server_name: &str) -> Result<MaybeTlsStream<TcpStream>> {
+    async fn connect_tls(host: Host<&str>, port: u16) -> Result<MaybeTlsStream<TcpStream>> {
         use tokio_native_tls::{TlsConnector, native_tls};
 
+        let server_name = match host {
+            Host::Domain(domain) => Cow::from(domain),
+            Host::Ipv4(ip) => Cow::from(ip.to_string()),
+            Host::Ipv6(ip) => Cow::from(ip.to_string()),
+        };
+
+        let tcp = Self::connect_tcp(host, port).await?;
         let connector = native_tls::TlsConnector::new().map_err(IoError::other)?;
         let tls = TlsConnector::from(connector)
-            .connect(server_name, tcp)
+            .connect(&server_name, tcp)
             .await
             .map_err(IoError::other)?;
 
@@ -371,7 +375,7 @@ impl WsClient {
     }
 
     #[cfg(not(feature = "native_tls_backend"))]
-    async fn connect_tls(tcp: TcpStream, server_name: &str) -> Result<MaybeTlsStream<TcpStream>> {
+    async fn connect_tls(host: Host<&str>, port: u16) -> Result<MaybeTlsStream<TcpStream>> {
         use std::sync::Arc;
 
         use rustls_platform_verifier::ConfigVerifierExt as _;
@@ -379,9 +383,15 @@ impl WsClient {
         use tokio_rustls::rustls::ClientConfig;
         use tokio_rustls::rustls::pki_types::ServerName;
 
-        let config = ClientConfig::with_platform_verifier().map_err(IoError::other)?;
-        let server_name = ServerName::try_from(server_name.to_owned()).map_err(IoError::other)?;
-        let tls = TlsConnector::from(Arc::new(config)).connect(server_name, tcp).await?;
+        let server_name = match host {
+            Host::Domain(domain) => ServerName::try_from(domain).map_err(IoError::other)?,
+            Host::Ipv4(ip) => ServerName::from(ip),
+            Host::Ipv6(ip) => ServerName::from(ip),
+        };
+
+        let config = Arc::new(ClientConfig::with_platform_verifier().map_err(IoError::other)?);
+        let tcp = Self::connect_tcp(host, port).await?;
+        let tls = TlsConnector::from(config).connect(server_name.to_owned(), tcp).await?;
 
         Ok(MaybeTlsStream::Rustls(tls))
     }
