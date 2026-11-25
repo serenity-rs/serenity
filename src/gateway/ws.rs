@@ -282,9 +282,9 @@ impl WsClient {
         }
 
         let (Some(target_host), Some(target_port), Some(proxy_host), Some(proxy_port)) = (
-            target.host_str(),
+            target.host(),
             target.port_or_known_default(),
-            proxy.host_str(),
+            proxy.host(),
             proxy.port_or_known_default(),
         ) else {
             return Err(Error::Gateway(GatewayError::BuildingUrl));
@@ -309,10 +309,10 @@ impl WsClient {
         }
         let request = request.body(String::new()).map_err(IoError::other)?;
 
-        // The bracketed form `host_str` gives for an IPv6 literal does not resolve
-        let stream = match proxy.host() {
-            Some(Host::Ipv6(ip)) => TcpStream::connect((ip, proxy_port)).await?,
-            _ => TcpStream::connect((proxy_host, proxy_port)).await?,
+        let stream = match proxy_host {
+            Host::Domain(domain) => TcpStream::connect((domain, proxy_port)).await?,
+            Host::Ipv4(ip) => TcpStream::connect((ip, proxy_port)).await?,
+            Host::Ipv6(ip) => TcpStream::connect((ip, proxy_port)).await?,
         };
         let (mut sender, conn) =
             http1::handshake(TokioIo::new(stream)).await.map_err(IoError::other)?;
