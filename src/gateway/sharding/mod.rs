@@ -98,6 +98,7 @@ pub struct Shard {
     stage: ConnectionStage,
     token: Token,
     ws_url: Arc<str>,
+    ws_proxy: Option<Arc<Url>>,
     heartbeater: HeartbeatMetadata,
     resume_metadata: Option<ResumeMetadata>,
     compression: TransportCompression,
@@ -138,6 +139,7 @@ impl Shard {
     /// let gateway = Arc::from(http.get_gateway().await?.url);
     /// let shard = Shard::new(
     ///     gateway,
+    ///     None,
     ///     token,
     ///     shard_info,
     ///     GatewayIntents::all(),
@@ -156,8 +158,10 @@ impl Shard {
     /// # Errors
     ///
     /// On Error, will return either [`Error::Gateway`] or a Rustls/native TLS error.
+    #[expect(clippy::too_many_arguments)]
     pub async fn new(
         ws_url: Arc<str>,
+        ws_proxy: Option<Arc<Url>>,
         token: Token,
         info: ShardInfo,
         intents: GatewayIntents,
@@ -165,7 +169,7 @@ impl Shard {
         presence: Option<PresenceData>,
         compression: TransportCompression,
     ) -> Result<Shard> {
-        let client = connect(&ws_url, compression).await?;
+        let client = connect(&ws_url, ws_proxy.as_deref(), compression).await?;
 
         let presence = presence.unwrap_or_default();
         let seq = 0;
@@ -180,6 +184,7 @@ impl Shard {
             token,
             info,
             ws_url,
+            ws_proxy,
             heartbeater: HeartbeatMetadata::default(),
             resume_metadata: None,
             compression,
@@ -621,7 +626,7 @@ impl Shard {
         // Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.heartbeater.start();
-        let client = connect(ws_url, self.compression).await?;
+        let client = connect(ws_url, self.ws_proxy.as_deref(), self.compression).await?;
         self.stage = ConnectionStage::Handshake;
 
         Ok(client)
@@ -655,7 +660,11 @@ impl Shard {
     }
 }
 
-async fn connect(base_url: &str, compression: TransportCompression) -> Result<WsClient> {
+async fn connect(
+    base_url: &str,
+    proxy: Option<&Url>,
+    compression: TransportCompression,
+) -> Result<WsClient> {
     let url = Url::parse(&aformat!(
         "{}?v={}{}",
         CapStr::<64>(base_url),
@@ -667,7 +676,7 @@ async fn connect(base_url: &str, compression: TransportCompression) -> Result<Ws
         Error::Gateway(GatewayError::BuildingUrl)
     })?;
 
-    WsClient::connect(url, compression).await
+    WsClient::connect(url, proxy, compression).await
 }
 
 struct HeartbeatMetadata {

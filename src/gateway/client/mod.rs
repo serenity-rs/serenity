@@ -38,6 +38,7 @@ use futures::future::BoxFuture;
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, warn};
+use url::Url;
 
 pub use self::context::Context;
 pub use self::event_handler::{EventHandler, RawEventHandler};
@@ -84,6 +85,7 @@ pub struct ClientBuilder {
     presence: PresenceData,
     wait_time_between_shard_start: Duration,
     compression: TransportCompression,
+    ws_proxy: Option<Url>,
 }
 
 impl ClientBuilder {
@@ -121,6 +123,7 @@ impl ClientBuilder {
             presence: PresenceData::default(),
             wait_time_between_shard_start: DEFAULT_WAIT_BETWEEN_SHARD_START,
             compression: TransportCompression::None,
+            ws_proxy: None,
         }
     }
 
@@ -183,6 +186,16 @@ impl ClientBuilder {
     /// Sets the compression method to be used when receiving data from the gateway.
     pub fn compression(mut self, compression: TransportCompression) -> Self {
         self.compression = compression;
+        self
+    }
+
+    /// Sets an HTTP or HTTPS proxy to tunnel gateway connections through with the `CONNECT`
+    /// method.
+    ///
+    /// If the URL contains a username, it will be used to authenticate to the proxy. Password
+    /// authentication is only supported over HTTPS for security reasons.
+    pub fn ws_proxy(mut self, proxy: Url) -> Self {
+        self.ws_proxy = Some(proxy);
         self
     }
 
@@ -343,6 +356,7 @@ impl IntoFuture for ClientBuilder {
                 #[cfg(feature = "voice")]
                 voice_manager: self.voice_manager.clone(),
                 ws_url: Arc::clone(&ws_url),
+                ws_proxy: self.ws_proxy.map(Arc::new),
                 compression: self.compression,
                 shard_total,
                 max_concurrency,
