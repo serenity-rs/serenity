@@ -1,11 +1,19 @@
+use std::borrow::Cow;
 use std::env::consts;
-use std::io::Read;
+use std::io::{Error as IoError, ErrorKind, Read};
 use std::time::{Duration, SystemTime};
 
+use base64::prelude::BASE64_STANDARD;
+use base64::write::EncoderWriter;
 use flate2::read::ZlibDecoder;
 #[cfg(feature = "transport_compression_zlib")]
 use flate2::write::ZlibDecoder as ZlibWriter;
 use futures::{SinkExt, StreamExt};
+use hyper::Request;
+use hyper::client::conn::http1;
+use hyper::header::{HOST, PROXY_AUTHORIZATION};
+use hyper_util::rt::TokioIo;
+use percent_encoding::percent_decode_str;
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 use tokio_tungstenite::tungstenite::Message;
@@ -14,11 +22,16 @@ use tokio_tungstenite::tungstenite::protocol::{
     CloseFrame as TungsteniteCloseFrame,
     WebSocketConfig,
 };
-use tokio_tungstenite::{MaybeTlsStream, WebSocketStream, connect_async_with_config};
+use tokio_tungstenite::{
+    MaybeTlsStream,
+    WebSocketStream,
+    client_async_tls_with_config,
+    connect_async_with_config,
+};
 #[cfg(feature = "tracing_instrument")]
 use tracing::instrument;
 use tracing::{debug, trace, warn};
-use url::Url;
+use url::{Host, Url};
 #[cfg(feature = "transport_compression_zstd")]
 use zstd::stream::write::Decoder as ZstdWriter;
 
@@ -226,7 +239,11 @@ fn transport_err_to_lib(err: TungsteniteError) -> Error {
 }
 
 impl WsClient {
-    pub(crate) async fn connect(url: Url, compression: TransportCompression) -> Result<Self> {
+    pub(crate) async fn connect(
+        url: Url,
+        proxy: Option<&Url>,
+        compression: TransportCompression,
+    ) -> Result<Self> {
         let config = {
             let mut config = WebSocketConfig::default();
             config.max_message_size = None;
@@ -235,14 +252,92 @@ impl WsClient {
             config
         };
 
-        let (stream, _) = connect_async_with_config(url, Some(config), false)
-            .await
-            .map_err(transport_err_to_lib)?;
+        let (stream, _) = match proxy {
+            Some(proxy) => {
+                let tunnel = Self::connect_through_proxy(&url, proxy).await?;
+                client_async_tls_with_config(url, tunnel, Some(config), None).await
+            },
+            None => connect_async_with_config(url, Some(config), false).await,
+        }
+        .map_err(transport_err_to_lib)?;
 
         Ok(Self {
             stream,
             compression: compression.into(),
         })
+    }
+
+    async fn connect_through_proxy(target: &Url, proxy: &Url) -> Result<TcpStream> {
+        if proxy.scheme() != "http" {
+            return Err(Error::Io(IoError::new(
+                ErrorKind::Unsupported,
+                "only HTTP proxies are supported",
+            )));
+        }
+        if proxy.password().is_some() {
+            return Err(Error::Io(IoError::new(
+                ErrorKind::Unsupported,
+                "password authentication over HTTP is unsupported",
+            )));
+        }
+
+        let (Some(target_host), Some(target_port), Some(proxy_host), Some(proxy_port)) = (
+            target.host(),
+            target.port_or_known_default(),
+            proxy.host(),
+            proxy.port_or_known_default(),
+        ) else {
+            return Err(Error::Gateway(GatewayError::BuildingUrl));
+        };
+
+        let authority = format!("{target_host}:{target_port}");
+        let mut request = Request::connect(&authority).header(HOST, &authority);
+
+        let username = proxy.username();
+        if !username.is_empty() {
+            use std::io::Write;
+
+            let mut header = "Basic ".as_bytes().to_vec();
+            let username_bytes = Cow::from(percent_decode_str(username));
+            {
+                let mut encoder = EncoderWriter::new(&mut header, &BASE64_STANDARD);
+                encoder.write_all(&username_bytes)?;
+                encoder.write_all(b":")?;
+                encoder.finish()?;
+            }
+            request = request.header(PROXY_AUTHORIZATION, header);
+        }
+        let request = request.body(String::new()).map_err(IoError::other)?;
+
+        let stream = match proxy_host {
+            Host::Domain(domain) => TcpStream::connect((domain, proxy_port)).await?,
+            Host::Ipv4(ip) => TcpStream::connect((ip, proxy_port)).await?,
+            Host::Ipv6(ip) => TcpStream::connect((ip, proxy_port)).await?,
+        };
+        let (mut sender, conn) =
+            http1::handshake(TokioIo::new(stream)).await.map_err(IoError::other)?;
+
+        // `sender` drops with its block once the response is read, so `conn` stops waiting
+        let (response, ()) = tokio::try_join!(
+            async move { sender.send_request(request).await },
+            conn.with_upgrades()
+        )
+        .map_err(IoError::other)?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            return Err(Error::Io(IoError::other(format!("proxy refused to tunnel: {status}"))));
+        }
+
+        let upgraded = hyper::upgrade::on(response).await.map_err(IoError::other)?;
+        let parts = upgraded
+            .downcast::<TokioIo<TcpStream>>()
+            .map_err(|_| IoError::other("unexpected stream type after proxy upgrade"))?;
+        if !parts.read_buf.is_empty() {
+            return Err(Error::Io(IoError::other("proxy sent data before the tunnel was used")));
+        }
+
+        Ok(parts.io.into_inner())
     }
 
     pub(crate) async fn recv_json(&mut self) -> Result<Option<GatewayEvent>> {
